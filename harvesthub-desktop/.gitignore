@@ -1,0 +1,18 @@
+# Maven Build Folder (Critical)
+target/
+
+# IDE Settings
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS Junk
+.DS_Store
+Thumbs.db
+
+# Launch4j & Distribution (Don't upload the massive JRE or EXE)
+harvesthub-app/
+dist/
+*.exe
+*.log
