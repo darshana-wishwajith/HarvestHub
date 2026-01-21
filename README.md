@@ -1,7 +1,7 @@
 # HarvestHub: Integrated Agricultural & Logistics System
 
 [![Java Version](https://img.shields.io/badge/Java-21-orange)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4-green)](https://spring.io/projects/spring-boot)
 [![Project Status](https://img.shields.io/badge/MySQL-8-blue)](#-project-status-increment-01)
 
 ---
