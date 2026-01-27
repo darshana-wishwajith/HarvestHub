@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     // REPLACE THIS WITH YOUR PC's IP ADDRESS FOUND IN IPCONFIG
-    private static final String BASE_URL = "http://10.30.5.209:8080/";
+    private static final String BASE_URL = "https://harvesthubapp.tech/";
 
     @SuppressLint("SetTextI18n")
     @Override
