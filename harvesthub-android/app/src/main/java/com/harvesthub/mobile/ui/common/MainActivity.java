@@ -1,24 +1,24 @@
-package com.harvesthub.mobile;
+package com.harvesthub.mobile.ui.common;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.User;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-
-    // REPLACE THIS WITH YOUR PC's IP ADDRESS FOUND IN IPCONFIG
-    private static final String BASE_URL = "https://harvesthubapp.tech/";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -29,13 +29,8 @@ public class MainActivity extends AppCompatActivity {
         Button btnLoad = findViewById(R.id.btnLoad);
         TextView txtResult = findViewById(R.id.txtResult);
 
-        // 1. Setup Retrofit
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ApiService apiService = retrofit.create(ApiService.class);
+        // 1. Setup API Service using ApiClient
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
         // 2. Button Click Listener
         btnLoad.setOnClickListener(v -> {
@@ -58,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<User>> call, Throwable t) {
+                public void onFailure(@NonNull Call<List<User>> call, @NonNull Throwable t) {
                     txtResult.setText("Failed: " + t.getMessage());
                 }
             });

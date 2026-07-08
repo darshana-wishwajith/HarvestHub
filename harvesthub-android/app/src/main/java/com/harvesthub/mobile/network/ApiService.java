@@ -1,4 +1,6 @@
-package com.harvesthub.mobile;
+package com.harvesthub.mobile.network;
+
+import com.harvesthub.mobile.model.User;
 
 import java.util.List;
 import retrofit2.Call;

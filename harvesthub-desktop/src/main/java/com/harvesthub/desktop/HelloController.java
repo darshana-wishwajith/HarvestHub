@@ -28,52 +28,57 @@ public class HelloController {
     @FXML
     private TableView<User> userTable;
 
+    // CRITICAL FIX: Changed from <User, Long> to <User, String>
     @FXML
-    private TableColumn<User, Long> idColumn; // Must match fx:id in Scene Builder exactly
+    private TableColumn<User, String> idColumn;
 
     @FXML
-    private TableColumn<User, String> nameColumn;
+    private TableColumn<User, String> emailColumn;
 
     @FXML
-    private TableColumn<User, String> roleColumn;
+    private TableColumn<User, String> passwordColumn;
 
     @FXML
     public void initialize() {
-        // This connects the 'id' and 'name' variables from your User.java to the UI columns
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
     }
+
     @FXML
-    private void handleLoadUsers() { // Must match the name in the error message exactly
-        System.out.println("Connecting to HarvestHub backend...");
+    private void handleLoadUsers() {
+        System.out.println("Connecting to HarvestHub backend at https://harvesthubapp.tech/api/users...");
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/users"))
+                .uri(URI.create("https://harvesthubapp.tech/api/users"))
                 .build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
-                    // Check if the server actually sent data (Status 200)
                     if (response.statusCode() != 200) {
                         System.err.println("Server returned error: " + response.statusCode());
-                        return ""; // Return empty string so Jackson doesn't crash
+                        return "";
                     }
                     return response.body();
                 })
                 .thenAccept(json -> {
-                    if (json.isEmpty()) return; // Stop if there is no content
+                    if (json.isEmpty()) return;
 
                     try {
                         ObjectMapper mapper = new ObjectMapper();
                         List<User> users = mapper.readValue(json, new TypeReference<List<User>>(){});
-                        Platform.runLater(() -> userTable.getItems().setAll(users));
+
+                        // Safely update the JavaFX UI thread
+                        Platform.runLater(() -> {
+                            userTable.getItems().clear();
+                            userTable.getItems().setAll(users);
+                            System.out.println("Successfully loaded " + users.size() + " users from MongoDB Atlas!");
+                        });
                     } catch (Exception e) {
+                        System.err.println("Failed to parse JSON from backend:");
                         e.printStackTrace();
                     }
                 });
     }
-
-
 }

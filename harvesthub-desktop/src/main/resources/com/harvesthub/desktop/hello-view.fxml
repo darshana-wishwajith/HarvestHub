@@ -12,8 +12,8 @@
       <TableView fx:id="userTable" layoutX="37.0" layoutY="46.0" prefHeight="200.0" prefWidth="526.0">
         <columns>
           <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
-          <TableColumn fx:id="nameColumn" prefWidth="164.0" text="Name" />
-            <TableColumn id="nameColumn" fx:id="roleColumn" prefWidth="132.0" text="Role" />
+          <TableColumn fx:id="emailColumn" prefWidth="164.0" text="Email" />
+            <TableColumn id="emailColumn" fx:id="passwordColumn" prefWidth="132.0" text="Password" />
         </columns>
       </TableView>
       <Label layoutX="37.0" layoutY="14.0" text="User Table" />
