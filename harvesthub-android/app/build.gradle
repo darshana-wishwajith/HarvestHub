@@ -4,16 +4,17 @@ plugins {
 
 android {
     namespace 'com.harvesthub.mobile'
-    compileSdk 34  // Changed from 36 (Beta) to 34 (Stable)
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.harvesthub.mobile"
         minSdk 21
-        targetSdk 34 // Changed from 36 to 34
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -30,25 +31,21 @@ android {
 }
 
 dependencies {
-    // --- TESTING LIBRARIES (Keep these) ---
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 
-    // --- YOUR MANUAL FIXES (The Important Part) ---
-
-    // 1. THE FIX: Force Activity 1.8.0 to solve the "minSdk 23" error
-    // We removed "implementation libs.activity" because that was pulling the broken version
     implementation 'androidx.activity:activity:1.8.0'
-
-    // 2. Standard UI Libraries
-    // We removed "libs.appcompat", "libs.material", etc. to avoid duplicates
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // 3. Retrofit & Desugaring (For API & Java 8 support)
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation 'com.google.android.gms:play-services-location:21.1.0'
 }

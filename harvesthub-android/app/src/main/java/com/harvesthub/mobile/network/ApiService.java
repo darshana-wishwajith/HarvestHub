@@ -1,12 +1,46 @@
 package com.harvesthub.mobile.network;
 
+import com.harvesthub.mobile.model.DashboardResponse;
+import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.model.MarketTrendResponse;
+import com.harvesthub.mobile.model.ResendOtpRequest;
 import com.harvesthub.mobile.model.User;
+import com.harvesthub.mobile.model.VerifyOtpRequest;
+import com.harvesthub.mobile.model.VerifyOtpResponse;
+import com.harvesthub.mobile.ui.farmer.LocationRequest;
+import com.harvesthub.mobile.ui.farmer.RegisterRequest;
+import com.harvesthub.mobile.ui.farmer.ResetPasswordRequest;
 
 import java.util.List;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
     @GET("/api/users")
     Call<List<User>> getAllUsers();
+
+    @POST("auth/verify-otp")
+    Call<VerifyOtpResponse> verifyOtp(@Body VerifyOtpRequest request);
+
+    @POST("auth/resend-otp")
+    Call<GenericResponse> resendOtp(@Body ResendOtpRequest request);
+
+    @GET("dashboard/farmer/{id}")
+    Call<DashboardResponse> getFarmerDashboard(@Path("id") String farmerId);
+
+    @GET("market/trend")
+    Call<MarketTrendResponse> getMarketTrend(@Query("crop") String cropType, @Query("days") int days);
+
+    @POST("auth/reset-password")
+    Call<GenericResponse> resetPassword(@Body ResetPasswordRequest request);
+
+    @POST("auth/register")
+    Call<GenericResponse> registerFarmer(@Body RegisterRequest request);
+
+    @POST("farmer/location")
+    Call<GenericResponse> saveFarmLocation(@Body LocationRequest request);
 }
