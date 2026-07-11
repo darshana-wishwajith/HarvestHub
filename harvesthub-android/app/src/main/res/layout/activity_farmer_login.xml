@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -37,6 +38,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:text="Harvest"
                 android:textColor="@color/primary_dark_green"
@@ -46,6 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:text="Hub"
                 android:textColor="@color/accent_green"
@@ -71,7 +74,7 @@
             android:id="@+id/titleWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="100dp"
             android:fontFamily="@font/plus_jakarta_sans_bold"
             android:text="Welcome Back"
             android:textColor="@color/text_dark"
@@ -148,16 +151,18 @@
             android:id="@+id/btnSignIn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="80dp"
-            android:background="@drawable/bg_button_primary"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:layout_marginTop="50dp"
+            app:layout_constraintCircleRadius="5dp"
+            android:background="@drawable/bg_revenue_card"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:text="@string/sign_in_as_farmer"
             android:textAllCaps="false"
-            android:text="Sign In as Farmer"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:textStyle="bold"
+            android:textStyle="normal"
             app:backgroundTint="@null"
-            app:layout_constraintTop_toBottomOf="@id/tvForgotPassword" />
+            app:layout_constraintTop_toBottomOf="@id/tvForgotPassword"
+            tools:layout_editor_absoluteX="24dp" />
 
         <!-- Divider OR -->
         <LinearLayout
@@ -223,7 +228,7 @@
                 android:text="Register Farm"
                 android:textColor="@color/accent_green"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="normal" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
