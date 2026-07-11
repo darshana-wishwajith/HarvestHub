@@ -30,6 +30,7 @@
         <activity android:name=".ui.farmer.RegisterActivity" />
         <activity android:name=".ui.farmer.VerifyOtpActivity" />
         <activity android:name=".ui.farmer.AccountVerifiedActivity" />
+        <activity android:name=".ui.farmer.ForgotPasswordActivity" />
         <activity android:name=".ui.farmer.CreateNewPasswordActivity" />
         <activity android:name=".ui.farmer.LocationSetupActivity" />
         <activity android:name=".ui.farmer.FarmerLoginActivity" />

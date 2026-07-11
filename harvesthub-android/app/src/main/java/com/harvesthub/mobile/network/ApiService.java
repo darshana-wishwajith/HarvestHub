@@ -5,13 +5,14 @@ import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.ResendOtpRequest;
+import com.harvesthub.mobile.model.SendOtpRequest;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.model.VerifyOtpRequest;
 import com.harvesthub.mobile.model.VerifyOtpResponse;
 import com.harvesthub.mobile.model.WeatherResponse;
 import com.harvesthub.mobile.ui.farmer.LocationRequest;
 import com.harvesthub.mobile.ui.farmer.RegisterRequest;
-import com.harvesthub.mobile.ui.farmer.ResetPasswordRequest;
+import com.harvesthub.mobile.model.ResetPasswordRequest;
 
 import java.util.List;
 import retrofit2.Call;
@@ -27,6 +28,9 @@ public interface ApiService {
 
     @POST("auth/verify-otp")
     Call<VerifyOtpResponse> verifyOtp(@Body VerifyOtpRequest request);
+
+    @POST("auth/send-otp")
+    Call<GenericResponse> sendVerificationCode(@Body SendOtpRequest request);
 
     @POST("auth/resend-otp")
     Call<GenericResponse> resendOtp(@Body ResendOtpRequest request);
