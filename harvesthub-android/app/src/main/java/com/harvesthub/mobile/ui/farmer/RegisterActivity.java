@@ -10,7 +10,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,7 +28,6 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText etFullName, etMobileNumber, etNic, etPassword, etConfirmPassword;
     private TextView tvAppName, tvSignIn;
     private Button btnContinue;
-    private ImageButton btnNicInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         initViews();
         setupSpannableTexts();
 
-        btnNicInfo.setOnClickListener(v -> showNicInfoDialog());
+        tilNic.setEndIconOnClickListener(v -> showNicInfoDialog());
         btnContinue.setOnClickListener(v -> validateAndContinue());
     }
 
@@ -59,7 +57,6 @@ public class RegisterActivity extends AppCompatActivity {
         tvAppName = findViewById(R.id.tvAppName);
         tvSignIn = findViewById(R.id.tvSignIn);
         btnContinue = findViewById(R.id.btnContinue);
-        btnNicInfo = findViewById(R.id.btnNicInfo);
     }
 
     private void setupSpannableTexts() {
