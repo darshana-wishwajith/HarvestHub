@@ -1,62 +1,37 @@
 package com.harvesthub.mobile.ui.common;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.User;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-
-import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.harvesthub.mobile.ui.farmer.RegisterActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnLoad = findViewById(R.id.btnLoad);
-        TextView txtResult = findViewById(R.id.txtResult);
+        TextView tvAppName = findViewById(R.id.tvAppName);
+        Button btnFarmer = findViewById(R.id.btnFarmer);
 
-        // 1. Setup API Service using ApiClient
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String appName = "HarvestHub";
+        SpannableString ss = new SpannableString(appName);
+        ss.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new ForegroundColorSpan(Color.parseColor("#1B4332")), 7, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvAppName.setText(ss);
 
-        // 2. Button Click Listener
-        btnLoad.setOnClickListener(v -> {
-            txtResult.setText("Loading...");
-
-            // 3. Make API Call
-            apiService.getAllUsers().enqueue(new Callback<List<User>>() {
-                @Override
-                public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        StringBuilder sb = new StringBuilder();
-                        for (User u : response.body()) {
-                            sb.append("• ").append(u.getName())
-                                    .append(" (").append(u.getRole()).append(")\n");
-                        }
-                        txtResult.setText(sb.toString());
-                    } else {
-                        txtResult.setText("Error: " + response.code());
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<List<User>> call, @NonNull Throwable t) {
-                    txtResult.setText("Failed: " + t.getMessage());
-                }
-            });
+        btnFarmer.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RegisterActivity.class));
         });
     }
 }
