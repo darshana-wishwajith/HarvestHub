@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Semantic mapping of colors for Dark Theme -->
+    <color name="black">#FFFFFFFF</color> <!-- Light text on dark background -->
+    <color name="white">#121212</color> <!-- Dark surface background -->
+    <color name="bg_light_green">#121B12</color> <!-- Very dark green background -->
+    <color name="primary_green">#81C784</color> <!-- Brighter green for contrast -->
+    <color name="text_grey">#BDBDBD</color> <!-- Light grey text -->
+    <color name="card_stroke">#388E3C</color> <!-- Brighter stroke -->
+    <color name="icon_bg_green">#1B3D2F</color> <!-- Darker icon container -->
+    <color name="icon_bg_grey">#2C2C2C</color> <!-- Darker grey container -->
+    <color name="primary_dark_green">#A5D6A7</color> <!-- Light green for visibility -->
+    <color name="secondary_green">#81C784</color>
+    <color name="edittext_stroke">#424242</color>
+    <color name="divider_color">#333333</color>
+</resources>
