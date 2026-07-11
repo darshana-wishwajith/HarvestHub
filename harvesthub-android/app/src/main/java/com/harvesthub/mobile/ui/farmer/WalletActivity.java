@@ -69,6 +69,10 @@ public class WalletActivity extends AppCompatActivity {
             startActivity(new Intent(this, ListingsActivity.class));
             finish();
         });
+        findViewById(R.id.navSettingsItem).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class));
+            finish();
+        });
     }
 
     private void fetchWalletSummary() {
