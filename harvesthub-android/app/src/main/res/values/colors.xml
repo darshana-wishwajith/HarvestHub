@@ -16,5 +16,15 @@
     <color name="text_gray_dark">#9E9E9E</color>
     <color name="border_gray">#D0D0D0</color>
     <color name="divider_gray">#E0E0E0</color>
-    <color name="input_bg">#FFFFFF</color>
+    <color name="screen_background">#FFFFFF</color>
+    <color name="screen_background_variant">#F1FFF1</color>
+    <color name="surface_background">#FFFFFF</color>
+    <color name="text_primary">#1B1B1B</color>
+    <color name="text_secondary">#6E6E6E</color>
+    <color name="text_tertiary">#8A8A8A</color>
+    <color name="text_disabled">#9E9E9E</color>
+    <color name="border_default">#E0E0E0</color>
+    <color name="border_active">#1B5E20</color>
+    <color name="gradient_start">#FFFFFF</color>
+    <color name="gradient_end">#E8F5E9</color>
 </resources>
