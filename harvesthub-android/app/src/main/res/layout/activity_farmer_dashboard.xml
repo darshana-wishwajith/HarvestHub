@@ -26,13 +26,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
+
                 <ImageView
                     android:id="@+id/ivLogo"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_centerVertical="true"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#123927"/>
+                    android:src="@drawable/ic_harvesthub_logo"
+                    app:tint="#1C3529" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
