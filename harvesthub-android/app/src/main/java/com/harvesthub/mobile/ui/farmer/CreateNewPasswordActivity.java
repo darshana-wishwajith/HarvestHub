@@ -12,6 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.model.ResetPasswordRequest;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CreateNewPasswordActivity extends AppCompatActivity {
 
@@ -64,11 +72,44 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
         }
 
         if (isValid) {
-            Toast.makeText(this, "Password updated successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, FarmerLoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            performResetPassword(newPassword);
         }
+    }
+
+    private void performResetPassword(String newPassword) {
+        btnSave.setEnabled(false);
+        btnSave.setText("Updating...");
+
+        ResetPasswordRequest request = new ResetPasswordRequest(resetToken, newPassword);
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        apiService.resetPassword(request).enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                btnSave.setEnabled(true);
+                btnSave.setText("Save & Login");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(CreateNewPasswordActivity.this, "Password updated successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(CreateNewPasswordActivity.this, FarmerLoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    String errorMsg = "Failed to update password";
+                    if (response.body() != null) {
+                        errorMsg = response.body().getMessage();
+                    }
+                    Toast.makeText(CreateNewPasswordActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                btnSave.setEnabled(true);
+                btnSave.setText("Save & Login");
+                Toast.makeText(CreateNewPasswordActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
