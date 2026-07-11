@@ -8,6 +8,7 @@ import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.NotificationItem;
@@ -104,7 +105,7 @@ public interface ApiService {
     Call<List<ListingItem>> getActiveListings(@Path("id") String farmerId);
 
     @GET("farmer/{id}/listing-history")
-    Call<List<ListingItem>> getListingHistory(@Path("id") String farmerId);
+    Call<List<HistoryListing>> getListingHistory(@Path("id") String farmerId, @Query("search") String searchQuery);
 
     @GET("wallet/{farmerId}/summary")
     Call<WalletSummaryResponse> getWalletSummary(@Path("farmerId") String farmerId);
