@@ -37,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         initViews();
         setupSpannableTexts();
 
+        tilEmail.setEndIconOnClickListener(v -> showEmailInfoDialog());
         tilNic.setEndIconOnClickListener(v -> showNicInfoDialog());
         btnContinue.setOnClickListener(v -> validateAndContinue());
     }
@@ -94,6 +95,16 @@ public class RegisterActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showEmailInfoDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Email Format Info")
+                .setMessage("Please enter a valid email address.\n\n" +
+                        "Example: example@domain.com\n" +
+                        "It must contain an '@' symbol and a domain (e.g., .com, .org).")
+                .setPositiveButton("Got it", null)
+                .show();
+    }
+
     private void validateAndContinue() {
         String fullName = etFullName.getText().toString().trim();
         String mobile = etMobileNumber.getText().toString().trim();
@@ -137,12 +148,11 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isValid) {
+            RegisterRequest registerRequest = new RegisterRequest(
+                    fullName, mobile, nic, email, password, "FARMER"
+            );
             Intent intent = new Intent(this, LocationSetupActivity.class);
-            intent.putExtra("fullName", fullName);
-            intent.putExtra("mobile", mobile);
-            intent.putExtra("email", email);
-            intent.putExtra("nic", nic);
-            intent.putExtra("password", password);
+            intent.putExtra("registerRequest", registerRequest);
             startActivity(intent);
         }
     }

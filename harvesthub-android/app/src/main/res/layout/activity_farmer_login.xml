@@ -224,7 +224,7 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/plus_jakarta_sans"
                 android:text="Register Farm"
                 android:textColor="@color/accent_green"
                 android:textSize="14sp"

@@ -1,6 +1,7 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -20,13 +21,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.FarmLocation;
+import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LocationSetupActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
-    private String farmerId;
+    private RegisterRequest registerRequest;
     private Button btnConfirm;
 
     @Override
@@ -39,7 +48,7 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         View btnCloseMap = findViewById(R.id.btnCloseMap);
         View btnMyLocation = findViewById(R.id.btnMyLocation);
 
-        farmerId = getIntent().getStringExtra("farmerId");
+        registerRequest = getIntent().getParcelableExtra("registerRequest");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -91,10 +100,35 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
     }
 
     private void saveLocation() {
-        if (mMap == null) return;
+        if (mMap == null || registerRequest == null) return;
         LatLng center = mMap.getCameraPosition().target;
-        Toast.makeText(this, "Location Selected: " + center.latitude + ", " + center.longitude, Toast.LENGTH_SHORT).show();
-        finish();
+        
+        FarmLocation farmLocation = new FarmLocation("Address logic here", center.latitude, center.longitude);
+        registerRequest.setFarmLocation(farmLocation);
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.registerFarmer(registerRequest).enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(LocationSetupActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LocationSetupActivity.this, FarmerLoginActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    Toast.makeText(LocationSetupActivity.this, "Registration Failed: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LocationSetupActivity.this, FarmerRegisterActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GenericResponse> call, Throwable t) {
+                Toast.makeText(LocationSetupActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
