@@ -68,6 +68,9 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
         btnSendOffer = findViewById(R.id.btnSendOffer);
         cardSelectBatch = findViewById(R.id.cardSelectBatch);
 
+        findViewById(R.id.ivNotification).setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationsActivity.class)));
+
         // Bottom Nav setup
         findViewById(R.id.navHomeItem).setOnClickListener(v -> finish());
         // Add other nav listeners if needed
