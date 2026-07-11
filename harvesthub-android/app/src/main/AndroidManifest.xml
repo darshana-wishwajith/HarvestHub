@@ -38,6 +38,13 @@
         <activity android:name=".ui.farmer.RatingFeedbackActivity" />
 
         <activity android:name=".ui.farmer.CreateListingActivity" />
+        <activity android:name=".ui.farmer.NotificationsActivity" />
+        <activity android:name=".ui.farmer.ListingsActivity" />
+        <activity android:name=".ui.farmer.WalletActivity" />
+        <activity android:name=".ui.farmer.SettingsActivity" />
+        <activity android:name=".ui.farmer.EditProfileActivity" />
+        <activity android:name=".ui.farmer.ChatActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.farmer.CreateSupplyOfferActivity" />
         <activity android:name=".ui.farmer.ActiveOrderTrackerActivity" />
 
