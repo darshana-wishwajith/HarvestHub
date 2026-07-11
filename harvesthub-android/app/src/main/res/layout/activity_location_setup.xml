@@ -4,19 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/screen_background">
 
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            app:tint="@color/text_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -25,7 +26,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:text="Pin Farm Location"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +39,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="8dp"
         android:text="Register the exact GPS coordinates of your physical farm"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/text_disabled"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +88,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/surface_background"
             app:cardCornerRadius="20dp"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -98,7 +99,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_close"
-                app:tint="@color/black" />
+                app:tint="@color/text_primary" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -107,7 +108,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/surface_background"
             app:cardCornerRadius="20dp"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -118,7 +119,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_my_location"
-                app:tint="@color/black" />
+                app:tint="@color/text_primary" />
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -127,7 +128,7 @@
         android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/surface_background"
         app:cardCornerRadius="24dp"
         app:cardElevation="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -146,11 +147,11 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#CCCCCC"
+                app:boxStrokeColor="@color/border_default"
                 app:hintEnabled="false"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:startIconDrawable="@drawable/ic_search"
-                app:startIconTint="#9E9E9E">
+                app:startIconTint="@color/text_disabled">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearch"
@@ -166,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_revenue_card"
-                android:backgroundTint="#F5F5F5"
+                android:backgroundTint="@color/screen_background_variant"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="12dp">
@@ -175,14 +176,14 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_info"
-                    app:tint="#9E9E9E" />
+                    app:tint="@color/text_disabled" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Drag the map to position the pin exactly over your main farm facility or central field."
-                    android:textColor="#757575"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -191,7 +192,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
-                android:backgroundTint="#1B4332"
+                android:backgroundTint="@color/primary_dark_green"
                 android:text="Confirm Coordinates"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
