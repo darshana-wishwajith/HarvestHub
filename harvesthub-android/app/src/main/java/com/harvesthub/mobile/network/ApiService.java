@@ -1,11 +1,13 @@
 package com.harvesthub.mobile.network;
 
 
+import com.harvesthub.mobile.model.CropBatch;
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.ResendOtpRequest;
 import com.harvesthub.mobile.model.SendOtpRequest;
+import com.harvesthub.mobile.model.SupplyOfferRequest;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.model.VerifyOtpRequest;
 import com.harvesthub.mobile.model.VerifyOtpResponse;
@@ -52,4 +54,10 @@ public interface ApiService {
 
     @POST("farmer/location")
     Call<GenericResponse> saveFarmLocation(@Body LocationRequest request);
+
+    @GET("batches/verified")
+    Call<List<CropBatch>> getFarmerVerifiedBatches(@Query("farmerId") String farmerId, @Query("cropType") String cropType);
+
+    @POST("offers/create")
+    Call<GenericResponse> createSupplyOffer(@Body SupplyOfferRequest request);
 }
