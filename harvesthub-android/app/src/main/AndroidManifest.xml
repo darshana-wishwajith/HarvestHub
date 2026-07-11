@@ -36,6 +36,7 @@
         <activity android:name=".ui.farmer.FarmerLoginActivity" />
 
         <activity android:name=".ui.farmer.CreateListingActivity" />
+        <activity android:name=".ui.farmer.CreateSupplyOfferActivity" />
 
         <!-- Buyer Activities -->
         <activity android:name=".ui.buyer.BuyerLoginActivity" />
