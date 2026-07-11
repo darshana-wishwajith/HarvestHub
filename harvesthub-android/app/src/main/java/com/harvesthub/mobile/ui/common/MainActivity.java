@@ -27,9 +27,29 @@ public class MainActivity extends AppCompatActivity {
         MaterialCardView cardBuyer = findViewById(R.id.cardBuyer);
         MaterialCardView cardTransporter = findViewById(R.id.cardTransporter);
 
-        cardFarmer.setOnClickListener(v -> navigateToFarmerLogin());
-        cardBuyer.setOnClickListener(v -> navigateToBuyerLogin());
-        cardTransporter.setOnClickListener(v -> navigateToTransporterLogin());
+        cardFarmer.setOnClickListener(v -> {
+            updateSelection(cardFarmer, cardBuyer, cardTransporter);
+            navigateToFarmerLogin();
+        });
+        cardBuyer.setOnClickListener(v -> {
+            updateSelection(cardBuyer, cardFarmer, cardTransporter);
+            navigateToBuyerLogin();
+        });
+        cardTransporter.setOnClickListener(v -> {
+            updateSelection(cardTransporter, cardFarmer, cardBuyer);
+            navigateToTransporterLogin();
+        });
+    }
+
+    private void updateSelection(MaterialCardView selected, MaterialCardView... others) {
+        selected.setChecked(true);
+        selected.setActivated(true);
+        selected.setSelected(true);
+        for (MaterialCardView other : others) {
+            other.setChecked(false);
+            other.setActivated(false);
+            other.setSelected(false);
+        }
     }
 
     private void navigateToFarmerLogin() {

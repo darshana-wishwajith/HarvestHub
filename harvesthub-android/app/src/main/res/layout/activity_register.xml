@@ -123,6 +123,9 @@
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:hintEnabled="false"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_info"
+            app:endIconTint="@color/text_secondary"
             app:layout_constraintTop_toBottomOf="@id/tilMobileNumber">
 
             <com.google.android.material.textfield.TextInputEditText
