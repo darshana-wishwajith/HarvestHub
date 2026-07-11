@@ -76,6 +76,14 @@ public class ListingsActivity extends AppCompatActivity {
                 startActivity(new Intent(this, NotificationsActivity.class)));
 
         findViewById(R.id.navHomeItem).setOnClickListener(v -> finish());
+        findViewById(R.id.navWalletItem).setOnClickListener(v -> {
+            startActivity(new Intent(this, WalletActivity.class));
+            finish();
+        });
+        findViewById(R.id.navSettingsItem).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class));
+            finish();
+        });
     }
 
     private void setupTabs() {

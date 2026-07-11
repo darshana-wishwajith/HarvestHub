@@ -5,6 +5,7 @@ import com.harvesthub.mobile.model.ChatMessage;
 import com.harvesthub.mobile.model.ConfirmDealRequest;
 import com.harvesthub.mobile.model.CropBatch;
 import com.harvesthub.mobile.model.DashboardResponse;
+import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.ListingItem;
@@ -26,10 +27,15 @@ import com.harvesthub.mobile.ui.farmer.RegisterRequest;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
 
 import java.util.List;
+
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -105,4 +111,17 @@ public interface ApiService {
 
     @GET("wallet/{farmerId}/transactions")
     Call<List<Transaction>> getRecentTransactions(@Path("farmerId") String farmerId, @Query("limit") int limit);
+
+    @GET("farmer/{id}/profile")
+    Call<FarmerProfileResponse> getFarmerProfile(@Path("id") String farmerId);
+
+    @Multipart
+    @POST("farmer/{id}/update-profile")
+    Call<GenericResponse> updateFarmerProfile(
+            @Path("id") String farmerId,
+            @Part("fullName") RequestBody fullName,
+            @Part("phoneNumber") RequestBody phoneNumber,
+            @Part("nic") RequestBody nic,
+            @Part MultipartBody.Part photo
+    );
 }

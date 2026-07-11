@@ -90,7 +90,7 @@ public class HomeFragment extends Fragment {
         root.findViewById(R.id.navWalletItem).setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), WalletActivity.class)));
         root.findViewById(R.id.navSettingsItem).setOnClickListener(v ->
-                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(getActivity(), SettingsActivity.class)));
     }
 
     private void fetchDashboardData(String farmerId) {
