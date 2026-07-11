@@ -112,6 +112,32 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:boxStrokeColor="@color/border_default"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:hintEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/tilMobileNumber">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email Address (e.g., example@domain.com)"
+                android:inputType="textEmailAddress"
+                android:padding="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilNic"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -126,7 +152,7 @@
             app:endIconMode="custom"
             app:endIconDrawable="@drawable/ic_info"
             app:endIconTint="@color/text_secondary"
-            app:layout_constraintTop_toBottomOf="@id/tilMobileNumber">
+            app:layout_constraintTop_toBottomOf="@id/tilEmail">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNic"
@@ -215,14 +241,15 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/primary_dark_green"
+            android:backgroundTint="@color/nav_indicator_color"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:text="Continue to Location Setup"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:cornerRadius="12dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTerms" />
+            app:layout_constraintTop_toBottomOf="@id/tvTerms"
+            tools:layout_editor_absoluteX="24dp" />
 
         <TextView
             android:id="@+id/tvSignIn"

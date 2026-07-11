@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private TextInputLayout tilFullName, tilMobileNumber, tilNic, tilPassword, tilConfirmPassword;
-    private TextInputEditText etFullName, etMobileNumber, etNic, etPassword, etConfirmPassword;
+    private TextInputLayout tilFullName, tilMobileNumber, tilEmail, tilNic, tilPassword, tilConfirmPassword;
+    private TextInputEditText etFullName, etMobileNumber, etEmail, etNic, etPassword, etConfirmPassword;
     private TextView tvAppName, tvSignIn;
     private Button btnContinue;
 
@@ -44,12 +44,14 @@ public class RegisterActivity extends AppCompatActivity {
     private void initViews() {
         tilFullName = findViewById(R.id.tilFullName);
         tilMobileNumber = findViewById(R.id.tilMobileNumber);
+        tilEmail = findViewById(R.id.tilEmail);
         tilNic = findViewById(R.id.tilNic);
         tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
         etFullName = findViewById(R.id.etFullName);
         etMobileNumber = findViewById(R.id.etMobileNumber);
+        etEmail = findViewById(R.id.etEmail);
         etNic = findViewById(R.id.etNic);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -95,12 +97,14 @@ public class RegisterActivity extends AppCompatActivity {
     private void validateAndContinue() {
         String fullName = etFullName.getText().toString().trim();
         String mobile = etMobileNumber.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
         String nic = etNic.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         tilFullName.setError(null);
         tilMobileNumber.setError(null);
+        tilEmail.setError(null);
         tilNic.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
@@ -113,6 +117,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
         if (!Pattern.matches("07[0-9]{8}", mobile)) {
             tilMobileNumber.setError("Enter a valid 10-digit mobile number");
+            isValid = false;
+        }
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Enter a valid email address");
             isValid = false;
         }
         if (!Pattern.matches("^[0-9]{9}[vVxX]$|^[0-9]{12}$", nic)) {
@@ -132,6 +140,7 @@ public class RegisterActivity extends AppCompatActivity {
             Intent intent = new Intent(this, LocationSetupActivity.class);
             intent.putExtra("fullName", fullName);
             intent.putExtra("mobile", mobile);
+            intent.putExtra("email", email);
             intent.putExtra("nic", nic);
             intent.putExtra("password", password);
             startActivity(intent);
