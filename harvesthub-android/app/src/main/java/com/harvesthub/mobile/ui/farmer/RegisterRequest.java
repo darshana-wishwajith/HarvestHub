@@ -3,6 +3,7 @@ package com.harvesthub.mobile.ui.farmer;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
+import com.harvesthub.mobile.model.FarmLocation;
 
 public class RegisterRequest implements Parcelable {
     @SerializedName("fullName")
@@ -14,21 +15,35 @@ public class RegisterRequest implements Parcelable {
     @SerializedName("nic")
     private String nic;
     
+    @SerializedName("email")
+    private String email;
+    
     @SerializedName("password")
     private String password;
 
-    public RegisterRequest(String fullName, String mobileNumber, String nic, String password) {
+    @SerializedName("role")
+    private String role;
+
+    @SerializedName("farmLocation")
+    private FarmLocation farmLocation;
+
+    public RegisterRequest(String fullName, String mobileNumber, String nic, String email, String password, String role) {
         this.fullName = fullName;
         this.mobileNumber = mobileNumber;
         this.nic = nic;
+        this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     protected RegisterRequest(Parcel in) {
         fullName = in.readString();
         mobileNumber = in.readString();
         nic = in.readString();
+        email = in.readString();
         password = in.readString();
+        role = in.readString();
+        farmLocation = in.readParcelable(FarmLocation.class.getClassLoader());
     }
 
     public static final Creator<RegisterRequest> CREATOR = new Creator<RegisterRequest>() {
@@ -51,11 +66,18 @@ public class RegisterRequest implements Parcelable {
         dest.writeString(fullName);
         dest.writeString(mobileNumber);
         dest.writeString(nic);
+        dest.writeString(email);
         dest.writeString(password);
+        dest.writeString(role);
+        dest.writeParcelable(farmLocation, flags);
     }
 
     public String getFullName() { return fullName; }
     public String getMobileNumber() { return mobileNumber; }
     public String getNic() { return nic; }
+    public String getEmail() { return email; }
     public String getPassword() { return password; }
+    public String getRole() { return role; }
+    public FarmLocation getFarmLocation() { return farmLocation; }
+    public void setFarmLocation(FarmLocation farmLocation) { this.farmLocation = farmLocation; }
 }

@@ -2,6 +2,17 @@
     <string name="app_name">HarvestHub Mobile</string>
     <string name="sign_in_as_farmer">Sign In as Farmer</string>
 
+    <!-- Main Activity -->
+    <string name="welcome_to_harvesthub">Welcome to HarvestHub</string>
+    <string name="choose_account_type">Choose your account type to get started</string>
+    <string name="farmer">Farmer</string>
+    <string name="farmer_desc">Sell crops &amp; manage harvests</string>
+    <string name="buyer">Buyer</string>
+    <string name="buyer_desc">Purchase verified produce</string>
+    <string name="transporter">Transporter</string>
+    <string name="transporter_desc">Accept delivery jobs</string>
+    <string name="terms_and_privacy">Terms of Service &amp; Privacy Policy</string>
+
     <!-- Rating & Feedback -->
     <string name="transaction_complete">Transaction Complete!</string>
     <string name="order_summary">Order Summary</string>
