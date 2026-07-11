@@ -11,7 +11,7 @@ import com.harvesthub.mobile.model.VerifyOtpResponse;
 import com.harvesthub.mobile.model.WeatherResponse;
 import com.harvesthub.mobile.ui.farmer.LocationRequest;
 import com.harvesthub.mobile.ui.farmer.RegisterRequest;
-import com.harvesthub.mobile.ui.farmer.ResetPasswordRequest;
+import com.harvesthub.mobile.model.ResetPasswordRequest;
 
 import java.util.List;
 import retrofit2.Call;
