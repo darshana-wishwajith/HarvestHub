@@ -1,5 +1,6 @@
 package com.harvesthub.mobile.network;
 
+
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
@@ -7,6 +8,7 @@ import com.harvesthub.mobile.model.ResendOtpRequest;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.model.VerifyOtpRequest;
 import com.harvesthub.mobile.model.VerifyOtpResponse;
+import com.harvesthub.mobile.model.WeatherResponse;
 import com.harvesthub.mobile.ui.farmer.LocationRequest;
 import com.harvesthub.mobile.ui.farmer.RegisterRequest;
 import com.harvesthub.mobile.ui.farmer.ResetPasswordRequest;
@@ -31,6 +33,9 @@ public interface ApiService {
 
     @GET("dashboard/farmer/{id}")
     Call<DashboardResponse> getFarmerDashboard(@Path("id") String farmerId);
+
+    @GET("weather")
+    Call<WeatherResponse> getWeather(@Query("location") String location);
 
     @GET("market/trend")
     Call<MarketTrendResponse> getMarketTrend(@Query("crop") String cropType, @Query("days") int days);
