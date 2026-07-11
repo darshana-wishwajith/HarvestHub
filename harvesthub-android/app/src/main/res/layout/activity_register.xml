@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/screen_background"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="Register to Next Generation Agricultural MarketPlace"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_disabled"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:text="Create Account"
-            android:textColor="@color/black"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:boxStrokeColor="#CCCCCC"
+            app:boxStrokeColor="@color/border_default"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -80,8 +80,8 @@
                 android:hint="Full Name (e.g., W.B.D.W. Bandara)"
                 android:inputType="textPersonName"
                 android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="#CCCCCC"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -91,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:boxStrokeColor="#CCCCCC"
+            app:boxStrokeColor="@color/border_default"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -106,8 +106,8 @@
                 android:hint="Mobile Number (e.g., 07X XXX XXXX)"
                 android:inputType="phone"
                 android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="#CCCCCC"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,7 +117,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:boxStrokeColor="#CCCCCC"
+            app:boxStrokeColor="@color/border_default"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -125,7 +125,7 @@
             app:hintEnabled="false"
             app:endIconMode="custom"
             app:endIconDrawable="@drawable/ic_info"
-            app:endIconTint="#77777E"
+            app:endIconTint="@color/text_secondary"
             app:layout_constraintTop_toBottomOf="@id/tilMobileNumber">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -135,8 +135,8 @@
                 android:hint="National Identity Card (NIC)"
                 android:inputType="text"
                 android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="#CCCCCC"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
                 android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -147,7 +147,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:boxStrokeColor="#CCCCCC"
+            app:boxStrokeColor="@color/border_default"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -155,7 +155,7 @@
             app:hintEnabled="false"
             app:layout_constraintTop_toBottomOf="@id/tilNic"
             app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#2D3142">
+            app:passwordToggleTint="@color/primary_dark_green">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -164,8 +164,8 @@
                 android:hint="Create Password"
                 android:inputType="textPassword"
                 android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="#CCCCCC"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -175,7 +175,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:boxStrokeColor="#CCCCCC"
+            app:boxStrokeColor="@color/border_default"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -183,7 +183,7 @@
             app:hintEnabled="false"
             app:layout_constraintTop_toBottomOf="@id/tilPassword"
             app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#2D3142">
+            app:passwordToggleTint="@color/primary_dark_green">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etConfirmPassword"
@@ -192,8 +192,8 @@
                 android:hint="Confirm Password"
                 android:inputType="textPassword"
                 android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="#CCCCCC"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_disabled"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -204,7 +204,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:text="By registering, you agree to HarvestHub's Terms of Service"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_disabled"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -215,7 +215,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#1B4332"
+            android:backgroundTint="@color/primary_dark_green"
             android:text="Continue to Location Setup"
             android:textAllCaps="false"
             android:textColor="@color/white"
@@ -230,7 +230,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_disabled"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
