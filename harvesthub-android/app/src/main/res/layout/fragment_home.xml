@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#FAF9F6">
 
-    <!-- Scrollable Content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        android:paddingBottom="80dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- App Bar -->
+            <!-- Top Bar -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -29,29 +29,29 @@
 
                 <ImageView
                     android:id="@+id/ivLogo"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_harvesthublogo"
-                    app:tint="#1C3529" />
+                    android:src="@drawable/ic_leaf" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/ivLogo"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@id/ivLogo"
                     android:text="HarvestHub"
+                    android:textColor="#1B4332"
                     android:textSize="18sp"
-                    android:textColor="#000000"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
+
                 <ImageView
                     android:id="@+id/ivNotification"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:src="@android:drawable/ic_popup_reminder"
-                    app:tint="#333333"/>
+                    android:src="@drawable/ic_notification"
+                    app:tint="#333333" />
             </RelativeLayout>
 
             <!-- Greeting -->
@@ -61,108 +61,139 @@
                 android:layout_height="wrap_content"
                 android:text="Good morning, Kamal!"
                 android:textColor="#123927"
-                android:textSize="24sp"
-                android:textStyle="bold"/>
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
                 android:text="Here's what's happening at your farm today."
                 android:textColor="#666666"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"/>
+                android:textSize="14sp" />
 
             <!-- Weather Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E5E5E5"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp">
-                <LinearLayout
+                app:strokeWidth="1dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#FFFFFF">
+                    android:padding="12dp">
+
                     <ImageView
+                        android:id="@+id/ivWeatherIcon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_centerVertical="true"
                         android:src="@android:drawable/ic_menu_day"
-                        app:tint="#F2994A"/>
+                        app:tint="#F2994A" />
+
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="28°C, Cloudy"
-                        android:textColor="#333333"
-                        android:textStyle="bold"/>
-                    <TextView
+                        android:id="@+id/tvWeatherTemp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/ivWeatherIcon"
+                        android:text="28°C, Cloudy"
+                        android:textColor="#333333"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvWeatherLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:text="Dambulla, LK"
-                        android:textColor="#888888"/>
-                </LinearLayout>
+                        android:textColor="#888888" />
+                </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Revenue Card -->
+            <!-- Total Revenue Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="#123927"
-                app:cardCornerRadius="16dp"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
-                    <TextView
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="~ TOTAL REVENUE"
-                        android:textColor="#88A096"
-                        android:textSize="12sp"
-                        android:textStyle="bold"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_trending_up"
+                            app:tint="#88A096" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="TOTAL REVENUE"
+                            android:textColor="#88A096"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
                     <TextView
                         android:id="@+id/tvTotalRevenue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="LKR 125,000"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"/>
-                    
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         app:cardBackgroundColor="#1F8B4D"
-                        app:cardCornerRadius="4dp"
-                        app:cardElevation="0dp"
-                        android:layout_marginTop="8dp">
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
+
                         <TextView
+                            android:id="@+id/tvRevenueChange"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingHorizontal="8dp"
+                            android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="↑ 12%"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
+                        android:id="@+id/tvPreviousRevenueSubtext"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:text="Increased from LKR 111,600 last month"
                         android:textColor="#88A096"
-                        android:textSize="12sp"
-                        android:layout_marginTop="16dp"/>
+                        android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -170,321 +201,317 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E5E5E5"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="12dp">
-                <LinearLayout
+                app:strokeWidth="1dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#FFFFFF">
+                    android:padding="16dp">
+
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="ACTIVE LISTINGS"
                             android:textColor="#666666"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/tvActiveListings"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="02"
                             android:textColor="#333333"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
+
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         app:cardBackgroundColor="#D3EFE1"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center"
-                            android:src="@android:drawable/ic_menu_sort_by_size"
-                            app:tint="#123927"/>
+                            android:src="@drawable/ic_active_listings" />
                     </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
+                </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Completed Card -->
+            <!-- Completed Orders Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E5E5E5"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="12dp">
-                <LinearLayout
+                app:strokeWidth="1dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#FFFFFF">
+                    android:padding="16dp">
+
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="COMPLETED"
+                            android:text="COMPLATED"
                             android:textColor="#666666"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/tvCompletedOrders"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="05"
                             android:textColor="#333333"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
+
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         app:cardBackgroundColor="#A8F0B8"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center"
-                            android:src="@android:drawable/ic_menu_directions"
-                            app:tint="#123927"/>
+                            android:src="@drawable/ic_completed" />
                     </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
+                </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Trust Score Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E5E5E5"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp">
-                <LinearLayout
+                app:strokeWidth="1dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#FFFFFF">
+                    android:padding="16dp">
+
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="TRUST SCORE"
                             android:textColor="#666666"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/tvTrustScore"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="94%"
                             android:textColor="#333333"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
+
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         app:cardBackgroundColor="#E0E0E0"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center"
-                            android:src="@android:drawable/ic_dialog_info"
-                            app:tint="#333333"/>
+                            android:src="@drawable/ic_trust_score" />
                     </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
+                </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Market Price Card -->
+            <!-- Market Insight Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E5E5E5"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp">
+                app:strokeWidth="1dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:orientation="vertical"
-                    android:background="#FFFFFF">
-                    
+                    android:padding="20dp">
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/tvMarketAvgLabel"
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Current Market Avg."
-                            android:textColor="#888888"
-                            android:textSize="12sp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/tvMarketAvgLabel"
-                            android:text="LKR 185.00 /kg"
-                            android:textColor="#333333"
-                            android:textSize="16sp"
-                            android:textStyle="bold"/>
-                            
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Current Market Avg."
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvMarketAvg"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="LKR 185.00 /kg"
+                                android:textColor="#333333"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="~ +12.5%\nPAST 7 DAYS"
+                            android:text="+12.5%\nPAST 7 DAYS"
+                            android:textAlignment="viewEnd"
                             android:textColor="#27AE60"
                             android:textSize="10sp"
-                            android:textAlignment="viewEnd"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
                     </RelativeLayout>
 
-                    <!-- Chart Placeholder -->
-                    <View
+                    <!-- Chart -->
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/marketChart"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="16dp"
-                        android:background="#F0FFF5" />
+                        android:layout_height="140dp"
+                        android:layout_marginTop="16dp" />
 
-                    <!-- Insight Text Box -->
+                    <!-- Info Banner -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         app:cardBackgroundColor="#E6F8E8"
-                        app:cardElevation="0dp"
                         app:cardCornerRadius="8dp"
-                        android:layout_marginTop="16dp">
+                        app:cardElevation="0dp">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="12dp"
+                            android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:padding="12dp">
+
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@android:drawable/ic_menu_info_details"
-                                app:tint="#123927"/>
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_trending_up"
+                                app:tint="#123927" />
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:text="Prices are expected to peak this weekend. Consider listing now."
                                 android:textColor="#123927"
-                                android:textSize="12sp"/>
+                                android:textSize="12sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnViewMarketInsights"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:backgroundTint="#EAEAEA"
-                        android:textColor="#333333"
                         android:text="View Market Insights"
                         android:textAllCaps="false"
-                        app:cornerRadius="8dp"/>
+                        android:textColor="#333333"
+                        app:backgroundTint="#EAEAEA"
+                        app:cornerRadius="10dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Create Listing Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCreateListing"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="24dp"
+                android:text="Create New Listing"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:backgroundTint="#123927"
+                app:cornerRadius="16dp"
+                app:icon="@android:drawable/ic_input_add"
+                app:iconGravity="textStart"
+                app:iconSize="20dp" />
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Create Listing Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateListing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create New Listing"
-        android:textColor="#FFFFFF"
-        android:textAllCaps="false"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="#FFFFFF"
-        app:backgroundTint="#123927"
-        app:cornerRadius="24dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="12dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Bottom Navigation placeholder -->
-    <LinearLayout
-        android:id="@+id/bottomNav"
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#FFFFFF"
-        android:orientation="horizontal"
+        android:layout_height="72dp"
+        android:background="#FAF9F6"
+        app:elevation="8dp"
+        app:itemIconSize="24dp"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemBackground="@drawable/bottom_nav_pill"
+        app:itemActiveIndicatorColor="@android:color/transparent"
+        app:itemRippleColor="@android:color/transparent"
+        app:itemTextColor="@color/nav_item_color"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:elevation="8dp">
-        <!-- Mock Bottom Nav items (Since we don't have a menu XML yet) -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Home"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Market"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Listings"
-            android:textColor="#123927"
-            android:textStyle="bold"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Wallet"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Settings"
-            android:textSize="12sp"/>
-    </LinearLayout>
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

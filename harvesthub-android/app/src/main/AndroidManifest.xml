@@ -33,7 +33,7 @@
         <activity android:name=".ui.farmer.CreateNewPasswordActivity" />
         <activity android:name=".ui.farmer.LocationSetupActivity" />
         <activity android:name=".ui.farmer.FarmerLoginActivity" />
-        <activity android:name=".ui.farmer.FarmerDashboardActivity" />
+
         <activity android:name=".ui.farmer.CreateListingActivity" />
 
         <!-- Buyer Activities -->
