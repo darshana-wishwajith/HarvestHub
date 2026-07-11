@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardNotification"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivNotificationIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="10dp"
+                android:background="@color/white"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                tools:backgroundTint="#13A34A"
+                tools:src="@drawable/ic_check_circle"
+                tools:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/tvNotificationTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_toStartOf="@id/tvTimestamp"
+                android:layout_toEndOf="@id/ivNotificationIcon"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textColor="#1A1A1A"
+                android:textSize="14sp"
+                tools:text="Delivery Successful – Funds Transferred" />
+
+            <TextView
+                android:id="@+id/tvTimestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="#13A34A"
+                android:textSize="12sp"
+                tools:text="2 mins ago" />
+
+            <TextView
+                android:id="@+id/tvNotificationBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvNotificationTitle"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@id/ivNotificationIcon"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:lineSpacingExtra="2dp"
+                android:textColor="#828282"
+                android:textSize="13sp"
+                tools:text="LKR 140,000 has been credited to your wallet after successful verification of the paddy delivery at the Ampara Depot." />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvMarkAsRead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:text="✓ Mark as Read"
+            android:textColor="#1B4332"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

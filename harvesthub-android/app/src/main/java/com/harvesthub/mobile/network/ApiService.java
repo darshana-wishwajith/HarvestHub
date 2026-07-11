@@ -5,6 +5,7 @@ import com.harvesthub.mobile.model.CropBatch;
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
+import com.harvesthub.mobile.model.NotificationItem;
 import com.harvesthub.mobile.model.ResendOtpRequest;
 import com.harvesthub.mobile.model.SendOtpRequest;
 import com.harvesthub.mobile.model.SupplyOfferRequest;
@@ -60,4 +61,13 @@ public interface ApiService {
 
     @POST("offers/create")
     Call<GenericResponse> createSupplyOffer(@Body SupplyOfferRequest request);
+
+    @GET("notifications/{farmerId}")
+    Call<List<NotificationItem>> getNotifications(@Path("farmerId") String farmerId);
+
+    @POST("notifications/{id}/read")
+    Call<GenericResponse> markNotificationRead(@Path("id") String notificationId);
+
+    @POST("notifications/mark-all-read")
+    Call<GenericResponse> markAllNotificationsRead(@Query("farmerId") String farmerId);
 }

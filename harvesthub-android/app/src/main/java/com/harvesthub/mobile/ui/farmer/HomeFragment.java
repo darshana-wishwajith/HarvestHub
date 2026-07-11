@@ -56,6 +56,9 @@ public class HomeFragment extends Fragment {
         btnCreateListing.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CreateListingActivity.class)));
 
+        view.findViewById(R.id.ivNotification).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), NotificationsActivity.class)));
+
         btnViewMarketInsights.setOnClickListener(v ->
                 Toast.makeText(getActivity(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
 
