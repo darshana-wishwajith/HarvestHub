@@ -1,7 +1,6 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -95,10 +94,6 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         if (mMap == null) return;
         LatLng center = mMap.getCameraPosition().target;
         Toast.makeText(this, "Location Selected: " + center.latitude + ", " + center.longitude, Toast.LENGTH_SHORT).show();
-        
-        Intent intent = new Intent(this, FarmerDashboardActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
         finish();
     }
 
