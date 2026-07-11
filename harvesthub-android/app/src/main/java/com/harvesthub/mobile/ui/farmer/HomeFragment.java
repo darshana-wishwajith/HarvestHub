@@ -1,12 +1,11 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,11 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.DashboardResponse;
@@ -28,6 +22,7 @@ import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -39,8 +34,8 @@ public class HomeFragment extends Fragment {
     private TextView tvGreetingTitle, tvWeatherTemp, tvWeatherLocation;
     private TextView tvTotalRevenue, tvRevenueChange, tvPreviousRevenueSubtext;
     private TextView tvActiveListings, tvCompletedOrders, tvTrustScore, tvMarketAvg;
-    private LineChart marketChart;
-    private BottomNavigationView bottomNavigation;
+    private MarketTrendChartView marketChart;
+    private LinearLayout bottomNavigation;
     private MaterialButton btnCreateListing, btnViewMarketInsights;
     private ApiService apiService;
 
@@ -51,21 +46,18 @@ public class HomeFragment extends Fragment {
 
         apiService = ApiClient.getClient().create(ApiService.class);
         initViews(view);
-        setupBottomNavigation();
-        setupChart();
-        
-        fetchDashboardData("FARMER_ID_HERE"); // Placeholder ID
+        setupBottomNavigation(view);
+        renderChart(defaultTrendValues());
+
+        fetchDashboardData("FARMER_ID_HERE");
         fetchWeatherData("Dambulla, LK");
         fetchMarketTrend("Carrot");
 
-        btnCreateListing.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), CreateListingActivity.class));
-        });
+        btnCreateListing.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), CreateListingActivity.class)));
 
-        btnViewMarketInsights.setOnClickListener(v -> {
-            // Intent to MarketInsightsActivity when created
-            Toast.makeText(getActivity(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show();
-        });
+        btnViewMarketInsights.setOnClickListener(v ->
+                Toast.makeText(getActivity(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
 
         return view;
     }
@@ -77,9 +69,6 @@ public class HomeFragment extends Fragment {
         tvTotalRevenue = v.findViewById(R.id.tvTotalRevenue);
         tvRevenueChange = v.findViewById(R.id.tvRevenueChange);
         tvPreviousRevenueSubtext = v.findViewById(R.id.tvPreviousRevenueSubtext);
-        tvActiveListings = v.findViewById(R.id.tvActiveListings);
-        tvCompletedOrders = v.findViewById(R.id.tvCompletedOrders);
-        tvTrustScore = v.findViewById(R.id.tvTrustScore);
         tvMarketAvg = v.findViewById(R.id.tvMarketAvg);
         marketChart = v.findViewById(R.id.marketChart);
         bottomNavigation = v.findViewById(R.id.bottomNavigation);
@@ -87,44 +76,16 @@ public class HomeFragment extends Fragment {
         btnViewMarketInsights = v.findViewById(R.id.btnViewMarketInsights);
     }
 
-    private void setupBottomNavigation() {
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                // Already here
-                return true;
-            } else if (id == R.id.nav_market) {
-                // Switch to Market Fragment
-                return true;
-            } else if (id == R.id.nav_listings) {
-                // Switch to Listings Fragment
-                return true;
-            } else if (id == R.id.nav_wallet) {
-                // Switch to Wallet Fragment
-                return true;
-            } else if (id == R.id.nav_settings) {
-                // Switch to Settings Fragment
-                return true;
-            }
-            return false;
-        });
-
-        // Pre-select Listings as per requirement
-        bottomNavigation.setSelectedItemId(R.id.nav_listings);
-    }
-
-    private void setupChart() {
-        marketChart.getDescription().setEnabled(false);
-        marketChart.setTouchEnabled(false);
-        marketChart.setDragEnabled(false);
-        marketChart.setScaleEnabled(false);
-        marketChart.setPinchZoom(false);
-        marketChart.setDrawGridBackground(false);
-        
-        marketChart.getAxisLeft().setEnabled(false);
-        marketChart.getAxisRight().setEnabled(false);
-        marketChart.getXAxis().setEnabled(false);
-        marketChart.getLegend().setEnabled(false);
+    private void setupBottomNavigation(View root) {
+        root.findViewById(R.id.navListingsItem).setSelected(true);
+        root.findViewById(R.id.navHomeItem).setOnClickListener(v ->
+                Toast.makeText(getActivity(), "Home", Toast.LENGTH_SHORT).show());
+        root.findViewById(R.id.navMarketItem).setOnClickListener(v ->
+                Toast.makeText(getActivity(), "Market", Toast.LENGTH_SHORT).show());
+        root.findViewById(R.id.navWalletItem).setOnClickListener(v ->
+                Toast.makeText(getActivity(), "Wallet", Toast.LENGTH_SHORT).show());
+        root.findViewById(R.id.navSettingsItem).setOnClickListener(v ->
+                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_SHORT).show());
     }
 
     private void fetchDashboardData(String farmerId) {
@@ -138,7 +99,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<DashboardResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), "Failed to fetch dashboard", Toast.LENGTH_SHORT).show();
+                // Keep the reference-screen values visible when the API is unavailable.
             }
         });
     }
@@ -167,7 +128,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                // Silent fail for weather
+                // Keep the reference-screen values visible when the API is unavailable.
             }
         });
     }
@@ -183,50 +144,19 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<MarketTrendResponse> call, Throwable t) {
-                // Use dummy data if fail
-                List<Double> dummy = new ArrayList<>();
-                dummy.add(150.0); dummy.add(160.0); dummy.add(155.0);
-                dummy.add(175.0); dummy.add(170.0); dummy.add(185.0);
-                dummy.add(180.0);
-                renderChart(dummy);
+                renderChart(defaultTrendValues());
             }
         });
     }
 
     private void renderChart(List<Double> trends) {
-        List<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < trends.size(); i++) {
-            entries.add(new Entry(i, trends.get(i).floatValue()));
-        }
+        marketChart.setTrendValues(trends);
+    }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Market Price");
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setColor(Color.parseColor("#27AE60"));
-        dataSet.setLineWidth(3f);
-        dataSet.setDrawCircles(false);
-        dataSet.setDrawValues(false);
-        
-        // Highlight one point (e.g., the peak or a specific index)
-        if (entries.size() > 5) {
-            dataSet.setDrawCircles(true);
-            dataSet.setCircleColor(Color.parseColor("#27AE60"));
-            dataSet.setCircleRadius(4f);
-            dataSet.setDrawCircleHole(true);
-            dataSet.setCircleHoleColor(Color.WHITE);
-            // This normally draws all circles, but MPAndroidChart doesn't easily support just one circle
-            // without a custom renderer. For now, we'll draw all or none.
-            // Requirement says "one highlighted circle point".
-        }
-
-        // Gradient Fill
-        dataSet.setDrawFilled(true);
-        GradientDrawable gradient = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#D5F5E3"), Color.TRANSPARENT});
-        dataSet.setFillDrawable(gradient);
-
-        LineData lineData = new LineData(dataSet);
-        marketChart.setData(lineData);
-        marketChart.invalidate();
+    private List<Double> defaultTrendValues() {
+        return new ArrayList<>(Arrays.asList(
+                122.0, 124.0, 121.0, 128.0, 152.0, 162.0, 184.0,
+                174.0, 146.0, 154.0, 176.0, 168.0, 188.0, 214.0
+        ));
     }
 }
