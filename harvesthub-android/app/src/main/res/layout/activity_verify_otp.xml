@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/screen_background"
     android:padding="24dp">
 
     <ImageButton
@@ -13,6 +13,7 @@
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_back"
+        app:tint="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
@@ -23,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Enter Verification Code"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +35,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,6 +63,7 @@
             android:maxLength="1"
             android:paddingHorizontal="0dp"
             android:text="8"
+            android:textColor="@color/text_primary"
             android:textSize="34sp"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
@@ -76,6 +78,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:paddingHorizontal="0dp"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
@@ -90,6 +93,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:paddingHorizontal="0dp"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
@@ -104,6 +108,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:paddingHorizontal="0dp"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
@@ -142,7 +147,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -154,7 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginBottom="32dp"
-        android:backgroundTint="#1B4332"
+        android:backgroundTint="@color/primary_dark_green"
         android:text="Verify Code"
         android:textAllCaps="false"
         android:textSize="18sp"
