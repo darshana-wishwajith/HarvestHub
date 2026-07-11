@@ -1,17 +1,25 @@
 package com.harvesthub.mobile.network;
 
 
+import com.harvesthub.mobile.model.ChatMessage;
+import com.harvesthub.mobile.model.ConfirmDealRequest;
 import com.harvesthub.mobile.model.CropBatch;
 import com.harvesthub.mobile.model.DashboardResponse;
+import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.model.ListingItem;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.NotificationItem;
 import com.harvesthub.mobile.model.ResendOtpRequest;
+import com.harvesthub.mobile.model.SendMessageRequest;
 import com.harvesthub.mobile.model.SendOtpRequest;
 import com.harvesthub.mobile.model.SupplyOfferRequest;
+import com.harvesthub.mobile.model.Transaction;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.model.VerifyOtpRequest;
 import com.harvesthub.mobile.model.VerifyOtpResponse;
+import com.harvesthub.mobile.model.WalletSummaryResponse;
+import com.harvesthub.mobile.model.WantedAd;
 import com.harvesthub.mobile.model.WeatherResponse;
 import com.harvesthub.mobile.ui.farmer.LocationRequest;
 import com.harvesthub.mobile.ui.farmer.RegisterRequest;
@@ -70,4 +78,31 @@ public interface ApiService {
 
     @POST("notifications/mark-all-read")
     Call<GenericResponse> markAllNotificationsRead(@Query("farmerId") String farmerId);
+
+    @GET("chat/{orderId}/messages")
+    Call<List<ChatMessage>> getChatMessages(@Path("orderId") String orderId);
+
+    @POST("chat/{orderId}/send")
+    Call<ChatMessage> sendMessage(@Path("orderId") String orderId, @Body SendMessageRequest request);
+
+    @POST("orders/{orderId}/confirm-deal")
+    Call<GenericResponse> confirmDeal(@Path("orderId") String orderId, @Body ConfirmDealRequest request);
+
+    @GET("farmer/{id}/summary")
+    Call<FarmerSummaryResponse> getFarmerSummary(@Path("id") String farmerId);
+
+    @GET("wanted-ads")
+    Call<List<WantedAd>> getWantedAds(@Query("crop") String cropFilter, @Query("search") String searchQuery);
+
+    @GET("farmer/{id}/active-listings")
+    Call<List<ListingItem>> getActiveListings(@Path("id") String farmerId);
+
+    @GET("farmer/{id}/listing-history")
+    Call<List<ListingItem>> getListingHistory(@Path("id") String farmerId);
+
+    @GET("wallet/{farmerId}/summary")
+    Call<WalletSummaryResponse> getWalletSummary(@Path("farmerId") String farmerId);
+
+    @GET("wallet/{farmerId}/transactions")
+    Call<List<Transaction>> getRecentTransactions(@Path("farmerId") String farmerId, @Query("limit") int limit);
 }

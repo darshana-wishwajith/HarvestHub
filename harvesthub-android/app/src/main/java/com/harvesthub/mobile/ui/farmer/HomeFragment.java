@@ -81,12 +81,14 @@ public class HomeFragment extends Fragment {
 
     private void setupBottomNavigation(View root) {
         root.findViewById(R.id.navListingsItem).setSelected(true);
+        root.findViewById(R.id.navListingsItem).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), ListingsActivity.class)));
         root.findViewById(R.id.navHomeItem).setOnClickListener(v ->
                 Toast.makeText(getActivity(), "Home", Toast.LENGTH_SHORT).show());
         root.findViewById(R.id.navMarketItem).setOnClickListener(v ->
                 Toast.makeText(getActivity(), "Market", Toast.LENGTH_SHORT).show());
         root.findViewById(R.id.navWalletItem).setOnClickListener(v ->
-                Toast.makeText(getActivity(), "Wallet", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(getActivity(), WalletActivity.class)));
         root.findViewById(R.id.navSettingsItem).setOnClickListener(v ->
                 Toast.makeText(getActivity(), "Settings", Toast.LENGTH_SHORT).show());
     }
