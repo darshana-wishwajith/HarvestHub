@@ -27,6 +27,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private TextInputLayout tilIdentifier;
     private TextInputEditText etIdentifier;
     private MaterialButton btnSendCode;
+    private com.google.android.material.card.MaterialCardView cvError;
+    private android.widget.TextView tvErrorMessage;
+    private View ivCloseError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         tilIdentifier = findViewById(R.id.tilIdentifier);
         etIdentifier = findViewById(R.id.etIdentifier);
         btnSendCode = findViewById(R.id.btnSendCode);
+        cvError = findViewById(R.id.cvError);
+        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        ivCloseError = findViewById(R.id.ivCloseError);
+
+        ivCloseError.setOnClickListener(v -> cvError.setVisibility(View.GONE));
     }
 
     private void validateAndSend() {
@@ -66,6 +74,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void performSendOtp(String identifier) {
+        cvError.setVisibility(View.GONE);
         btnSendCode.setEnabled(false);
         btnSendCode.setText("Sending...");
 
@@ -82,11 +91,27 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     Intent intent = new Intent(ForgotPasswordActivity.this, VerifyOtpActivity.class);
                     intent.putExtra("identifier", identifier);
                     intent.putExtra("maskedIdentifier", maskIdentifier(identifier));
-                    // If API returns userId or token, pass it here
-                    // intent.putExtra("userId", response.body().getUserId()); 
                     startActivity(intent);
                 } else {
-                    tilIdentifier.setError("No account found with this email or mobile number");
+                    String detailedErrorMessage = "No account found with this email or mobile number";
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            String bodyString = errorBody.string();
+                            if (bodyString != null && !bodyString.trim().isEmpty()) {
+                                detailedErrorMessage = bodyString;
+                            } else {
+                                detailedErrorMessage = "Error: " + response.code() + " " + response.message();
+                            }
+                        } else if (response.message() != null && !response.message().isEmpty()) {
+                            detailedErrorMessage = response.message();
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("ForgotPasswordError", "Error parsing error body", e);
+                        detailedErrorMessage = "Error: " + response.code();
+                    }
+                    tvErrorMessage.setText(detailedErrorMessage);
+                    cvError.setVisibility(View.VISIBLE);
+                    android.util.Log.e("ForgotPasswordError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
                 }
             }
 
@@ -94,7 +119,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
                 btnSendCode.setEnabled(true);
                 btnSendCode.setText("Send Verification Code");
-                Toast.makeText(ForgotPasswordActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                String errorMessage = "Network error: " + t.getMessage();
+                tvErrorMessage.setText(errorMessage);
+                cvError.setVisibility(View.VISIBLE);
+                android.util.Log.e("ForgotPasswordError", errorMessage, t);
             }
         });
     }

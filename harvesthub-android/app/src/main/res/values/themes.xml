@@ -3,8 +3,7 @@
     <style name="Base.Theme.HarvestHubMobile" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primary_green</item>
-        <item name="android:statusBarColor">@color/screen_background</item>
-        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:statusBarColor">@color/bg_light</item>
     </style>
 
     <style name="Theme.HarvestHubMobile" parent="Base.Theme.HarvestHubMobile" />

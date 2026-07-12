@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
+import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
@@ -184,18 +185,31 @@ public class ListingsActivity extends AppCompatActivity {
     }
 
     private void fetchHistory() {
-        apiService.getListingHistory(farmerId).enqueue(new Callback<List<ListingItem>>() {
+        apiService.getListingHistory(farmerId, null).enqueue(new Callback<List<HistoryListing>>() {
             @Override
-            public void onResponse(@NonNull Call<List<ListingItem>> call, @NonNull Response<List<ListingItem>> response) {
+            public void onResponse(@NonNull Call<List<HistoryListing>> call, @NonNull Response<List<HistoryListing>> response) {
                 allItems.clear();
                 if (response.isSuccessful() && response.body() != null) {
-                    allItems.addAll(response.body());
+                    for (HistoryListing h : response.body()) {
+                        allItems.add(new ListingItem(
+                                h.getListingId(),
+                                h.getCropName(),
+                                h.getBuyerName(),
+                                h.getQuantityKg(),
+                                h.getTotalValue(),
+                                h.getStatus(),
+                                false,
+                                "HISTORY"
+                        ));
+                    }
                 } else {
                     addMockHistory();
                 }
                 updateFilteredList(etSearch.getText().toString());
             }
-            @Override public void onFailure(@NonNull Call<List<ListingItem>> call, @NonNull Throwable t) {
+
+            @Override
+            public void onFailure(@NonNull Call<List<HistoryListing>> call, @NonNull Throwable t) {
                 addMockHistory();
             }
         });
