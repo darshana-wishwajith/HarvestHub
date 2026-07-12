@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Semantic mapping of colors for Dark Theme -->
-    <color name="black">#FFFFFFFF</color> <!-- Light text on dark background -->
-    <color name="white">#121212</color> <!-- Dark surface background -->
-    <color name="bg_light_green">#121B12</color> <!-- Very dark green background -->
-    <color name="primary_green">#81C784</color> <!-- Brighter green for contrast -->
-    <color name="text_grey">#BDBDBD</color> <!-- Light grey text -->
-    <color name="card_stroke">#388E3C</color> <!-- Brighter stroke -->
-    <color name="icon_bg_green">#1B3D2F</color> <!-- Darker icon container -->
-    <color name="icon_bg_grey">#2C2C2C</color> <!-- Darker grey container -->
-    <color name="primary_dark_green">#A5D6A7</color> <!-- Light green for visibility -->
-    <color name="secondary_green">#81C784</color>
-    <color name="edittext_stroke">#424242</color>
-    <color name="divider_color">#333333</color>
+    <!-- Basic Colors -->
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#121212</color>
+    <color name="bg_light">#121212</color>
+
+    <!-- Semantic Colors for Dark Mode -->
+    <color name="screen_background">#121212</color>
+    <color name="screen_background_variant">#1A1C1A</color>
+    <color name="surface_background">#1E1E1E</color>
+
+    <color name="primary_green">#81C784</color>
+    <color name="primary_dark_green">#A5D6A7</color>
+
+    <color name="text_primary">#E1E1E1</color>
+    <color name="text_secondary">#BDBDBD</color>
+    <color name="text_tertiary">#9E9E9E</color>
+    <color name="text_disabled">#757575</color>
+
+    <color name="border_default">#333333</color>
+    <color name="border_active">#81C784</color>
+
+    <color name="gradient_start">#121212</color>
+    <color name="gradient_end">#1A251A</color>
+
+    <color name="icon_bg_green">#1B3D2F</color>
+    <color name="icon_bg_grey">#2C2C2C</color>
+
+    <color name="card_stroke">#388E3C</color>
+    <color name="chart_gradient_start">#81C784</color>
+    <color name="chart_gradient_end">#00121212</color>
 </resources>
