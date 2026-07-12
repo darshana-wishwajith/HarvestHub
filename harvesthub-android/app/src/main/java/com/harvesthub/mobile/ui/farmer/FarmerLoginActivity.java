@@ -13,6 +13,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.LoginRequest;
+import com.harvesthub.mobile.model.LoginResponse;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.PasswordUtils;
+import com.harvesthub.mobile.utils.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FarmerLoginActivity extends AppCompatActivity {
 
@@ -20,6 +30,9 @@ public class FarmerLoginActivity extends AppCompatActivity {
     private ImageView ivPasswordToggle;
     private TextView tvForgotPassword, tvRegister;
     private Button btnSignIn;
+    private com.google.android.material.card.MaterialCardView cvError;
+    private TextView tvErrorMessage;
+    private android.view.View ivCloseError;
     private boolean isPasswordVisible = false;
 
     @Override
@@ -38,6 +51,9 @@ public class FarmerLoginActivity extends AppCompatActivity {
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvRegister = findViewById(R.id.tvRegister);
         btnSignIn = findViewById(R.id.btnSignIn);
+        cvError = findViewById(R.id.cvError);
+        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        ivCloseError = findViewById(R.id.ivCloseError);
     }
 
     private void setupListeners() {
@@ -55,6 +71,8 @@ public class FarmerLoginActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
         });
+
+        ivCloseError.setOnClickListener(v -> cvError.setVisibility(android.view.View.GONE));
     }
 
     private void togglePasswordVisibility() {
@@ -85,12 +103,63 @@ public class FarmerLoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Logic for authentication would go here
-        // For now, we simulate a successful login
-        Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show();
-        
-        Intent intent = new Intent(this, FarmerDashboardActivity.class);
-        startActivity(intent);
-        finish();
+        // Hash the password before sending to the server
+        String hashedPassword = PasswordUtils.hashPassword(password);
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        LoginRequest loginRequest = new LoginRequest(emailOrMobile, hashedPassword);
+
+        cvError.setVisibility(android.view.View.GONE);
+        btnSignIn.setEnabled(false);
+        btnSignIn.setText("Signing In...");
+
+        apiService.login(loginRequest).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                btnSignIn.setEnabled(true);
+                btnSignIn.setText(R.string.sign_in_as_farmer);
+                if (response.isSuccessful() && response.body() != null) {
+                    LoginResponse loginResponse = response.body();
+                    SessionManager sessionManager = new SessionManager(FarmerLoginActivity.this);
+                    sessionManager.saveAuthToken(loginResponse.getToken());
+                    sessionManager.saveUser(loginResponse.getUser());
+
+                    Toast.makeText(FarmerLoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(FarmerLoginActivity.this, FarmerDashboardActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    String detailedErrorMessage = "Login Failed";
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            String bodyString = errorBody.string();
+                            if (bodyString != null && !bodyString.trim().isEmpty()) {
+                                detailedErrorMessage = bodyString;
+                            } else {
+                                detailedErrorMessage = "Login Failed: " + response.code() + " " + response.message();
+                            }
+                        } else {
+                            detailedErrorMessage = "Login Failed: " + response.code() + " " + response.message();
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("LoginError", "Error parsing error body", e);
+                        detailedErrorMessage = "Login Failed: " + response.code();
+                    }
+                    tvErrorMessage.setText(detailedErrorMessage);
+                    cvError.setVisibility(android.view.View.VISIBLE);
+                    android.util.Log.e("LoginError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                btnSignIn.setEnabled(true);
+                btnSignIn.setText(R.string.sign_in_as_farmer);
+                String errorMessage = "Network error: " + t.getMessage();
+                tvErrorMessage.setText(errorMessage);
+                cvError.setVisibility(android.view.View.VISIBLE);
+                android.util.Log.e("LoginError", errorMessage, t);
+            }
+        });
     }
 }

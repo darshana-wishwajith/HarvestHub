@@ -3,6 +3,5 @@
         <item name="colorPrimary">@color/primary_green</item>
         <item name="android:statusBarColor">@color/bg_light</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
     </style>
 </resources>
