@@ -83,13 +83,13 @@ public class SettingsActivity extends AppCompatActivity {
                     updateUI(response.body());
                 } else {
                     // Load mock if failed
-                    updateUI(new FarmerProfileResponse("Kamal Perera", "077 123 4567", "852145659V", null));
+                    updateUI(new FarmerProfileResponse("Kamal Perera", "kamal@example.com", "077 123 4567", "852145659V", null, null));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<FarmerProfileResponse> call, @NonNull Throwable t) {
-                updateUI(new FarmerProfileResponse("Kamal Perera", "077 123 4567", "852145659V", null));
+                updateUI(new FarmerProfileResponse("Kamal Perera", "kamal@example.com", "077 123 4567", "852145659V", null, null));
             }
         });
     }
