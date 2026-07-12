@@ -64,4 +64,21 @@
     <string name="advance_received_title">LKR 25,000 Advance Received</string>
     <string name="escrow_notice">The buyer\'s deposit is now secured in escrow.</string>
     <string name="acknowledge_start_harvesting">Acknowledge &amp; Start Harvesting</string>
+    <string name="escrow_setup">Escrow Setup</string>
+    <string name="order_id_waiting">HH-2024–8842</string>
+    <string name="waiting_advance_title">Waiting for Advance Payment</string>
+    <string name="waiting_desc">Roshan Silva has confirmed the deal. The payment is being secured in escrow to guarantee your transaction safety.</string>
+    <string name="escrow_amount_label">ESCROW AMOUNT (20%)</string>
+    <string name="escrow_amount_value">LKR 25,000</string>
+    <string name="agreed_quantity_label">AGREED QUANTITY</string>
+    <string name="unit_rate_label">UNIT RATE</string>
+    <string name="unit_rate_value">LKR 250/kg</string>
+    <string name="securing_transaction_title">Securing Your Transaction</string>
+    <string name="securing_transaction_desc">Once the deposit is confirmed, the inventory will be locked. You\'ll receive an instant notification to proceed with logistics.</string>
+    <string name="contact_buyer_btn">Contact Buyer</string>
+    <string name="need_assistance">Need Assistance?</string>
+    <string name="escrow_protection_title">Escrow Protection</string>
+    <string name="escrow_protection_desc">HarvestHub Escrow safeguards funds until quality inspection is cleared and final delivery is confirmed by logistics partners.</string>
+    <string name="escrow_protection_label">Escrow Protection</string>
+    <string name="view_protection_terms">View Protection Terms</string>
 </resources>

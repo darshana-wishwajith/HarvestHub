@@ -41,4 +41,9 @@
     <color name="row_bg">#FFFFFF</color>
     <color name="call_btn_bg_light">#D4EDE0</color>
     <color name="illustration_card_bg">#F8F9F8</color>
+    <color name="escrow_amber_bg">#FFF3E0</color>
+    <color name="escrow_amber_text">#E65100</color>
+    <color name="shield_inner_bg">#FFF8E1</color>
+    <color name="shield_outer_bg">#FFF3E0</color>
+    <color name="escrow_card_footer_bg">#1B4332</color>
 </resources>
