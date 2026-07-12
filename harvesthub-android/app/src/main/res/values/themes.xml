@@ -3,7 +3,8 @@
     <style name="Base.Theme.HarvestHubMobile" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primary_green</item>
-        <item name="android:statusBarColor">@color/bg_light</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
     </style>
 
     <style name="Theme.HarvestHubMobile" parent="Base.Theme.HarvestHubMobile" />
@@ -27,7 +28,7 @@
         <item name="cornerSizeBottomRight">0dp</item>
     </style>
 
-    <style name="CircleImageView" parent="">
+    <style name="CircleAppearance" parent="">
         <item name="cornerSize">50%</item>
     </style>
 </resources>
