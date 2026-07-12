@@ -1,27 +1,65 @@
-# Stop on any error
-$ErrorActionPreference = "Stop"
+# =======================================================================================
+# DEPLOYMENT SCRIPT FOR HARVESTHUB BACKEND TO DIGITALOCEAN
+#
+# This script automates the deployment using a robust stop -> build -> copy -> start sequence.
+# =======================================================================================
 
-$SERVER_IP = "152.42.164.221"
-$SSH_USER = "root"
+# --- Configuration ---
+$ErrorActionPreference = "Stop" # Exit the script on any error
 
-# 1. Build the project using Maven
-Write-Host "--- Step 1: Building JAR (Skipping Tests) ---" -ForegroundColor Cyan
-.\mvnw.cmd clean package -DskipTests
+$remoteUser = "root"
+$remoteHost = "152.42.164.221"
+$sshPort = 22
+$jarName = "app.jar"
+$remoteJarPath = "/root/app.jar"
+$remoteServiceName = "harvesthub"
 
-# 2. Check if build was successful
-$JAR_PATH = "target\app.jar"
-if (-not (Test-Path $JAR_PATH)) {
-    Write-Host "Error: Build failed or app.jar not found." -ForegroundColor Red
-    exit 1
+$projectRoot = $PSScriptRoot
+$localJarPath = Join-Path -Path $projectRoot -ChildPath "target\$jarName"
+
+# --- Main Script ---
+Set-Location $projectRoot
+Write-Host "Working directory set to: $projectRoot" -ForegroundColor Cyan
+
+# 1. Stop the remote service
+Write-Host "--- Step 1: Stopping remote service '$remoteServiceName' ---" -ForegroundColor Yellow
+try {
+    ssh -p $sshPort "${remoteUser}@${remoteHost}" "systemctl stop $remoteServiceName"
+    Write-Host "Service '$remoteServiceName' stopped successfully on the remote server." -ForegroundColor Green
+} catch {
+    Write-Host "Could not stop remote service. It might already be stopped. Continuing..." -ForegroundColor Yellow
 }
 
-# 3. Upload to server
-Write-Host "--- Step 2: Uploading to Server ---" -ForegroundColor Cyan
-# Using -o IdentitiesOnly=yes to ensure it uses the key we just authorized
-scp -o IdentitiesOnly=yes -P 22 "$JAR_PATH" "${SSH_USER}@${SERVER_IP}:/root/app.jar"
+# Add a small delay to ensure the process fully terminates
+Start-Sleep -Seconds 2
 
-# 4. Restart the remote service
-Write-Host "--- Step 3: Restarting Remote Service ---" -ForegroundColor Cyan
-ssh -o IdentitiesOnly=yes "${SSH_USER}@${SERVER_IP}" "systemctl restart harvesthub"
+# 2. Build the project locally
+Write-Host "--- Step 2: Building the project with Maven ---" -ForegroundColor Yellow
+if (-not (Test-Path "./mvnw.cmd")) {
+    Write-Host "Error: 'mvnw.cmd' not found. Make sure you are in the project root." -ForegroundColor Red
+    exit 1
+}
+./mvnw.cmd clean package -DskipTests
+Write-Host "Maven build successful." -ForegroundColor Green
 
-Write-Host "--- Deployment Successfully Completed! ---" -ForegroundColor Green
+# 3. Copy the new JAR file to the remote server
+Write-Host "--- Step 3: Copying '$jarName' to the remote server ---" -ForegroundColor Yellow
+if (-not (Test-Path $localJarPath)) {
+    Write-Host "Error: JAR file not found at '$localJarPath'. Build may have failed." -ForegroundColor Red
+    exit 1
+}
+scp -P $sshPort "$localJarPath" "${remoteUser}@${remoteHost}:${remoteJarPath}"
+Write-Host "JAR file copied successfully." -ForegroundColor Green
+
+# 4. Start the remote service
+Write-Host "--- Step 4: Starting the '$remoteServiceName' service on the server ---" -ForegroundColor Yellow
+ssh -p $sshPort "${remoteUser}@${remoteHost}" "systemctl start $remoteServiceName"
+Write-Host "Service started successfully." -ForegroundColor Green
+
+# 5. Check the status of the service
+Write-Host "Waiting 5 seconds before checking service status..." -ForegroundColor Cyan
+Start-Sleep -Seconds 5
+Write-Host "--- Final Service Status ---" -ForegroundColor Yellow
+ssh -p $sshPort "${remoteUser}@${remoteHost}" "systemctl status $remoteServiceName --no-pager"
+
+Write-Host "--- Deployment to $remoteHost finished successfully! ---" -ForegroundColor Magenta
