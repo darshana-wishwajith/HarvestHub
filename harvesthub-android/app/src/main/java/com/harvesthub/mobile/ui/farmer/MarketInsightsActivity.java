@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -173,7 +174,7 @@ public class MarketInsightsActivity extends AppCompatActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvName, tvLoc, tvBadge, tvSupply, tvDemand, tvUpdate;
             ProgressBar pbSupply, pbDemand;
-            View cvBadge;
+            MaterialCardView cvBadge;
             ViewHolder(View v) {
                 super(v);
                 tvName = v.findViewById(R.id.tvCenterName);

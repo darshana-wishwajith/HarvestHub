@@ -213,7 +213,18 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
                     Toast.makeText(CreateSupplyOfferActivity.this, "Offer sent to buyer", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(CreateSupplyOfferActivity.this, "Failed to send offer", Toast.LENGTH_SHORT).show();
+                    String detailedErrorMessage = "Failed to send offer";
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            detailedErrorMessage = errorBody.string();
+                        } else if (response.message() != null && !response.message().isEmpty()) {
+                            detailedErrorMessage = response.message();
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("CreateOfferError", "Error parsing error body", e);
+                    }
+                    Toast.makeText(CreateSupplyOfferActivity.this, detailedErrorMessage, Toast.LENGTH_SHORT).show();
+                    android.util.Log.e("CreateOfferError", "Error: " + detailedErrorMessage);
                 }
             }
 
@@ -221,7 +232,9 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
                 btnSendOffer.setEnabled(true);
                 btnSendOffer.setText("Send Offer to Buyer");
-                Toast.makeText(CreateSupplyOfferActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                String errorMessage = "Network error: " + t.getMessage();
+                Toast.makeText(CreateSupplyOfferActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                android.util.Log.e("CreateOfferError", errorMessage, t);
             }
         });
     }

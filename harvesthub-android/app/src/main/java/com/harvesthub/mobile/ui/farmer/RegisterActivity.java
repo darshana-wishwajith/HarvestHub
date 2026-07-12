@@ -148,8 +148,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isValid) {
+            String hashedPassword = com.harvesthub.mobile.utils.PasswordUtils.hashPassword(password);
             RegisterRequest registerRequest = new RegisterRequest(
-                    fullName, mobile, nic, email, password, "FARMER"
+                    fullName, mobile, nic, email, hashedPassword, "FARMER"
             );
             Intent intent = new Intent(this, LocationSetupActivity.class);
             intent.putExtra("registerRequest", registerRequest);

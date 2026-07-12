@@ -22,7 +22,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmLocation;
-import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
@@ -37,6 +36,9 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
     private FusedLocationProviderClient fusedLocationClient;
     private RegisterRequest registerRequest;
     private Button btnConfirm;
+    private com.google.android.material.card.MaterialCardView cvError;
+    private android.widget.TextView tvErrorMessage;
+    private View ivCloseError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,9 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         View btnBack = findViewById(R.id.btnBack);
         View btnCloseMap = findViewById(R.id.btnCloseMap);
         View btnMyLocation = findViewById(R.id.btnMyLocation);
+        cvError = findViewById(R.id.cvError);
+        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        ivCloseError = findViewById(R.id.ivCloseError);
 
         registerRequest = getIntent().getParcelableExtra("registerRequest");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -61,6 +66,7 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         btnCloseMap.setOnClickListener(v -> finish());
         btnMyLocation.setOnClickListener(v -> getDeviceLocation());
         btnConfirm.setOnClickListener(v -> saveLocation());
+        ivCloseError.setOnClickListener(v -> cvError.setVisibility(View.GONE));
     }
 
     @Override
@@ -106,27 +112,55 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         FarmLocation farmLocation = new FarmLocation("Address logic here", center.latitude, center.longitude);
         registerRequest.setFarmLocation(farmLocation);
 
+        cvError.setVisibility(View.GONE);
+        btnConfirm.setEnabled(false);
+        btnConfirm.setText("Registering...");
+
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        apiService.registerFarmer(registerRequest).enqueue(new Callback<GenericResponse>() {
+        apiService.registerFarmer(registerRequest).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                btnConfirm.setEnabled(true);
+                btnConfirm.setText("Confirm Coordinates");
+
                 if (response.isSuccessful()) {
                     Toast.makeText(LocationSetupActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LocationSetupActivity.this, FarmerLoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-
                 } else {
-                    Toast.makeText(LocationSetupActivity.this, "Registration Failed: " + response.message(), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LocationSetupActivity.this, FarmerRegisterActivity.class);
-                    startActivity(intent);
-                    finish();
+                    String detailedErrorMessage = "Registration Failed";
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            String bodyString = errorBody.string();
+                            if (bodyString != null && !bodyString.trim().isEmpty()) {
+                                detailedErrorMessage = bodyString;
+                            } else {
+                                detailedErrorMessage = "Registration Failed: " + response.code() + " " + response.message();
+                            }
+                        } else {
+                            detailedErrorMessage = "Registration Failed: " + response.code() + " " + response.message();
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("RegistrationError", "Error parsing error body", e);
+                        detailedErrorMessage = "Registration Failed: " + response.code();
+                    }
+                    
+                    tvErrorMessage.setText(detailedErrorMessage);
+                    cvError.setVisibility(View.VISIBLE);
+                    android.util.Log.e("RegistrationError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
                 }
             }
 
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
-                Toast.makeText(LocationSetupActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                btnConfirm.setEnabled(true);
+                btnConfirm.setText("Confirm Coordinates");
+                String errorMessage = "Network Error: " + t.getMessage();
+                tvErrorMessage.setText(errorMessage);
+                cvError.setVisibility(View.VISIBLE);
+                android.util.Log.e("RegistrationError", errorMessage, t);
             }
         });
     }
