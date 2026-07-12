@@ -34,4 +34,16 @@
     <string name="msg_outgoing_content">Hello Roshan. Given the certified quality and zero transport hassle, my best price is LKR 250/kg.</string>
     <string name="msg_outgoing_time">10:15 AM</string>
     <string name="type_message_hint">Type a message or counter-offer...</string>
+    <string name="vehicle_status_on_way">Status: Vehicle on the way</string>
+    <string name="order_number_arrival">Order #ORD-4082</string>
+    <string name="estimated_arrival_label">ESTIMATED ARRIVAL</string>
+    <string name="eta_value">30 mins</string>
+    <string name="driver_details_title">Driver Details</string>
+    <string name="driver_name">Sunil Perera</string>
+    <string name="verified_partner">Verified Partner</string>
+    <string name="vehicle_label">Vehicle</string>
+    <string name="vehicle_value">WP LG-5582</string>
+    <string name="capacity_label">Capacity</string>
+    <string name="capacity_value">10-ton Truck</string>
+    <string name="call_driver_btn">Call Driver</string>
 </resources>
