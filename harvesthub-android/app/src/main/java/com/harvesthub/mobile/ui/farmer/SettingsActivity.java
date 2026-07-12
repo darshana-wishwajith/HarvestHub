@@ -15,6 +15,7 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.SessionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,14 +26,22 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView ivProfile;
     private TextView tvInitial, tvProfileName, tvProfilePhone, tvProfileNic, tvCurrentLanguage;
     private ApiService apiService;
-    private final String farmerId = "FARMER_123";
+    private SessionManager sessionManager;
+    private String farmerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_settings);
 
-        apiService = ApiClient.getClient().create(ApiService.class);
+        sessionManager = new SessionManager(this);
+        if (sessionManager.getUser() != null) {
+            farmerId = sessionManager.getUser().getId();
+        } else {
+            farmerId = "FARMER_123"; // Fallback
+        }
+
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initViews();
         fetchProfile();
     }
@@ -128,7 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .setTitle("Log Out")
                 .setMessage("Are you sure you want to log out?")
                 .setPositiveButton("Log Out", (dialog, which) -> {
-                    // Clear session/prefs here
+                    sessionManager.logoutUser();
                     Intent intent = new Intent(this, FarmerLoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
