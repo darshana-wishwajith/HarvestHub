@@ -15,6 +15,7 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.PasswordUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,6 +26,9 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
     private TextInputLayout tilNewPassword, tilConfirmPassword;
     private TextInputEditText etNewPassword, etConfirmPassword;
     private Button btnSave;
+    private com.google.android.material.card.MaterialCardView cvError;
+    private android.widget.TextView tvErrorMessage;
+    private View ivCloseError;
     private String resetToken;
 
     @Override
@@ -37,12 +41,16 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnSave = findViewById(R.id.btnSave);
+        cvError = findViewById(R.id.cvError);
+        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        ivCloseError = findViewById(R.id.ivCloseError);
         View btnBack = findViewById(R.id.btnBack);
 
         resetToken = getIntent().getStringExtra("resetToken");
 
         btnBack.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> validateAndReset());
+        ivCloseError.setOnClickListener(v -> cvError.setVisibility(View.GONE));
     }
 
     private void validateAndReset() {
@@ -76,10 +84,12 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
     }
 
     private void performResetPassword(String newPassword) {
+        cvError.setVisibility(View.GONE);
         btnSave.setEnabled(false);
         btnSave.setText("Updating...");
 
-        ResetPasswordRequest request = new ResetPasswordRequest(resetToken, newPassword);
+        String hashedPassword = PasswordUtils.hashPassword(newPassword);
+        ResetPasswordRequest request = new ResetPasswordRequest(resetToken, hashedPassword);
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
         apiService.resetPassword(request).enqueue(new Callback<okhttp3.ResponseBody>() {
@@ -95,15 +105,25 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    StringBuilder errorMsg = new StringBuilder("Failed to update password");
+                    String detailedErrorMessage = "Failed to update password";
                     try (okhttp3.ResponseBody errorBody = response.errorBody()) {
                         if (errorBody != null) {
-                            errorMsg.append(": ").append(errorBody.string());
+                            String bodyString = errorBody.string();
+                            if (bodyString != null && !bodyString.trim().isEmpty()) {
+                                detailedErrorMessage = bodyString;
+                            } else {
+                                detailedErrorMessage = "Update Failed: " + response.code() + " " + response.message();
+                            }
+                        } else {
+                            detailedErrorMessage = "Update Failed: " + response.code() + " " + response.message();
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        android.util.Log.e("ResetPasswordError", "Error parsing error body", e);
+                        detailedErrorMessage = "Update Failed: " + response.code();
                     }
-                    Toast.makeText(CreateNewPasswordActivity.this, errorMsg.toString(), Toast.LENGTH_SHORT).show();
+                    tvErrorMessage.setText(detailedErrorMessage);
+                    cvError.setVisibility(View.VISIBLE);
+                    android.util.Log.e("ResetPasswordError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
                 }
             }
 
@@ -111,7 +131,10 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
                 btnSave.setEnabled(true);
                 btnSave.setText("Save & Login");
-                Toast.makeText(CreateNewPasswordActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                String errorMessage = "Network error: " + t.getMessage();
+                tvErrorMessage.setText(errorMessage);
+                cvError.setVisibility(View.VISIBLE);
+                android.util.Log.e("ResetPasswordError", errorMessage, t);
             }
         });
     }

@@ -10,6 +10,8 @@ import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
+import com.harvesthub.mobile.model.LoginRequest;
+import com.harvesthub.mobile.model.LoginResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.NotificationItem;
 import com.harvesthub.mobile.model.ResendOtpRequest;
@@ -46,6 +48,9 @@ public interface ApiService {
 
     @POST("auth/verify-otp")
     Call<VerifyOtpResponse> verifyOtp(@Body VerifyOtpRequest request);
+
+    @POST("api/auth/login")
+    Call<LoginResponse> login(@Body LoginRequest request);
 
     @POST("auth/send-otp")
     Call<GenericResponse> sendVerificationCode(@Body SendOtpRequest request);

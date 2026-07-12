@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary_green">#1B4332</color>
+    <color name="primary_dark_green">#081C15</color>
     <color name="accent_green">#0FA968</color>
     <color name="light_green_badge">#E8F5E9</color>
     <color name="dark_green_text">#2E7D32</color>
@@ -26,7 +27,6 @@
     <color name="divider_color">#E0E0E0</color>
     <color name="border_default">#E0E0E0</color>
     <color name="border_active">#1B4332</color>
-    <color name="primary_dark_green">#1B4332</color>
     <color name="gradient_start">#FFFFFF</color>
     <color name="gradient_end">#E4FFE5</color>
     <color name="icon_bg_green">#E8F5E9</color>
