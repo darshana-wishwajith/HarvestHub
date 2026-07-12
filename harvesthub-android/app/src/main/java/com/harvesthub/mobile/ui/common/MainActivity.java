@@ -10,15 +10,29 @@ import com.harvesthub.mobile.ui.buyer.BuyerLoginActivity;
 import com.harvesthub.mobile.ui.farmer.FarmerLoginActivity;
 import com.harvesthub.mobile.ui.farmer.RegisterActivity;
 import com.harvesthub.mobile.ui.transporter.TransporterLoginActivity;
+import com.harvesthub.mobile.utils.SessionManager;
+import com.harvesthub.mobile.ui.farmer.FarmerDashboardActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check if user is already logged in
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isLoggedIn()) {
+            String role = sessionManager.getUserRole();
+            if ("FARMER".equals(role)) {
+                startActivity(new Intent(this, FarmerDashboardActivity.class));
+                finish();
+                return;
+            }
+            // Add other roles here as they are implemented
+        }
+
         setContentView(R.layout.activity_main);
         setupCardListeners();
-
     }
 
     private void setupCardListeners() {
@@ -27,9 +41,29 @@ public class MainActivity extends AppCompatActivity {
         MaterialCardView cardBuyer = findViewById(R.id.cardBuyer);
         MaterialCardView cardTransporter = findViewById(R.id.cardTransporter);
 
-        cardFarmer.setOnClickListener(v -> navigateToFarmerLogin());
-        cardBuyer.setOnClickListener(v -> navigateToBuyerLogin());
-        cardTransporter.setOnClickListener(v -> navigateToTransporterLogin());
+        cardFarmer.setOnClickListener(v -> {
+            updateSelection(cardFarmer, cardBuyer, cardTransporter);
+            navigateToFarmerLogin();
+        });
+        cardBuyer.setOnClickListener(v -> {
+            updateSelection(cardBuyer, cardFarmer, cardTransporter);
+            navigateToBuyerLogin();
+        });
+        cardTransporter.setOnClickListener(v -> {
+            updateSelection(cardTransporter, cardFarmer, cardBuyer);
+            navigateToTransporterLogin();
+        });
+    }
+
+    private void updateSelection(MaterialCardView selected, MaterialCardView... others) {
+        selected.setChecked(true);
+        selected.setActivated(true);
+        selected.setSelected(true);
+        for (MaterialCardView other : others) {
+            other.setChecked(false);
+            other.setActivated(false);
+            other.setSelected(false);
+        }
     }
 
     private void navigateToFarmerLogin() {
