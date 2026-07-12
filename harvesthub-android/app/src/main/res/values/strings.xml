@@ -21,4 +21,17 @@
     <string name="notif_account_verified_title">Account Verified</string>
     <string name="notif_account_verified_time">Oct 10</string>
     <string name="notif_account_verified_desc">Your farmer certification has been successfully processed. You now have access to premium buyer listings.</string>
+    <string name="buyer_name">Roshan Silva</string>
+    <string name="verified_buyer">Verified Buyer</string>
+    <string name="buyer_rating">4.8★</string>
+    <string name="product_summary">Big Onions Batch #ON-104 • 500 KG • LKR 260/kg</string>
+    <string name="adjust_order_details">Adjust Order Details</string>
+    <string name="total_price_label">LKR 125,000</string>
+    <string name="confirm_final_deal">Confirm Final Deal</string>
+    <string name="today">TODAY</string>
+    <string name="msg_incoming_content">Hello Kamal, I reviewed your verified Grade A batch. Can you supply the full 500 KG at LKR 245/kg for immediate transport to Dambulla?</string>
+    <string name="msg_incoming_time">10:14 AM</string>
+    <string name="msg_outgoing_content">Hello Roshan. Given the certified quality and zero transport hassle, my best price is LKR 250/kg.</string>
+    <string name="msg_outgoing_time">10:15 AM</string>
+    <string name="type_message_hint">Type a message or counter-offer...</string>
 </resources>
