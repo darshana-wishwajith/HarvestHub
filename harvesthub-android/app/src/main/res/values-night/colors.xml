@@ -3,6 +3,7 @@
     <!-- Basic Colors -->
     <color name="black">#FFFFFFFF</color>
     <color name="white">#121212</color>
+    <color name="bg_light">#121212</color>
 
     <!-- Semantic Colors for Dark Mode -->
     <color name="screen_background">#121212</color>
@@ -27,4 +28,6 @@
     <color name="icon_bg_grey">#2C2C2C</color>
 
     <color name="card_stroke">#388E3C</color>
+    <color name="chart_gradient_start">#81C784</color>
+    <color name="chart_gradient_end">#00121212</color>
 </resources>
