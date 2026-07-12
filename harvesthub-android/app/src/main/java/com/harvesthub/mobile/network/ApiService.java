@@ -50,7 +50,7 @@ public interface ApiService {
     Call<GenericResponse> sendVerificationCode(@Body SendOtpRequest request);
 
     @POST("auth/resend-otp")
-    Call<GenericResponse> resendOtp(@Body ResendOtpRequest request);
+    Call<okhttp3.ResponseBody> resendOtp(@Body ResendOtpRequest request);
 
     @GET("dashboard/farmer/{id}")
     Call<DashboardResponse> getFarmerDashboard(@Path("id") String farmerId);
@@ -62,13 +62,13 @@ public interface ApiService {
     Call<MarketTrendResponse> getMarketTrend(@Query("crop") String cropType, @Query("days") int days);
 
     @POST("auth/reset-password")
-    Call<GenericResponse> resetPassword(@Body ResetPasswordRequest request);
+    Call<okhttp3.ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
-    @POST("auth/register")
-    Call<GenericResponse> registerFarmer(@Body RegisterRequest request);
+    @POST("api/auth/register")
+    Call<okhttp3.ResponseBody> registerFarmer(@Body RegisterRequest request);
 
     @POST("farmer/location")
-    Call<GenericResponse> saveFarmLocation(@Body LocationRequest request);
+    Call<okhttp3.ResponseBody> saveFarmLocation(@Body LocationRequest request);
 
     @GET("batches/verified")
     Call<List<CropBatch>> getFarmerVerifiedBatches(@Query("farmerId") String farmerId, @Query("cropType") String cropType);
@@ -80,10 +80,10 @@ public interface ApiService {
     Call<List<NotificationItem>> getNotifications(@Path("farmerId") String farmerId);
 
     @POST("notifications/{id}/read")
-    Call<GenericResponse> markNotificationRead(@Path("id") String notificationId);
+    Call<okhttp3.ResponseBody> markNotificationRead(@Path("id") String notificationId);
 
     @POST("notifications/mark-all-read")
-    Call<GenericResponse> markAllNotificationsRead(@Query("farmerId") String farmerId);
+    Call<okhttp3.ResponseBody> markAllNotificationsRead(@Query("farmerId") String farmerId);
 
     @GET("chat/{orderId}/messages")
     Call<List<ChatMessage>> getChatMessages(@Path("orderId") String orderId);
@@ -117,7 +117,7 @@ public interface ApiService {
 
     @Multipart
     @POST("farmer/{id}/update-profile")
-    Call<GenericResponse> updateFarmerProfile(
+    Call<okhttp3.ResponseBody> updateFarmerProfile(
             @Path("id") String farmerId,
             @Part("fullName") RequestBody fullName,
             @Part("phoneNumber") RequestBody phoneNumber,

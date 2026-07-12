@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
@@ -83,29 +82,33 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
         ResetPasswordRequest request = new ResetPasswordRequest(resetToken, newPassword);
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        apiService.resetPassword(request).enqueue(new Callback<GenericResponse>() {
+        apiService.resetPassword(request).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
                 btnSave.setEnabled(true);
                 btnSave.setText("Save & Login");
 
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful()) {
                     Toast.makeText(CreateNewPasswordActivity.this, "Password updated successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(CreateNewPasswordActivity.this, FarmerLoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 } else {
-                    String errorMsg = "Failed to update password";
-                    if (response.body() != null) {
-                        errorMsg = response.body().getMessage();
+                    StringBuilder errorMsg = new StringBuilder("Failed to update password");
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            errorMsg.append(": ").append(errorBody.string());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Toast.makeText(CreateNewPasswordActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewPasswordActivity.this, errorMsg.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
                 btnSave.setEnabled(true);
                 btnSave.setText("Save & Login");
                 Toast.makeText(CreateNewPasswordActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
