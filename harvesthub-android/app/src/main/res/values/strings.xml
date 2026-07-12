@@ -54,4 +54,14 @@
     <string name="vehicle_label_only">Vehicle: </string>
     <string name="vehicle_number_kdh">KDH 492L</string>
     <string name="confirm_harvest_ready">Confirm Harvest Ready</string>
+    <string name="order_details_title">Order Details</string>
+    <string name="commodity_label">Commodity</string>
+    <string name="commodity_value">Big Onions</string>
+    <string name="quantity_label">Quantity</string>
+    <string name="quantity_value_bold">500 KG</string>
+    <string name="total_value_label">Total Value</string>
+    <string name="total_value_amount">LKR 125,000</string>
+    <string name="advance_received_title">LKR 25,000 Advance Received</string>
+    <string name="escrow_notice">The buyer\'s deposit is now secured in escrow.</string>
+    <string name="acknowledge_start_harvesting">Acknowledge &amp; Start Harvesting</string>
 </resources>
