@@ -39,4 +39,6 @@
     <color name="clock_circle_bg">#E8F5E9</color>
     <color name="driver_card_bg">#F5F5F5</color>
     <color name="row_bg">#FFFFFF</color>
+    <color name="call_btn_bg_light">#D4EDE0</color>
+    <color name="illustration_card_bg">#F8F9F8</color>
 </resources>
