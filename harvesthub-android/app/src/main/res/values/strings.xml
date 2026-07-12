@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">HarvestHub Mobile</string>
     <string name="sign_in_as_farmer">Sign In as Farmer</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="mark_all_as_read">Mark all as read</string>
+    <string name="mark_as_read">Mark as Read</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_market">Market</string>
+    <string name="nav_listings">Listings</string>
+    <string name="nav_wallet">Wallet</string>
+    <string name="nav_settings">Settings</string>
+    <string name="notif_delivery_success_title">Delivery Successful - Funds Transferred</string>
+    <string name="notif_delivery_success_time">2 mins ago</string>
+    <string name="notif_delivery_success_desc">LKR 140,000 has been credited to your wallet after successful verification of the paddy delivery at the Ampara Depot.</string>
+    <string name="notif_penalty_title">Penalty Alert: Empty Trip Fee</string>
+    <string name="notif_penalty_time">Yesterday</string>
+    <string name="notif_penalty_desc">A fee of LKR 1,500 was applied due to a late cancellation on the logistics request #TRK-8821.</string>
+    <string name="notif_listing_approved_title">Listing Approved</string>
+    <string name="notif_listing_approved_time">Oct 12</string>
+    <string name="notif_listing_approved_desc">Your requested listing for 500 KG of Organic Keeri Samba has been verified and is now live.</string>
+    <string name="notif_account_verified_title">Account Verified</string>
+    <string name="notif_account_verified_time">Oct 10</string>
+    <string name="notif_account_verified_desc">Your farmer certification has been successfully processed. You now have access to premium buyer listings.</string>
 </resources>
