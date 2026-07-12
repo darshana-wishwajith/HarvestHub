@@ -99,39 +99,29 @@
                 tools:listitem="@layout/item_photo_thumbnail" />
 
             <!-- Crop Selector Card -->
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCropDropdown"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#94A3B8"
-                app:strokeWidth="1dp">
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:hintEnabled="false"
+                app:boxStrokeColor="#94A3B8">
 
-                <RelativeLayout
+                <AutoCompleteTextView
+                    android:id="@+id/actvCrop"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="16dp">
-
-                    <TextView
-                        android:id="@+id/tvSelectedCrop"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="Big Onions"
-                        android:textColor="#334155"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/arrow_icon"
-                        app:tint="#64748B" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_height="wrap_content"
+                    android:hint="@string/select_crop"
+                    android:inputType="none"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#334155"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Add New -->
             <LinearLayout

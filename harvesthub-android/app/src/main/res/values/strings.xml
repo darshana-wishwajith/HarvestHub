@@ -92,4 +92,33 @@
     <string name="pro_tip_content">You’ll be notified on confirmation. Do not harvest until the advance payment is secured in your wallet.</string>
     <string name="nav_message">Message</string>
     <string name="nav_view_post">View Post</string>
+
+    <!-- Main Activity Strings -->
+    <string name="welcome_to_harvesthub">Welcome to HarvestHub</string>
+    <string name="choose_account_type">Choose your account type to get started</string>
+    <string name="farmer">Farmer</string>
+    <string name="farmer_desc">Sell crops &amp; manage harvests</string>
+    <string name="buyer">Buyer</string>
+    <string name="buyer_desc">Purchase verified produce</string>
+    <string name="transporter">Transporter</string>
+    <string name="transporter_desc">Accept delivery jobs</string>
+    <string name="terms_and_privacy">BTerms of Service &amp; Privacy Policy</string>
+
+    <!-- Rating & Feedback Strings -->
+    <string name="notifications">Notifications</string>
+    <string name="transaction_complete">Transaction Complete</string>
+    <string name="order_summary">Order Summary</string>
+    <string name="total_payout">Total Payout</string>
+    <string name="rate_buyer">Rate Buyer</string>
+    <string name="communication_fairness">Communication &amp; Fairness</string>
+    <string name="rate_transporter">Rate Transporter</string>
+    <string name="punctuality_handling">Punctuality &amp; Handling</string>
+    <string name="feedback_hint">Add more details about your experience...</string>
+    <string name="submit_feedback">Submit Feedback</string>
+    <string name="home">Home</string>
+    <string name="market">Market</string>
+    <string name="listings">Listings</string>
+    <string name="wallet">Wallet</string>
+    <string name="settings">Settings</string>
+    <string name="select_crop">Select Crop</string>
 </resources>
