@@ -98,7 +98,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         if (errorBody != null) {
                             String bodyString = errorBody.string();
                             if (bodyString != null && !bodyString.trim().isEmpty()) {
-                                detailedErrorMessage = bodyString;
+                                detailedErrorMessage = formatError(bodyString);
                             } else {
                                 detailedErrorMessage = "Error: " + response.code() + " " + response.message();
                             }
@@ -125,6 +125,26 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 android.util.Log.e("ForgotPasswordError", errorMessage, t);
             }
         });
+    }
+
+    private String formatError(String errorBody) {
+        try {
+            if (errorBody.trim().startsWith("{")) {
+                org.json.JSONObject jsonObject = new org.json.JSONObject(errorBody);
+                StringBuilder sb = new StringBuilder();
+                java.util.Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    String message = jsonObject.optString(key);
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append("• ").append(message);
+                }
+                return sb.toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return errorBody;
     }
 
     private String maskIdentifier(String identifier) {
