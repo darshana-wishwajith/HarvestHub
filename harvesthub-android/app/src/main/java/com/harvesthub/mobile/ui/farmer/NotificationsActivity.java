@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.NotificationItem;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
@@ -109,15 +108,15 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     @Override
     public void onMarkAsRead(NotificationItem notification, int position) {
-        apiService.markNotificationRead(notification.getId()).enqueue(new Callback<GenericResponse>() {
+        apiService.markNotificationRead(notification.getId()).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
                 notification.setRead(true);
                 adapter.notifyItemChanged(position);
             }
 
             @Override
-            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
                 // For demo, just update UI
                 notification.setRead(true);
                 adapter.notifyItemChanged(position);
@@ -126,9 +125,9 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     }
 
     private void markAllAsRead() {
-        apiService.markAllNotificationsRead(farmerId).enqueue(new Callback<GenericResponse>() {
+        apiService.markAllNotificationsRead(farmerId).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
                 for (NotificationItem item : notificationList) {
                     item.setRead(true);
                 }
@@ -136,7 +135,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             }
 
             @Override
-            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
                 // For demo, just update UI
                 for (NotificationItem item : notificationList) {
                     item.setRead(true);

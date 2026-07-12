@@ -8,7 +8,10 @@ import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
+import com.harvesthub.mobile.model.LoginRequest;
+import com.harvesthub.mobile.model.LoginResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.NotificationItem;
 import com.harvesthub.mobile.model.ResendOtpRequest;
@@ -46,11 +49,14 @@ public interface ApiService {
     @POST("auth/verify-otp")
     Call<VerifyOtpResponse> verifyOtp(@Body VerifyOtpRequest request);
 
+    @POST("api/auth/login")
+    Call<LoginResponse> login(@Body LoginRequest request);
+
     @POST("auth/send-otp")
     Call<GenericResponse> sendVerificationCode(@Body SendOtpRequest request);
 
     @POST("auth/resend-otp")
-    Call<GenericResponse> resendOtp(@Body ResendOtpRequest request);
+    Call<okhttp3.ResponseBody> resendOtp(@Body ResendOtpRequest request);
 
     @GET("dashboard/farmer/{id}")
     Call<DashboardResponse> getFarmerDashboard(@Path("id") String farmerId);
@@ -62,13 +68,13 @@ public interface ApiService {
     Call<MarketTrendResponse> getMarketTrend(@Query("crop") String cropType, @Query("days") int days);
 
     @POST("auth/reset-password")
-    Call<GenericResponse> resetPassword(@Body ResetPasswordRequest request);
+    Call<okhttp3.ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
-    @POST("auth/register")
-    Call<GenericResponse> registerFarmer(@Body RegisterRequest request);
+    @POST("api/auth/register")
+    Call<okhttp3.ResponseBody> registerFarmer(@Body RegisterRequest request);
 
     @POST("farmer/location")
-    Call<GenericResponse> saveFarmLocation(@Body LocationRequest request);
+    Call<okhttp3.ResponseBody> saveFarmLocation(@Body LocationRequest request);
 
     @GET("batches/verified")
     Call<List<CropBatch>> getFarmerVerifiedBatches(@Query("farmerId") String farmerId, @Query("cropType") String cropType);
@@ -80,10 +86,10 @@ public interface ApiService {
     Call<List<NotificationItem>> getNotifications(@Path("farmerId") String farmerId);
 
     @POST("notifications/{id}/read")
-    Call<GenericResponse> markNotificationRead(@Path("id") String notificationId);
+    Call<okhttp3.ResponseBody> markNotificationRead(@Path("id") String notificationId);
 
     @POST("notifications/mark-all-read")
-    Call<GenericResponse> markAllNotificationsRead(@Query("farmerId") String farmerId);
+    Call<okhttp3.ResponseBody> markAllNotificationsRead(@Query("farmerId") String farmerId);
 
     @GET("chat/{orderId}/messages")
     Call<List<ChatMessage>> getChatMessages(@Path("orderId") String orderId);
@@ -104,7 +110,7 @@ public interface ApiService {
     Call<List<ListingItem>> getActiveListings(@Path("id") String farmerId);
 
     @GET("farmer/{id}/listing-history")
-    Call<List<ListingItem>> getListingHistory(@Path("id") String farmerId);
+    Call<List<HistoryListing>> getListingHistory(@Path("id") String farmerId, @Query("search") String searchQuery);
 
     @GET("wallet/{farmerId}/summary")
     Call<WalletSummaryResponse> getWalletSummary(@Path("farmerId") String farmerId);
@@ -117,7 +123,7 @@ public interface ApiService {
 
     @Multipart
     @POST("farmer/{id}/update-profile")
-    Call<GenericResponse> updateFarmerProfile(
+    Call<okhttp3.ResponseBody> updateFarmerProfile(
             @Path("id") String farmerId,
             @Part("fullName") RequestBody fullName,
             @Part("phoneNumber") RequestBody phoneNumber,
