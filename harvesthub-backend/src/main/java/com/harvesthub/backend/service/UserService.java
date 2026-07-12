@@ -17,10 +17,17 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser.isPresent()) {
-            throw new RuntimeException("Email already exists");
+        // Check for uniqueness
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalStateException("Email already exists");
         }
+        if (userRepository.findByMobileNumber(user.getMobileNumber()).isPresent()) {
+            throw new IllegalStateException("Mobile number already exists");
+        }
+        if (userRepository.findByNic(user.getNic()).isPresent()) {
+            throw new IllegalStateException("NIC already exists");
+        }
+
         // Hash the incoming SHA-256 password with BCrypt
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
