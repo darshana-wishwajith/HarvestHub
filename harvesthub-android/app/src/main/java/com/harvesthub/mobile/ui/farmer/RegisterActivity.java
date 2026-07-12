@@ -10,7 +10,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,11 +24,10 @@ import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private TextInputLayout tilFullName, tilMobileNumber, tilNic, tilPassword, tilConfirmPassword;
-    private TextInputEditText etFullName, etMobileNumber, etNic, etPassword, etConfirmPassword;
+    private TextInputLayout tilFullName, tilMobileNumber, tilEmail, tilNic, tilPassword, tilConfirmPassword;
+    private TextInputEditText etFullName, etMobileNumber, etEmail, etNic, etPassword, etConfirmPassword;
     private TextView tvAppName, tvSignIn;
     private Button btnContinue;
-    private ImageButton btnNicInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,19 +37,22 @@ public class RegisterActivity extends AppCompatActivity {
         initViews();
         setupSpannableTexts();
 
-        btnNicInfo.setOnClickListener(v -> showNicInfoDialog());
+        tilEmail.setEndIconOnClickListener(v -> showEmailInfoDialog());
+        tilNic.setEndIconOnClickListener(v -> showNicInfoDialog());
         btnContinue.setOnClickListener(v -> validateAndContinue());
     }
 
     private void initViews() {
         tilFullName = findViewById(R.id.tilFullName);
         tilMobileNumber = findViewById(R.id.tilMobileNumber);
+        tilEmail = findViewById(R.id.tilEmail);
         tilNic = findViewById(R.id.tilNic);
         tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
         etFullName = findViewById(R.id.etFullName);
         etMobileNumber = findViewById(R.id.etMobileNumber);
+        etEmail = findViewById(R.id.etEmail);
         etNic = findViewById(R.id.etNic);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -59,7 +60,6 @@ public class RegisterActivity extends AppCompatActivity {
         tvAppName = findViewById(R.id.tvAppName);
         tvSignIn = findViewById(R.id.tvSignIn);
         btnContinue = findViewById(R.id.btnContinue);
-        btnNicInfo = findViewById(R.id.btnNicInfo);
     }
 
     private void setupSpannableTexts() {
@@ -95,15 +95,27 @@ public class RegisterActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showEmailInfoDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Email Format Info")
+                .setMessage("Please enter a valid email address.\n\n" +
+                        "Example: example@domain.com\n" +
+                        "It must contain an '@' symbol and a domain (e.g., .com, .org).")
+                .setPositiveButton("Got it", null)
+                .show();
+    }
+
     private void validateAndContinue() {
         String fullName = etFullName.getText().toString().trim();
         String mobile = etMobileNumber.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
         String nic = etNic.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         tilFullName.setError(null);
         tilMobileNumber.setError(null);
+        tilEmail.setError(null);
         tilNic.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
@@ -116,6 +128,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
         if (!Pattern.matches("07[0-9]{8}", mobile)) {
             tilMobileNumber.setError("Enter a valid 10-digit mobile number");
+            isValid = false;
+        }
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Enter a valid email address");
             isValid = false;
         }
         if (!Pattern.matches("^[0-9]{9}[vVxX]$|^[0-9]{12}$", nic)) {
@@ -132,11 +148,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isValid) {
+            String hashedPassword = com.harvesthub.mobile.utils.PasswordUtils.hashPassword(password);
+            RegisterRequest registerRequest = new RegisterRequest(
+                    fullName, mobile, nic, email, hashedPassword, "FARMER"
+            );
             Intent intent = new Intent(this, LocationSetupActivity.class);
-            intent.putExtra("fullName", fullName);
-            intent.putExtra("mobile", mobile);
-            intent.putExtra("nic", nic);
-            intent.putExtra("password", password);
+            intent.putExtra("registerRequest", registerRequest);
             startActivity(intent);
         }
     }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/screen_background">
 
     <View
         android:layout_width="300dp"
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Account Verified!"
-            android:textColor="@color/black"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
             android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="Your identity has been successfully verified. You can now proceed to set a new password for your account."
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
         <Button
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="48dp"
-            android:backgroundTint="#1B4332"
+            android:backgroundTint="@color/primary_dark_green"
             android:text="Reset Password"
             android:textAllCaps="false"
             android:textColor="@color/white"

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Shield shape -->
+    <path
+        android:fillColor="#012D1D"
+        android:pathData="M12,2 L4,5.5 v6.5 c0,5.5 3.5,10.5 8,12 4.5,-1.5 8,-6.5 8,-12 V5.5 L12,2 z" />
+
+    <!-- Top Left quadrant (lighter/different green to create checker) -->
+    <path
+        android:fillColor="#073B27"
+        android:pathData="M12,3 L12,12 L5,12 v-5.6 z" />
+
+    <!-- Bottom Right quadrant -->
+    <path
+        android:fillColor="#073B27"
+        android:pathData="M12,12 h7 c0,4.5 -3,8.5 -7,10 v-10 z" />
+
+</vector>
