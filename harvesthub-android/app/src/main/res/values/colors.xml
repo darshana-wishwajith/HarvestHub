@@ -46,4 +46,6 @@
     <color name="shield_inner_bg">#FFF8E1</color>
     <color name="shield_outer_bg">#FFF3E0</color>
     <color name="escrow_card_footer_bg">#1B4332</color>
+    <color name="tip_bg">#E8F5E9</color>
+    <color name="pending_amber">#FFA000</color>
 </resources>

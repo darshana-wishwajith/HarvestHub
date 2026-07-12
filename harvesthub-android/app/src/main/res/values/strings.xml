@@ -81,4 +81,15 @@
     <string name="escrow_protection_desc">HarvestHub Escrow safeguards funds until quality inspection is cleared and final delivery is confirmed by logistics partners.</string>
     <string name="escrow_protection_label">Escrow Protection</string>
     <string name="view_protection_terms">View Protection Terms</string>
+    <string name="order_status_title">Order Status</string>
+    <string name="order_id_full">ID: #HH-8829-BS</string>
+    <string name="status_pending">Pending</string>
+    <string name="waiting_for_buyer_confirm">Waiting for Roshan Silva to confirm the final deal.</string>
+    <string name="price_per_unit_label">Price Per Unit</string>
+    <string name="deal_under_review">Deal Under Review</string>
+    <string name="deal_under_review_desc">We’ve sent the finalized terms to the buyer. This usually takes less than 30 minutes.</string>
+    <string name="farmer_pro_tip">Farmer Pro-Tip</string>
+    <string name="pro_tip_content">You’ll be notified on confirmation. Do not harvest until the advance payment is secured in your wallet.</string>
+    <string name="nav_message">Message</string>
+    <string name="nav_view_post">View Post</string>
 </resources>
