@@ -72,7 +72,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_person"
+            android:src="@drawable/profile_png"
             app:shapeAppearanceOverlay="@style/CircleAppearance"
             app:strokeColor="@color/divider_gray"
             app:strokeWidth="1dp" />

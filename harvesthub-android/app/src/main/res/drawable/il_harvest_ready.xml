@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="150dp"
+    android:viewportWidth="200"
+    android:viewportHeight="150">
+    <!-- Warehouse -->
+    <path
+        android:fillColor="#1B4332"
+        android:pathData="M140,120h-60V70l30,-20l30,20z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M125,120h-30V90h30z" />
+    <!-- Crates -->
+    <path
+        android:fillColor="#43B14B"
+        android:pathData="M60,120h20v-20h-20zM90,120h20v-20h-20zM120,120h20v-20h-20z" />
+    <!-- Sprout Arrow -->
+    <path
+        android:fillColor="#43B14B"
+        android:pathData="M100,50l-10,10h5v20h10V60h5z" />
+</vector>

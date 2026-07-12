@@ -46,4 +46,12 @@
     <string name="capacity_label">Capacity</string>
     <string name="capacity_value">10-ton Truck</string>
     <string name="call_driver_btn">Call Driver</string>
+    <string name="status_harvesting_in_progress">Status: Harvesting in Progress</string>
+    <string name="ready_for_dispatch_title">Ready for Dispatch?</string>
+    <string name="ready_for_dispatch_desc">Please ensure all crates are secured. The transport truck has entered the geo-fenced loading zone and is expected at your gate in 30 minutes after you conform as harvest is ready.</string>
+    <string name="driver_label">Driver: </string>
+    <string name="driver_name_samuel">Samuel O.</string>
+    <string name="vehicle_label_only">Vehicle: </string>
+    <string name="vehicle_number_kdh">KDH 492L</string>
+    <string name="confirm_harvest_ready">Confirm Harvest Ready</string>
 </resources>
