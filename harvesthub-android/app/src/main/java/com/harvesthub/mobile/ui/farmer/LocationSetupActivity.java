@@ -22,7 +22,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmLocation;
-import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
@@ -107,26 +106,36 @@ public class LocationSetupActivity extends AppCompatActivity implements OnMapRea
         registerRequest.setFarmLocation(farmLocation);
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        apiService.registerFarmer(registerRequest).enqueue(new Callback<GenericResponse>() {
+        apiService.registerFarmer(registerRequest).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(LocationSetupActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LocationSetupActivity.this, FarmerLoginActivity.class);
                     startActivity(intent);
                     finish();
-
                 } else {
-                    Toast.makeText(LocationSetupActivity.this, "Registration Failed: " + response.message(), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LocationSetupActivity.this, FarmerRegisterActivity.class);
+                    StringBuilder errorMsg = new StringBuilder("Registration Failed");
+                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                        if (errorBody != null) {
+                            errorMsg.append(": ").append(errorBody.string());
+                        } else {
+                            errorMsg.append(": ").append(response.message());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(LocationSetupActivity.this, errorMsg.toString(), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(LocationSetupActivity.this, RegisterActivity.class);
                     startActivity(intent);
                     finish();
                 }
             }
 
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
-                Toast.makeText(LocationSetupActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                Toast.makeText(LocationSetupActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                t.printStackTrace();
             }
         });
     }
