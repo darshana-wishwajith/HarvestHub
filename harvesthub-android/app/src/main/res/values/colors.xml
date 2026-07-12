@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="bg_cream">#FDF8F3</color>
     <color name="primary_green">#1B4332</color>
     <color name="primary_dark_green">#081C15</color>
     <color name="accent_green">#0FA968</color>
@@ -34,4 +35,19 @@
     <color name="card_stroke">#E0E0E0</color>
     <color name="chart_gradient_start">#4CAF50</color>
     <color name="chart_gradient_end">#00FFFFFF</color>
+
+    <color name="ring_light_green">#A8D5B5</color>
+    <color name="badge_red">#E53935</color>
+    <color name="text_gray_scanning">#6B7280</color>
+    <color name="progress_track">#E8E8E8</color>
+    <color name="nav_inactive">#414844</color>
+
+    <!-- Camera Capture Colors -->
+    <color name="brand_green">#1E5631</color>
+    <color name="accent_green_tabs">#2E7D32</color>
+    <color name="geo_lock_bg">#3D1F1F</color>
+    <color name="geo_lock_icon">#E53935</color>
+    <color name="control_bg_grey">#3A3A3A</color>
+    <color name="text_subtitle_grey">#B0B0B0</color>
+    <color name="nav_pill_green">#1B4332</color>
 </resources>
