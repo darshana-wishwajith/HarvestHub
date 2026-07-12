@@ -20,15 +20,9 @@ import java.util.List;
 public class HistoryListingAdapter extends RecyclerView.Adapter<HistoryListingAdapter.ViewHolder> {
 
     private final List<HistoryListing> items;
-    private final OnItemClickListener listener;
 
-    public interface OnItemClickListener {
-        void onItemClick(HistoryListing item);
-    }
-
-    public HistoryListingAdapter(List<HistoryListing> items, OnItemClickListener listener) {
+    public HistoryListingAdapter(List<HistoryListing> items) {
         this.items = items;
-        this.listener = listener;
     }
 
     @NonNull
@@ -41,7 +35,7 @@ public class HistoryListingAdapter extends RecyclerView.Adapter<HistoryListingAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HistoryListing item = items.get(position);
-        holder.bind(item, listener);
+        holder.bind(item);
     }
 
     @Override
@@ -50,48 +44,46 @@ public class HistoryListingAdapter extends RecyclerView.Adapter<HistoryListingAd
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCropName, tvStatusBadge, tvSecondRowText, tvLabelLeft, tvValueLeft, tvLabelRight, tvValueRight;
-        ImageView ivSecondRowIcon;
-        MaterialButton btnAction;
+        TextView tvCropName, tvStatusBadge, tvRowText, tvLabelLeft, tvValueLeft, tvLabelRight, tvValueRight;
+        ImageView ivRowIcon;
+        MaterialButton btnView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCropName = itemView.findViewById(R.id.tvCropName);
             tvStatusBadge = itemView.findViewById(R.id.tvStatusBadge);
-            tvSecondRowText = itemView.findViewById(R.id.tvSecondRowText);
+            tvRowText = itemView.findViewById(R.id.tvRowText);
             tvLabelLeft = itemView.findViewById(R.id.tvLabelLeft);
             tvValueLeft = itemView.findViewById(R.id.tvValueLeft);
             tvLabelRight = itemView.findViewById(R.id.tvLabelRight);
             tvValueRight = itemView.findViewById(R.id.tvValueRight);
-            ivSecondRowIcon = itemView.findViewById(R.id.ivSecondRowIcon);
-            btnAction = itemView.findViewById(R.id.btnAction);
+            ivRowIcon = itemView.findViewById(R.id.ivRowIcon);
+            btnView = itemView.findViewById(R.id.btnView);
         }
 
-        public void bind(HistoryListing item, OnItemClickListener listener) {
+        public void bind(HistoryListing item) {
             tvCropName.setText(item.getCropName());
             tvStatusBadge.setText(item.getStatus());
 
             if ("DELIVERED".equalsIgnoreCase(item.getStatus())) {
                 tvStatusBadge.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2D6A4F")));
-                ivSecondRowIcon.setImageResource(R.drawable.ic_calendar);
-                tvSecondRowText.setText(item.getDate());
+                ivRowIcon.setImageResource(R.drawable.ic_calendar);
+                tvRowText.setText(item.getDate());
                 tvLabelLeft.setText("Quantity");
                 tvValueLeft.setText(item.getQuantityKg() + " KG");
                 tvLabelRight.setText("Total Value");
                 tvValueRight.setText(item.getTotalValue());
-                btnAction.setText("View Receipt");
+                btnView.setText("View Receipt");
             } else if ("CLOSED".equalsIgnoreCase(item.getStatus())) {
                 tvStatusBadge.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
-                ivSecondRowIcon.setImageResource(R.drawable.ic_person);
-                tvSecondRowText.setText("Buyer: " + item.getBuyerName());
+                ivRowIcon.setImageResource(R.drawable.ic_person);
+                tvRowText.setText("Buyer: " + item.getBuyerName());
                 tvLabelLeft.setText("Completed");
                 tvValueLeft.setText(item.getDate());
                 tvLabelRight.setText("Final Price");
-                tvValueRight.setText(item.getFinalPricePerKg() + "/kg");
-                btnAction.setText("View Details");
+                tvValueRight.setText(item.getFinalPricePerKg());
+                btnView.setText("View Details");
             }
-
-            btnAction.setOnClickListener(v -> listener.onItemClick(item));
         }
     }
 }
