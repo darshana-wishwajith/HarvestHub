@@ -204,12 +204,57 @@
                 android:textSize="14sp"
                 android:text="Estimated Total Payout: LKR 0 (Zero farmer commission)" />
 
+            <!-- Error Message Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#FDECEA"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F44336"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_warning"
+                        app:tint="#F44336" />
+
+                    <TextView
+                        android:id="@+id/tvErrorMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Error message goes here"
+                        android:textColor="#F44336"
+                        android:textSize="12sp" />
+
+                    <ImageView
+                        android:id="@+id/ivCloseError"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_close"
+                        app:tint="#F44336" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Submit Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSendOffer"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:text="Send Offer to Buyer"

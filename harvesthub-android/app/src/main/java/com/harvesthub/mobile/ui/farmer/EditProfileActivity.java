@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
-import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
@@ -168,9 +167,9 @@ public class EditProfileActivity extends AppCompatActivity {
             // body = MultipartBody.Part.createFormData("photo", file.getName(), rbFile);
         }
 
-        apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<GenericResponse>() {
+        apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<okhttp3.ResponseBody>() {
             @Override
-            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                     finish();
@@ -180,7 +179,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
                 Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
