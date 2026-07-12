@@ -22,4 +22,10 @@
     <color name="control_bg_grey">#3A3A3A</color>
     <color name="text_subtitle_grey">#B0B0B0</color>
     <color name="nav_pill_green">#1B4332</color>
+
+    <!-- Listing Details Colors -->
+    <color name="bg_listing_details">#FAF7F2</color>
+    <color name="pricing_insight_bg">#E8F5E9</color>
+    <color name="pricing_insight_text">#2E7D32</color>
+    <color name="add_new_text">#1B4332</color>
 </resources>
