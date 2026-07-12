@@ -25,4 +25,13 @@
     <color name="nav_selected_bg">#1B4332</color>
     <color name="nav_unselected_text">#616161</color>
     <color name="text_black_bold">#1B1B1B</color>
+    <color name="chat_bg">#FDFDFD</color>
+    <color name="msg_incoming_bg">#F0F4F8</color>
+    <color name="msg_outgoing_bg">#E8F5E9</color>
+    <color name="msg_text">#333333</color>
+    <color name="msg_time">#9E9E9E</color>
+    <color name="date_pill_bg">#F5F5F5</color>
+    <color name="order_card_bg">#FFFFFF</color>
+    <color name="input_field_bg">#F8F8F8</color>
+    <color name="input_border">#E0E0E0</color>
 </resources>
