@@ -21,15 +21,19 @@ public class LauncherActivity extends AppCompatActivity {
 
         if (sessionManager.isLoggedIn()) {
             String role = sessionManager.getUserRole();
-            Intent intent;
+            if (role != null) role = role.trim().toUpperCase();
             
-            if ("FARMER".equalsIgnoreCase(role)) {
+            android.util.Log.d("LauncherActivity", "isLoggedIn: true, role: [" + role + "]");
+
+            Intent intent;
+            if ("FARMER".equals(role)) {
                 intent = new Intent(this, FarmerDashboardActivity.class);
-            } else if ("BUYER".equalsIgnoreCase(role)) {
+            } else if ("BUYER".equals(role)) {
                 intent = new Intent(this, BuyerDashboardActivity.class);
-            } else if ("TRANSPORTER".equalsIgnoreCase(role)) {
+            } else if ("TRANSPORTER".equals(role)) {
                 intent = new Intent(this, DeliveryDashboardActivity.class);
             } else {
+                android.util.Log.w("LauncherActivity", "Unknown role: " + role + ". Going to role selection.");
                 intent = new Intent(this, MainActivity.class);
             }
             startActivity(intent);
