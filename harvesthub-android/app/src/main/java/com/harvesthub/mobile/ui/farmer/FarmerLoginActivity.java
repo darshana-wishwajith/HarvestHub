@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.LoginRequest;
 import com.harvesthub.mobile.model.LoginResponse;
+import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 import com.harvesthub.mobile.utils.PasswordUtils;
@@ -121,11 +122,19 @@ public class FarmerLoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
                     SessionManager sessionManager = new SessionManager(FarmerLoginActivity.this);
+                    
+                    User user = loginResponse.getUser();
+                    if (user != null && (user.getRole() == null || user.getRole().isEmpty())) {
+                        user.setRole("FARMER");
+                    }
+                    
                     sessionManager.saveAuthToken(loginResponse.getToken());
-                    sessionManager.saveUser(loginResponse.getUser());
+                    sessionManager.saveUser(user);
+                    sessionManager.setLogin(true, "FARMER");
 
                     Toast.makeText(FarmerLoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(FarmerLoginActivity.this, FarmerDashboardActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 } else {

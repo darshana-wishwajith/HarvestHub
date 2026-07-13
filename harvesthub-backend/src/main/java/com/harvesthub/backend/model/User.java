@@ -5,13 +5,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 @Document(collection = "users")
 @Data
@@ -45,6 +46,10 @@ public class User {
     private String role = "FARMER";
 
     @NotNull(message = "Farm location is required")
-    @Valid // This enables validation for the nested FarmLocation object
+    @Valid
     private FarmLocation farmLocation;
+
+    // Fields for password reset
+    private String resetPasswordToken;
+    private LocalDateTime resetPasswordTokenExpiry;
 }

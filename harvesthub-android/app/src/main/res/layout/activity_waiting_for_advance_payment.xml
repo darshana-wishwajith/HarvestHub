@@ -294,11 +294,11 @@
                     android:textAllCaps="false"
                     android:textColor="@color/text_black_bold"
                     app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_chat_bubble_outline"
+                    app:icon="@android:drawable/stat_notify_chat"
                     app:iconGravity="textStart"
                     app:iconPadding="12dp"
                     app:iconTint="@color/text_black_bold"
-                    app:strokeColor="@color/divider_gray" />
+                    app:strokeColor="@color/border_gray" />
 
                 <TextView
                     android:layout_width="wrap_content"

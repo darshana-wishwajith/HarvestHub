@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -100,12 +101,15 @@
 
     <!-- ETA Content -->
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
         android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/driverCard"
-        app:layout_constraintTop_toBottomOf="@id/statusBanner">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar">
 
         <FrameLayout
             android:layout_width="96dp"
@@ -145,11 +149,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="100dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/bg_driver_card"
         android:orientation="vertical"
         android:padding="20dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:layout_editor_absoluteX="20dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -267,14 +274,14 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:backgroundTint="@color/nav_selected_bg"
-            app:icon="@drawable/ic_call"
-            app:iconGravity="textStart"
-            app:iconPadding="12dp"
-            app:iconTint="@color/white"
             android:text="@string/call_driver_btn"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_call"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconTint="@color/white" />
     </LinearLayout>
 
     <!-- Bottom Navigation -->
