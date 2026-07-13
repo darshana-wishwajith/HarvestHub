@@ -88,4 +88,8 @@
     <color name="control_bg_grey">#3A3A3A</color>
     <color name="text_subtitle_grey">#B0B0B0</color>
     <color name="nav_pill_green">#1B4332</color>
+    <color name="nav_active_bg">#1D3B2D</color>
+    <color name="nav_inactive_text">#414844</color>
+    <color name="nav_active_text">#FFFFFF</color>
+    <color name="nav_bar_bg">#FAFAFA</color>
 </resources>
