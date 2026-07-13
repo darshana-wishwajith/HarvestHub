@@ -5,7 +5,10 @@ import com.harvesthub.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -16,8 +19,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
     public User registerUser(User user) {
-        // Check for uniqueness
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalStateException("Email already exists");
         }
@@ -27,8 +32,6 @@ public class UserService {
         if (userRepository.findByNic(user.getNic()).isPresent()) {
             throw new IllegalStateException("NIC already exists");
         }
-
-        // Hash the incoming SHA-256 password with BCrypt
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -36,5 +39,31 @@ public class UserService {
     public Optional<User> findByEmailOrMobile(String emailOrMobile) {
         return userRepository.findByEmail(emailOrMobile)
                 .or(() -> userRepository.findByMobileNumber(emailOrMobile));
+    }
+
+    public void createPasswordResetTokenForUser(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            // Don't reveal that the user doesn't exist
+            return;
+        }
+        User user = userOptional.get();
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1)); // Token is valid for 1 hour
+        userRepository.save(user);
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        Optional<User> userOptional = userRepository.findByResetPasswordToken(token);
+        if (userOptional.isEmpty() || userOptional.get().getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Invalid or expired password reset token.");
+        }
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiry(null);
+        userRepository.save(user);
     }
 }

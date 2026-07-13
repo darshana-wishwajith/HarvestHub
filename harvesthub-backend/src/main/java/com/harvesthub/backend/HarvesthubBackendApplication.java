@@ -2,9 +2,10 @@ package com.harvesthub.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-// This annotation connects your 4 layers and bypasses security for testing
 @SpringBootApplication
+@EnableAsync // Enable Spring's ability to run tasks asynchronously
 public class HarvesthubBackendApplication {
 
 	public static void main(String[] args) {
