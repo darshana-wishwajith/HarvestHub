@@ -30,7 +30,7 @@ public class ApiClient {
                     .create();
 
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-            
+
             if (sessionManager != null) {
                 httpClient.addInterceptor(new Interceptor() {
                     @Override

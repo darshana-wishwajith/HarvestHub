@@ -418,7 +418,7 @@
                                 android:textColor="#1A1A1A"
                                 android:textSize="13sp"
                                 app:cornerRadius="8dp"
-                                app:strokeColor="#E0E0E0" />
+                                app:strokeColor="@color/account_card_icon_tint_selector" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 

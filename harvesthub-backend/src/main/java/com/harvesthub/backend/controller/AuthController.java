@@ -1,9 +1,6 @@
 package com.harvesthub.backend.controller;
 
-import com.harvesthub.backend.dto.LoginRequest;
-import com.harvesthub.backend.dto.LoginResponse;
-import com.harvesthub.backend.dto.ResetPasswordRequest;
-import com.harvesthub.backend.dto.UserDto;
+import com.harvesthub.backend.dto.*;
 import com.harvesthub.backend.model.User;
 import com.harvesthub.backend.service.UserService;
 import com.harvesthub.backend.util.JwtUtil;
@@ -43,9 +40,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
         try {
@@ -64,28 +58,21 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        // 1. Authenticate the user
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmailOrMobile(), loginRequest.getPassword())
             );
         } catch (AuthenticationException e) {
             logger.warn("Authentication failed for user: {}. Reason: {}", loginRequest.getEmailOrMobile(), e.getMessage());
-            Map<String, String> errorResponse = Collections.singletonMap("error", "Invalid credentials");
-            return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Invalid credentials"));
         }
 
-        // 2. Find the user in the database
         Optional<User> userOptional = userService.findByEmailOrMobile(loginRequest.getEmailOrMobile());
 
-        // 3. Handle the result with a simple if/else
-        if (!userOptional.isPresent()) { // Corrected for older Java versions
-            // This is a safeguard. If auth succeeded, the user must exist.
+        if (!userOptional.isPresent()) {
             logger.error("CRITICAL: User was authenticated but not found in the database: {}", loginRequest.getEmailOrMobile());
-            Map<String, String> errorResponse = Collections.singletonMap("error", "An internal server error occurred.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An internal server error occurred."));
         } else {
-            // 4. If user is found, create and return the JWT
             User user = userOptional.get();
             final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             final String jwt = jwtUtil.generateToken(userDetails);
@@ -94,20 +81,21 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        userService.createPasswordResetTokenForUser(forgotPasswordRequest.getEmail());
+        // Always return a success message to prevent user enumeration attacks
+        return ResponseEntity.ok(Map.of("message", "If an account with that email exists, a password reset token has been sent."));
+    }
+
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetRequest) {
-        String userEmail = resetRequest.getResetToken();
-        User user = userService.findByEmailOrMobile(userEmail)
-                .orElse(null);
-
-        if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid reset token.");
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetRequest) {
+        try {
+            userService.resetPassword(resetRequest.getToken(), resetRequest.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Password has been reset successfully."));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        user.setPassword(passwordEncoder.encode(resetRequest.getNewPassword()));
-        userService.registerUser(user);
-
-        return ResponseEntity.ok("Password has been reset successfully.");
     }
 
     @GetMapping("/farmer/{id}/profile")

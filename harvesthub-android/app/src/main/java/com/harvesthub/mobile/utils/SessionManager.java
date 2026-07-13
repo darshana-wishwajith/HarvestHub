@@ -2,9 +2,13 @@ package com.harvesthub.mobile.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import com.google.gson.Gson;
 import com.harvesthub.mobile.model.User;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class SessionManager {
     private static final String PREF_NAME = "HarvestHubSession";
@@ -13,26 +17,41 @@ public class SessionManager {
     private static final String KEY_AUTH_TOKEN = "authToken";
     private static final String KEY_USER_DATA = "userData";
     
-    private final SharedPreferences pref;
-    private final SharedPreferences.Editor editor;
+    private SharedPreferences pref;
     private final Gson gson;
 
     public SessionManager(Context context) {
-        pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        editor = pref.edit();
         gson = new Gson();
+        try {
+            MasterKey masterKey = new MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build();
+
+            pref = EncryptedSharedPreferences.create(
+                    context,
+                    PREF_NAME,
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
     }
 
     public void setLogin(boolean isLoggedIn, String role) {
-        editor.putBoolean(KEY_IS_LOGGED_IN, isLoggedIn);
-        editor.putString(KEY_USER_ROLE, role);
-        editor.apply();
+        pref.edit()
+            .putBoolean(KEY_IS_LOGGED_IN, isLoggedIn)
+            .putString(KEY_USER_ROLE, role)
+            .commit(); // Use commit for immediate effect before navigation
     }
 
     public void saveAuthToken(String token) {
-        editor.putString(KEY_AUTH_TOKEN, token);
-        editor.putBoolean(KEY_IS_LOGGED_IN, true);
-        editor.apply();
+        pref.edit()
+            .putString(KEY_AUTH_TOKEN, token)
+            .putBoolean(KEY_IS_LOGGED_IN, true)
+            .apply();
     }
 
     public String getAuthToken() {
@@ -41,9 +60,10 @@ public class SessionManager {
 
     public void saveUser(User user) {
         String userJson = gson.toJson(user);
-        editor.putString(KEY_USER_DATA, userJson);
-        editor.putString(KEY_USER_ROLE, user.getRole());
-        editor.apply();
+        pref.edit()
+            .putString(KEY_USER_DATA, userJson)
+            .putString(KEY_USER_ROLE, user.getRole())
+            .apply();
     }
 
     public User getUser() {
@@ -61,7 +81,6 @@ public class SessionManager {
     }
 
     public void logoutUser() {
-        editor.clear();
-        editor.commit();
+        pref.edit().clear().commit();
     }
 }

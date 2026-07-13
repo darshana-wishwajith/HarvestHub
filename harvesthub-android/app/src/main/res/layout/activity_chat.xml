@@ -99,17 +99,15 @@
                 android:text="@string/verified_buyer"
                 android:textColor="@color/text_gray_medium"
                 android:textSize="12sp" />
-        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="100dp"
-            android:layout_toEndOf="@id/ivAvatar"
-            android:text="@string/buyer_rating"
-            android:textColor="@color/text_black_bold"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:text="@string/buyer_rating"
+                android:textColor="@color/text_black_bold"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <ImageView
             android:layout_width="40dp"

@@ -7,6 +7,7 @@ import com.harvesthub.mobile.model.CropBatch;
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
+import com.harvesthub.mobile.model.ForgotPasswordRequest;
 import com.harvesthub.mobile.model.GenericResponse;
 import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
@@ -67,7 +68,10 @@ public interface ApiService {
     @GET("market/trend")
     Call<MarketTrendResponse> getMarketTrend(@Query("crop") String cropType, @Query("days") int days);
 
-    @POST("auth/reset-password")
+    @POST("api/auth/forgot-password")
+    Call<okhttp3.ResponseBody> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("api/auth/reset-password")
     Call<okhttp3.ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("api/auth/register")
