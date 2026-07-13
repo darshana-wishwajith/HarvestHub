@@ -12,6 +12,9 @@ public class User {
     @SerializedName("password")
     private String password;
 
+    @SerializedName("role")
+    private String role;
+
     // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -22,7 +25,9 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
     // Compatibility methods for existing MainActivity code
     public String getName() { return email; }
-    public String getRole() { return password; }
 }

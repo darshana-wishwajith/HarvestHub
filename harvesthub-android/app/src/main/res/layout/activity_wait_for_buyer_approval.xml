@@ -75,6 +75,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="#DEDDDD"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -99,7 +100,10 @@
                             android:textColor="@color/text_gray_medium"
                             android:textSize="14sp" />
 
-                        <View android:id="@+id/order_status_title_stub" android:layout_width="0dp" android:layout_height="24dp"/>
+                        <View
+                            android:id="@+id/order_status_title_stub"
+                            android:layout_width="0dp"
+                            android:layout_height="24dp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -131,12 +135,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
                         android:background="@drawable/bg_order_details_gray"
                         android:padding="16dp"
                         android:text="@string/waiting_for_buyer_confirm"
                         android:textColor="@color/text_black_bold"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="24dp" />
+                        android:textSize="14sp" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -207,8 +211,8 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@drawable/dashed_border"
-                        android:layout_marginBottom="16dp"/>
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/dashed_border" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -365,7 +369,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMessage"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="?attr/materialIconButtonOutlinedStyle"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_marginEnd="8dp"
@@ -374,11 +378,11 @@
                     android:textAllCaps="false"
                     android:textColor="@color/text_black_bold"
                     app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_chat_bubble_outline"
+                    app:icon="@drawable/ic_mail_outline"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     app:iconTint="@color/text_black_bold"
-                    app:strokeColor="@color/divider_gray" />
+                    app:strokeColor="@color/border_gray" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewPost"
@@ -387,6 +391,8 @@
                     android:layout_height="56dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
+                    android:insetTop="4dp"
+                    android:insetBottom="4dp"
                     android:text="@string/nav_view_post"
                     android:textAllCaps="false"
                     android:textColor="@color/text_black_bold"

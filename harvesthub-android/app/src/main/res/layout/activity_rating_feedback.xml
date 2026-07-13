@@ -164,7 +164,7 @@
                         android:layout_width="53dp"
                         android:layout_height="60dp"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_rating_order_summary"
+                        android:src="@drawable/ic_listings_icon_bottom_bar"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -438,7 +438,7 @@
             android:id="@+id/llNavListings"
             android:layout_width="72dp"
             android:layout_height="46dp"
-            android:background="@drawable/bg_nav_selected"
+            android:background="@drawable/bg_pill_active"
             android:gravity="center"
             android:orientation="vertical">
 

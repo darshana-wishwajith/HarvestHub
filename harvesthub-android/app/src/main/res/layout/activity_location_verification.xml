@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_cream">
+    android:background="@color/bg_light">
 
     <!-- Top App Bar -->
     <RelativeLayout
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/bg_cream"
+        android:background="@color/bg_light"
         android:paddingHorizontal="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -194,16 +194,12 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Green Top Outline/Divider Line -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:background="#123927" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <!-- Home -->
             <LinearLayout
@@ -212,12 +208,14 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_home"
                     app:tint="#666666"
                     tools:ignore="ContentDescription" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -233,12 +231,14 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_market"
                     app:tint="#666666"
                     tools:ignore="ContentDescription" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -264,14 +264,14 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingHorizontal="16dp"
-                        android:gravity="center">
+                        android:paddingHorizontal="16dp">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/lstning"
+                            android:src="@drawable/ic_listings_icon_bottom_bar"
                             app:tint="#FFFFFF"
                             tools:ignore="ContentDescription" />
 
@@ -294,12 +294,14 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_wallet"
                     app:tint="#666666"
                     tools:ignore="ContentDescription" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -315,12 +317,14 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_setting"
                     app:tint="#666666"
                     tools:ignore="ContentDescription" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

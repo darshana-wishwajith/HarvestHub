@@ -18,19 +18,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Check if user is already logged in
-        SessionManager sessionManager = new SessionManager(this);
-        if (sessionManager.isLoggedIn()) {
-            String role = sessionManager.getUserRole();
-            if ("FARMER".equals(role)) {
-                startActivity(new Intent(this, FarmerDashboardActivity.class));
-                finish();
-                return;
-            }
-            // Add other roles here as they are implemented
-        }
-
         setContentView(R.layout.activity_main);
         setupCardListeners();
     }

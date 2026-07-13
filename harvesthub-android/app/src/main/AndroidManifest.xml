@@ -19,6 +19,10 @@
 
         <activity
             android:name=".ui.common.MainActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".ui.common.LauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,9 +35,11 @@
         <activity android:name=".ui.farmer.VerifyOtpActivity" />
         <activity android:name=".ui.farmer.AccountVerifiedActivity" />
         <activity android:name=".ui.farmer.ForgotPasswordActivity" />
+        <activity android:name=".ui.farmer.ResetPasswordActivity" />
         <activity android:name=".ui.farmer.CreateNewPasswordActivity" />
         <activity android:name=".ui.farmer.LocationSetupActivity" />
         <activity android:name=".ui.farmer.FarmerLoginActivity" />
+        <activity android:name=".ui.farmer.FarmerDashboardActivity" />
         <activity android:name=".ui.farmer.OrderInTransitActivity" />
         <activity android:name=".ui.farmer.RatingFeedbackActivity" />
 
