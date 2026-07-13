@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivCropThumbnail"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#F5F5F5"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/RoundedSquare"
+            tools:src="@drawable/ic_leaf" />
+
+        <TextView
+            android:id="@+id/tvCropName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tvStatusBadge"
+            app:layout_constraintStart_toEndOf="@id/ivCropThumbnail"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Tomatoes" />
+
+        <TextView
+            android:id="@+id/tvListingCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="#9E9E9E"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/tvStatusBadge"
+            app:layout_constraintStart_toStartOf="@id/tvCropName"
+            app:layout_constraintTop_toBottomOf="@id/tvCropName"
+            tools:text="Listing #TM-2024" />
+
+        <TextView
+            android:id="@+id/tvStatusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_pill_badge"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:backgroundTint="#9E9E9E"
+            tools:text="DRAFT" />
+
+        <LinearLayout
+            android:id="@+id/llYield"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/llPrice"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivCropThumbnail">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EST. YIELD"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEstYield"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="120 KG" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/llYield"
+            app:layout_constraintTop_toTopOf="@id/llYield">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EXPECTED"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvExpectedPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="LKR 180/kg" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowMetadata"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:constraint_referenced_ids="llCreated,llUpdated,llLocation"
+            app:flow_horizontalGap="16dp"
+            app:flow_horizontalStyle="packed"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llYield" />
+
+        <LinearLayout
+            android:id="@+id/llCreated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_calendar"
+                app:tint="#9E9E9E" />
+            <TextView
+                android:id="@+id/tvCreatedDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp"
+                tools:text="Created: Oct 24" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llUpdated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_done_all"
+                app:tint="#9E9E9E" />
+            <TextView
+                android:id="@+id/tvUpdatedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp"
+                tools:text="Updated: Yesterday" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_location_pin"
+                app:tint="#9E9E9E" />
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp"
+                tools:text="Dambulla Sector" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvHelperText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textColor="#9E9E9E"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/flowMetadata"
+            tools:text="Our team is verifying your listing details."
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/llActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tvHelperText">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPrimary"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                app:cornerRadius="8dp"
+                app:strokeColor="#CCCCCC"
+                tools:text="Edit" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSecondary"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                app:cornerRadius="8dp"
+                app:strokeColor="#CCCCCC"
+                tools:text="Deactivate" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

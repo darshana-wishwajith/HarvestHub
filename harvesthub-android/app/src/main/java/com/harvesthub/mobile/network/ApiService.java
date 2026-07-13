@@ -1,6 +1,7 @@
 package com.harvesthub.mobile.network;
 
 
+import com.harvesthub.mobile.model.ActiveListing;
 import com.harvesthub.mobile.model.ChatMessage;
 import com.harvesthub.mobile.model.ConfirmDealRequest;
 import com.harvesthub.mobile.model.CropBatch;
@@ -111,7 +112,13 @@ public interface ApiService {
     Call<List<WantedAd>> getWantedAds(@Query("crop") String cropFilter, @Query("search") String searchQuery);
 
     @GET("farmer/{id}/active-listings")
-    Call<List<ListingItem>> getActiveListings(@Path("id") String farmerId);
+    Call<List<ActiveListing>> getActiveListings(@Path("id") String farmerId, @Query("status") String statusFilter, @Query("search") String searchQuery);
+
+    @POST("listings/{id}/deactivate")
+    Call<GenericResponse> deactivateListing(@Path("id") String listingId);
+
+    @POST("listings/{id}/reactivate")
+    Call<GenericResponse> reactivateListing(@Path("id") String listingId);
 
     @GET("farmer/{id}/listing-history")
     Call<List<HistoryListing>> getListingHistory(@Path("id") String farmerId, @Query("search") String searchQuery);
