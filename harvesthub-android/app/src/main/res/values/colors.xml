@@ -92,4 +92,20 @@
     <color name="nav_inactive_text">#414844</color>
     <color name="nav_active_text">#FFFFFF</color>
     <color name="nav_bar_bg">#FAFAFA</color>
+    <color name="nav_active_green">#1D3B2D</color>
+    <color name="status_draft_bg">#EEEEEE</color>
+    <color name="status_draft_text">#616161</color>
+    <color name="status_pending_bg">#FFF3E0</color>
+    <color name="status_pending_text">#EF6C00</color>
+    <color name="status_review_bg">#F5F5F5</color>
+    <color name="status_review_text">#757575</color>
+    <color name="status_listed_bg">#E8F5E9</color>
+    <color name="status_listed_text">#2E7D32</color>
+    <color name="status_ongoing_bg">#E3F2FD</color>
+    <color name="status_ongoing_text">#1565C0</color>
+    <color name="status_ongoing_card_tint">#F0F7FF</color>
+    <color name="status_deactivated_bg">#37474F</color>
+    <color name="status_deactivated_text">#FFFFFF</color>
+    <color name="search_bar_bg">#F5F7F5</color>
+    <color name="tab_indicator_green">#13A34A</color>
 </resources>

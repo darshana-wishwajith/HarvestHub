@@ -1,6 +1,5 @@
 package com.harvesthub.mobile.ui.farmer;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,20 +29,21 @@ import retrofit2.Response;
 public class WalletFragment extends Fragment {
 
     private TextView tvBalance, tvTrustScore, tvPenalties, tvViewAll, tvEmptyState;
-    private RecyclerView rvTransactions;
     private TransactionAdapter adapter;
-    private List<Transaction> transactionList = new ArrayList<>();
+    private final List<Transaction> transactionList = new ArrayList<>();
     private ApiService apiService;
-    private String farmerId = "FARMER_123";
+    private final String farmerId = "FARMER_123";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_wallet, container, false);
+
         apiService = ApiClient.getClient().create(ApiService.class);
         initViews(view);
         fetchWalletSummary();
         fetchRecentTransactions();
+
         return view;
     }
 
@@ -53,27 +53,24 @@ public class WalletFragment extends Fragment {
         tvPenalties = v.findViewById(R.id.tvPenalties);
         tvViewAll = v.findViewById(R.id.tvViewAll);
         tvEmptyState = v.findViewById(R.id.tvEmptyState);
-        rvTransactions = v.findViewById(R.id.rvTransactions);
+        RecyclerView rvTransactions = v.findViewById(R.id.rvTransactions);
 
-        rvTransactions.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new TransactionAdapter(transactionList);
         rvTransactions.setAdapter(adapter);
 
         v.findViewById(R.id.btnWithdraw).setOnClickListener(view ->
-                Toast.makeText(getActivity(), "Withdraw Funds Clicked", Toast.LENGTH_SHORT).show());
+                Toast.makeText(requireContext(), "Withdraw Funds Clicked", Toast.LENGTH_SHORT).show());
 
         tvViewAll.setOnClickListener(view ->
-                Toast.makeText(getActivity(), "View All Transactions Clicked", Toast.LENGTH_SHORT).show());
-        
-        v.findViewById(R.id.ivNotificationTop).setOnClickListener(view ->
-                startActivity(new Intent(getActivity(), NotificationsActivity.class)));
+                Toast.makeText(requireContext(), "View All Transactions Clicked", Toast.LENGTH_SHORT).show());
     }
 
     private void fetchWalletSummary() {
         apiService.getWalletSummary(farmerId).enqueue(new Callback<WalletSummaryResponse>() {
             @Override
             public void onResponse(@NonNull Call<WalletSummaryResponse> call, @NonNull Response<WalletSummaryResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (isAdded() && response.isSuccessful() && response.body() != null) {
                     WalletSummaryResponse data = response.body();
                     tvBalance.setText("LKR " + data.getAvailableBalance());
                     tvTrustScore.setText(data.getTrustScore());
@@ -88,6 +85,7 @@ public class WalletFragment extends Fragment {
         apiService.getRecentTransactions(farmerId, 2).enqueue(new Callback<List<Transaction>>() {
             @Override
             public void onResponse(@NonNull Call<List<Transaction>> call, @NonNull Response<List<Transaction>> response) {
+                if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     transactionList.clear();
                     transactionList.addAll(response.body());
@@ -100,16 +98,18 @@ public class WalletFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<List<Transaction>> call, @NonNull Throwable t) {
-                addMockData();
+                if (isAdded()) addMockData();
             }
         });
     }
 
     private void addMockData() {
         transactionList.clear();
-        transactionList.add(new Transaction("1", "Order #402 Settled", "Yesterday, 4:30 PM", "LKR 45,000", true));
-        transactionList.add(new Transaction("2", "Order #398 Settled", "2 days ago", "LKR 22,000", true));
-        adapter.notifyDataSetChanged();
-        tvEmptyState.setVisibility(transactionList.isEmpty() ? View.VISIBLE : View.GONE);
+        transactionList.add(new Transaction("1", "Order #402 Settled", "Yesterday, 4:30 PM", "45,000", true));
+        transactionList.add(new Transaction("2", "Order #398 Settled", "2 days ago", "22,000", true));
+        if (adapter != null) adapter.notifyDataSetChanged();
+        if (tvEmptyState != null) {
+            tvEmptyState.setVisibility(transactionList.isEmpty() ? View.VISIBLE : View.GONE);
+        }
     }
 }

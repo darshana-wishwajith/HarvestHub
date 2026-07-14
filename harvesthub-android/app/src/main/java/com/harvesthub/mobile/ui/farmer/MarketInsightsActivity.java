@@ -24,6 +24,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.util.NotificationPanelHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,14 @@ public class MarketInsightsActivity extends AppCompatActivity {
         initViews();
         setupLineChart();
         setupRecyclerView();
+        setupTopNav();
+    }
+
+    private void setupTopNav() {
+        View btnNotification = findViewById(R.id.iconNotification);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> NotificationPanelHelper.showNotificationPanel(this, v));
+        }
     }
 
     private void initViews() {

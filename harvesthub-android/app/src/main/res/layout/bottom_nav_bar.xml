@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/navBarContainer"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_bar_height"
+    android:layout_height="wrap_content"
     android:background="@color/nav_bar_bg"
+    android:baselineAligned="false"
     android:elevation="8dp"
-    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:baselineAligned="false">
+    android:orientation="horizontal"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
     <!-- Home -->
     <FrameLayout
@@ -15,27 +17,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <LinearLayout
             android:id="@+id/pill_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
-            android:paddingVertical="@dimen/nav_pill_padding_vertical"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
+            android:paddingVertical="@dimen/nav_pill_padding_vertical">
+
             <ImageView
                 android:id="@+id/icon_home"
                 android:layout_width="@dimen/nav_icon_size"
                 android:layout_height="@dimen/nav_icon_size"
                 android:src="@drawable/ic_home" />
+
             <TextView
                 android:id="@+id/label_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Home"
-                android:textSize="@dimen/nav_label_size"
-                android:layout_marginTop="2dp" />
+                android:textSize="@dimen/nav_label_size" />
         </LinearLayout>
     </FrameLayout>
 
@@ -45,27 +50,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <LinearLayout
             android:id="@+id/pill_market"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
-            android:paddingVertical="@dimen/nav_pill_padding_vertical"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
+            android:paddingVertical="@dimen/nav_pill_padding_vertical">
+
             <ImageView
                 android:id="@+id/icon_market"
                 android:layout_width="@dimen/nav_icon_size"
                 android:layout_height="@dimen/nav_icon_size"
                 android:src="@drawable/ic_market" />
+
             <TextView
                 android:id="@+id/label_market"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Market"
-                android:textSize="@dimen/nav_label_size"
-                android:layout_marginTop="2dp" />
+                android:textSize="@dimen/nav_label_size" />
         </LinearLayout>
     </FrameLayout>
 
@@ -75,27 +83,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <LinearLayout
             android:id="@+id/pill_listings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
-            android:paddingVertical="@dimen/nav_pill_padding_vertical"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
+            android:paddingVertical="@dimen/nav_pill_padding_vertical">
+
             <ImageView
                 android:id="@+id/icon_listings"
                 android:layout_width="@dimen/nav_icon_size"
                 android:layout_height="@dimen/nav_icon_size"
                 android:src="@drawable/ic_list" />
+
             <TextView
                 android:id="@+id/label_listings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Listings"
-                android:textSize="@dimen/nav_label_size"
-                android:layout_marginTop="2dp" />
+                android:textSize="@dimen/nav_label_size" />
         </LinearLayout>
     </FrameLayout>
 
@@ -105,27 +116,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <LinearLayout
             android:id="@+id/pill_wallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
-            android:paddingVertical="@dimen/nav_pill_padding_vertical"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
+            android:paddingVertical="@dimen/nav_pill_padding_vertical">
+
             <ImageView
                 android:id="@+id/icon_wallet"
                 android:layout_width="@dimen/nav_icon_size"
                 android:layout_height="@dimen/nav_icon_size"
                 android:src="@drawable/ic_wallet" />
+
             <TextView
                 android:id="@+id/label_wallet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Wallet"
-                android:textSize="@dimen/nav_label_size"
-                android:layout_marginTop="2dp" />
+                android:textSize="@dimen/nav_label_size" />
         </LinearLayout>
     </FrameLayout>
 
@@ -135,27 +149,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <LinearLayout
             android:id="@+id/pill_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
-            android:paddingVertical="@dimen/nav_pill_padding_vertical"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:paddingHorizontal="@dimen/nav_pill_padding_horizontal"
+            android:paddingVertical="@dimen/nav_pill_padding_vertical">
+
             <ImageView
                 android:id="@+id/icon_settings"
                 android:layout_width="@dimen/nav_icon_size"
                 android:layout_height="@dimen/nav_icon_size"
                 android:src="@drawable/ic_settings" />
+
             <TextView
                 android:id="@+id/label_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Settings"
-                android:textSize="@dimen/nav_label_size"
-                android:layout_marginTop="2dp" />
+                android:textSize="@dimen/nav_label_size" />
         </LinearLayout>
     </FrameLayout>
 

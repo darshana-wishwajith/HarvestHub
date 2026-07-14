@@ -73,15 +73,6 @@ public class CameraCaptureActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
-        // Set up listeners
-        btnCapture.setOnClickListener(v -> takePhoto());
-        
-        btnFlip.setOnClickListener(v -> {
-            lensFacing = (lensFacing == CameraSelector.LENS_FACING_BACK) ? 
-                    CameraSelector.LENS_FACING_FRONT : CameraSelector.LENS_FACING_BACK;
-            startCamera();
-        });
-
         btnLock.setOnClickListener(v -> {
             isLocationLocked = !isLocationLocked;
             btnLock.setSelected(isLocationLocked);

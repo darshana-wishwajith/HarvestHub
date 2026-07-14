@@ -28,6 +28,6 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    // Compatibility methods for existing MainActivity code
+    // Compatibility methods for existing RoleSelectionActivity code
     public String getName() { return email; }
 }
