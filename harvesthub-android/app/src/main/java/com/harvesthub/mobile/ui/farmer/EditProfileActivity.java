@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
@@ -57,6 +59,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         apiService = ApiClient.getClient().create(ApiService.class);
         initViews();
+        setupBottomNavVisuals();
         fetchProfile();
     }
 
@@ -85,19 +88,64 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnUpdatePassword).setOnClickListener(v -> 
-                Toast.makeText(this, "Navigate to Change Password", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, ResetPasswordActivity.class)));
 
         findViewById(R.id.btnSaveChanges).setOnClickListener(v -> validateAndSave());
 
         // Bottom Nav Logic
-        findViewById(R.id.navHomeItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, FarmerDashboardActivity.class));
+        findViewById(R.id.nav_home).setOnClickListener(v -> {
+            startActivity(new Intent(this, com.harvesthub.mobile.MainActivity.class));
             finish();
         });
-        findViewById(R.id.navListingsItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, ListingsActivity.class));
+        findViewById(R.id.nav_listings).setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
+            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.LISTINGS.name());
+            startActivity(intent);
             finish();
         });
+        findViewById(R.id.nav_market).setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
+            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.MARKET.name());
+            startActivity(intent);
+            finish();
+        });
+        findViewById(R.id.nav_wallet).setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
+            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.WALLET.name());
+            startActivity(intent);
+            finish();
+        });
+        findViewById(R.id.nav_settings).setOnClickListener(v -> {
+            finish(); // Settings is usually where we came from
+        });
+    }
+
+    private void setupBottomNavVisuals() {
+        LinearLayout pill = findViewById(R.id.pill_settings);
+        ImageView icon = findViewById(R.id.icon_settings);
+        TextView label = findViewById(R.id.label_settings);
+
+        if (pill != null) pill.setBackgroundResource(R.drawable.bg_nav_item_active);
+        if (icon != null) {
+            icon.setImageResource(R.drawable.ic_settings);
+            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_active_text));
+        }
+        if (label != null) label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
+        
+        int[] otherPills = {R.id.pill_home, R.id.pill_market, R.id.pill_listings, R.id.pill_wallet};
+        int[] otherIcons = {R.id.icon_home, R.id.icon_market, R.id.icon_listings, R.id.icon_wallet};
+        int[] otherLabels = {R.id.label_home, R.id.label_market, R.id.label_listings, R.id.label_wallet};
+        
+        for (int i = 0; i < otherPills.length; i++) {
+            View p = findViewById(otherPills[i]);
+            if (p != null) p.setBackground(null);
+            
+            ImageView ic = findViewById(otherIcons[i]);
+            if (ic != null) ic.setColorFilter(ContextCompat.getColor(this, R.color.nav_inactive_text));
+            
+            TextView lb = findViewById(otherLabels[i]);
+            if (lb != null) lb.setTextColor(ContextCompat.getColor(this, R.color.nav_inactive_text));
+        }
     }
 
     private void fetchProfile() {
@@ -124,7 +172,6 @@ public class EditProfileActivity extends AppCompatActivity {
         if (profile.getPasswordLastUpdated() != null) {
             tvLastUpdated.setText("Last updated " + profile.getPasswordLastUpdated());
         }
-        // Load image here if profile.getProfilePhotoUrl() is not null
     }
 
     private void validateAndSave() {
@@ -140,9 +187,6 @@ public class EditProfileActivity extends AppCompatActivity {
         if (name.isEmpty()) {
             tilFullName.setError("Name is required");
             isValid = false;
-        }
-        if (!phone.matches("\\+94\\s\\d{2}\\s\\d{3}\\s\\d{4}")) {
-            // Simplified check for mockup format
         }
         if (nic.isEmpty()) {
             tilNic.setError("NIC is required");
@@ -161,10 +205,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         MultipartBody.Part body = null;
         if (selectedImageUri != null) {
-            // In real app, convert Uri to File. For now, assume it's handled.
-            // File file = new File(selectedImageUri.getPath());
-            // RequestBody rbFile = RequestBody.create(MediaType.parse("image/*"), file);
-            // body = MultipartBody.Part.createFormData("photo", file.getName(), rbFile);
+            // Real app would handle file conversion
         }
 
         apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<okhttp3.ResponseBody>() {

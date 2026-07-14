@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
-    android:layout_marginEnd="8dp">
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_gray"
+    app:strokeWidth="1dp">
 
     <ImageView
         android:id="@+id/ivThumbnail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:background="@drawable/bg_dashed_border"
-        android:padding="20dp"
-        android:src="@drawable/ic_plus_chat"
         android:contentDescription="Photo Thumbnail" />
 
-</FrameLayout>
+</com.google.android.material.card.MaterialCardView>

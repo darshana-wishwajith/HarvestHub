@@ -1,47 +1,64 @@
 package com.harvesthub.mobile.ui.farmer;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.utils.BottomNavHelper;
 
 public class ActiveOrderTrackerActivity extends AppCompatActivity {
 
-    private LinearLayout navHomeItem;
-    private LinearLayout navMarketItem;
-    private LinearLayout navListingsItem;
-    private LinearLayout navWalletItem;
-    private LinearLayout navSettingsItem;
+    private GestureDetector gestureDetector;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_order_tracker);
 
-        initViews();
-        setupBottomNavigation();
+        setupNavigation();
+        setupGestureDetector();
+
+        getWindow().getDecorView().setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        });
     }
 
-    private void initViews() {
-        navHomeItem = findViewById(R.id.navHomeItem);
-        navMarketItem = findViewById(R.id.navMarketItem);
-        navListingsItem = findViewById(R.id.navListingsItem);
-        navWalletItem = findViewById(R.id.navWalletItem);
-        navSettingsItem = findViewById(R.id.navSettingsItem);
+    private void setupNavigation() {
+        // Setup Top Navigation
+        View topNav = findViewById(R.id.included_top_nav);
+        View btnNotification = topNav.findViewById(R.id.btnNotification);
+        btnNotification.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+        });
+
+        // Setup Bottom Navigation
+        View navBar = findViewById(R.id.included_nav);
+        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
     }
 
-    private void setupBottomNavigation() {
-        navHomeItem.setOnClickListener(v -> showNavigationToast("Home"));
-        navMarketItem.setOnClickListener(v -> showNavigationToast("Market"));
-        navListingsItem.setOnClickListener(v -> showNavigationToast("Listings"));
-        navWalletItem.setOnClickListener(v -> showNavigationToast("Wallet"));
-        navSettingsItem.setOnClickListener(v -> showNavigationToast("Settings"));
-    }
+    private void setupGestureDetector() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(@NonNull MotionEvent e) {
+                startActivity(new Intent(ActiveOrderTrackerActivity.this, RatingFeedbackActivity.class));
+                finish();
+                return true;
+            }
 
-    private void showNavigationToast(String destination) {
-        Toast.makeText(this, destination, Toast.LENGTH_SHORT).show();
+            @Override
+            public boolean onDown(@NonNull MotionEvent e) {
+                return true;
+            }
+        });
     }
 }
