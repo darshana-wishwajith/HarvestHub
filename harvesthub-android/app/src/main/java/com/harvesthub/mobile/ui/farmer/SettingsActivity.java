@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.network.ApiClient;
@@ -58,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, EditProfileActivity.class)));
 
         findViewById(R.id.rowChangePassword).setOnClickListener(v -> 
-            Toast.makeText(this, "Change Password clicked", Toast.LENGTH_SHORT).show());
+            startActivity(new Intent(this, ResetPasswordActivity.class)));
 
         findViewById(R.id.rowNotifications).setOnClickListener(v -> 
             Toast.makeText(this, "Notification Preferences clicked", Toast.LENGTH_SHORT).show());
@@ -70,16 +71,20 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> showLogoutConfirmation());
 
-        findViewById(R.id.ivNotificationTop).setOnClickListener(v -> 
+        findViewById(R.id.ivNotification).setOnClickListener(v ->
             startActivity(new Intent(this, NotificationsActivity.class)));
 
         findViewById(R.id.navHomeItem).setOnClickListener(v -> finish());
         findViewById(R.id.navListingsItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, ListingsActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(MainActivity.EXTRA_INITIAL_TAB, MainActivity.Tab.LISTINGS.name());
+            startActivity(intent);
             finish();
         });
         findViewById(R.id.navWalletItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, WalletActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(MainActivity.EXTRA_INITIAL_TAB, MainActivity.Tab.WALLET.name());
+            startActivity(intent);
             finish();
         });
     }

@@ -3,7 +3,7 @@ package com.harvesthub.mobile.ui.farmer;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.LinearLayout;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,13 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.utils.BottomNavHelper;
 
 public class OrderInTransitActivity extends AppCompatActivity {
 
     private TextView tvOrderId, tvDriverName, tvVehicleInfo;
     private MaterialCardView btnCall;
     private MaterialButton btnTrackOrder;
-    private LinearLayout llNavHome, llNavMarket, llNavListings, llNavWallet, llNavSettings;
 
     private String driverPhoneNumber = "0712345678"; // Default placeholder
 
@@ -30,6 +30,7 @@ public class OrderInTransitActivity extends AppCompatActivity {
         initViews();
         setupData();
         setupListeners();
+        setupNavigation();
     }
 
     private void initViews() {
@@ -38,12 +39,6 @@ public class OrderInTransitActivity extends AppCompatActivity {
         tvVehicleInfo = findViewById(R.id.tvVehicleInfo);
         btnCall = findViewById(R.id.btnCall);
         btnTrackOrder = findViewById(R.id.btnTrackOrder);
-        
-        llNavHome = findViewById(R.id.llNavHome);
-        llNavMarket = findViewById(R.id.llNavMarket);
-        llNavListings = findViewById(R.id.llNavListings);
-        llNavWallet = findViewById(R.id.llNavWallet);
-        llNavSettings = findViewById(R.id.llNavSettings);
     }
 
     private void setupData() {
@@ -67,27 +62,20 @@ public class OrderInTransitActivity extends AppCompatActivity {
 
         btnTrackOrder.setOnClickListener(v -> {
             Toast.makeText(this, "Opening Live Tracking Map...", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, ActiveOrderTrackerActivity.class));
+        });
+    }
+
+    private void setupNavigation() {
+        // Setup Top Navigation
+        View topNav = findViewById(R.id.included_top_nav);
+        View btnNotification = topNav.findViewById(R.id.btnNotification);
+        btnNotification.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
         });
 
-        llNavHome.setOnClickListener(v -> {
-            // startActivity(new Intent(this, HomeActivity.class));
-            Toast.makeText(this, "Home Clicked", Toast.LENGTH_SHORT).show();
-        });
-
-        llNavMarket.setOnClickListener(v -> {
-             Toast.makeText(this, "Market Clicked", Toast.LENGTH_SHORT).show();
-        });
-
-        llNavListings.setOnClickListener(v -> {
-             // Already on Listings
-        });
-
-        llNavWallet.setOnClickListener(v -> {
-             Toast.makeText(this, "Wallet Clicked", Toast.LENGTH_SHORT).show();
-        });
-
-        llNavSettings.setOnClickListener(v -> {
-             Toast.makeText(this, "Settings Clicked", Toast.LENGTH_SHORT).show();
-        });
+        // Setup Bottom Navigation
+        View navBar = findViewById(R.id.included_nav);
+        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
     }
 }

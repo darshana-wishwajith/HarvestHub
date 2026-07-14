@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/topNavBar"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="wrap_content"
     android:background="@color/white"
     android:elevation="4dp"
+    android:padding="10dp"
     android:paddingHorizontal="16dp">
 
     <!-- Logo Icon -->

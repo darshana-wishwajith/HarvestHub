@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Transaction;
 import com.harvesthub.mobile.model.WalletSummaryResponse;
@@ -61,16 +62,20 @@ public class WalletActivity extends AppCompatActivity {
         tvViewAll.setOnClickListener(view ->
                 Toast.makeText(this, "View All Transactions Clicked", Toast.LENGTH_SHORT).show());
 
-        findViewById(R.id.ivNotificationTop).setOnClickListener(view ->
+        findViewById(R.id.ivNotification).setOnClickListener(view ->
                 startActivity(new Intent(this, NotificationsActivity.class)));
 
         findViewById(R.id.navHomeItem).setOnClickListener(v -> finish());
         findViewById(R.id.navListingsItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, ListingsActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(MainActivity.EXTRA_INITIAL_TAB, MainActivity.Tab.LISTINGS.name());
+            startActivity(intent);
             finish();
         });
         findViewById(R.id.navSettingsItem).setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(MainActivity.EXTRA_INITIAL_TAB, MainActivity.Tab.SETTINGS.name());
+            startActivity(intent);
             finish();
         });
     }

@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- Header Section -->
+
+        <LinearLayout
+            android:id="@+id/llLogoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivLogo"/>
+
+        <!-- Illustration Section -->
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="123dp"
+            android:layout_height="123dp"
+            android:layout_marginTop="25dp"
+            android:src="@drawable/ic_harvesthublogo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/ivIllustration"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="-25dp"
+            android:layout_marginBottom="-50dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/img_harvest_eco"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llLogoText"
+            tools:ignore="ContentDescription" />
+
+        <!-- Title Section -->
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:text="@string/welcome_to_harvesthub"
+            android:textColor="@color/text_primary"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivIllustration" />
+
+        <TextView
+            android:id="@+id/tvInstruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/choose_account_type"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+
+        <!-- Account Type Cards -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFarmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/surface_background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/account_card_stroke_selector"
+            app:strokeWidth="2dp"
+            android:checkable="true"
+            app:checkedIcon="@null"
+            app:checkedIconVisible="false"
+            app:layout_constraintTop_toBottomOf="@id/tvInstruction">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <View
+                    android:id="@+id/viewFarmerIconBg"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_background"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivFarmerIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/farmer_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="@id/viewFarmerIconBg"
+                    app:layout_constraintEnd_toEndOf="@id/viewFarmerIconBg"
+                    app:layout_constraintStart_toStartOf="@id/viewFarmerIconBg"
+                    app:layout_constraintTop_toTopOf="@id/viewFarmerIconBg"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ivChevronFarmer"
+                    app:layout_constraintStart_toEndOf="@id/viewFarmerIconBg"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/farmer"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/farmer_desc"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivChevronFarmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/arrow_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBuyer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/surface_background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/account_card_stroke_selector"
+            app:strokeWidth="2dp"
+            android:checkable="true"
+            app:checkedIcon="@null"
+            app:checkedIconVisible="false"
+            app:layout_constraintTop_toBottomOf="@id/cardFarmer">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <View
+                    android:id="@+id/viewBuyerIconBg"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_background"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivBuyerIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/buyer_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="@id/viewBuyerIconBg"
+                    app:layout_constraintEnd_toEndOf="@id/viewBuyerIconBg"
+                    app:layout_constraintStart_toStartOf="@id/viewBuyerIconBg"
+                    app:layout_constraintTop_toTopOf="@id/viewBuyerIconBg"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ivChevronBuyer"
+                    app:layout_constraintStart_toEndOf="@id/viewBuyerIconBg"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buyer"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buyer_desc"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivChevronBuyer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/arrow_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTransporter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/surface_background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/account_card_stroke_selector"
+            app:strokeWidth="2dp"
+            android:checkable="true"
+            app:checkedIcon="@null"
+            app:checkedIconVisible="false"
+            app:layout_constraintTop_toBottomOf="@id/cardBuyer">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <View
+                    android:id="@+id/viewTransporterIconBg"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_background"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivTransporterIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/transporter_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="@id/viewTransporterIconBg"
+                    app:layout_constraintEnd_toEndOf="@id/viewTransporterIconBg"
+                    app:layout_constraintStart_toStartOf="@id/viewTransporterIconBg"
+                    app:layout_constraintTop_toTopOf="@id/viewTransporterIconBg"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ivChevronTransporter"
+                    app:layout_constraintStart_toEndOf="@id/viewTransporterIconBg"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/transporter"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/transporter_desc"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivChevronTransporter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/arrow_icon"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/account_card_icon_tint_selector"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Footer Section -->
+        <TextView
+            android:id="@+id/tvFooter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/terms_and_privacy"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardTransporter"
+            app:layout_constraintVertical_bias="1.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -11,10 +11,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.ui.farmer.FarmerDashboardActivity;
-import com.harvesthub.mobile.ui.farmer.ListingsHistoryActivity;
-import com.harvesthub.mobile.ui.farmer.SettingsActivity;
-import com.harvesthub.mobile.ui.farmer.WalletActivity;
+import com.harvesthub.mobile.MainActivity;
 
 public class BottomNavHelper {
 
@@ -50,7 +47,7 @@ public class BottomNavHelper {
         switch (activeTab) {
             case MARKET:
                 pillId = R.id.pill_market; iconId = R.id.icon_market; labelId = R.id.label_market;
-                activeIconRes = R.drawable.ic_trending_up; // Assuming ic_market is ic_trending_up
+                activeIconRes = R.drawable.ic_market;
                 break;
             case LISTINGS:
                 pillId = R.id.pill_listings; iconId = R.id.icon_listings; labelId = R.id.label_listings;
@@ -96,32 +93,18 @@ public class BottomNavHelper {
     }
 
     private static void navigate(Activity activity, Tab targetTab) {
-        Class<?> targetActivity;
+        MainActivity.Tab mainTab;
         switch (targetTab) {
-            case MARKET:
-                // Assuming MarketActivity exists or reusing Dashboard for now
-                targetActivity = FarmerDashboardActivity.class; 
-                break;
-            case LISTINGS:
-                targetActivity = ListingsHistoryActivity.class;
-                break;
-            case WALLET:
-                targetActivity = WalletActivity.class;
-                break;
-            case SETTINGS:
-                targetActivity = SettingsActivity.class;
-                break;
-            case HOME:
-            default:
-                targetActivity = FarmerDashboardActivity.class;
-                break;
+            case MARKET: mainTab = MainActivity.Tab.MARKET; break;
+            case LISTINGS: mainTab = MainActivity.Tab.LISTINGS; break;
+            case WALLET: mainTab = MainActivity.Tab.WALLET; break;
+            case SETTINGS: mainTab = MainActivity.Tab.SETTINGS; break;
+            default: mainTab = MainActivity.Tab.HOME; break;
         }
 
-        if (activity.getClass() != targetActivity) {
-            Intent intent = new Intent(activity, targetActivity);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            activity.startActivity(intent);
-            // No finish() here because we want to keep them in front
-        }
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_INITIAL_TAB, mainTab.name());
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        activity.startActivity(intent);
     }
 }

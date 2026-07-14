@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/listingCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="2dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Top Section: Image and Basic Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivThumbnail"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:background="#F5F5F5"
+                app:shapeAppearanceOverlay="@style/RoundedSquare"
+                tools:src="@drawable/ic_leaf" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="17sp"
+                    tools:text="Tomatoes" />
+
+                <TextView
+                    android:id="@+id/tvListingId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textColor="#828282"
+                    android:textSize="12sp"
+                    tools:text="Listing #TM-2024" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvStatusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_badge"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:textAllCaps="true"
+                android:textSize="10sp"
+                tools:backgroundTint="@color/status_draft_bg"
+                tools:text="DRAFT"
+                tools:textColor="@color/status_draft_text" />
+        </LinearLayout>
+
+        <!-- Stats Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#FAFAFA"
+            android:padding="12dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:text="QUANTITY"
+                    android:textColor="#9E9E9E"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/tvYieldValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:textColor="#2E7D32"
+                    android:textSize="15sp"
+                    tools:text="120 KG" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="12dp"
+                android:background="#EEEEEE" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:text="EXP. PRICE"
+                    android:textColor="#9E9E9E"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/tvExpectedValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="15sp"
+                    tools:text="LKR 180/kg" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Metadata Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_location_pin"
+                app:tint="#828282"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="#828282"
+                android:textSize="12sp"
+                tools:text="Dambulla Sector" />
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_clock"
+                app:tint="#828282"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tvUpdatedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="#828282"
+                android:textSize="12sp"
+                tools:text="2h ago" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvReviewNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#FFF9C4"
+            android:padding="10dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:text="Pending verification by HarvestHub team."
+            android:textColor="#827717"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:id="@+id/llActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPrimary"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                app:backgroundTint="#F5F5F5"
+                android:textColor="#1A1A1A"
+                app:cornerRadius="10dp"
+                app:iconSize="18dp"
+                tools:icon="@drawable/ic_edit_chat"
+                tools:text="Edit Details" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSecondary"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                app:strokeColor="#EEEEEE"
+                android:textColor="#D32F2F"
+                app:cornerRadius="10dp"
+                app:iconSize="18dp"
+                android:visibility="gone"
+                tools:text="Deactivate"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

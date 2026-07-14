@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +13,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
@@ -34,8 +43,9 @@ public class HomeFragment extends Fragment {
     private TextView tvGreetingTitle, tvWeatherTemp, tvWeatherLocation;
     private TextView tvTotalRevenue, tvRevenueChange, tvPreviousRevenueSubtext;
     private TextView tvActiveListings, tvCompletedOrders, tvTrustScore, tvMarketAvg;
-    private MarketTrendChartView marketChart;
-    private LinearLayout bottomNavigation;
+    private MaterialCardView cvTab24h, cvTab7d, cvTab30d;
+    private TextView tvTab24h, tvTab7d, tvTab30d;
+    private LineChart marketChart;
     private MaterialButton btnCreateListing, btnViewMarketInsights;
     private ApiService apiService;
 
@@ -46,21 +56,20 @@ public class HomeFragment extends Fragment {
 
         apiService = ApiClient.getClient().create(ApiService.class);
         initViews(view);
-        setupBottomNavigation(view);
-        renderChart(defaultTrendValues());
+        setupLineChart();
+        setupTabListeners();
+
+        renderChart(defaultTrendValues(), 7);
 
         fetchDashboardData("FARMER_ID_HERE");
         fetchWeatherData("Dambulla, LK");
-        fetchMarketTrend("Carrot");
+        fetchMarketTrend("Carrot", 7);
 
         btnCreateListing.setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), CreateListingActivity.class)));
-
-        view.findViewById(R.id.ivNotification).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), NotificationsActivity.class)));
+                startActivity(new Intent(requireContext(), ListingDetailsActivity.class)));
 
         btnViewMarketInsights.setOnClickListener(v ->
-                Toast.makeText(getActivity(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
+                Toast.makeText(requireContext(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
 
         return view;
     }
@@ -72,38 +81,78 @@ public class HomeFragment extends Fragment {
         tvTotalRevenue = v.findViewById(R.id.tvTotalRevenue);
         tvRevenueChange = v.findViewById(R.id.tvRevenueChange);
         tvPreviousRevenueSubtext = v.findViewById(R.id.tvPreviousRevenueSubtext);
+        tvActiveListings = v.findViewById(R.id.tvActiveListings);
+        tvCompletedOrders = v.findViewById(R.id.tvCompletedOrders);
+        tvTrustScore = v.findViewById(R.id.tvTrustScore);
         tvMarketAvg = v.findViewById(R.id.tvMarketAvg);
         marketChart = v.findViewById(R.id.marketChart);
-        bottomNavigation = v.findViewById(R.id.bottomNavigation);
         btnCreateListing = v.findViewById(R.id.btnCreateListing);
         btnViewMarketInsights = v.findViewById(R.id.btnViewMarketInsights);
+
+        cvTab24h = v.findViewById(R.id.cvTab24h);
+        cvTab7d = v.findViewById(R.id.cvTab7d);
+        cvTab30d = v.findViewById(R.id.cvTab30d);
+        tvTab24h = v.findViewById(R.id.tvTab24h);
+        tvTab7d = v.findViewById(R.id.tvTab7d);
+        tvTab30d = v.findViewById(R.id.tvTab30d);
     }
 
-    private void setupBottomNavigation(View root) {
-        root.findViewById(R.id.navListingsItem).setSelected(true);
-        root.findViewById(R.id.navListingsItem).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), ListingsActivity.class)));
-        root.findViewById(R.id.navHomeItem).setOnClickListener(v ->
-                Toast.makeText(getActivity(), "Home", Toast.LENGTH_SHORT).show());
-        root.findViewById(R.id.navMarketItem).setOnClickListener(v ->
-                Toast.makeText(getActivity(), "Market", Toast.LENGTH_SHORT).show());
-        root.findViewById(R.id.navWalletItem).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), WalletActivity.class)));
-        root.findViewById(R.id.navSettingsItem).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), SettingsActivity.class)));
+    private void setupTabListeners() {
+        cvTab24h.setOnClickListener(v -> {
+            updateTabUI(1);
+            fetchMarketTrend("Carrot", 1);
+        });
+        cvTab7d.setOnClickListener(v -> {
+            updateTabUI(7);
+            fetchMarketTrend("Carrot", 7);
+        });
+        cvTab30d.setOnClickListener(v -> {
+            updateTabUI(30);
+            fetchMarketTrend("Carrot", 30);
+        });
+    }
+
+    private void updateTabUI(int days) {
+        // Reset all
+        cvTab24h.setCardBackgroundColor(Color.TRANSPARENT);
+        cvTab24h.setCardElevation(0);
+        tvTab24h.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_gray));
+
+        cvTab7d.setCardBackgroundColor(Color.TRANSPARENT);
+        cvTab7d.setCardElevation(0);
+        tvTab7d.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_gray));
+
+        cvTab30d.setCardBackgroundColor(Color.TRANSPARENT);
+        cvTab30d.setCardElevation(0);
+        tvTab30d.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_gray));
+
+        // Set active
+        if (days == 1) {
+            cvTab24h.setCardBackgroundColor(Color.WHITE);
+            cvTab24h.setCardElevation(2);
+            tvTab24h.setTextColor(Color.parseColor("#1C3529"));
+        } else if (days == 7) {
+            cvTab7d.setCardBackgroundColor(Color.WHITE);
+            cvTab7d.setCardElevation(2);
+            tvTab7d.setTextColor(Color.parseColor("#1C3529"));
+        } else if (days == 30) {
+            cvTab30d.setCardBackgroundColor(Color.WHITE);
+            cvTab30d.setCardElevation(2);
+            tvTab30d.setTextColor(Color.parseColor("#1C3529"));
+        }
     }
 
     private void fetchDashboardData(String farmerId) {
         apiService.getFarmerDashboard(farmerId).enqueue(new Callback<DashboardResponse>() {
             @Override
-            public void onResponse(Call<DashboardResponse> call, Response<DashboardResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+            public void onResponse(@NonNull Call<DashboardResponse> call, @NonNull Response<DashboardResponse> response) {
+                if (isAdded() && response.isSuccessful() && response.body() != null) {
                     updateDashboardUI(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<DashboardResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<DashboardResponse> call, @NonNull Throwable t) {
                 // Keep the reference-screen values visible when the API is unavailable.
             }
         });
@@ -124,38 +173,86 @@ public class HomeFragment extends Fragment {
     private void fetchWeatherData(String location) {
         apiService.getWeather(location).enqueue(new Callback<WeatherResponse>() {
             @Override
-            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+            public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+                if (isAdded() && response.isSuccessful() && response.body() != null) {
                     tvWeatherTemp.setText(response.body().getTemperature() + ", " + response.body().getCondition());
                     tvWeatherLocation.setText(response.body().getLocation());
                 }
             }
 
             @Override
-            public void onFailure(Call<WeatherResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
                 // Keep the reference-screen values visible when the API is unavailable.
             }
         });
     }
 
-    private void fetchMarketTrend(String crop) {
-        apiService.getMarketTrend(crop, 7).enqueue(new Callback<MarketTrendResponse>() {
+    private void fetchMarketTrend(String crop, int days) {
+        apiService.getMarketTrend(crop, days).enqueue(new Callback<MarketTrendResponse>() {
             @Override
-            public void onResponse(Call<MarketTrendResponse> call, Response<MarketTrendResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    renderChart(response.body().getTrends());
+            public void onResponse(@NonNull Call<MarketTrendResponse> call, @NonNull Response<MarketTrendResponse> response) {
+                if (isAdded() && response.isSuccessful() && response.body() != null) {
+                    renderChart(response.body().getTrends(), days);
                 }
             }
 
             @Override
-            public void onFailure(Call<MarketTrendResponse> call, Throwable t) {
-                renderChart(defaultTrendValues());
+            public void onFailure(@NonNull Call<MarketTrendResponse> call, @NonNull Throwable t) {
+                renderChart(defaultTrendValues(), days);
             }
         });
     }
 
-    private void renderChart(List<Double> trends) {
-        marketChart.setTrendValues(trends);
+    private void setupLineChart() {
+        marketChart.getDescription().setEnabled(false);
+        marketChart.getLegend().setEnabled(false);
+        marketChart.getAxisRight().setEnabled(false);
+        marketChart.getAxisLeft().setDrawGridLines(false);
+        marketChart.getXAxis().setDrawGridLines(false);
+        marketChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        marketChart.getXAxis().setGranularity(1f);
+        marketChart.getXAxis().setTextColor(Color.GRAY);
+
+        final String[] labels = new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+        marketChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+    }
+
+    private void renderChart(List<Double> trends, int days) {
+        if (trends == null || trends.isEmpty()) return;
+
+        // Update labels based on range
+        String[] labels;
+        if (days == 1) {
+            labels = new String[]{"00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "23:59"};
+        } else if (days == 30) {
+            labels = new String[]{"W1", "W2", "W3", "W4", "W5"};
+        } else {
+            labels = new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+        }
+        marketChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        int count = Math.min(trends.size(), labels.length);
+        for (int i = 0; i < count; i++) {
+            entries.add(new Entry(i, trends.get(i).floatValue()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Market Price");
+        dataSet.setColor(Color.parseColor("#0FA968"));
+        dataSet.setLineWidth(3f);
+        dataSet.setDrawCircles(true);
+        dataSet.setCircleColor(Color.parseColor("#0FA968"));
+        dataSet.setCircleRadius(4f);
+        dataSet.setDrawValues(false);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setDrawFilled(true);
+
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_gradient);
+        dataSet.setFillDrawable(drawable);
+
+        marketChart.setData(new LineData(dataSet));
+        marketChart.invalidate();
+        marketChart.animateX(1000);
     }
 
     private List<Double> defaultTrendValues() {
