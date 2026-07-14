@@ -50,11 +50,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         if (item.isRead()) {
             holder.cardNotification.setCardBackgroundColor(Color.WHITE);
             holder.tvMarkAsRead.setVisibility(View.GONE);
-            holder.cardNotification.setStrokeColor(Color.parseColor("#E0E0E0"));
+            holder.cardNotification.setStrokeColor(Color.parseColor("#F0F0F0"));
+            holder.cardNotification.setAlpha(0.7f);
         } else {
-            holder.cardNotification.setCardBackgroundColor(Color.parseColor("#E8F5E9"));
+            holder.cardNotification.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
             holder.tvMarkAsRead.setVisibility(View.VISIBLE);
-            holder.cardNotification.setStrokeColor(Color.parseColor("#A5D6A7"));
+            holder.cardNotification.setStrokeColor(Color.parseColor("#E8F5E9"));
+            holder.cardNotification.setAlpha(1.0f);
         }
 
         // Type-based icon styling

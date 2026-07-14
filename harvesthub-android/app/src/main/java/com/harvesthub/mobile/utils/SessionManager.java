@@ -44,7 +44,7 @@ public class SessionManager {
         pref.edit()
             .putBoolean(KEY_IS_LOGGED_IN, isLoggedIn)
             .putString(KEY_USER_ROLE, role)
-            .commit(); // Use commit for immediate effect before navigation
+            .commit();
     }
 
     public void saveAuthToken(String token) {
@@ -81,6 +81,21 @@ public class SessionManager {
     }
 
     public void logoutUser() {
-        pref.edit().clear().commit();
+        // Individual key removal is safer for EncryptedSharedPreferences
+        try {
+            pref.edit()
+                .remove(KEY_IS_LOGGED_IN)
+                .remove(KEY_USER_ROLE)
+                .remove(KEY_AUTH_TOKEN)
+                .remove(KEY_USER_DATA)
+                .commit();
+        } catch (Exception e) {
+            // Fallback to clear if remove fails
+            try {
+                pref.edit().clear().commit();
+            } catch (Exception ex) {
+                pref.edit().clear().apply();
+            }
+        }
     }
 }

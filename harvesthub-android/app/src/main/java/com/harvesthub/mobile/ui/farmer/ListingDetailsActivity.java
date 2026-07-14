@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,13 +22,16 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.util.NotificationPanelHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +40,7 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
     private RecyclerView rvPhotos;
     private PhotoAdapter photoAdapter;
-    private List<Uri> photoUris = new ArrayList<>();
+    private final List<Uri> photoUris = new ArrayList<>();
     
     private AutoCompleteTextView actvCrop;
     private TextInputLayout tilCropDropdown, tilYield, tilPrice;
@@ -45,14 +49,14 @@ public class ListingDetailsActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvAddNewCrop;
 
-    private List<String> cropList = new ArrayList<>();
+    private final List<String> cropList = new ArrayList<>();
     private ArrayAdapter<String> cropAdapter;
 
-    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+    private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 if (uri != null) {
                     photoUris.add(uri);
-                    photoAdapter.notifyDataSetChanged();
+                    photoAdapter.notifyItemInserted(photoUris.size() - 1);
                 }
             });
 
@@ -65,6 +69,8 @@ public class ListingDetailsActivity extends AppCompatActivity {
         setupPhotoList();
         setupCropDropdown();
         setupClickListeners();
+        setupBottomNav();
+        setupTopNav();
     }
 
     private void initViews() {
@@ -78,6 +84,13 @@ public class ListingDetailsActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         progressBar = findViewById(R.id.progressBar);
         tvAddNewCrop = findViewById(R.id.tvAddNewCrop);
+    }
+
+    private void setupTopNav() {
+        View btnNotification = findViewById(R.id.btnNotification);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> NotificationPanelHelper.showNotificationPanel(this, v));
+        }
     }
 
     private void setupPhotoList() {
@@ -98,6 +111,7 @@ public class ListingDetailsActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         tvAddNewCrop.setOnClickListener(v -> showAddNewCropDialog());
 
         btnSubmit.setOnClickListener(v -> {
@@ -105,6 +119,26 @@ public class ListingDetailsActivity extends AppCompatActivity {
                 submitListing();
             }
         });
+    }
+
+    private void setupBottomNav() {
+        findViewById(R.id.nav_home).setOnClickListener(v -> {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        });
+        findViewById(R.id.nav_listings).setOnClickListener(v -> finish());
+        
+        // Highlight Listings tab
+        LinearLayout pill = findViewById(R.id.pill_listings);
+        ImageView icon = findViewById(R.id.icon_listings);
+        TextView label = findViewById(R.id.label_listings);
+
+        if (pill != null) pill.setBackgroundResource(R.drawable.bg_nav_item_active);
+        if (icon != null) {
+            icon.setImageResource(R.drawable.ic_list);
+            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_active_text));
+        }
+        if (label != null) label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
     }
 
     private void showAddNewCropDialog() {
@@ -163,10 +197,11 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         // Simulate network delay
         new Handler().postDelayed(() -> {
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(this, "Listing Submitted Successfully!", Toast.LENGTH_SHORT).show();
-            // Navigate to success screen or back
-            finish();
+            if (!isFinishing()) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "Listing Submitted for Verification!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }, 2000);
     }
 
@@ -196,6 +231,9 @@ public class ListingDetailsActivity extends AppCompatActivity {
                 ((ImageViewHolder) holder).ivThumbnail.setPadding(0, 0, 0, 0);
                 ((ImageViewHolder) holder).ivThumbnail.setBackground(null);
             } else if (holder instanceof AddViewHolder) {
+                ((AddViewHolder) holder).ivThumbnail.setImageResource(R.drawable.ic_plus_chat);
+                ((AddViewHolder) holder).ivThumbnail.setPadding(20, 20, 20, 20);
+                ((AddViewHolder) holder).ivThumbnail.setBackgroundResource(R.drawable.bg_dashed_border);
                 holder.itemView.setOnClickListener(v -> pickMedia.launch(new PickVisualMediaRequest.Builder()
                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                         .build()));
@@ -204,7 +242,6 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            // Photos + the Add Button
             return photoUris.size() + 1;
         }
 
@@ -217,8 +254,10 @@ public class ListingDetailsActivity extends AppCompatActivity {
         }
 
         class AddViewHolder extends RecyclerView.ViewHolder {
+            ImageView ivThumbnail;
             AddViewHolder(View itemView) {
                 super(itemView);
+                ivThumbnail = itemView.findViewById(R.id.ivThumbnail);
             }
         }
     }
