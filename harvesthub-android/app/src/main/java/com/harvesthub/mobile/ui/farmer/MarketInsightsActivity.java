@@ -24,7 +24,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.util.NotificationPanelHelper;
+import com.harvesthub.mobile.utils.NotificationPanelHelper;
 
 import java.util.ArrayList;
 import java.util.List;

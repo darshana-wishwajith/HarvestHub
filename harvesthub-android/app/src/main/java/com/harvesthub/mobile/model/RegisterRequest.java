@@ -1,9 +1,8 @@
-package com.harvesthub.mobile.ui.farmer;
+package com.harvesthub.mobile.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
-import com.harvesthub.mobile.model.FarmLocation;
 
 public class RegisterRequest implements Parcelable {
     @SerializedName("fullName")

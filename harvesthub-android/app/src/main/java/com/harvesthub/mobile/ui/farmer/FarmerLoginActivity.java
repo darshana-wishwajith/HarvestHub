@@ -4,15 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.databinding.ActivityFarmerLoginBinding;
 import com.harvesthub.mobile.model.LoginRequest;
 import com.harvesthub.mobile.model.LoginResponse;
 import com.harvesthub.mobile.model.User;
@@ -21,104 +21,83 @@ import com.harvesthub.mobile.network.ApiService;
 import com.harvesthub.mobile.utils.PasswordUtils;
 import com.harvesthub.mobile.utils.SessionManager;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FarmerLoginActivity extends AppCompatActivity {
 
-    private EditText etEmail, etPassword;
-    private ImageView ivPasswordToggle;
-    private TextView tvForgotPassword, tvRegister;
-    private Button btnSignIn;
-    private com.google.android.material.card.MaterialCardView cvError;
-    private TextView tvErrorMessage;
-    private android.view.View ivCloseError;
+    private ActivityFarmerLoginBinding binding;
     private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_farmer_login);
+        binding = ActivityFarmerLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        initViews();
         setupListeners();
     }
 
-    private void initViews() {
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
-        tvForgotPassword = findViewById(R.id.tvForgotPassword);
-        tvRegister = findViewById(R.id.tvRegister);
-        btnSignIn = findViewById(R.id.btnSignIn);
-        cvError = findViewById(R.id.cvError);
-        tvErrorMessage = findViewById(R.id.tvErrorMessage);
-        ivCloseError = findViewById(R.id.ivCloseError);
-    }
-
     private void setupListeners() {
-        ivPasswordToggle.setOnClickListener(v -> togglePasswordVisibility());
+        binding.ivPasswordToggle.setOnClickListener(v -> togglePasswordVisibility());
 
-        tvForgotPassword.setOnClickListener(v -> {
-            // Navigate to Forgot Password screen
-            Intent intent = new Intent(this, ForgotPasswordActivity.class);
-            startActivity(intent);
+        binding.tvForgotPassword.setOnClickListener(v -> {
+            startActivity(new Intent(this, ForgotPasswordActivity.class));
         });
 
-        btnSignIn.setOnClickListener(v -> performLogin());
+        binding.btnSignIn.setOnClickListener(v -> performLogin());
 
-        tvRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RegisterActivity.class);
-            startActivity(intent);
+        binding.tvRegister.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterActivity.class));
         });
 
-        ivCloseError.setOnClickListener(v -> cvError.setVisibility(android.view.View.GONE));
+        binding.ivCloseError.setOnClickListener(v -> binding.cvError.setVisibility(View.GONE));
     }
 
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
-            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            ivPasswordToggle.setImageResource(R.drawable.ic_visibility);
+            binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            binding.ivPasswordToggle.setImageResource(R.drawable.ic_visibility);
         } else {
-            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            ivPasswordToggle.setImageResource(R.drawable.ic_visibility_off);
+            binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            binding.ivPasswordToggle.setImageResource(R.drawable.ic_visibility_off);
         }
         isPasswordVisible = !isPasswordVisible;
-        etPassword.setSelection(etPassword.getText().length());
+        binding.etPassword.setSelection(binding.etPassword.getText().length());
     }
 
     private void performLogin() {
-        String emailOrMobile = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+        String emailOrMobile = binding.etEmail.getText().toString().trim();
+        String password = binding.etPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(emailOrMobile)) {
-            etEmail.setError("Please enter your email or mobile number");
-            etEmail.requestFocus();
+            binding.etEmail.setError("Please enter your email or mobile number");
+            binding.etEmail.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("Please enter your password");
-            etPassword.requestFocus();
+            binding.etPassword.setError("Please enter your password");
+            binding.etPassword.requestFocus();
             return;
         }
 
-        // Hash the password before sending to the server
         String hashedPassword = PasswordUtils.hashPassword(password);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        ApiService apiService = ApiClient.getApiService();
         LoginRequest loginRequest = new LoginRequest(emailOrMobile, hashedPassword);
 
-        cvError.setVisibility(android.view.View.GONE);
-        btnSignIn.setEnabled(false);
-        btnSignIn.setText("Signing In...");
+        binding.cvError.setVisibility(View.GONE);
+        binding.btnSignIn.setEnabled(false);
+        binding.btnSignIn.setText("Signing In...");
 
         apiService.login(loginRequest).enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                btnSignIn.setEnabled(true);
-                btnSignIn.setText(R.string.sign_in_as_farmer);
+            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+                binding.btnSignIn.setEnabled(true);
+                binding.btnSignIn.setText(R.string.sign_in_as_farmer);
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
                     SessionManager sessionManager = new SessionManager(FarmerLoginActivity.this);
@@ -133,13 +112,13 @@ public class FarmerLoginActivity extends AppCompatActivity {
                     sessionManager.setLogin(true, "FARMER");
 
                     Toast.makeText(FarmerLoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(FarmerLoginActivity.this, com.harvesthub.mobile.MainActivity.class);
+                    Intent intent = new Intent(FarmerLoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 } else {
                     String detailedErrorMessage = "Login Failed";
-                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                    try (ResponseBody errorBody = response.errorBody()) {
                         if (errorBody != null) {
                             String bodyString = errorBody.string();
                             if (bodyString != null && !bodyString.trim().isEmpty()) {
@@ -151,23 +130,20 @@ public class FarmerLoginActivity extends AppCompatActivity {
                             detailedErrorMessage = "Login Failed: " + response.code() + " " + response.message();
                         }
                     } catch (Exception e) {
-                        android.util.Log.e("LoginError", "Error parsing error body", e);
                         detailedErrorMessage = "Login Failed: " + response.code();
                     }
-                    tvErrorMessage.setText(detailedErrorMessage);
-                    cvError.setVisibility(android.view.View.VISIBLE);
-                    android.util.Log.e("LoginError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
+                    binding.tvErrorMessage.setText(detailedErrorMessage);
+                    binding.cvError.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                btnSignIn.setEnabled(true);
-                btnSignIn.setText(R.string.sign_in_as_farmer);
+            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                binding.btnSignIn.setEnabled(true);
+                binding.btnSignIn.setText(R.string.sign_in_as_farmer);
                 String errorMessage = "Network error: " + t.getMessage();
-                tvErrorMessage.setText(errorMessage);
-                cvError.setVisibility(android.view.View.VISIBLE);
-                android.util.Log.e("LoginError", errorMessage, t);
+                binding.tvErrorMessage.setText(errorMessage);
+                binding.cvError.setVisibility(View.VISIBLE);
             }
         });
     }

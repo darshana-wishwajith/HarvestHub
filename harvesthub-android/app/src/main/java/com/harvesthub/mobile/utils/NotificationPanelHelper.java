@@ -1,4 +1,4 @@
-package com.harvesthub.mobile.util;
+package com.harvesthub.mobile.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +41,7 @@ public class NotificationPanelHelper {
         notificationPopup.setFocusable(true);
         notificationPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         notificationPopup.setElevation(24f);
+        notificationPopup.setAnimationStyle(R.style.PopupAnimation);
 
         RecyclerView rv = popupView.findViewById(R.id.rvNotifications);
         rv.setLayoutManager(new LinearLayoutManager(context));
@@ -54,7 +54,9 @@ public class NotificationPanelHelper {
 
         NotificationAdapter adapter = new NotificationAdapter(dummyData, (notification, position) -> {
             notification.setRead(true);
-            rv.getAdapter().notifyItemChanged(position);
+            if (rv.getAdapter() != null) {
+                rv.getAdapter().notifyItemChanged(position);
+            }
         });
         rv.setAdapter(adapter);
 
@@ -63,6 +65,13 @@ public class NotificationPanelHelper {
             Intent intent = new Intent(context, NotificationsActivity.class);
             intent.putExtra(NotificationsActivity.EXTRA_HIDE_NAV, true);
             context.startActivity(intent);
+        });
+
+        popupView.findViewById(R.id.tvMarkAllRead).setOnClickListener(v -> {
+            for (NotificationItem item : dummyData) {
+                item.setRead(true);
+            }
+            adapter.notifyDataSetChanged();
         });
 
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);

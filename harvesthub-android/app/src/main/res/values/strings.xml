@@ -102,7 +102,7 @@
     <string name="buyer_desc">Purchase verified produce</string>
     <string name="transporter">Transporter</string>
     <string name="transporter_desc">Accept delivery jobs</string>
-    <string name="terms_and_privacy">BTerms of Service &amp; Privacy Policy</string>
+    <string name="terms_and_privacy">Terms of Service &amp; Privacy Policy</string>
 
     <!-- Rating & Feedback Strings -->
     <string name="notifications">Notifications</string>

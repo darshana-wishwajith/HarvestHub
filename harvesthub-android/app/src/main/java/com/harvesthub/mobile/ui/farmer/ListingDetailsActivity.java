@@ -31,7 +31,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.util.NotificationPanelHelper;
+import com.harvesthub.mobile.utils.NotificationPanelHelper;
 
 import java.util.ArrayList;
 import java.util.List;
