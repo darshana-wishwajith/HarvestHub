@@ -59,7 +59,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         apiService = ApiClient.getClient().create(ApiService.class);
         initViews();
-        setupBottomNavVisuals();
         fetchProfile();
     }
 
@@ -72,7 +71,7 @@ public class EditProfileActivity extends AppCompatActivity {
         tilFullName = findViewById(R.id.tilFullName);
         tilPhone = findViewById(R.id.tilPhone);
         tilNic = findViewById(R.id.tilNic);
-        tvLastUpdated = findViewById(R.id.tvLastUpdated);
+        tvLastUpdated = findViewById(R.id.llUpdated);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
@@ -91,61 +90,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ResetPasswordActivity.class)));
 
         findViewById(R.id.btnSaveChanges).setOnClickListener(v -> validateAndSave());
-
-        // Bottom Nav Logic
-        findViewById(R.id.nav_home).setOnClickListener(v -> {
-            startActivity(new Intent(this, com.harvesthub.mobile.MainActivity.class));
-            finish();
-        });
-        findViewById(R.id.nav_listings).setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
-            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.LISTINGS.name());
-            startActivity(intent);
-            finish();
-        });
-        findViewById(R.id.nav_market).setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
-            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.MARKET.name());
-            startActivity(intent);
-            finish();
-        });
-        findViewById(R.id.nav_wallet).setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.harvesthub.mobile.MainActivity.class);
-            intent.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.WALLET.name());
-            startActivity(intent);
-            finish();
-        });
-        findViewById(R.id.nav_settings).setOnClickListener(v -> {
-            finish(); // Settings is usually where we came from
-        });
-    }
-
-    private void setupBottomNavVisuals() {
-        LinearLayout pill = findViewById(R.id.pill_settings);
-        ImageView icon = findViewById(R.id.icon_settings);
-        TextView label = findViewById(R.id.label_settings);
-
-        if (pill != null) pill.setBackgroundResource(R.drawable.bg_nav_item_active);
-        if (icon != null) {
-            icon.setImageResource(R.drawable.ic_settings);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_active_text));
-        }
-        if (label != null) label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
-        
-        int[] otherPills = {R.id.pill_home, R.id.pill_market, R.id.pill_listings, R.id.pill_wallet};
-        int[] otherIcons = {R.id.icon_home, R.id.icon_market, R.id.icon_listings, R.id.icon_wallet};
-        int[] otherLabels = {R.id.label_home, R.id.label_market, R.id.label_listings, R.id.label_wallet};
-        
-        for (int i = 0; i < otherPills.length; i++) {
-            View p = findViewById(otherPills[i]);
-            if (p != null) p.setBackground(null);
-            
-            ImageView ic = findViewById(otherIcons[i]);
-            if (ic != null) ic.setColorFilter(ContextCompat.getColor(this, R.color.nav_inactive_text));
-            
-            TextView lb = findViewById(otherLabels[i]);
-            if (lb != null) lb.setTextColor(ContextCompat.getColor(this, R.color.nav_inactive_text));
-        }
     }
 
     private void fetchProfile() {

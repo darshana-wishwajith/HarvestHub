@@ -1,28 +1,29 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.DashboardResponse;
 import com.harvesthub.mobile.model.MarketTrendResponse;
@@ -153,7 +154,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<DashboardResponse> call, @NonNull Throwable t) {
-                // Keep the reference-screen values visible when the API is unavailable.
             }
         });
     }
@@ -182,7 +182,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
-                // Keep the reference-screen values visible when the API is unavailable.
             }
         });
     }
@@ -220,7 +219,6 @@ public class HomeFragment extends Fragment {
     private void renderChart(List<Double> trends, int days) {
         if (trends == null || trends.isEmpty()) return;
 
-        // Update labels based on range
         String[] labels;
         if (days == 1) {
             labels = new String[]{"00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "23:59"};
@@ -248,7 +246,7 @@ public class HomeFragment extends Fragment {
         dataSet.setDrawFilled(true);
 
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_gradient);
-        dataSet.setFillDrawable(drawable);
+        if (drawable != null) dataSet.setFillDrawable(drawable);
 
         marketChart.setData(new LineData(dataSet));
         marketChart.invalidate();
