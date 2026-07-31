@@ -93,6 +93,12 @@
     <color name="nav_active_text">#FFFFFF</color>
     <color name="nav_bar_bg">#FAFAFA</color>
     <color name="nav_active_green">#1D3B2D</color>
+    <color name="nav_ripple">#1A000000</color>
+
+    <!-- Top Navigation -->
+    <color name="top_nav_bg">#FFFFFF</color>
+    <color name="top_nav_icon_tint">#1B1B1B</color>
+
     <color name="status_draft_bg">#EEEEEE</color>
     <color name="status_draft_text">#616161</color>
     <color name="status_pending_bg">#FFF3E0</color>
