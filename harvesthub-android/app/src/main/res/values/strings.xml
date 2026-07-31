@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HarvestHub Mobile</string>
+    <string name="app_name">HarvestHub</string>
     <string name="sign_in_as_farmer">Sign In as Farmer</string>
     <string name="notifications_title">Notifications</string>
     <string name="mark_all_as_read">Mark all as read</string>
