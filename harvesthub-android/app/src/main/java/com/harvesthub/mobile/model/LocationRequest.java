@@ -1,4 +1,4 @@
-package com.harvesthub.mobile.ui.farmer;
+package com.harvesthub.mobile.model;
 
 import com.google.gson.annotations.SerializedName;
 

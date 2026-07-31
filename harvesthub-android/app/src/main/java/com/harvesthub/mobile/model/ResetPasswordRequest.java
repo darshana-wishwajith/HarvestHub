@@ -3,17 +3,17 @@ package com.harvesthub.mobile.model;
 import com.google.gson.annotations.SerializedName;
 
 public class ResetPasswordRequest {
-    @SerializedName("token")
-    private String token;
+    @SerializedName("resetToken")
+    private String resetToken;
 
     @SerializedName("newPassword")
     private String newPassword;
 
-    public ResetPasswordRequest(String token, String newPassword) {
-        this.token = token;
+    public ResetPasswordRequest(String resetToken, String newPassword) {
+        this.resetToken = resetToken;
         this.newPassword = newPassword;
     }
 
-    public String getToken() { return token; }
+    public String getResetToken() { return resetToken; }
     public String getNewPassword() { return newPassword; }
 }

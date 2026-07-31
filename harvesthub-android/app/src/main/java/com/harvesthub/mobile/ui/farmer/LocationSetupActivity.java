@@ -22,6 +22,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.FarmLocation;
+import com.harvesthub.mobile.model.LocationRequest;
+import com.harvesthub.mobile.model.RegisterRequest;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 

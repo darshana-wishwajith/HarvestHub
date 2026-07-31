@@ -4,42 +4,32 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.databinding.ActivityEditProfileBinding;
 import com.harvesthub.mobile.model.FarmerProfileResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
-import java.io.File;
-
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class EditProfileActivity extends AppCompatActivity {
 
-    private ImageView ivProfileLarge;
-    private EditText etFullName, etEmail, etPhone, etNic;
-    private TextInputLayout tilFullName, tilPhone, tilNic;
-    private TextView tvLastUpdated;
+    private ActivityEditProfileBinding binding;
     private ApiService apiService;
-    private String farmerId = "FARMER_123";
+    private final String farmerId = "FARMER_123";
     private Uri selectedImageUri;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
@@ -47,7 +37,7 @@ public class EditProfileActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     selectedImageUri = result.getData().getData();
-                    ivProfileLarge.setImageURI(selectedImageUri);
+                    binding.ivProfileLarge.setImageURI(selectedImageUri);
                 }
             }
     );
@@ -55,41 +45,32 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+        binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         apiService = ApiClient.getClient().create(ApiService.class);
-        initViews();
+        initListeners();
         fetchProfile();
     }
 
-    private void initViews() {
-        ivProfileLarge = findViewById(R.id.ivProfileLarge);
-        etFullName = findViewById(R.id.etFullName);
-        etEmail = findViewById(R.id.etEmail);
-        etPhone = findViewById(R.id.etPhone);
-        etNic = findViewById(R.id.etNic);
-        tilFullName = findViewById(R.id.tilFullName);
-        tilPhone = findViewById(R.id.tilPhone);
-        tilNic = findViewById(R.id.tilNic);
-        tvLastUpdated = findViewById(R.id.llUpdated);
+    private void initListeners() {
+        binding.btnBack.setOnClickListener(v -> finish());
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
-        findViewById(R.id.btnUploadPhoto).setOnClickListener(v -> {
+        binding.btnUploadPhoto.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             imagePickerLauncher.launch(intent);
         });
 
-        findViewById(R.id.btnRemovePhoto).setOnClickListener(v -> {
+        binding.btnRemovePhoto.setOnClickListener(v -> {
             selectedImageUri = null;
-            ivProfileLarge.setImageResource(R.drawable.ic_person);
+            binding.ivProfileLarge.setImageResource(R.drawable.ic_person);
         });
 
-        findViewById(R.id.btnUpdatePassword).setOnClickListener(v -> 
+        binding.btnUpdatePassword.setOnClickListener(v -> 
                 startActivity(new Intent(this, ResetPasswordActivity.class)));
 
-        findViewById(R.id.btnSaveChanges).setOnClickListener(v -> validateAndSave());
+        binding.btnSaveChanges.setOnClickListener(v -> validateAndSave());
     }
 
     private void fetchProfile() {
@@ -109,31 +90,31 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void populateUI(FarmerProfileResponse profile) {
-        etFullName.setText(profile.getFullName());
-        etEmail.setText(profile.getEmail());
-        etPhone.setText(profile.getPhoneNumber());
-        etNic.setText(profile.getNic());
+        binding.etFullName.setText(profile.getFullName());
+        binding.etEmail.setText(profile.getEmail());
+        binding.etPhone.setText(profile.getPhoneNumber());
+        binding.etNic.setText(profile.getNic());
         if (profile.getPasswordLastUpdated() != null) {
-            tvLastUpdated.setText("Last updated " + profile.getPasswordLastUpdated());
+            binding.tvLastUpdated.setText("Last updated " + profile.getPasswordLastUpdated());
         }
     }
 
     private void validateAndSave() {
-        String name = etFullName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String nic = etNic.getText().toString().trim();
+        String name = binding.etFullName.getText().toString().trim();
+        String phone = binding.etPhone.getText().toString().trim();
+        String nic = binding.etNic.getText().toString().trim();
 
-        tilFullName.setError(null);
-        tilPhone.setError(null);
-        tilNic.setError(null);
+        binding.tilFullName.setError(null);
+        binding.tilPhone.setError(null);
+        binding.tilNic.setError(null);
 
         boolean isValid = true;
         if (name.isEmpty()) {
-            tilFullName.setError("Name is required");
+            binding.tilFullName.setError("Name is required");
             isValid = false;
         }
         if (nic.isEmpty()) {
-            tilNic.setError("NIC is required");
+            binding.tilNic.setError("NIC is required");
             isValid = false;
         }
 
@@ -152,9 +133,9 @@ public class EditProfileActivity extends AppCompatActivity {
             // Real app would handle file conversion
         }
 
-        apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<okhttp3.ResponseBody>() {
+        apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                     finish();
@@ -164,7 +145,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
