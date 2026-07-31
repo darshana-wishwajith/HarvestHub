@@ -114,4 +114,49 @@
     <color name="status_deactivated_text">#FFFFFF</color>
     <color name="search_bar_bg">#F5F7F5</color>
     <color name="tab_indicator_green">#13A34A</color>
+    <!-- Home Screen Specific -->
+    <color name="home_bg">#FAFDF9</color>
+    <color name="home_greeting_title">#073B27</color>
+    <color name="home_greeting_subtext">#667796</color>
+    <color name="weather_card_bg">#FCFEFB</color>
+    <color name="weather_card_stroke">#E0E7E1</color>
+    <color name="weather_text_temp">#242424</color>
+    <color name="weather_text_location">#657794</color>
+    <color name="revenue_card_bg">#1D4032</color>
+    <color name="revenue_card_text_primary">#FFFFFF</color>
+    <color name="revenue_card_text_secondary">#8BA899</color>
+    <color name="revenue_card_text_sub">#7DA191</color>
+    <color name="stat_card_bg">#FFFFFF</color>
+    <color name="stat_card_stroke">#E0E7E1</color>
+    <color name="stat_text_label">#657794</color>
+    <color name="stat_text_value">#171717</color>
+    <color name="stat_icon_mint_bg">#EBF7EE</color>
+    <color name="stat_icon_mint_tint">#1D4032</color>
+    <color name="stat_icon_lime_bg">#F3FBEF</color>
+    <color name="stat_icon_lime_tint">#3B6324</color>
+    <color name="stat_icon_gray_bg">#F5F7F9</color>
+    <color name="stat_icon_gray_tint">#4A5568</color>
+    <color name="market_avg_label">#657794</color>
+    <color name="market_chart_axis">#A0AEC0</color>
+    <color name="insight_button_bg">#E8E8E8</color>
+    <color name="insight_button_text">#4A5568</color>
+    <color name="market_tip_bg">#D9FCDD</color>
+    <color name="create_button_bg">#05291C</color>
+    <color name="create_button_text">#FFFFFF</color>
+    <color name="success_green">#07993E</color>
+
+    <!-- Notification Panel -->
+    <color name="notif_panel_bg">#FFFFFF</color>
+    <color name="notif_panel_stroke">#F0F0F0</color>
+    <color name="notif_panel_header_text">#1A1C1A</color>
+    <color name="notif_panel_divider">#F0F0F0</color>
+    <color name="notif_panel_footer_bg">#F9FBFA</color>
+    <color name="notif_panel_footer_text">#4A6A5D</color>
+
+    <color name="notif_item_bg">#FFFFFF</color>
+    <color name="notif_item_unread_bg">#F4FBF7</color>
+    <color name="notif_item_stroke">#F0F0F0</color>
+    <color name="notif_item_title">#1A1A1A</color>
+    <color name="notif_item_body">#666666</color>
+    <color name="notif_item_time">#9E9E9E</color>
 </resources>

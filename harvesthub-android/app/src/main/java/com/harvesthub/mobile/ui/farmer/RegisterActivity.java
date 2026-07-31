@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.RegisterRequest;
 
 import java.util.regex.Pattern;
 

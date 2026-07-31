@@ -9,17 +9,16 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import com.harvesthub.mobile.databinding.ActivityMainBinding;
+import com.harvesthub.mobile.databinding.BottomNavBarBinding;
 import com.harvesthub.mobile.ui.farmer.HomeFragment;
 import com.harvesthub.mobile.ui.farmer.MarketFragment;
 import com.harvesthub.mobile.ui.farmer.ListingsFragment;
 import com.harvesthub.mobile.ui.farmer.WalletFragment;
 import com.harvesthub.mobile.ui.farmer.SettingsFragment;
-import com.harvesthub.mobile.ui.farmer.NotificationsActivity;
-import com.harvesthub.mobile.util.NotificationPanelHelper;
+import com.harvesthub.mobile.utils.NotificationPanelHelper;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,14 +26,14 @@ public class MainActivity extends AppCompatActivity {
     
     public enum Tab { HOME, MARKET, LISTINGS, WALLET, SETTINGS }
     private Tab currentTab;
-    private ApiService apiService;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        apiService = ApiClient.getClient().create(ApiService.class);
         setupTopNav();
         setupBottomNav();
 
@@ -63,9 +62,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupTopNav() {
-        View topNav = findViewById(R.id.top_nav_bar);
-        if (topNav != null) {
-            View btnNotification = topNav.findViewById(R.id.btnNotification);
+        if (binding.topNavBar.getRoot() != null) {
+            View btnNotification = binding.topNavBar.getRoot().findViewById(R.id.btnNotification);
             if (btnNotification != null) {
                 btnNotification.setOnClickListener(v -> NotificationPanelHelper.showNotificationPanel(this, v));
             }
@@ -73,11 +71,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupBottomNav() {
-        findViewById(R.id.nav_home).setOnClickListener(v -> loadFragment(Tab.HOME, new HomeFragment()));
-        findViewById(R.id.nav_market).setOnClickListener(v -> loadFragment(Tab.MARKET, new MarketFragment()));
-        findViewById(R.id.nav_listings).setOnClickListener(v -> loadFragment(Tab.LISTINGS, new ListingsFragment()));
-        findViewById(R.id.nav_wallet).setOnClickListener(v -> loadFragment(Tab.WALLET, new WalletFragment()));
-        findViewById(R.id.nav_settings).setOnClickListener(v -> loadFragment(Tab.SETTINGS, new SettingsFragment()));
+        BottomNavBarBinding nav = BottomNavBarBinding.bind(binding.bottomNavBar.getRoot());
+        nav.navHome.setOnClickListener(v -> loadFragment(Tab.HOME, new HomeFragment()));
+        nav.navMarket.setOnClickListener(v -> loadFragment(Tab.MARKET, new MarketFragment()));
+        nav.navListings.setOnClickListener(v -> loadFragment(Tab.LISTINGS, new ListingsFragment()));
+        nav.navWallet.setOnClickListener(v -> loadFragment(Tab.WALLET, new WalletFragment()));
+        nav.navSettings.setOnClickListener(v -> loadFragment(Tab.SETTINGS, new SettingsFragment()));
     }
 
     private void loadFragment(Tab tab, Fragment fragment) {
@@ -103,36 +102,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateBottomNavVisuals(Tab activeTab) {
-        resetAllTabs();
+        BottomNavBarBinding nav = BottomNavBarBinding.bind(binding.bottomNavBar.getRoot());
+        resetAllTabs(nav);
 
-        int pillId, iconId, labelId, activeIconRes;
+        LinearLayout pill;
+        ImageView icon;
+        TextView label;
+        int activeIconRes;
+
         switch (activeTab) {
             case MARKET:
-                pillId = R.id.pill_market; iconId = R.id.icon_market; labelId = R.id.label_market;
+                pill = nav.pillMarket; icon = nav.iconMarket; label = nav.labelMarket;
                 activeIconRes = R.drawable.ic_market;
                 break;
             case LISTINGS:
-                pillId = R.id.pill_listings; iconId = R.id.icon_listings; labelId = R.id.label_listings;
+                pill = nav.pillListings; icon = nav.iconListings; label = nav.labelListings;
                 activeIconRes = R.drawable.ic_list;
                 break;
             case WALLET:
-                pillId = R.id.pill_wallet; iconId = R.id.icon_wallet; labelId = R.id.label_wallet;
+                pill = nav.pillWallet; icon = nav.iconWallet; label = nav.labelWallet;
                 activeIconRes = R.drawable.ic_wallet;
                 break;
             case SETTINGS:
-                pillId = R.id.pill_settings; iconId = R.id.icon_settings; labelId = R.id.label_settings;
+                pill = nav.pillSettings; icon = nav.iconSettings; label = nav.labelSettings;
                 activeIconRes = R.drawable.ic_settings;
                 break;
             case HOME:
             default:
-                pillId = R.id.pill_home; iconId = R.id.icon_home; labelId = R.id.label_home;
+                pill = nav.pillHome; icon = nav.iconHome; label = nav.labelHome;
                 activeIconRes = R.drawable.ic_home;
                 break;
         }
-
-        LinearLayout pill = findViewById(pillId);
-        ImageView icon = findViewById(iconId);
-        TextView label = findViewById(labelId);
 
         pill.setBackgroundResource(R.drawable.bg_nav_item_active);
         icon.setImageResource(activeIconRes);
@@ -140,17 +140,17 @@ public class MainActivity extends AppCompatActivity {
         label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
     }
 
-    private void resetAllTabs() {
-        int[] pills = {R.id.pill_home, R.id.pill_market, R.id.pill_listings, R.id.pill_wallet, R.id.pill_settings};
-        int[] icons = {R.id.icon_home, R.id.icon_market, R.id.icon_listings, R.id.icon_wallet, R.id.icon_settings};
-        int[] labels = {R.id.label_home, R.id.label_market, R.id.label_listings, R.id.label_wallet, R.id.label_settings};
+    private void resetAllTabs(BottomNavBarBinding nav) {
+        LinearLayout[] pills = {nav.pillHome, nav.pillMarket, nav.pillListings, nav.pillWallet, nav.pillSettings};
+        ImageView[] icons = {nav.iconHome, nav.iconMarket, nav.iconListings, nav.iconWallet, nav.iconSettings};
+        TextView[] labels = {nav.labelHome, nav.labelMarket, nav.labelListings, nav.labelWallet, nav.labelSettings};
+
+        int inactiveColor = ContextCompat.getColor(this, R.color.nav_inactive_text);
 
         for (int i = 0; i < pills.length; i++) {
-            findViewById(pills[i]).setBackground(null);
-            ImageView icon = findViewById(icons[i]);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_inactive_text));
-            TextView label = findViewById(labels[i]);
-            label.setTextColor(ContextCompat.getColor(this, R.color.nav_inactive_text));
+            pills[i].setBackground(null);
+            icons[i].setColorFilter(inactiveColor);
+            labels[i].setTextColor(inactiveColor);
         }
     }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -48,15 +49,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         // Read/Unread styling
         if (item.isRead()) {
-            holder.cardNotification.setCardBackgroundColor(Color.WHITE);
+            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.notif_item_bg));
             holder.tvMarkAsRead.setVisibility(View.GONE);
-            holder.cardNotification.setStrokeColor(Color.parseColor("#F0F0F0"));
-            holder.cardNotification.setAlpha(0.7f);
+            holder.cardNotification.setAlpha(0.6f);
+            holder.cardNotification.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.notif_item_stroke));
         } else {
-            holder.cardNotification.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
+            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.notif_item_unread_bg));
             holder.tvMarkAsRead.setVisibility(View.VISIBLE);
-            holder.cardNotification.setStrokeColor(Color.parseColor("#E8F5E9"));
             holder.cardNotification.setAlpha(1.0f);
+            holder.cardNotification.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.success_green));
         }
 
         // Type-based icon styling
@@ -68,12 +69,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private void setupIcon(NotificationViewHolder holder, String type) {
         int iconRes;
         int bgColor;
-        int iconTint = Color.WHITE;
+        int iconTint;
 
         switch (type) {
             case "DELIVERY_SUCCESS":
                 iconRes = R.drawable.ic_check_circle;
-                bgColor = Color.parseColor("#13A34A");
+                bgColor = Color.parseColor("#E8F5E9");
+                iconTint = Color.parseColor("#13A34A");
                 break;
             case "PENALTY":
                 iconRes = R.drawable.ic_warning;
@@ -82,17 +84,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 break;
             case "LISTING_APPROVED":
                 iconRes = R.drawable.ic_description;
-                bgColor = Color.parseColor("#78909C");
-                break;
-            case "ACCOUNT_VERIFIED":
-                iconRes = R.drawable.ic_person;
-                bgColor = Color.parseColor("#F5F5F5");
-                iconTint = Color.parseColor("#757575");
-                break;
-            default:
-                iconRes = R.drawable.ic_info;
                 bgColor = Color.parseColor("#E3F2FD");
                 iconTint = Color.parseColor("#1976D2");
+                break;
+            default:
+                iconRes = R.drawable.ic_bell;
+                bgColor = Color.parseColor("#F5F5F5");
+                iconTint = Color.parseColor("#757575");
                 break;
         }
 

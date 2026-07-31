@@ -7,9 +7,10 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
     android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="@color/notif_item_bg"
     app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
-    app:strokeColor="#F0F0F0"
+    app:strokeColor="@color/notif_item_stroke"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -24,9 +25,9 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivNotificationIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:padding="8dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="9dp"
                 android:background="#E8F5E9"
                 app:shapeAppearanceOverlay="@style/CircleImageView"
                 tools:backgroundTint="#13A34A"
@@ -37,12 +38,12 @@
                 android:id="@+id/tvNotificationTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="14dp"
                 android:layout_toStartOf="@id/tvTimestamp"
                 android:layout_toEndOf="@id/ivNotificationIcon"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:textColor="#1A1A1A"
-                android:textSize="13sp"
+                android:textColor="@color/notif_item_title"
+                android:textSize="14sp"
                 tools:text="Delivery Successful" />
 
             <TextView
@@ -51,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="#9E9E9E"
+                android:textColor="@color/notif_item_time"
                 android:textSize="11sp"
                 tools:text="2m ago" />
 
@@ -60,13 +61,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tvNotificationTitle"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="3dp"
                 android:layout_toEndOf="@id/ivNotificationIcon"
                 android:fontFamily="@font/plus_jakarta_sans"
-                android:lineSpacingExtra="1dp"
-                android:textColor="#666666"
-                android:textSize="12sp"
+                android:lineSpacingExtra="2dp"
+                android:textColor="@color/notif_item_body"
+                android:textSize="12.5sp"
                 tools:text="LKR 140,000 has been credited to your wallet." />
 
         </RelativeLayout>
@@ -76,10 +77,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:text="Mark as Read"
             android:textColor="@color/primary_green"
             android:textSize="11sp"
