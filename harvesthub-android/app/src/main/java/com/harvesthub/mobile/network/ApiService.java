@@ -20,15 +20,15 @@ import com.harvesthub.mobile.model.SendMessageRequest;
 import com.harvesthub.mobile.model.SendOtpRequest;
 import com.harvesthub.mobile.model.SupplyOfferRequest;
 import com.harvesthub.mobile.model.Transaction;
+import com.harvesthub.mobile.model.LocationRequest;
+import com.harvesthub.mobile.model.RegisterRequest;
+import com.harvesthub.mobile.model.ResetPasswordRequest;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.model.VerifyOtpRequest;
 import com.harvesthub.mobile.model.VerifyOtpResponse;
 import com.harvesthub.mobile.model.WalletSummaryResponse;
 import com.harvesthub.mobile.model.WantedAd;
 import com.harvesthub.mobile.model.WeatherResponse;
-import com.harvesthub.mobile.ui.farmer.LocationRequest;
-import com.harvesthub.mobile.ui.farmer.RegisterRequest;
-import com.harvesthub.mobile.model.ResetPasswordRequest;
 
 import java.util.List;
 
