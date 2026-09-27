@@ -7,10 +7,10 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="2dp"
     android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/stat_card_bg"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:strokeColor="#E0E0E0"
+    app:strokeColor="@color/stat_card_stroke"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -19,7 +19,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top Section: Image and Basic Info -->
+        <!-- Top Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,17 +28,17 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivThumbnail"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:scaleType="centerCrop"
-                android:background="#F5F5F5"
+                android:background="@color/bg_light"
                 app:shapeAppearanceOverlay="@style/RoundedSquare"
                 tools:src="@drawable/ic_leaf" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:textColor="#1A1A1A"
+                    android:textColor="@color/stat_text_value"
                     android:textSize="17sp"
                     tools:text="Tomatoes" />
 
@@ -55,10 +55,10 @@
                     android:id="@+id/tvListingId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="1dp"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:textColor="#828282"
-                    android:textSize="12sp"
+                    android:textColor="@color/listing_id_text"
+                    android:textSize="12.5sp"
                     tools:text="Listing #TM-2024" />
             </LinearLayout>
 
@@ -72,18 +72,17 @@
                 android:paddingVertical="5dp"
                 android:textAllCaps="true"
                 android:textSize="10sp"
-                tools:backgroundTint="@color/status_draft_bg"
+                android:letterSpacing="0.02"
+                tools:backgroundTint="#718096"
                 tools:text="DRAFT"
-                tools:textColor="@color/status_draft_text" />
+                tools:textColor="@color/white" />
         </LinearLayout>
 
-        <!-- Stats Section -->
+        <!-- Yield and Price -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#FAFAFA"
-            android:padding="12dp"
+            android:layout_marginTop="20dp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
@@ -91,58 +90,74 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_yield"
+                    app:tint="@color/listing_label_text" />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="QUANTITY"
-                    android:textColor="#9E9E9E"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.05" />
-
-                <TextView
-                    android:id="@+id/tvYieldValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:textColor="#2E7D32"
-                    android:textSize="15sp"
-                    tools:text="120 KG" />
+                    android:layout_marginStart="8dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:text="EST. YIELD"
+                        android:textColor="@color/listing_label_text"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.05" />
+                    <TextView
+                        android:id="@+id/tvYieldValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:textColor="@color/listing_data_value_text"
+                        android:textSize="14sp"
+                        tools:text="120 KG" />
+                </LinearLayout>
             </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="12dp"
-                android:background="#EEEEEE" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_price"
+                    app:tint="@color/listing_label_text" />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="EXP. PRICE"
-                    android:textColor="#9E9E9E"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.05" />
-
-                <TextView
-                    android:id="@+id/tvExpectedValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:textColor="#1A1A1A"
-                    android:textSize="15sp"
-                    tools:text="LKR 180/kg" />
+                    android:layout_marginStart="8dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:text="EXPECTED"
+                        android:textColor="@color/listing_label_text"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.05" />
+                    <TextView
+                        android:id="@+id/tvExpectedValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:textColor="@color/listing_data_value_text"
+                        android:textSize="14sp"
+                        tools:text="LKR 180/kg" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -150,35 +165,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="20dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:src="@drawable/ic_location_pin"
-                app:tint="#828282"
-                tools:ignore="ContentDescription" />
+                android:src="@drawable/ic_calendar"
+                app:tint="@color/listing_meta_text" />
 
             <TextView
-                android:id="@+id/tvLocation"
-                android:layout_width="0dp"
+                android:id="@+id/tvCreatedDate"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:layout_weight="1"
                 android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="#828282"
+                android:textColor="@color/listing_meta_text"
                 android:textSize="12sp"
-                tools:text="Dambulla Sector" />
+                tools:text="Created: Oct 24" />
 
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="16dp"
                 android:src="@drawable/ic_clock"
-                app:tint="#828282"
-                tools:ignore="ContentDescription" />
+                app:tint="@color/listing_meta_text" />
 
             <TextView
                 android:id="@+id/tvUpdatedTime"
@@ -186,23 +198,42 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="#828282"
+                android:textColor="@color/listing_meta_text"
                 android:textSize="12sp"
-                tools:text="2h ago" />
+                tools:text="Updated: Yesterday" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_location_pin"
+                app:tint="@color/listing_meta_text" />
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="@color/listing_meta_text"
+                android:textSize="12sp"
+                tools:text="Dambulla Sector" />
         </LinearLayout>
 
+        <!-- Verification/Review Note -->
         <TextView
             android:id="@+id/tvReviewNote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="#FFF9C4"
-            android:padding="10dp"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/plus_jakarta_sans"
-            android:text="Pending verification by HarvestHub team."
-            android:textColor="#827717"
-            android:textSize="12sp"
-            android:textStyle="italic"
+            android:text="Our team is verifying your listing details."
+            android:textColor="@color/listing_review_text"
+            android:textSize="13sp"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -211,32 +242,32 @@
             android:id="@+id/llActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="18dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPrimary"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:textAllCaps="false"
                 android:textSize="14sp"
-                app:backgroundTint="#F5F5F5"
-                android:textColor="#1A1A1A"
-                app:cornerRadius="10dp"
+                app:cornerRadius="12dp"
                 app:iconSize="18dp"
+                app:strokeColor="@color/border_gray"
+                android:textColor="@color/stat_text_value"
                 tools:icon="@drawable/ic_edit_chat"
-                tools:text="Edit Details" />
+                tools:text="Edit" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSecondary"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
@@ -244,13 +275,11 @@
                 android:insetBottom="0dp"
                 android:textAllCaps="false"
                 android:textSize="14sp"
-                app:strokeColor="#EEEEEE"
-                android:textColor="#D32F2F"
-                app:cornerRadius="10dp"
+                app:cornerRadius="12dp"
                 app:iconSize="18dp"
-                android:visibility="gone"
-                tools:text="Deactivate"
-                tools:visibility="visible" />
+                app:strokeColor="@color/listing_deactivate_stroke"
+                android:textColor="@color/listing_deactivate_text"
+                tools:text="Deactivate" />
         </LinearLayout>
 
     </LinearLayout>

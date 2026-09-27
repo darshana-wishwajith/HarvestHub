@@ -4,389 +4,398 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFDF9">
+    android:background="@color/home_bg">
 
-    <!-- Scrollable Content -->
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="100dp">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
-            <!-- Stats Row -->
             <LinearLayout
+                android:id="@+id/mainContentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="100dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.6"
-                    app:cardBackgroundColor="@color/nav_active_green"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_banknote"
-                            app:tint="@color/white"
-                            tools:ignore="ContentDescription" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="Monthly Rev"
-                            android:textColor="#BDBDBD"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonthlyRev"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:textColor="@color/white"
-                            android:textSize="20sp"
-                            tools:text="LKR 42.5k" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="0.4"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="#E0E0E0"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_leaf"
-                            app:tint="@color/accent_green"
-                            tools:ignore="ContentDescription" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="Trust Score"
-                            android:textColor="#828282"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvTrustScore"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:textColor="#1A1A1A"
-                            android:textSize="20sp"
-                            tools:text="94%" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-            <!-- Section Title -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:text="Listings &amp; Demands"
-                android:textColor="#1A1A1A"
-                android:textSize="22sp" />
-
-            <!-- Tab Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
-
+                <!-- Summary Row -->
                 <LinearLayout
-                    android:id="@+id/tabActive"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:id="@+id/tvTabActive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:text="Active"
-                        android:textColor="@color/nav_active_green"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:id="@+id/indicatorActive"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginTop="12dp"
-                        android:background="@color/tab_indicator_green"
-                        android:visibility="visible" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tabHistory"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:id="@+id/tvTabHistory"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="History"
-                        android:textColor="#828282"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:id="@+id/indicatorHistory"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginTop="12dp"
-                        android:background="@color/tab_indicator_green"
-                        android:visibility="invisible" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tabWantedAds"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:id="@+id/tvTabWantedAds"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="Wanted Ads"
-                        android:textColor="#828282"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:id="@+id/indicatorWantedAds"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginTop="12dp"
-                        android:background="@color/tab_indicator_green"
-                        android:visibility="invisible" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F0F0F0" />
-
-            <!-- Search Bar -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/search_bar_bg"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
-
-                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="12dp">
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/ivSearch"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/ic_search"
-                        app:tint="#828282"
-                        tools:ignore="ContentDescription" />
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
+                        android:layout_weight="1.2"
+                        app:cardBackgroundColor="@color/success_green"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
 
-                    <EditText
-                        android:id="@+id/etSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="16dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_banknote"
+                                app:tint="#FFFFFF" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Monthly Rev"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvMonthlyRev"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                tools:text="LKR 42.5k" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
                         android:layout_marginStart="12dp"
-                        android:layout_toEndOf="@id/ivSearch"
-                        android:background="@android:color/transparent"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:hint="Search listings..."
-                        android:inputType="text"
-                        android:textColor="#1A1A1A"
-                        android:textColorHint="#9E9E9E"
-                        android:textSize="14sp" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/stat_card_bg"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/stat_card_stroke"
+                        app:strokeWidth="1dp">
 
-            <!-- Filter Chip Row -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:scrollbars="none">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="16dp">
 
-                <LinearLayout
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_leaf"
+                                app:tint="@color/accent_green" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Trust Score"
+                                android:textColor="@color/listing_meta_text"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvTrustScore"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:textColor="@color/stat_text_value"
+                                android:textSize="18sp"
+                                tools:text="94%" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Section Title -->
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="4dp">
+                    android:layout_marginTop="28dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:text="Listings &amp; Demands"
+                    android:textColor="@color/home_greeting_title"
+                    android:textSize="22sp" />
 
-                    <TextView
-                        android:id="@+id/filterAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_badge"
-                        android:backgroundTint="@color/nav_active_green"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="All"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        android:clickable="true"
-                        android:focusable="true" />
+                <!-- Tabs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/filterDraft"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/tabActive"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_outlined_button_chat"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="Draft"
-                        android:textColor="#828282"
-                        android:textSize="13sp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
                         android:clickable="true"
-                        android:focusable="true" />
+                        android:focusable="true">
 
-                    <TextView
-                        android:id="@+id/filterPending"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_outlined_button_chat"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="Pending"
-                        android:textColor="#828282"
-                        android:textSize="13sp"
-                        android:clickable="true"
-                        android:focusable="true" />
+                        <TextView
+                            android:id="@+id/tvTabActive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="Active"
+                            android:textColor="@color/success_green"
+                            android:textSize="14sp" />
 
-                    <TextView
-                        android:id="@+id/filterListed"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_outlined_button_chat"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="Listed"
-                        android:textColor="#828282"
-                        android:textSize="13sp"
-                        android:clickable="true"
-                        android:focusable="true" />
+                        <View
+                            android:id="@+id/indicatorActive"
+                            android:layout_width="match_parent"
+                            android:layout_height="2.5dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@color/success_green"
+                            android:visibility="visible" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/filterOngoing"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/tabHistory"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_outlined_button_chat"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="Ongoing"
-                        android:textColor="#828282"
-                        android:textSize="13sp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
                         android:clickable="true"
-                        android:focusable="true" />
+                        android:focusable="true">
+
+                        <TextView
+                            android:id="@+id/tvTabHistory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:text="History"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:id="@+id/indicatorHistory"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@color/success_green"
+                            android:visibility="invisible" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tabWantedAds"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:id="@+id/tvTabWantedAds"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:text="Wanted Ads"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:id="@+id/indicatorWantedAds"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@color/success_green"
+                            android:visibility="invisible" />
+                    </LinearLayout>
                 </LinearLayout>
-            </HorizontalScrollView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvListings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_listing_variant" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stat_card_stroke" />
 
-            <TextView
-                android:id="@+id/tvEmptyState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:gravity="center"
-                android:text="No listings found"
-                android:textColor="#828282"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                <!-- Search Bar -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="@color/search_bar_bg"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/stat_card_stroke"
+                    app:strokeWidth="1dp">
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="14dp">
 
-    <!-- FAB for Creating Listing -->
+                        <ImageView
+                            android:id="@+id/ivSearch"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/listing_meta_text" />
+
+                        <EditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="12dp"
+                            android:layout_toEndOf="@id/ivSearch"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:hint="Search listings..."
+                            android:inputType="text"
+                            android:textColor="@color/stat_text_value"
+                            android:textColorHint="@color/listing_label_text"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Filters -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <TextView
+                            android:id="@+id/filterAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_badge"
+                            android:backgroundTint="#2D3748"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="9dp"
+                            android:text="All"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/filterDraft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_outlined_button_chat"
+                            android:backgroundTint="@color/stat_card_bg"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="9dp"
+                            android:text="Draft"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="13sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/filterPending"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_outlined_button_chat"
+                            android:backgroundTint="@color/stat_card_bg"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="9dp"
+                            android:text="Pending"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="13sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/filterListed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_outlined_button_chat"
+                            android:backgroundTint="@color/stat_card_bg"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="9dp"
+                            android:text="Listed"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="13sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/filterOngoing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_outlined_button_chat"
+                            android:backgroundTint="@color/stat_card_bg"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="9dp"
+                            android:text="Ongoing"
+                            android:textColor="@color/listing_meta_text"
+                            android:textSize="13sp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvListings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_listing_variant" />
+
+                <TextView
+                    android:id="@+id/tvEmptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="48dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:text="No listings found"
+                    android:textColor="@color/listing_meta_text"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabCreateListing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        app:backgroundTint="@color/nav_active_green"
-        app:srcCompat="@drawable/ic_add"
+        android:layout_margin="20dp"
+        app:backgroundTint="@color/success_green"
+        app:srcCompat="@drawable/ic_plus"
         app:tint="@color/white"
-        tools:ignore="ContentDescription" />
+        app:fabSize="normal"
+        app:elevation="6dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
