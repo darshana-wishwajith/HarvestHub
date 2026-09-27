@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -17,8 +16,6 @@ import com.harvesthub.mobile.ui.farmer.ListingsFragment;
 import com.harvesthub.mobile.ui.farmer.WalletFragment;
 import com.harvesthub.mobile.ui.farmer.SettingsFragment;
 import com.harvesthub.mobile.utils.NotificationPanelHelper;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
             if (getIntent().hasExtra(EXTRA_INITIAL_TAB)) {
                 try {
                     initialTab = Tab.valueOf(getIntent().getStringExtra(EXTRA_INITIAL_TAB));
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
             }
             loadFragment(initialTab, createFragmentForTab(initialTab));
         }
@@ -105,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavBarBinding nav = BottomNavBarBinding.bind(binding.bottomNavBar.getRoot());
         resetAllTabs(nav);
 
-        LinearLayout pill;
+        View pill;
         ImageView icon;
         TextView label;
         int activeIconRes;
@@ -113,42 +109,42 @@ public class MainActivity extends AppCompatActivity {
         switch (activeTab) {
             case MARKET:
                 pill = nav.pillMarket; icon = nav.iconMarket; label = nav.labelMarket;
-                activeIconRes = R.drawable.ic_market;
+                activeIconRes = R.drawable.ic_market_icon_bottom_bar;
                 break;
             case LISTINGS:
                 pill = nav.pillListings; icon = nav.iconListings; label = nav.labelListings;
-                activeIconRes = R.drawable.ic_list;
+                activeIconRes = R.drawable.ic_listings_icon_bottom_bar;
                 break;
             case WALLET:
                 pill = nav.pillWallet; icon = nav.iconWallet; label = nav.labelWallet;
-                activeIconRes = R.drawable.ic_wallet;
+                activeIconRes = R.drawable.ic_wallet_bottom_bar;
                 break;
             case SETTINGS:
                 pill = nav.pillSettings; icon = nav.iconSettings; label = nav.labelSettings;
-                activeIconRes = R.drawable.ic_settings;
+                activeIconRes = R.drawable.ic_settings_bottom_bar;
                 break;
             case HOME:
             default:
                 pill = nav.pillHome; icon = nav.iconHome; label = nav.labelHome;
-                activeIconRes = R.drawable.ic_home;
+                activeIconRes = R.drawable.ic_home_bottom_bar;
                 break;
         }
 
-        pill.setBackgroundResource(R.drawable.bg_nav_item_active);
+        pill.setVisibility(View.VISIBLE);
         icon.setImageResource(activeIconRes);
         icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_active_text));
-        label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
+        label.setTextColor(ContextCompat.getColor(this, R.color.primary_green));
     }
 
     private void resetAllTabs(BottomNavBarBinding nav) {
-        LinearLayout[] pills = {nav.pillHome, nav.pillMarket, nav.pillListings, nav.pillWallet, nav.pillSettings};
+        View[] pills = {nav.pillHome, nav.pillMarket, nav.pillListings, nav.pillWallet, nav.pillSettings};
         ImageView[] icons = {nav.iconHome, nav.iconMarket, nav.iconListings, nav.iconWallet, nav.iconSettings};
         TextView[] labels = {nav.labelHome, nav.labelMarket, nav.labelListings, nav.labelWallet, nav.labelSettings};
 
         int inactiveColor = ContextCompat.getColor(this, R.color.nav_inactive_text);
 
         for (int i = 0; i < pills.length; i++) {
-            pills[i].setBackground(null);
+            pills[i].setVisibility(View.INVISIBLE);
             icons[i].setColorFilter(inactiveColor);
             labels[i].setTextColor(inactiveColor);
         }

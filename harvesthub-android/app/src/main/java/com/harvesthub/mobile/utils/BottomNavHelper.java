@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -47,35 +46,35 @@ public class BottomNavHelper {
         switch (activeTab) {
             case MARKET:
                 pillId = R.id.pill_market; iconId = R.id.icon_market; labelId = R.id.label_market;
-                activeIconRes = R.drawable.ic_market;
+                activeIconRes = R.drawable.ic_market_icon_bottom_bar;
                 break;
             case LISTINGS:
                 pillId = R.id.pill_listings; iconId = R.id.icon_listings; labelId = R.id.label_listings;
-                activeIconRes = R.drawable.ic_list;
+                activeIconRes = R.drawable.ic_listings_icon_bottom_bar;
                 break;
             case WALLET:
                 pillId = R.id.pill_wallet; iconId = R.id.icon_wallet; labelId = R.id.label_wallet;
-                activeIconRes = R.drawable.ic_wallet;
+                activeIconRes = R.drawable.ic_wallet_bottom_bar;
                 break;
             case SETTINGS:
                 pillId = R.id.pill_settings; iconId = R.id.icon_settings; labelId = R.id.label_settings;
-                activeIconRes = R.drawable.ic_settings;
+                activeIconRes = R.drawable.ic_settings_bottom_bar;
                 break;
             case HOME:
             default:
                 pillId = R.id.pill_home; iconId = R.id.icon_home; labelId = R.id.label_home;
-                activeIconRes = R.drawable.ic_home;
+                activeIconRes = R.drawable.ic_home_bottom_bar;
                 break;
         }
 
-        LinearLayout pill = navBarView.findViewById(pillId);
+        View pill = navBarView.findViewById(pillId);
         ImageView icon = navBarView.findViewById(iconId);
         TextView label = navBarView.findViewById(labelId);
 
-        pill.setBackgroundResource(R.drawable.bg_nav_item_active);
+        pill.setVisibility(View.VISIBLE);
         icon.setImageResource(activeIconRes);
         icon.setColorFilter(ContextCompat.getColor(context, R.color.nav_active_text));
-        label.setTextColor(ContextCompat.getColor(context, R.color.nav_active_text));
+        label.setTextColor(ContextCompat.getColor(context, R.color.primary_green));
     }
 
     private static void resetAllTabs(View navBarView, Context context) {
@@ -83,12 +82,14 @@ public class BottomNavHelper {
         int[] icons = {R.id.icon_home, R.id.icon_market, R.id.icon_listings, R.id.icon_wallet, R.id.icon_settings};
         int[] labels = {R.id.label_home, R.id.label_market, R.id.label_listings, R.id.label_wallet, R.id.label_settings};
 
+        int inactiveColor = ContextCompat.getColor(context, R.color.nav_inactive_text);
+
         for (int i = 0; i < pills.length; i++) {
-            navBarView.findViewById(pills[i]).setBackground(null);
+            navBarView.findViewById(pills[i]).setVisibility(View.INVISIBLE);
             ImageView icon = navBarView.findViewById(icons[i]);
-            icon.setColorFilter(ContextCompat.getColor(context, R.color.nav_inactive_text));
+            icon.setColorFilter(inactiveColor);
             TextView label = navBarView.findViewById(labels[i]);
-            label.setTextColor(ContextCompat.getColor(context, R.color.nav_inactive_text));
+            label.setTextColor(inactiveColor);
         }
     }
 

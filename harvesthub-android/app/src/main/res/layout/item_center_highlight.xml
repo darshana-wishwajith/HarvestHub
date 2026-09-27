@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/market_chart_card_bg"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/divider_color"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/market_chart_card_stroke"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="18dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -24,10 +25,12 @@
                 android:id="@+id/tvCenterName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dambulla Market"
-                android:textColor="@color/text_dark"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_toStartOf="@id/cvBadge"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textColor="@color/stat_text_value"
+                android:textSize="17sp"
+                tools:text="Dambulla Market" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -40,17 +43,18 @@
                 <ImageView
                     android:layout_width="12dp"
                     android:layout_height="12dp"
-                    android:src="@drawable/ic_location"
-                    app:tint="@color/text_gray" />
+                    android:src="@drawable/ic_location_pin"
+                    app:tint="@color/market_chart_axis" />
 
                 <TextView
                     android:id="@+id/tvLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="Central Province"
-                    android:textColor="@color/text_gray"
-                    android:textSize="12sp" />
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textColor="@color/market_chart_axis"
+                    android:textSize="13sp"
+                    tools:text="Central Province" />
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
@@ -58,27 +62,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                app:cardBackgroundColor="@color/light_green_badge"
-                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="@color/badge_harvest_bg"
+                app:cardCornerRadius="8dp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:id="@+id/tvBadgeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:text="HARVEST NOW"
-                    android:textColor="@color/dark_green_text"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:textColor="@color/badge_harvest_text"
+                    android:textSize="10.5sp"
+                    android:letterSpacing="0.02"
+                    tools:text="HARVEST NOW" />
             </com.google.android.material.card.MaterialCardView>
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -86,14 +91,15 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:src="@drawable/ic_truck"
-                app:tint="@color/text_dark" />
+                app:tint="@color/stat_text_value" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:text="Supply"
-                android:textColor="@color/text_dark"
+                android:textColor="@color/stat_text_value"
                 android:textSize="14sp" />
 
             <View
@@ -105,40 +111,42 @@
                 android:id="@+id/tvSupplyLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Low"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textColor="@color/warning_orange"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                tools:text="Low" />
         </LinearLayout>
 
         <ProgressBar
             android:id="@+id/pbSupply"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="6dp"
             android:layout_marginTop="8dp"
-            android:progress="30"
-            android:progressTint="@color/warning_orange" />
+            android:progressDrawable="@drawable/progress_location_horizontal"
+            android:progressTint="@color/warning_orange"
+            tools:progress="30" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/ic_shopping_cart"
-                app:tint="@color/text_dark" />
+                android:src="@drawable/ic_cart"
+                app:tint="@color/stat_text_value" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:text="Demand"
-                android:textColor="@color/text_dark"
+                android:textColor="@color/stat_text_value"
                 android:textSize="14sp" />
 
             <View
@@ -150,46 +158,52 @@
                 android:id="@+id/tvDemandLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="High"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textColor="@color/accent_green"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                tools:text="High" />
         </LinearLayout>
 
         <ProgressBar
             android:id="@+id/pbDemand"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="6dp"
             android:layout_marginTop="8dp"
-            android:progress="85"
-            android:progressTint="@color/accent_green" />
+            android:progressDrawable="@drawable/progress_location_horizontal"
+            android:progressTint="@color/accent_green"
+            tools:progress="85" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/divider_color" />
+            android:layout_marginTop="20dp"
+            android:background="@color/market_chart_card_stroke" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="14dp">
 
             <TextView
                 android:id="@+id/tvUpdateTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Update: 15 mins ago"
-                android:textColor="@color/text_gray"
-                android:textSize="12sp" />
+                android:layout_toStartOf="@id/ivArrow"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="@color/market_chart_axis"
+                android:textSize="12.5sp"
+                tools:text="Update: 15 mins ago" />
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:id="@+id/ivArrow"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/arrow_icon"
-                app:tint="@color/text_gray" />
+                app:tint="@color/market_chart_axis" />
         </RelativeLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
