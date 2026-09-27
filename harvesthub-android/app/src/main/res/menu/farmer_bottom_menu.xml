@@ -10,7 +10,7 @@
         android:title="Market" />
     <item
         android:id="@+id/nav_listings"
-        android:icon="@drawable/lstning"
+        android:icon="@drawable/ic_list"
         android:title="Listings" />
     <item
         android:id="@+id/nav_wallet"

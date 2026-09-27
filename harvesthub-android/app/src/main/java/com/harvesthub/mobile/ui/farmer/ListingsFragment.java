@@ -1,6 +1,8 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,17 +10,17 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.databinding.FragmentListingsBinding;
 import com.harvesthub.mobile.model.FarmerSummaryResponse;
 import com.harvesthub.mobile.model.HistoryListing;
 import com.harvesthub.mobile.model.ListingItem;
@@ -35,11 +37,7 @@ import retrofit2.Response;
 
 public class ListingsFragment extends Fragment {
 
-    private TextView tvMonthlyRev, tvTrustScore, tvEmptyState;
-    private TextView tvTabActive, tvTabHistory, tvTabWantedAds;
-    private View indicatorActive, indicatorHistory, indicatorWantedAds;
-    private EditText etSearch;
-    private RecyclerView rvListings;
+    private FragmentListingsBinding binding;
     private ListingAdapter adapter;
     private final List<ListingItem> allItems = new ArrayList<>();
     private final List<ListingItem> filteredItems = new ArrayList<>();
@@ -48,105 +46,144 @@ public class ListingsFragment extends Fragment {
     private String currentTab = "Active";
     private ListingItem.Status selectedFilter = null;
 
-    private TextView filterAll, filterDraft, filterPending, filterListed, filterOngoing;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_listings, container, false);
+        binding = FragmentListingsBinding.inflate(inflater, container, false);
 
-        apiService = ApiClient.getClient().create(ApiService.class);
-        initViews(view);
-        setupTabs(view);
+        apiService = ApiClient.getApiService();
+        initRecyclerView();
+        setupTabs();
         setupSearch();
+        setupFilters();
+        setupRefreshLayout();
+        
         fetchSummary();
         selectTab("Active");
 
-        return view;
+        binding.fabCreateListing.setOnClickListener(v -> openCreateListing());
+
+        return binding.getRoot();
     }
 
-    private void initViews(View v) {
-        tvMonthlyRev = v.findViewById(R.id.tvMonthlyRev);
-        tvTrustScore = v.findViewById(R.id.tvTrustScore);
-        tvEmptyState = v.findViewById(R.id.tvEmptyState);
-        tvTabActive = v.findViewById(R.id.tvTabActive);
-        tvTabHistory = v.findViewById(R.id.tvTabHistory);
-        tvTabWantedAds = v.findViewById(R.id.tvTabWantedAds);
-        indicatorActive = v.findViewById(R.id.indicatorActive);
-        indicatorHistory = v.findViewById(R.id.indicatorHistory);
-        indicatorWantedAds = v.findViewById(R.id.indicatorWantedAds);
-        etSearch = v.findViewById(R.id.etSearch);
-        rvListings = v.findViewById(R.id.rvListings);
-
-        filterAll = v.findViewById(R.id.filterAll);
-        filterDraft = v.findViewById(R.id.filterDraft);
-        filterPending = v.findViewById(R.id.filterPending);
-        filterListed = v.findViewById(R.id.filterListed);
-        filterOngoing = v.findViewById(R.id.filterOngoing);
-
-        rvListings.setLayoutManager(new LinearLayoutManager(requireContext()));
+    private void initRecyclerView() {
+        binding.rvListings.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ListingAdapter(filteredItems, new ListingAdapter.OnListingActionListener() {
             @Override public void onAction(ListingItem item) {}
-            @Override public void onChat(ListingItem item) { startChat(item); }
-            @Override public void onTrack(ListingItem item) { startTracking(item); }
-            @Override public void onEdit(ListingItem item) { editListing(item); }
-            @Override public void onSupply(ListingItem item) { supplyWantedAd(item); }
+            @Override public void onChat(ListingItem item) { 
+                startActivity(new Intent(requireContext(), ChatActivity.class));
+            }
+            @Override public void onTrack(ListingItem item) {
+                startActivity(new Intent(requireContext(), ActiveOrderTrackerActivity.class));
+            }
+            @Override public void onEdit(ListingItem item) {
+                CreateListingFragment fragment = new CreateListingFragment();
+                Bundle args = new Bundle();
+                args.putString("listingId", item.getId());
+                fragment.setArguments(args);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            @Override public void onDeactivate(ListingItem item) {
+                Toast.makeText(requireContext(), "Listing Deactivated", Toast.LENGTH_SHORT).show();
+            }
+            @Override public void onReactivate(ListingItem item) {
+                Toast.makeText(requireContext(), "Listing Re-activated", Toast.LENGTH_SHORT).show();
+            }
+            @Override public void onSupply(ListingItem item) {
+                Intent intent = new Intent(requireContext(), CreateSupplyOfferActivity.class);
+                intent.putExtra("requestId", item.getId());
+                intent.putExtra("cropName", item.getCropName());
+                startActivity(intent);
+            }
         });
-        rvListings.setAdapter(adapter);
-
-        v.findViewById(R.id.fabCreateListing).setOnClickListener(view -> {
-            startActivity(new Intent(requireContext(), CreateListingActivity.class));
-        });
-
-        filterAll.setOnClickListener(view -> filterByStatus(null));
-        filterDraft.setOnClickListener(view -> filterByStatus(ListingItem.Status.DRAFT));
-        filterPending.setOnClickListener(view -> filterByStatus(ListingItem.Status.PENDING));
-        filterListed.setOnClickListener(view -> filterByStatus(ListingItem.Status.LISTED));
-        filterOngoing.setOnClickListener(view -> filterByStatus(ListingItem.Status.ONGOING));
+        binding.rvListings.setAdapter(adapter);
     }
 
-    private void setupTabs(View v) {
-        v.findViewById(R.id.tabActive).setOnClickListener(view -> selectTab("Active"));
-        v.findViewById(R.id.tabHistory).setOnClickListener(view -> selectTab("History"));
-        v.findViewById(R.id.tabWantedAds).setOnClickListener(view -> selectTab("Wanted Ads"));
+    private void setupTabs() {
+        binding.tabActive.setOnClickListener(v -> selectTab("Active"));
+        binding.tabHistory.setOnClickListener(v -> selectTab("History"));
+        binding.tabWantedAds.setOnClickListener(v -> selectTab("Wanted Ads"));
     }
 
     private void selectTab(String tabName) {
         currentTab = tabName;
         resetTabStyles();
 
+        int activeColor = ContextCompat.getColor(requireContext(), R.color.success_green);
         if (tabName.equals("Active")) {
-            tvTabActive.setTypeface(null, Typeface.BOLD);
-            tvTabActive.setTextColor(getResources().getColor(R.color.nav_active_green));
-            indicatorActive.setVisibility(View.VISIBLE);
+            binding.tvTabActive.setTypeface(null, Typeface.BOLD);
+            binding.tvTabActive.setTextColor(activeColor);
+            binding.indicatorActive.setVisibility(View.VISIBLE);
             fetchActiveListings();
         } else if (tabName.equals("History")) {
-            tvTabHistory.setTypeface(null, Typeface.BOLD);
-            tvTabHistory.setTextColor(getResources().getColor(R.color.nav_active_green));
-            indicatorHistory.setVisibility(View.VISIBLE);
+            binding.tvTabHistory.setTypeface(null, Typeface.BOLD);
+            binding.tvTabHistory.setTextColor(activeColor);
+            binding.indicatorHistory.setVisibility(View.VISIBLE);
             fetchHistory();
         } else {
-            tvTabWantedAds.setTypeface(null, Typeface.BOLD);
-            tvTabWantedAds.setTextColor(getResources().getColor(R.color.nav_active_green));
-            indicatorWantedAds.setVisibility(View.VISIBLE);
+            binding.tvTabWantedAds.setTypeface(null, Typeface.BOLD);
+            binding.tvTabWantedAds.setTextColor(activeColor);
+            binding.indicatorWantedAds.setVisibility(View.VISIBLE);
             fetchWantedAds();
         }
     }
 
     private void resetTabStyles() {
-        tvTabActive.setTypeface(null, Typeface.NORMAL);
-        tvTabHistory.setTypeface(null, Typeface.NORMAL);
-        tvTabWantedAds.setTypeface(null, Typeface.NORMAL);
-        tvTabActive.setTextColor(getResources().getColor(R.color.text_gray_medium));
-        tvTabHistory.setTextColor(getResources().getColor(R.color.text_gray_medium));
-        tvTabWantedAds.setTextColor(getResources().getColor(R.color.text_gray_medium));
-        indicatorActive.setVisibility(View.INVISIBLE);
-        indicatorHistory.setVisibility(View.INVISIBLE);
-        indicatorWantedAds.setVisibility(View.INVISIBLE);
+        int inactiveColor = ContextCompat.getColor(requireContext(), R.color.listing_meta_text);
+        binding.tvTabActive.setTypeface(null, Typeface.NORMAL);
+        binding.tvTabHistory.setTypeface(null, Typeface.NORMAL);
+        binding.tvTabWantedAds.setTypeface(null, Typeface.NORMAL);
+        binding.tvTabActive.setTextColor(inactiveColor);
+        binding.tvTabHistory.setTextColor(inactiveColor);
+        binding.tvTabWantedAds.setTextColor(inactiveColor);
+        binding.indicatorActive.setVisibility(View.INVISIBLE);
+        binding.indicatorHistory.setVisibility(View.INVISIBLE);
+        binding.indicatorWantedAds.setVisibility(View.INVISIBLE);
+    }
+
+    private void setupFilters() {
+        binding.filterAll.setOnClickListener(v -> filterByStatus(null));
+        binding.filterDraft.setOnClickListener(v -> filterByStatus(ListingItem.Status.DRAFT));
+        binding.filterPending.setOnClickListener(v -> filterByStatus(ListingItem.Status.PENDING));
+        binding.filterListed.setOnClickListener(v -> filterByStatus(ListingItem.Status.LISTED));
+        binding.filterOngoing.setOnClickListener(v -> filterByStatus(ListingItem.Status.ONGOING));
+        updateFilterUI();
+    }
+
+    private void filterByStatus(ListingItem.Status status) {
+        selectedFilter = status;
+        updateFilterUI();
+        updateFilteredList(binding.etSearch.getText().toString());
+    }
+
+    private void updateFilterUI() {
+        if (binding == null) return;
+        TextView[] filters = {binding.filterAll, binding.filterDraft, binding.filterPending, binding.filterListed, binding.filterOngoing};
+        ListingItem.Status[] statuses = {null, ListingItem.Status.DRAFT, ListingItem.Status.PENDING, ListingItem.Status.LISTED, ListingItem.Status.ONGOING};
+
+        int inactiveBg = Color.WHITE;
+        int inactiveText = ContextCompat.getColor(requireContext(), R.color.text_sub);
+        int activeBg = ContextCompat.getColor(requireContext(), R.color.filter_active_bg);
+        int activeText = Color.WHITE;
+
+        for (int i = 0; i < filters.length; i++) {
+            if (selectedFilter == statuses[i]) {
+                filters[i].setBackgroundTintList(ColorStateList.valueOf(activeBg));
+                filters[i].setTextColor(activeText);
+                filters[i].setTypeface(null, Typeface.BOLD);
+            } else {
+                filters[i].setBackgroundTintList(ColorStateList.valueOf(inactiveBg));
+                filters[i].setTextColor(inactiveText);
+                filters[i].setTypeface(null, Typeface.NORMAL);
+            }
+        }
     }
 
     private void setupSearch() {
-        etSearch.addTextChangedListener(new TextWatcher() {
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateFilteredList(s.toString());
@@ -155,102 +192,25 @@ public class ListingsFragment extends Fragment {
         });
     }
 
-    private void fetchSummary() {
-        // Mocking for now because API might fail
-        tvMonthlyRev.setText("LKR 42.5k");
-        tvTrustScore.setText("94%");
+    private void setupRefreshLayout() {
+        binding.swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.success_green));
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            selectTab(currentTab);
+            fetchSummary();
+        });
+    }
 
+    private void fetchSummary() {
         apiService.getFarmerSummary(farmerId).enqueue(new Callback<FarmerSummaryResponse>() {
             @Override
             public void onResponse(@NonNull Call<FarmerSummaryResponse> call, @NonNull Response<FarmerSummaryResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    tvMonthlyRev.setText(response.body().getMonthlyRevenue());
-                    tvTrustScore.setText(response.body().getTrustScore());
+                if (isAdded() && response.isSuccessful() && response.body() != null) {
+                    binding.tvMonthlyRev.setText(response.body().getMonthlyRevenue());
+                    binding.tvTrustScore.setText(response.body().getTrustScore());
                 }
             }
             @Override public void onFailure(@NonNull Call<FarmerSummaryResponse> call, @NonNull Throwable t) {}
         });
-    }
-
-    private void fetchWantedAds() {
-        apiService.getWantedAds(null, null).enqueue(new Callback<List<WantedAd>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<WantedAd>> call, @NonNull Response<List<WantedAd>> response) {
-                allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
-                    for (WantedAd ad : response.body()) {
-                        allItems.add(new ListingItem(ad.getRequestId(), ad.getCropName(), ad.getLocation(),
-                                String.valueOf(ad.getRequiredQuantityKg()), String.valueOf(ad.getTargetPricePerKg()), "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
-                    }
-                } else {
-                    addMockWantedAds();
-                }
-                updateFilteredList(etSearch.getText().toString());
-            }
-            @Override public void onFailure(@NonNull Call<List<WantedAd>> call, @NonNull Throwable t) {
-                addMockWantedAds();
-            }
-        });
-    }
-
-    private void fetchActiveListings() {
-        apiService.getActiveListings(farmerId).enqueue(new Callback<List<ListingItem>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<ListingItem>> call, @NonNull Response<List<ListingItem>> response) {
-                allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
-                    allItems.addAll(response.body());
-                } else {
-                    addMockActiveListings();
-                }
-                updateFilteredList(etSearch.getText().toString());
-            }
-            @Override public void onFailure(@NonNull Call<List<ListingItem>> call, @NonNull Throwable t) {
-                addMockActiveListings();
-            }
-        });
-    }
-
-    private void fetchHistory() {
-        apiService.getListingHistory(farmerId, null).enqueue(new Callback<List<HistoryListing>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<HistoryListing>> call, @NonNull Response<List<HistoryListing>> response) {
-                allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
-                    for (HistoryListing h : response.body()) {
-                        allItems.add(new ListingItem(h.getListingId(), h.getCropName(), h.getBuyerName(),
-                                h.getQuantityKg(), h.getTotalValue(), "Oct 20", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
-                    }
-                } else {
-                    addMockHistory();
-                }
-                updateFilteredList(etSearch.getText().toString());
-            }
-            @Override public void onFailure(@NonNull Call<List<HistoryListing>> call, @NonNull Throwable t) {
-                addMockHistory();
-            }
-        });
-    }
-
-    private void addMockWantedAds() {
-        allItems.add(new ListingItem("W1", "Big Onions", "Dambulla Sector", "1,000 KG", "LKR 280/kg", "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("W2", "Tomatoes", "Colombo Sector", "500 KG", "LKR 150/kg", "Wanted", "Normal", ListingItem.Status.WANTED, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("W3", "Potatoes", "Nuwara Eliya Sector", "2,500 KG", "LKR 190/kg", "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
-        updateFilteredList(etSearch.getText().toString());
-    }
-
-    private void addMockActiveListings() {
-        allItems.add(new ListingItem("A1", "Red Onions", "Jaffna", "2,000 KG", "LKR 260/kg", "Oct 24", "Yesterday", ListingItem.Status.LISTED, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("A2", "Carrots", "Nuwara Eliya", "800 KG", "LKR 180/kg", "Oct 25", "1h ago", ListingItem.Status.ONGOING, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("A3", "Leeks", "Badulla", "400 KG", "LKR 210/kg", "Oct 22", "Draft", ListingItem.Status.DRAFT, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("A4", "Potatoes", "Jaffna", "600 KG", "LKR 240/kg", "Oct 21", "2 days ago", ListingItem.Status.PENDING, R.drawable.ic_leaf));
-        updateFilteredList(etSearch.getText().toString());
-    }
-
-    private void addMockHistory() {
-        allItems.add(new ListingItem("H1", "Keeri Samba", "Ampara", "5,000 KG", "LKR 125/kg", "Sep 15", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("H2", "Green Chillies", "Puttalam", "300 KG", "LKR 450/kg", "Sep 10", "Cancelled", ListingItem.Status.CANCELLED, R.drawable.ic_leaf));
-        updateFilteredList(etSearch.getText().toString());
     }
 
     private void updateFilteredList(String query) {
@@ -266,84 +226,111 @@ public class ListingsFragment extends Fragment {
             }
         }
         adapter.notifyDataSetChanged();
-        tvEmptyState.setVisibility(filteredItems.isEmpty() ? View.VISIBLE : View.GONE);
+        binding.tvEmptyState.setVisibility(filteredItems.isEmpty() ? View.VISIBLE : View.GONE);
         if (filteredItems.isEmpty()) {
-            tvEmptyState.setText("No " + currentTab.toLowerCase() + " found");
+            binding.tvEmptyState.setText("No " + currentTab.toLowerCase() + " found");
         }
     }
 
-    private void filterByStatus(ListingItem.Status status) {
-        selectedFilter = status;
-        updateFilterUI();
-        updateFilteredList(etSearch.getText().toString());
-    }
-
-    private void updateFilterUI() {
-        resetFilterStyles();
-        if (selectedFilter == null) {
-            setActiveFilterStyle(filterAll);
-        } else {
-            switch (selectedFilter) {
-                case DRAFT: setActiveFilterStyle(filterDraft); break;
-                case PENDING: setActiveFilterStyle(filterPending); break;
-                case LISTED: setActiveFilterStyle(filterListed); break;
-                case ONGOING: setActiveFilterStyle(filterOngoing); break;
+    private void fetchActiveListings() {
+        binding.swipeRefreshLayout.setRefreshing(true);
+        apiService.getActiveListings(farmerId).enqueue(new Callback<List<ListingItem>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<ListingItem>> call, @NonNull Response<List<ListingItem>> response) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                allItems.clear();
+                if (response.isSuccessful() && response.body() != null) {
+                    allItems.addAll(response.body());
+                } else {
+                    addMockActiveListings();
+                }
+                updateFilteredList(binding.etSearch.getText().toString());
             }
-        }
+            @Override public void onFailure(@NonNull Call<List<ListingItem>> call, @NonNull Throwable t) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                addMockActiveListings();
+            }
+        });
     }
 
-    private void resetFilterStyles() {
-        int grayText = getResources().getColor(R.color.text_gray_medium);
-        filterAll.setBackgroundResource(R.drawable.bg_outlined_button_chat);
-        filterAll.setBackgroundTintList(null);
-        filterAll.setTextColor(grayText);
-        
-        filterDraft.setBackgroundResource(R.drawable.bg_outlined_button_chat);
-        filterDraft.setBackgroundTintList(null);
-        filterDraft.setTextColor(grayText);
-        
-        filterPending.setBackgroundResource(R.drawable.bg_outlined_button_chat);
-        filterPending.setBackgroundTintList(null);
-        filterPending.setTextColor(grayText);
-        
-        filterListed.setBackgroundResource(R.drawable.bg_outlined_button_chat);
-        filterListed.setBackgroundTintList(null);
-        filterListed.setTextColor(grayText);
-        
-        filterOngoing.setBackgroundResource(R.drawable.bg_outlined_button_chat);
-        filterOngoing.setBackgroundTintList(null);
-        filterOngoing.setTextColor(grayText);
+    private void fetchHistory() {
+        binding.swipeRefreshLayout.setRefreshing(true);
+        apiService.getListingHistory(farmerId, null).enqueue(new Callback<List<HistoryListing>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<HistoryListing>> call, @NonNull Response<List<HistoryListing>> response) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                allItems.clear();
+                if (response.isSuccessful() && response.body() != null) {
+                    for (HistoryListing h : response.body()) {
+                        allItems.add(new ListingItem(h.getListingId(), h.getCropName(), h.getBuyerName(),
+                                h.getQuantityKg(), h.getTotalValue(), "Oct 20", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
+                    }
+                } else {
+                    addMockHistory();
+                }
+                updateFilteredList(binding.etSearch.getText().toString());
+            }
+            @Override public void onFailure(@NonNull Call<List<HistoryListing>> call, @NonNull Throwable t) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                addMockHistory();
+            }
+        });
     }
 
-    private void setActiveFilterStyle(TextView view) {
-        view.setBackgroundResource(R.drawable.bg_pill_badge);
-        view.setBackgroundTintList(getResources().getColorStateList(R.color.nav_active_green));
-        view.setTextColor(getResources().getColor(R.color.white));
+    private void fetchWantedAds() {
+        binding.swipeRefreshLayout.setRefreshing(true);
+        apiService.getWantedAds(null, null).enqueue(new Callback<List<WantedAd>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<WantedAd>> call, @NonNull Response<List<WantedAd>> response) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                allItems.clear();
+                if (response.isSuccessful() && response.body() != null) {
+                    for (WantedAd ad : response.body()) {
+                        allItems.add(new ListingItem(ad.getRequestId(), ad.getCropName(), ad.getLocation(),
+                                String.valueOf(ad.getRequiredQuantityKg()), String.valueOf(ad.getTargetPricePerKg()), "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
+                    }
+                } else {
+                    addMockWantedAds();
+                }
+                updateFilteredList(binding.etSearch.getText().toString());
+            }
+            @Override public void onFailure(@NonNull Call<List<WantedAd>> call, @NonNull Throwable t) {
+                binding.swipeRefreshLayout.setRefreshing(false);
+                addMockWantedAds();
+            }
+        });
     }
 
-    private void onListingAction(ListingItem item) {
-        // Handled via inner interface in adapter for specific buttons
+    private void addMockActiveListings() {
+        allItems.add(new ListingItem("TM-2024", "Tomatoes", "Dambulla Sector", "120 KG", "LKR 180/kg", "Oct 24", "Yesterday", ListingItem.Status.DRAFT, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("BO-2024", "Big Onions", "Dambulla Sector", "500 KG", "LKR 250/kg", "Oct 20", "2h ago", ListingItem.Status.PENDING, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("CR-2024", "Carrots", "Nuwara Eliya", "300 KG", "LKR 220/kg", "Oct 25", "1h ago", ListingItem.Status.UNDER_REVIEW, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("PT-2024", "Potatoes", "Jaffna Sector", "450 KG", "LKR 190/kg", "Oct 18", "3h ago", ListingItem.Status.LISTED, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("LK-2024", "Leeks", "Badulla Sector", "200 KG", "LKR 210/kg", "Oct 25", "15m ago", ListingItem.Status.ONGOING, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("CB-2024", "Cabbage", "Kandapola Sector", "400 KG", "LKR 160/kg", "Oct 10", "3 days ago", ListingItem.Status.DEACTIVATED, R.drawable.ic_leaf));
+        updateFilteredList(binding.etSearch.getText().toString());
     }
 
-    // Inside adapter we will use these methods via interface or direct access if fragment is passed
-    public void startChat(ListingItem item) {
-        startActivity(new Intent(requireContext(), ChatActivity.class));
+    private void addMockHistory() {
+        allItems.add(new ListingItem("H1", "Keeri Samba", "Ampara", "5,000 KG", "LKR 125/kg", "Sep 15", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
+        updateFilteredList(binding.etSearch.getText().toString());
     }
 
-    public void startTracking(ListingItem item) {
-        startActivity(new Intent(requireContext(), ActiveOrderTrackerActivity.class));
+    private void addMockWantedAds() {
+        allItems.add(new ListingItem("W1", "Big Onions", "Dambulla Sector", "1,000 KG", "LKR 280/kg", "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
+        updateFilteredList(binding.etSearch.getText().toString());
     }
 
-    public void editListing(ListingItem item) {
-        Intent intent = new Intent(requireContext(), CreateListingActivity.class);
-        intent.putExtra("listingId", item.getId());
-        startActivity(intent);
+    private void openCreateListing() {
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new CreateListingFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
-    public void supplyWantedAd(ListingItem item) {
-        Intent intent = new Intent(requireContext(), CreateSupplyOfferActivity.class);
-        intent.putExtra("requestId", item.getId());
-        intent.putExtra("cropName", item.getCropName());
-        startActivity(intent);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

@@ -58,7 +58,10 @@ public class HomeFragment extends Fragment {
         refreshData();
 
         binding.btnCreateListing.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), ListingDetailsActivity.class)));
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new CreateListingFragment())
+                        .addToBackStack(null)
+                        .commit());
 
         binding.btnViewMarketInsights.setOnClickListener(v ->
                 Toast.makeText(requireContext(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
@@ -113,6 +116,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateDashboardUI(DashboardResponse data) {
+        if (binding == null) return;
         if (data.getFarmerName() != null) {
             String greeting = "Good morning, " + data.getFarmerName() + "!";
             if (!binding.tvGreetingTitle.getText().toString().equals(greeting)) {
@@ -218,7 +222,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void renderChart(List<Double> trends, int days) {
-        if (trends == null || trends.isEmpty()) return;
+        if (binding == null || trends == null || trends.isEmpty()) return;
 
         String[] labels = new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
         binding.marketChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));

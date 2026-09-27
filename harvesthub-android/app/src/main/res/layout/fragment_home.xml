@@ -25,8 +25,7 @@
                 android:paddingStart="20dp"
                 android:paddingTop="24dp"
                 android:paddingEnd="20dp"
-                android:paddingBottom="100dp"
-                android:layoutAnimation="@anim/layout_staggered_fade">
+                android:paddingBottom="100dp">
 
                 <!-- Greeting Section -->
                 <TextView

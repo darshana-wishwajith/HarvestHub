@@ -4,30 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_light">
-
-    <!-- Top App Bar -->
-    <include
-        android:id="@+id/top_nav_bar"
-        layout="@layout/top_nav_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:background="@color/home_bg">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"
-        app:layout_constraintTop_toBottomOf="@id/top_nav_bar">
+        android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/contentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- Header with Back Button -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,54 +31,41 @@
                     android:layout_height="32dp"
                     android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Go back"
                     android:src="@drawable/ic_back"
-                    app:tint="@color/text_dark" />
+                    app:tint="@color/home_greeting_title" />
 
                 <TextView
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="12dp"
                     android:layout_toEndOf="@id/btnBack"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="Create Listing"
-                    android:textColor="@color/text_dark"
-                    android:textSize="24sp" />
+                    android:text="Listing Details"
+                    android:textColor="@color/home_greeting_title"
+                    android:textSize="22sp" />
             </RelativeLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:text="Harvest Media"
-                android:textColor="@color/text_dark"
-                android:textSize="16sp" />
-
+            <!-- Media Section -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPhotos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="24dp"
                 android:orientation="horizontal"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_photo_thumbnail" />
 
             <!-- Crop Selector -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:text="Crop Details"
-                android:textColor="@color/text_dark"
-                android:textSize="16sp" />
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCropDropdown"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="30dp"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -97,27 +76,42 @@
                 <AutoCompleteTextView
                     android:id="@+id/actvCrop"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="60dp"
                     android:fontFamily="@font/plus_jakarta_sans"
                     android:hint="Select Crop Type"
                     android:inputType="none"
                     android:paddingHorizontal="16dp"
-                    android:textColor="@color/text_dark"
-                    android:textSize="14sp" />
+                    android:textColor="@color/stat_text_value"
+                    android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/tvAddNewCrop"
+            <LinearLayout
+                android:id="@+id/btnAddNewCrop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:text="+ Add New Category"
-                android:textColor="@color/primary_green"
-                android:textSize="12sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_add_circle"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:text="Can't find your harvest? Add New"
+                    android:textColor="@color/form_add_new_text"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
             <!-- Yield Input -->
             <com.google.android.material.textfield.TextInputLayout
@@ -133,17 +127,17 @@
                 app:boxStrokeColor="@color/border_gray"
                 app:hintEnabled="false"
                 app:startIconDrawable="@drawable/ic_yield"
-                app:startIconTint="@color/text_gray">
+                app:startIconTint="@color/form_input_icon_tint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etYield"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="60dp"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:hint="Estimated Yield (KG)"
+                    android:hint="Estimated Total Yield (in KG)"
                     android:inputType="numberDecimal"
-                    android:textColor="@color/text_dark"
-                    android:textSize="14sp" />
+                    android:textColor="@color/stat_text_value"
+                    android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Price Input -->
@@ -160,17 +154,17 @@
                 app:boxStrokeColor="@color/border_gray"
                 app:hintEnabled="false"
                 app:startIconDrawable="@drawable/ic_price"
-                app:startIconTint="@color/text_gray">
+                app:startIconTint="@color/form_input_icon_tint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPrice"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="60dp"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:hint="Expected Price per KG (LKR)"
+                    android:hint="Expected price per kg (LKR)"
                     android:inputType="numberDecimal"
-                    android:textColor="@color/text_dark"
-                    android:textSize="14sp" />
+                    android:textColor="@color/stat_text_value"
+                    android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Pricing Insights -->
@@ -178,7 +172,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardBackgroundColor="@color/pricing_insight_bg"
+                app:cardBackgroundColor="@color/market_tip_bg"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#C8E6C9"
@@ -192,10 +186,11 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Pricing Info"
                         android:src="@drawable/ic_info"
-                        app:tint="@color/status_text_green" />
+                        app:tint="#10A34A" />
 
                     <TextView
                         android:id="@+id/tvPricingInsight"
@@ -203,9 +198,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="Current market average is LKR 250/kg. Set a competitive price for faster approval."
-                        android:textColor="@color/status_text_green"
-                        android:textSize="12sp" />
+                        android:text="Pricing insights: Current average market rate is LKR 250/kg."
+                        android:textColor="#047A35"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -213,36 +209,33 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="32dp"
+                android:layout_height="58dp"
+                android:layout_marginTop="40dp"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Submit for Verification"
+                android:text="Submit Listing"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                app:backgroundTint="@color/primary_green"
-                app:cornerRadius="12dp"
-                app:elevation="4dp" />
+                android:textSize="18sp"
+                app:backgroundTint="@color/create_button_bg"
+                app:cornerRadius="14dp"
+                app:elevation="4dp"
+                app:icon="@drawable/ic_check_circle"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconSize="22dp"
+                app:iconTint="@color/white" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Bottom Navigation Bar -->
-    <include
-        android:id="@+id/bottom_nav_bar"
-        layout="@layout/bottom_nav_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

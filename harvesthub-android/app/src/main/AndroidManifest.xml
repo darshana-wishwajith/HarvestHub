@@ -46,8 +46,6 @@
         <activity android:name=".ui.farmer.OrderInTransitActivity" />
         <activity android:name=".ui.farmer.RatingFeedbackActivity" />
 
-        <activity android:name=".ui.farmer.CreateListingActivity" />
-        <activity android:name=".ui.farmer.ListingDetailsActivity" />
         <activity android:name=".ui.farmer.NotificationsActivity" />
         <activity android:name=".ui.farmer.ListingsHistoryActivity" />
         <activity android:name=".ui.farmer.EditProfileActivity" />
