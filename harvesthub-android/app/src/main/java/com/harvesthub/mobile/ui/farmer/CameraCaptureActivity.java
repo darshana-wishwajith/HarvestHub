@@ -3,12 +3,12 @@ package com.harvesthub.mobile.ui.farmer;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,12 +19,14 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.databinding.ActivityCameraCaptureBinding;
+import com.harvesthub.mobile.utils.BottomNavHelper;
+import com.harvesthub.mobile.utils.NotificationPanelHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -39,13 +41,9 @@ public class CameraCaptureActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
 
-    private PreviewView viewFinder;
+    private ActivityCameraCaptureBinding binding;
     private ImageCapture imageCapture;
     private ExecutorService cameraExecutor;
-
-    private TextView tvStepTitle, tvStepSubtitle;
-    private TextView tabWideAngle, tabCloseUp, tabVideo;
-    private ImageButton btnLock, btnFlip;
     
     private int lensFacing = CameraSelector.LENS_FACING_BACK;
     private boolean isLocationLocked = false;
@@ -53,58 +51,75 @@ public class CameraCaptureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera_capture);
+        binding = ActivityCameraCaptureBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Initialize Views
-        viewFinder = findViewById(R.id.viewFinder);
-        tvStepTitle = findViewById(R.id.tvStepTitle);
-        tvStepSubtitle = findViewById(R.id.tvStepSubtitle);
-        tabWideAngle = findViewById(R.id.tabWideAngle);
-        tabCloseUp = findViewById(R.id.tabCloseUp);
-        tabVideo = findViewById(R.id.tabVideo);
-        btnLock = findViewById(R.id.btnLock);
-        btnFlip = findViewById(R.id.btnFlip);
-        ImageButton btnCapture = findViewById(R.id.btnCapture);
+        setupNavigation();
+        setupTabs();
+        setupClickListeners();
 
-        // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera();
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
-        btnLock.setOnClickListener(v -> {
-            isLocationLocked = !isLocationLocked;
-            btnLock.setSelected(isLocationLocked);
-            Toast.makeText(this, isLocationLocked ? "Location Locked" : "Location Unlocked", Toast.LENGTH_SHORT).show();
-        });
-
-        setupTabs();
-
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
+    private void setupNavigation() {
+        // Setup Top Navigation
+        View btnNotification = binding.topNavBar.btnNotification;
+        btnNotification.setOnClickListener(v -> NotificationPanelHelper.showNotificationPanel(this, v));
+
+        // Setup Bottom Navigation
+        BottomNavHelper.setup(this, binding.bottomNavBar.getRoot(), BottomNavHelper.Tab.LISTINGS);
+    }
+
+    private void setupClickListeners() {
+        binding.btnCapture.setOnClickListener(v -> {
+            v.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
+                takePhoto();
+            }).start();
+        });
+
+        binding.btnFlip.setOnClickListener(v -> {
+            lensFacing = (lensFacing == CameraSelector.LENS_FACING_BACK) ? 
+                    CameraSelector.LENS_FACING_FRONT : CameraSelector.LENS_FACING_BACK;
+            startCamera();
+        });
+
+        binding.btnLock.setOnClickListener(v -> {
+            isLocationLocked = !isLocationLocked;
+            binding.btnLock.setSelected(isLocationLocked);
+            binding.btnLock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(this, isLocationLocked ? R.color.accent_green : R.color.white)));
+            Toast.makeText(this, isLocationLocked ? "Farm Location Locked" : "Location Unlocked", Toast.LENGTH_SHORT).show();
+        });
+    }
+
     private void setupTabs() {
-        tabWideAngle.setOnClickListener(v -> updateMode("Step 1: Capture Wide Angle", "Show the entire cultivated area", tabWideAngle));
-        tabCloseUp.setOnClickListener(v -> updateMode("Step 2: Capture Close Up", "Show details of the crop", tabCloseUp));
-        tabVideo.setOnClickListener(v -> updateMode("Step 3: Record Video", "Capture a 10-second overview", tabVideo));
+        binding.tabWideAngle.setOnClickListener(v -> updateMode("Step 1: Capture Wide Angle", "Show the entire cultivated area", binding.tabWideAngle));
+        binding.tabCloseUp.setOnClickListener(v -> updateMode("Step 2: Capture Close Up", "Show details of the crop", binding.tabCloseUp));
+        binding.tabVideo.setOnClickListener(v -> updateMode("Step 3: Record Video", "Capture a 10-second overview", binding.tabVideo));
     }
 
     private void updateMode(String title, String subtitle, TextView activeTab) {
-        tvStepTitle.setText(title);
-        tvStepSubtitle.setText(subtitle);
+        binding.tvStepTitle.setText(title);
+        binding.tvStepSubtitle.setText(subtitle);
 
-        // Reset tab styles
-        tabWideAngle.setTextColor(ContextCompat.getColor(this, R.color.text_gray));
-        tabWideAngle.setTypeface(null, android.graphics.Typeface.NORMAL);
-        tabCloseUp.setTextColor(ContextCompat.getColor(this, R.color.text_gray));
-        tabCloseUp.setTypeface(null, android.graphics.Typeface.NORMAL);
-        tabVideo.setTextColor(ContextCompat.getColor(this, R.color.text_gray));
-        tabVideo.setTypeface(null, android.graphics.Typeface.NORMAL);
+        // Reset tabs
+        binding.tabWideAngle.setTextColor(Color.WHITE);
+        binding.tabCloseUp.setTextColor(Color.WHITE);
+        binding.tabVideo.setTextColor(Color.WHITE);
 
-        // Set active tab style
-        activeTab.setTextColor(ContextCompat.getColor(this, R.color.accent_green_tabs));
-        activeTab.setTypeface(null, android.graphics.Typeface.BOLD);
+        // Set active
+        activeTab.setTextColor(ContextCompat.getColor(this, R.color.accent_green));
+        
+        // Add subtle animation to text change
+        binding.headerLayout.setAlpha(0f);
+        binding.headerLayout.animate().alpha(1f).setDuration(300).start();
     }
 
     private void takePhoto() {
@@ -116,7 +131,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/HarvestHub-Image");
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/HarvestHub");
         }
 
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions
@@ -127,9 +142,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        String msg = "Photo capture succeeded: " + outputFileResults.getSavedUri();
-                        Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, msg);
+                        Toast.makeText(getBaseContext(), "Photo saved successfully", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -147,7 +160,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
+                preview.setSurfaceProvider(binding.viewFinder.getSurfaceProvider());
 
                 imageCapture = new ImageCapture.Builder().build();
 
@@ -180,7 +193,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
             if (allPermissionsGranted()) {
                 startCamera();
             } else {
-                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }

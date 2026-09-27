@@ -44,49 +44,22 @@
 
     <color name="search_bar_bg">#1E1E1E</color>
     <color name="tab_indicator_green">#81C784</color>
-    <!-- Home Screen Specific Dark Mode -->
+
+    <!-- Missing colors for restored V0 layouts (Night versions) -->
     <color name="home_bg">#121212</color>
     <color name="home_greeting_title">#E1E1E1</color>
-    <color name="home_greeting_subtext">#BDBDBD</color>
-    <color name="weather_card_bg">#1E1E1E</color>
-    <color name="weather_card_stroke">#333333</color>
-    <color name="weather_text_temp">#E1E1E1</color>
-    <color name="weather_text_location">#BDBDBD</color>
-    <color name="revenue_card_bg">#1D4032</color>
-    <color name="revenue_card_text_primary">#FFFFFF</color>
-    <color name="revenue_card_text_secondary">#8BA899</color>
-    <color name="revenue_card_text_sub">#7DA191</color>
     <color name="stat_card_bg">#1E1E1E</color>
     <color name="stat_card_stroke">#333333</color>
-    <color name="stat_text_label">#BDBDBD</color>
     <color name="stat_text_value">#E1E1E1</color>
-    <color name="stat_icon_mint_bg">#1B3D2F</color>
-    <color name="stat_icon_mint_tint">#81C784</color>
-    <color name="stat_icon_lime_bg">#253518</color>
-    <color name="stat_icon_lime_tint">#A5D6A7</color>
-    <color name="stat_icon_gray_bg">#2C2C2C</color>
-    <color name="stat_icon_gray_tint">#BDBDBD</color>
-    <color name="market_avg_label">#BDBDBD</color>
-    <color name="market_chart_axis">#757575</color>
-    <color name="insight_button_bg">#2C2C2C</color>
-    <color name="insight_button_text">#BDBDBD</color>
-    <color name="market_tip_bg">#1B3D2F</color>
-    <color name="create_button_bg">#81C784</color>
-    <color name="create_button_text">#121212</color>
-    <color name="success_green">#0FA968</color>
-
-    <!-- Notification Panel Dark -->
-    <color name="notif_panel_bg">#1E1E1E</color>
-    <color name="notif_panel_stroke">#333333</color>
-    <color name="notif_panel_header_text">#E1E1E1</color>
-    <color name="notif_panel_divider">#333333</color>
-    <color name="notif_panel_footer_bg">#252525</color>
-    <color name="notif_panel_footer_text">#81C784</color>
-
-    <color name="notif_item_bg">#1E1E1E</color>
-    <color name="notif_item_unread_bg">#1B3D2F</color>
-    <color name="notif_item_stroke">#333333</color>
-    <color name="notif_item_title">#E1E1E1</color>
-    <color name="notif_item_body">#BDBDBD</color>
-    <color name="notif_item_time">#9E9E9E</color>
+    <color name="stat_text_label">#BDBDBD</color>
+    <color name="listing_meta_text">#A0AEC0</color>
+    <color name="listing_label_text">#718096</color>
+    <color name="listing_id_text">#A0AEC0</color>
+    <color name="listing_data_value_text">#E2E8F0</color>
+    <color name="listing_review_text">#CBD5E0</color>
+    <color name="listing_deactivate_stroke">#4A5568</color>
+    <color name="listing_deactivate_text">#A0AEC0</color>
+    <color name="status_review_pill">#2D3748</color>
+    <color name="listing_ongoing_bg">#1A263D</color>
+    <color name="listing_ongoing_stroke">#2D3748</color>
 </resources>
