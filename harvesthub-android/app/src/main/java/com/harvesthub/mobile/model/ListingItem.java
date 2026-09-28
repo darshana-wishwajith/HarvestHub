@@ -10,6 +10,12 @@ public class ListingItem {
     @SerializedName("id")
     private String id;
 
+    @SerializedName("farmerId")
+    private String farmerId;
+
+    @SerializedName("farmerName")
+    private String farmerName;
+
     @SerializedName("cropName")
     private String cropName;
 
@@ -30,6 +36,9 @@ public class ListingItem {
 
     @SerializedName("status")
     private Status status;
+
+    @SerializedName("grade")
+    private String grade;
 
     private int imageResource;
 
@@ -66,6 +75,8 @@ public class ListingItem {
     }
 
     public String getId() { return id; }
+    public String getFarmerId() { return farmerId; }
+    public String getFarmerName() { return farmerName; }
     public String getCropName() { return cropName; }
     public String getLocation() { return location; }
     public String getQuantity() { return quantity; }
@@ -73,6 +84,7 @@ public class ListingItem {
     public String getCreatedDate() { return createdDate; }
     public String getUpdatedTime() { return updatedTime; }
     public Status getStatus() { return status; }
+    public String getGrade() { return grade; }
     public int getImageResource() { return imageResource; }
     
     // For compatibility with previous code

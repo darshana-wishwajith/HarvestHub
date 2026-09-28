@@ -2,10 +2,10 @@ package com.harvesthub.desktop.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/** Mirrors GET /api/listings/{id} — same fields as the existing Listing model. */
+/** Mirrors GET /api/listings/{id}. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ListingDetailDto {
-    public Long id;
+    public String id;
     public String cropName;
     public String farmerName;
     public String farmerAvatar;

@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Pediment triangle roof -->
+    <path
+        android:fillColor="#334155"
+        android:pathData="M12,2L2,7v2h20V7L12,2z" />
+    <!-- Columns -->
+    <path
+        android:fillColor="#334155"
+        android:pathData="M4,11h2.5v7H4z M9.25,11h2.5v7h-2.5z M14.5,11h2.5v7h-2.5z M18,11h2v7h-2z" />
+    <!-- Base foundation -->
+    <path
+        android:fillColor="#334155"
+        android:pathData="M2,19h20v2H2z" />
+</vector>
+

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Rate Experience - Mobile View</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #F8F9FA; width: 100%; max-width: 412px; margin: 0 auto; color: #0F172A; }
+
+  /* Android Status Bar */
+  .status-bar { height: 38px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font-size: 13.5px; font-weight: 600; color: #1E293B; }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+
+  .content-container { padding: 8px 16px 24px 16px; }
+
+  /* Top Bar */
+  .top-header { display: flex; justify-content: space-between; align-items: center; }
+  .close-btn { width: 32px; height: 32px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .trip-chip { display: inline-flex; align-items: center; gap: 5px; background: #F1F5F9; border-radius: 16px; padding: 4.5px 9px; flex-shrink: 0; }
+  .trip-chip-dot { width: 6px; height: 6px; background: #16A34A; border-radius: 50%; }
+  .trip-chip span { font-size: 10.8px; font-weight: 700; color: #475569; white-space: nowrap; }
+
+  /* Title & Subtitle */
+  .title-main { font-size: 26px; font-weight: 800; color: #0C2E1F; margin-top: 14px; letter-spacing: -0.3px; }
+  .subtitle-main { font-size: 13px; color: #64748B; margin-top: 4px; line-height: 1.45; }
+
+  /* Transaction Closed Banner */
+  .trans-banner { background: #E8F5EE; border-radius: 16px; padding: 13px 14px; margin-top: 16px; display: flex; align-items: center; gap: 12px; }
+  .trans-check-icon { width: 26px; height: 26px; background: #0C2E1F; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .trans-title { font-size: 13.5px; font-weight: 700; color: #0C2E1F; }
+  .trans-pill { display: inline-flex; align-items: center; gap: 6px; background: #0F3A22; border-radius: 14px; padding: 4.5px 11px; margin-top: 6px; }
+  .trans-pill span { font-size: 11px; font-weight: 700; color: #FFFFFF; }
+
+  /* Cards */
+  .review-card { background: #FFFFFF; border: 1px solid #EAECEF; border-radius: 18px; padding: 16px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .card-header-row { display: flex; align-items: center; justify-content: space-between; }
+  .avatar-wrap { position: relative; width: 46px; height: 46px; flex-shrink: 0; }
+  .avatar-img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+  .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #16A34A; border: 2px solid #FFFFFF; border-radius: 50%; }
+
+  .header-info { margin-left: 12px; flex: 1; }
+  .party-name { font-size: 15px; font-weight: 700; color: #0F172A; }
+  .party-sub { font-size: 12px; color: #64748B; margin-top: 1px; }
+  .meta-tag { display: flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 11.5px; color: #334155; }
+
+  .role-pill { background: #F1F5F9; border-radius: 8px; padding: 3px 9px; font-size: 11px; font-weight: 700; color: #64748B; align-self: flex-start; }
+
+  /* Star Box */
+  .stars-box { background: #F8F6F2; border-radius: 14px; padding: 14px; margin-top: 14px; text-align: center; }
+  .stars-row { display: flex; justify-content: center; gap: 7px; }
+  .star-text { font-size: 12.5px; font-weight: 700; color: #1E293B; margin-top: 8px; }
+
+  /* Tags Question */
+  .question-label { font-size: 12px; color: #64748B; margin-top: 14px; }
+  .tags-group { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .tags-row { display: flex; gap: 8px; }
+  .tag-chip { padding: 6px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; }
+  .tag-chip.selected { background: #0C2E1F; color: #FFFFFF; }
+  .tag-chip.unselected { background: #F1F5F9; color: #475569; }
+
+  /* Notes Input */
+  .notes-box { background: #F8F6F2; border-radius: 12px; padding: 12px 14px; margin-top: 12px; font-size: 12px; color: #94A3B8; min-height: 52px; line-height: 1.4; border: 1px solid transparent; }
+
+  /* SLA Banner */
+  .sla-banner { background: #F8F6F2; border-radius: 12px; padding: 12px 14px; margin-top: 16px; display: flex; align-items: center; gap: 9px; }
+  .sla-banner span { font-size: 11.5px; color: #475569; line-height: 1.35; }
+
+  /* Submit Button */
+  .submit-btn { background: #163A2B; border-radius: 15px; height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; margin-bottom: 12px; color: #FFFFFF; font-size: 15px; font-weight: 700; border: none; width: 100%; box-shadow: 0 4px 14px rgba(22, 58, 43, 0.28); cursor: pointer; }
+
+  /* Android Gesture Bar */
+  .gesture-bar { width: 130px; height: 4px; background: #94A3B8; border-radius: 3px; margin: 10px auto 4px auto; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+  <!-- Android Status Bar -->
+  <div class="status-bar">
+    <span>19:05</span>
+    <div class="status-icons">
+      <!-- VoLTE / 4G -->
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="#1E293B">
+        <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19H12v-2H6.46c-.92-1.33-1.46-2.95-1.46-4.7C5 7.6 8.6 4 13 4c3.95 0 7.24 2.86 7.89 6.64l1.98-.33C22.04 5.75 17.91 3 13 3z"/>
+      </svg>
+      <!-- Signal -->
+      <svg width="15" height="14" viewBox="0 0 24 24" fill="#1E293B">
+        <rect x="2" y="16" width="3" height="6" rx="1"/>
+        <rect x="7" y="12" width="3" height="10" rx="1"/>
+        <rect x="12" y="8" width="3" height="14" rx="1"/>
+        <rect x="17" y="4" width="3" height="18" rx="1"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="22" height="13" viewBox="0 0 24 24" fill="#1E293B">
+        <rect x="1" y="6" width="19" height="12" rx="2" stroke="#1E293B" stroke-width="1.8" fill="none"/>
+        <rect x="3" y="8" width="12" height="8" rx="1"/>
+        <path d="M21 9v6" stroke="#1E293B" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="content-container">
+
+    <!-- Top Header Bar -->
+    <div class="top-header">
+      <button class="close-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round" fill="none">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="trip-chip">
+        <div class="trip-chip-dot"></div>
+        <span>Trip Completed • Consignment #842</span>
+      </div>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <h1 class="title-main">Rate Experience</h1>
+    <p class="subtitle-main">Help improve the HarvestHub community with verified feedback.</p>
+
+    <!-- Transaction Closed Banner -->
+    <div class="trans-banner">
+      <div class="trans-check-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <div>
+        <div class="trans-title">Transaction Closed – Transport Fee Transferred</div>
+        <div class="trans-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M3,6a2,2 0 0,1 2,-2h14a2,2 0 0,1 2,2v12a2,2 0 0,1 -2,2H5a2,2 0 0,1 -2,-2V6z M16,11h5v4h-5a2,2 0 0,1 0,-4z M3,9h18" />
+          </svg>
+          <span>Rs. 4,500 Credited to Wallet</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1: Rate Farmer -->
+    <div class="review-card">
+      <div class="card-header-row">
+        <div class="avatar-wrap">
+          <img src="img_transporter_avatar.png" alt="Farmer" class="avatar-img">
+          <div class="online-dot"></div>
+        </div>
+        <div class="header-info">
+          <div class="party-name">Rate Farmer</div>
+          <div class="party-sub">Bandara Farms • Dambulla Hub</div>
+          <div class="meta-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22l1,-2.3A4.49,4.49 0,0 0,8 20C19,20 22,3 22,3c0,0 -4,0 -9,3.5z"/>
+            </svg>
+            <span>800 kg Jaffna Red Onions</span>
+          </div>
+        </div>
+        <div class="role-pill">Pickup</div>
+      </div>
+
+      <!-- Star Rating Box -->
+      <div class="stars-box">
+        <div class="stars-row">
+          <!-- 5 Filled Green Stars -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+        </div>
+        <div class="star-text">5.0 • Exceptional Dispatch</div>
+      </div>
+
+      <!-- Question & Chips -->
+      <div class="question-label">What went well at pickup?</div>
+      <div class="tags-group">
+        <div class="tags-row">
+          <div class="tag-chip selected">Punctual Loading</div>
+          <div class="tag-chip selected">Accurate Weight</div>
+        </div>
+        <div class="tags-row">
+          <div class="tag-chip unselected">Friendly</div>
+          <div class="tag-chip selected">Crates Ready</div>
+        </div>
+      </div>
+
+      <!-- Input Box -->
+      <div class="notes-box">Add notes about pickup experience...</div>
+    </div>
+
+    <!-- Card 2: Rate Buyer -->
+    <div class="review-card">
+      <div class="card-header-row">
+        <div class="avatar-wrap">
+          <img src="img_cargo_market_truck.jpg" alt="Buyer" class="avatar-img">
+          <div class="online-dot"></div>
+        </div>
+        <div class="header-info">
+          <div class="party-name">Rate Buyer</div>
+          <div class="party-sub">Colombo Wholesale Manning Market</div>
+          <div class="meta-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M3,21h18 M5,21V7l7,-4 7,4v14 M9,21v-6h6v6 M9,10h.01 M15,10h.01" />
+            </svg>
+            <span>Offload Terminal • Bay #14</span>
+          </div>
+        </div>
+        <div class="role-pill">Drop-off</div>
+      </div>
+
+      <!-- Star Rating Box -->
+      <div class="stars-box">
+        <div class="stars-row">
+          <!-- 4 Filled Green Stars + 1 Outline Star -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" stroke="#CBD5E1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/></svg>
+        </div>
+        <div class="star-text">4.0 • Quick Offload</div>
+      </div>
+
+      <!-- Question & Chips -->
+      <div class="question-label">What went well at delivery?</div>
+      <div class="tags-group">
+        <div class="tags-row">
+          <div class="tag-chip selected">Quick Unloading</div>
+          <div class="tag-chip selected">Fair Inspection</div>
+        </div>
+        <div class="tags-row">
+          <div class="tag-chip unselected">Prompt Sign-off</div>
+          <div class="tag-chip unselected">Easy Bay Access</div>
+        </div>
+      </div>
+
+      <!-- Input Box -->
+      <div class="notes-box">Add notes about destination offloading...</div>
+    </div>
+
+    <!-- SLA Banner -->
+    <div class="sla-banner">
+      <svg width="18" height="18" viewBox="0 0 24 24" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M12,2L4,5v6.09c0,5.05 3.41,9.76 8,10.91 4.59,-1.15 8,-5.86 8,-10.91V5l-8,-3z M9,12l2,2 4,-4" />
+      </svg>
+      <span>Verified transporter submission under Colombo-Central Route SLA.</span>
+    </div>
+
+    <!-- Submit Button -->
+    <button class="submit-btn">
+      <span>Submit Feedback</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="13 6 19 12 13 18"></polyline>
+      </svg>
+    </button>
+
+    <!-- Gesture Bar -->
+    <div class="gesture-bar"></div>
+
+  </div>
+
+</body>
+</html>

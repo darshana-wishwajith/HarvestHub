@@ -33,6 +33,22 @@ public class Order {
     private String ratingComment;
     private String pickupDate;
     private String actualDeliveryDate;
+    private java.util.List<TransportEvent> transportEvents;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TransportEvent {
+        private String eventType;
+        private String timestamp;
+        private String transporterId;
+        private String note;
+        private Double latitude;
+        private Double longitude;
+        private Integer photoCount;
+        private Boolean buyerVerified;
+        private String rejectionReason;
+    }
 
     @Data
     @NoArgsConstructor

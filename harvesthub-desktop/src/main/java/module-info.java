@@ -9,6 +9,10 @@ module com.harvesthub.desktop {
     requires org.kordamp.ikonli.fontawesome5;
 
     opens com.harvesthub.desktop.model to javafx.base, com.fasterxml.jackson.databind;
+    opens com.harvesthub.desktop.api to com.fasterxml.jackson.databind;
     opens com.harvesthub.desktop to javafx.fxml;
+
     exports com.harvesthub.desktop;
+    exports com.harvesthub.desktop.api;
+    exports com.harvesthub.desktop.model;
 }

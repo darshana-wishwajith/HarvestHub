@@ -86,8 +86,9 @@ public class SidebarController {
 
     @FXML
     private void handleLogout() {
+        com.harvesthub.desktop.api.Session.clear();
         SceneNavigator.navigate(navDashboard,
                 "/com/harvesthub/desktop/LoginView.fxml",
-                "HarvestHub â€” Agricultural Officer Portal");
+                "HarvestHub — Agricultural Officer Portal");
     }
 }

@@ -20,6 +20,7 @@ import com.harvesthub.mobile.model.SendMessageRequest;
 import com.harvesthub.mobile.model.SendOtpRequest;
 import com.harvesthub.mobile.model.SupplyOfferRequest;
 import com.harvesthub.mobile.model.Transaction;
+import com.harvesthub.mobile.model.TransporterEventRequest;
 import com.harvesthub.mobile.model.LocationRequest;
 import com.harvesthub.mobile.model.RegisterRequest;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
@@ -153,6 +154,21 @@ public interface ApiService {
     @GET("orders/farmer/{farmerId}")
     Call<List<Order>> getFarmerOrders(@Path("farmerId") String farmerId);
 
+    @GET("orders/buyer/{buyerId}")
+    Call<List<Order>> getBuyerOrders(@Path("buyerId") String buyerId);
+
+    @POST("orders/create")
+    Call<Order> createOrder(@Body Order order);
+
+    @POST("orders/{orderId}/payment")
+    Call<Order> recordAdvancePayment(@Path("orderId") String orderId, @Body Map<String, Object> payment);
+
+    @GET("orders/transporter/{transporterId}")
+    Call<List<Order>> getTransporterOrders(@Path("transporterId") String transporterId, @Query("status") String status);
+
+    @POST("orders/{orderId}/transporter-events")
+    Call<Order> applyTransporterEvent(@Path("orderId") String orderId, @Body TransporterEventRequest request);
+
     @GET("orders/{orderId}")
     Call<Order> getOrder(@Path("orderId") String orderId);
 
@@ -164,4 +180,7 @@ public interface ApiService {
 
     @GET("market/centers")
     Call<List<MarketCenter>> getMarketCenters();
+
+    @GET("buyer/listings")
+    Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grade);
 }

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/buyerBottomNavBar"
+    android:layout_width="match_parent"
+    android:layout_height="78dp"
+    android:background="@color/nav_bar_bg"
+    android:elevation="10dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/buyerNavHome"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:id="@+id/buyerPillHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:id="@+id/buyerIconHome"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Marketplace"
+                android:src="@drawable/ic_home" />
+            <TextView
+                android:id="@+id/buyerLabelHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/buyerNavOrders"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:id="@+id/buyerPillOrders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:id="@+id/buyerIconOrders"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Orders"
+                android:src="@drawable/ic_list" />
+            <TextView
+                android:id="@+id/buyerLabelOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Orders"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/buyerNavDemands"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:id="@+id/buyerPillDemands"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:id="@+id/buyerIconDemands"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Demand requests"
+                android:src="@drawable/ic_tag" />
+            <TextView
+                android:id="@+id/buyerLabelDemands"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Demands"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/buyerNavOffers"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:id="@+id/buyerPillOffers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:id="@+id/buyerIconOffers"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Supply offers"
+                android:src="@drawable/ic_wallet" />
+            <TextView
+                android:id="@+id/buyerLabelOffers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Offers"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

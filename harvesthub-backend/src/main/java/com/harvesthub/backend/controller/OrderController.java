@@ -2,6 +2,7 @@ package com.harvesthub.backend.controller;
 
 import com.harvesthub.backend.dto.ConfirmDealRequest;
 import com.harvesthub.backend.dto.GenericResponse;
+import com.harvesthub.backend.dto.TransporterEventRequest;
 import com.harvesthub.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,43 @@ public class OrderController {
     @GetMapping("/orders/farmer/{farmerId}")
     public ResponseEntity<java.util.List<com.harvesthub.backend.model.Order>> getOrdersByFarmer(@PathVariable String farmerId) {
         return ResponseEntity.ok(orderService.getOrdersByFarmer(farmerId));
+    }
+
+    @GetMapping("/orders/buyer/{buyerId}")
+    public ResponseEntity<java.util.List<com.harvesthub.backend.model.Order>> getOrdersByBuyer(@PathVariable String buyerId) {
+        return ResponseEntity.ok(orderService.getOrdersByBuyer(buyerId));
+    }
+
+    @GetMapping("/orders/transporter/{transporterId}")
+    public ResponseEntity<java.util.List<com.harvesthub.backend.model.Order>> getOrdersByTransporter(
+            @PathVariable String transporterId,
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(orderService.getOrdersByTransporter(transporterId, status));
+    }
+
+    @PostMapping("/orders/{orderId}/transporter-events")
+    public ResponseEntity<?> applyTransporterEvent(
+            @PathVariable String orderId,
+            @RequestBody TransporterEventRequest request) {
+        try {
+            com.harvesthub.backend.model.Order order = orderService.applyTransporterEvent(orderId, request);
+            return order == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(order);
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+    }
+
+    @PostMapping("/orders/{orderId}/payment")
+    public ResponseEntity<?> recordAdvancePayment(
+            @PathVariable String orderId,
+            @RequestBody java.util.Map<String, Object> request) {
+        Object amountValue = request.get("amount");
+        if (!(amountValue instanceof Number)) {
+            return ResponseEntity.badRequest().body("Payment amount is required");
+        }
+        com.harvesthub.backend.model.Order order = orderService.recordAdvancePayment(
+                orderId, ((Number) amountValue).doubleValue());
+        return order == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(order);
     }
 
     @GetMapping("/orders/{orderId}")

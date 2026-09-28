@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Light background track -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#DBEAFE"
+        android:strokeWidth="2.5"
+        android:pathData="M12,12 m-9,0 a9,9 0 1,1 18,0 a9,9 0 1,1 -18,0" />
+    <!-- Prominent blue loading arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2563EB"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M4.5,16.5 A9,9 0 0,1 12,3" />
+    <!-- Secondary arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3B82F6"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M12,3 A9,9 0 0,1 19.5,7.5" />
+</vector>

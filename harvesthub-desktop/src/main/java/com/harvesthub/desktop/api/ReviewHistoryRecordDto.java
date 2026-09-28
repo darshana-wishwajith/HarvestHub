@@ -2,10 +2,10 @@ package com.harvesthub.desktop.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/** Mirrors GET /api/review-history row shape — same fields as the existing ReviewHistoryRecord model. */
+/** Mirrors GET /api/review-history row shape. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReviewHistoryRecordDto {
-    public Long id;
+    public String id;
     public String avatarCode;
     public String cropName;
     public String variety;

@@ -7,4 +7,5 @@ public interface ListingRepository extends MongoRepository<Listing, String> {
     List<Listing> findByFarmerIdAndStatusIn(String farmerId, List<String> statuses);
     List<Listing> findByFarmerId(String farmerId);
     List<Listing> findByFarmerIdAndCropNameContainingIgnoreCase(String farmerId, String cropName);
+    List<Listing> findByStatusIn(List<String> statuses);
 }

@@ -1,10 +1,17 @@
 package com.harvesthub.desktop;
 
+import com.harvesthub.desktop.api.ApiClient;
+import com.harvesthub.desktop.api.OfficerDto;
+import com.harvesthub.desktop.api.QueueListingDto;
+import com.harvesthub.desktop.api.Session;
 import com.harvesthub.desktop.model.QueueListing;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -19,6 +26,11 @@ import java.util.stream.Collectors;
 public class VerificationQueueController implements Initializable {
 
     @FXML private SidebarController sidebarController;
+    @FXML private Label queueSubtitleLabel;
+    @FXML private Label chipInitialsLabel;
+    @FXML private Label chipNameLabel;
+    @FXML private Label paginationLabel;
+
     @FXML private TextField searchField;
     @FXML private Button tabAll;
     @FXML private Button tabUnclaimed;
@@ -38,23 +50,76 @@ public class VerificationQueueController implements Initializable {
             sidebarController.activate(SidebarController.Nav.VERIFICATION_QUEUE);
         }
 
+        setupOfficerProfile();
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshListings());
+
+        loadQueueFromBackend();
+    }
+
+    private void setupOfficerProfile() {
+        OfficerDto officer = Session.getOfficer();
+        if (officer != null) {
+            String name = officer.fullName != null && !officer.fullName.isBlank() ? officer.fullName : "Officer";
+            if (chipNameLabel != null) chipNameLabel.setText(name);
+
+            String initials = "OF";
+            String[] parts = name.trim().split("\\s+");
+            if (parts.length == 1 && !parts[0].isEmpty()) {
+                initials = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+            } else if (parts.length > 1) {
+                initials = ("" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+            }
+            if (chipInitialsLabel != null) chipInitialsLabel.setText(initials);
+        }
+    }
+
+    private void loadQueueFromBackend() {
+        Thread worker = new Thread(() -> {
+            try {
+                String search = searchField != null && searchField.getText() != null ? searchField.getText().trim() : "";
+                List<QueueListingDto> dtos = ApiClient.getQueue(activeTab, search);
+
+                Platform.runLater(() -> {
+                    allListings.clear();
+                    if (dtos != null && !dtos.isEmpty()) {
+                        allListings.addAll(dtos.stream().map(QueueListing::fromDto).collect(Collectors.toList()));
+                    } else {
+                        loadDefaultMockListings();
+                    }
+                    if (queueSubtitleLabel != null) {
+                        queueSubtitleLabel.setText(allListings.size() + " listings awaiting review across your region");
+                    }
+                    refreshListings();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    if (allListings.isEmpty()) {
+                        loadDefaultMockListings();
+                    }
+                    refreshListings();
+                });
+            }
+        }, "queue-data-loader");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void loadDefaultMockListings() {
         allListings.addAll(List.of(
-                new QueueListing("Paddy", "Kalinga Perera", "Anuradhapura North",
+                new QueueListing("listing_mock_1", "Paddy", "Kalinga Perera", "Anuradhapura North",
                         "2 hours ago", "450 kg", "LKR 120/kg",
                         "Pending", true, QueueListing.CropTone.AMBER, "fas-seedling"),
-                new QueueListing("Cinnamon", "Anura Silva", "Galle Central",
+                new QueueListing("listing_mock_2", "Cinnamon", "Anura Silva", "Galle Central",
                         "4 hours ago", "120 kg", "LKR 540/kg",
                         "Pending", true, QueueListing.CropTone.BROWN, "fas-leaf"),
-                new QueueListing("Tea", "Bandara Wijesinghe", "Nuwara Eliya East",
+                new QueueListing("listing_mock_3", "Tea", "Bandara Wijesinghe", "Nuwara Eliya East",
                         "5 hours ago", "800 kg", "LKR 165/kg",
                         "Pending", true, QueueListing.CropTone.TEAL, "fas-leaf"),
-                new QueueListing("Onion", "Priyantha Kumara", "Dambulla Town",
+                new QueueListing("listing_mock_4", "Onion", "Priyantha Kumara", "Dambulla Town",
                         "6 hours ago", "300 kg", "LKR 195/kg",
                         "Pending", true, QueueListing.CropTone.PURPLE, "fas-seedling")
         ));
-
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshListings());
-        refreshListings();
     }
 
     private void refreshListings() {
@@ -69,6 +134,10 @@ public class VerificationQueueController implements Initializable {
         listingsContainer.getChildren().clear();
         for (QueueListing listing : filtered) {
             listingsContainer.getChildren().add(new ListingRow(listing));
+        }
+
+        if (paginationLabel != null) {
+            paginationLabel.setText("Showing " + filtered.size() + " of " + allListings.size() + " listings");
         }
     }
 
@@ -99,7 +168,7 @@ public class VerificationQueueController implements Initializable {
             case "claimed" -> tabClaimedByMe.getStyleClass().add("queue-segment-active");
             default -> tabAll.getStyleClass().add("queue-segment-active");
         }
-        refreshListings();
+        loadQueueFromBackend();
     }
 
     private void setActivePage(int page) {
@@ -130,32 +199,36 @@ public class VerificationQueueController implements Initializable {
 
     @FXML
     private void handleFilterCropType() {
-        System.out.println("Filter: Crop Type");
+        searchField.setText("Paddy");
     }
 
     @FXML
     private void handleFilterLocation() {
-        System.out.println("Filter: Location");
+        searchField.setText("Dambulla");
     }
 
     @FXML
     private void handleFilterSubmittedDate() {
-        System.out.println("Filter: Submitted Date");
+        loadQueueFromBackend();
     }
 
     @FXML
     private void handleNotifications() {
-        System.out.println("Notifications clicked");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notifications");
+        alert.setHeaderText("Officer Notifications");
+        alert.setContentText("You have no unread notifications.");
+        alert.showAndWait();
     }
 
     @FXML
     private void handlePagePrev() {
-        System.out.println("Pagination: previous");
+        setActivePage(1);
     }
 
     @FXML
     private void handlePageNext() {
-        System.out.println("Pagination: next");
+        setActivePage(2);
     }
 
     @FXML

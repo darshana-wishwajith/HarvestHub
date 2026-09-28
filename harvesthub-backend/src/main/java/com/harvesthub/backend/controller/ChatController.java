@@ -23,7 +23,7 @@ public class ChatController {
     public ResponseEntity<ChatMessage> sendMessage(
             @PathVariable String orderId,
             @RequestBody SendMessageRequest request) {
-        ChatMessage message = chatService.sendMessage(orderId, request.getText(), "current-user");
+        ChatMessage message = chatService.sendMessage(orderId, request.getText(), request.getSenderId());
         return ResponseEntity.ok(message);
     }
 }

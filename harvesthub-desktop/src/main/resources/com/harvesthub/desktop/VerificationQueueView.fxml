@@ -29,7 +29,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="16">
                     <VBox spacing="4" HBox.hgrow="ALWAYS">
                         <Label text="Verification Queue" styleClass="page-heading"/>
-                        <Label text="7 listings awaiting review across your region"
+                        <Label fx:id="queueSubtitleLabel" text="Listings awaiting review across your region"
                                styleClass="page-subtitle"/>
                     </VBox>
 
@@ -58,9 +58,9 @@
                                        prefWidth="34" prefHeight="34"
                                        minWidth="34" minHeight="34"
                                        maxWidth="34" maxHeight="34">
-                                <Label text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
+                                <Label fx:id="chipInitialsLabel" text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
                             </StackPane>
-                            <Label text="Lahiru Sahan" styleClass="profile-chip-name"/>
+                            <Label fx:id="chipNameLabel" text="Lahiru Sahan" styleClass="profile-chip-name"/>
                         </HBox>
                     </HBox>
                 </HBox>
@@ -146,7 +146,7 @@
                         <padding>
                             <Insets top="14" right="20" bottom="14" left="20"/>
                         </padding>
-                        <Label text="Showing 1-5 of 12 listings" styleClass="queue-pagination-text"
+                        <Label fx:id="paginationLabel" text="Showing 1-5 of 12 listings" styleClass="queue-pagination-text"
                                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
 
                         <HBox spacing="6" alignment="CENTER_RIGHT">

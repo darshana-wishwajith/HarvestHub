@@ -3,5 +3,6 @@ import lombok.Data;
 
 @Data
 public class SendMessageRequest {
+    private String senderId;
     private String text;
 }

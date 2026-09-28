@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Thin wrapper around java.net.http.HttpClient for calling the HarvestHub backend
- * (see harvesthub-backend/README.md for the full API). Attaches the JWT from
- * {@link Session} to every call once the officer has logged in.
+ * Thin wrapper around java.net.http.HttpClient for calling the HarvestHub backend.
+ * Attaches the JWT from {@link Session} to every call once the officer has logged in.
  */
 public final class ApiClient {
 
@@ -47,6 +46,10 @@ public final class ApiClient {
         return getList("/api/dashboard/activity", ActivityLogDto.class);
     }
 
+    public static OfficerStatsDto getDashboardStats() {
+        return get("/api/dashboard/stats", OfficerStatsDto.class);
+    }
+
     // ---- Verification Queue ---------------------------------------------
 
     public static List<QueueListingDto> getQueue(String tab, String search) {
@@ -57,18 +60,30 @@ public final class ApiClient {
         return getList(path.toString(), QueueListingDto.class);
     }
 
-    public static ListingDetailDto claimListing(long listingId) {
+    public static ListingDetailDto claimListing(String listingId) {
         return post("/api/queue/" + listingId + "/claim", Map.of(), ListingDetailDto.class, true);
     }
 
-    public static ListingDetailDto getListing(long listingId) {
+    public static ListingDetailDto claimListing(long listingId) {
+        return claimListing(String.valueOf(listingId));
+    }
+
+    public static ListingDetailDto getListing(String listingId) {
         return get("/api/listings/" + listingId, ListingDetailDto.class);
+    }
+
+    public static ListingDetailDto getListing(long listingId) {
+        return getListing(String.valueOf(listingId));
     }
 
     // ---- Review -----------------------------------------------------------
 
-    public static void submitReview(long listingId, ReviewDecisionRequestDto request) {
+    public static void submitReview(String listingId, ReviewDecisionRequestDto request) {
         post("/api/listings/" + listingId + "/review", request, Void.class, true);
+    }
+
+    public static void submitReview(long listingId, ReviewDecisionRequestDto request) {
+        submitReview(String.valueOf(listingId), request);
     }
 
     public static List<ReviewHistoryRecordDto> getReviewHistory(String search) {
