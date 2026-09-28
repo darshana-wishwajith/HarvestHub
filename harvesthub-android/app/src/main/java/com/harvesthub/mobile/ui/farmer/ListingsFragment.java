@@ -57,6 +57,8 @@ public class ListingsFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
         if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
             farmerId = sessionManager.getUser().getId();
+        } else {
+            farmerId = "user_farmer_kamal";
         }
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initRecyclerView();
@@ -71,6 +73,13 @@ public class ListingsFragment extends Fragment {
         binding.fabCreateListing.setOnClickListener(v -> openCreateListing());
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchSummary();
+        selectTab(currentTab);
     }
 
     private void initRecyclerView() {

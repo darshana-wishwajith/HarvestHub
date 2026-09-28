@@ -78,6 +78,16 @@ public class VerifiedHarvestsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BuyerNavigationHelper.setupNotifications(this, findViewById(R.id.buyerTopNav));
+        RecyclerView rvHarvestList = findViewById(R.id.rvHarvestList);
+        if (rvHarvestList != null) {
+            loadMarketplaceListings(rvHarvestList, "", "");
+        }
+    }
+
     private void loadMarketplaceListings(RecyclerView recyclerView, String search, String grade) {
         SessionManager sessionManager = new SessionManager(this);
         ApiService apiService = ApiClient.getClient(sessionManager).create(ApiService.class);

@@ -8,7 +8,10 @@ $remoteJarPath = "/home/ec2-user/app.jar"
 $remoteServiceName = "harvesthub"
 
 $projectRoot = $PSScriptRoot
-$localJarPath = Join-Path -Path $projectRoot -ChildPath "target\$jarName"
+$localJarPath = Join-Path -Path $projectRoot -ChildPath "harvesthub-backend\target\$jarName"
+if (-not (Test-Path $localJarPath)) {
+    $localJarPath = Join-Path -Path $projectRoot -ChildPath "target\$jarName"
+}
 $pemKeyPath = Join-Path -Path $projectRoot -ChildPath "harvesthub_key_pair.pem"
 
 function Invoke-Checked {
@@ -39,7 +42,7 @@ if ($LASTEXITCODE -ne 0) {
 Start-Sleep -Seconds 2
 
 Invoke-Checked "Step 2: Building the project with Maven" {
-    ./mvnw.cmd clean package -DskipTests
+    & ".\harvesthub-backend\mvnw.cmd" -f ".\harvesthub-backend\pom.xml" clean package -DskipTests
 }
 
 if (-not (Test-Path $localJarPath)) {

@@ -1,0 +1,659 @@
+# Project Proposal  - Revised.pdf
+
+
+--- PAGE 1 ---
+
+ 
+ 
+Project Proposal 
+Integrated Agricultural Marketplace and Logistics 
+Management System 
+ 
+Project - ICT 2212 
+Bachelor of Information and Communication Technology 
+(BICT) 
+Degree Programme 
+ 
+ 
+Department of Information and Communication Technology 
+Faculty of Technology 
+Rajarata University of Sri Lanka 
+Mihintale  
+
+--- PAGE 2 ---
+
+i 
+ 
+Details of the Project 
+Project Title    :_________________________________________________ 
+Group Number: ______________________________________________________ 
+Group Name   :_________________________________________________ 
+Submission Date: _________________________________________________ 
+Group Members:  
+Student Name Index Number Signature 
+W.B.D.W. Bandara 2452 
+ 
+L.V .L.S. Jayarathne 2451 
+ 
+U.H.G.R. Madushan 2354 
+ 
+H.H.D.V . Ishan 2353 
+ 
+R.A. Kavindi 2450 
+ 
+H.W.D.I. Ishanthi 2362 
+ 
+Supervisor(s): 
+ Name  : ___________________________________________ 
+ Designation : ___________________________________________ 
+ Department : ___________________________________________ 
+ Email  : ___________________________________________ 
+ Signature : ________________________ Date: 07/05/2026  
+Integrated Agricultural Marketplace and Logistics Management System  
+Group 12 
+ CodeX 
+07/05/2026 
+Ms. Dinusika Wickramasiri 
+Lecturer (Temporary) 
+dinushiw@tec.rjt.ac.lk 
+Department of Information Communication Technology 
+
+--- PAGE 3 ---
+
+ii 
+ 
+Table of Contents  
+ 
+List of Figures ........................................................................................................................................ iv 
+List of Tables ........................................................................................................................................... v 
+1. Introduction .................................................................................................................................... 1 
+2. Problem Statement ......................................................................................................................... 1 
+2.1. Information Asymmetry (Farmers Don't Know Demand) ..................................................... 1 
+2.2. The Trust Gap (Buyers Can't Verify Quality) ........................................................................ 1 
+2.3. Logistical Inefficiency (Transport is Hard to Find) ............................................................... 1 
+2.4. Financial Risk & Payment Uncertainty ................................................................................. 2 
+3. Proposed Solution .......................................................................................................................... 2 
+3.1. For Farmers ........................................................................................................................... 2 
+3.2. For Buyers ............................................................................................................................. 2 
+3.3. For Agricultural Officers ....................................................................................................... 3 
+3.3.1. Quality Review Method ................................................................................................ 3 
+3.4. For Transporters ..................................................................................................................... 3 
+4. Scope of the project ........................................................................................................................ 3 
+4.1. In-Scope (Main Deliverables) ............................................................................................... 4 
+4.2. Excluded from Scope (Project Boundaries) .......................................................................... 4 
+5. Aim and Objectives ........................................................................................................................ 5 
+5.1. Aim ........................................................................................................................................ 5 
+5.2. Objectives .............................................................................................................................. 5 
+6. Technical Approach ........................................................................................................................ 6 
+6.1. Overall System Architecture .................................................................................................. 6 
+6.2. Layered Architecture of the system ....................................................................................... 7 
+6.3. Frontend Design & Technologies .......................................................................................... 8 
+6.3.1. JavaFX (Admins) .......................................................................................................... 8 
+6.3.2. Android Mobile Application (Java + XML) ................................................................. 8 
+6.4. Backend Design (Spring Boot) .............................................................................................. 8 
+--- PAGE 4 ---
+
+iii 
+ 
+6.4.1. Core Backend Responsibilities ..................................................................................... 8 
+6.4.2. Security ......................................................................................................................... 9 
+6.5. Database Design .................................................................................................................... 9 
+6.6. Bidirectional Marketplace Logic ........................................................................................... 9 
+6.7. Collaborative Quality Verification Queue ........................................................................... 10 
+6.8. Algorithmic Vehicle Selector & Dynamic Cost Calculator ................................................. 10 
+6.9. Advanced Order Workflow & Liability Engine .................................................................. 10 
+6.10. Rating & Trust Score System .......................................................................................... 11 
+6.11. Project Methodology – Incremental .................................................................................... 12 
+6.12. Business & Revenue Model ............................................................................................ 13 
+7. Project Work Plan ......................................................................................................................... 13 
+7.1. Project Timeline and Milestones ......................................................................................... 13 
+7.2. Gantt Chart Description ....................................................................................................... 15 
+8. Project Resources ......................................................................................................................... 15 
+8.1. Human Resources ................................................................................................................ 15 
+8.2. Physical & Software Resources ........................................................................................... 15 
+8.2.1. Hardware ..................................................................................................................... 15 
+8.2.2. Software Stack: ........................................................................................................... 15 
+9. Conclusion .................................................................................................................................... 16 
+ 
+  
+--- PAGE 5 ---
+
+iv 
+ 
+List of Figures 
+Figure 1: System Workflow .................................................................................................................... 6 
+Figure 2: Layered Architecture of the system ......................................................................................... 7 
+Figure 3:Project Methodology (Incremental Model) ............................................................................ 12 
+Figure 4: Gantt Chart of the project work plan ..................................................................................... 15 
+ 
+  
+--- PAGE 6 ---
+
+v 
+ 
+List of Tables 
+Table 1: Main deliverables of Project (in scope) .................................................................................... 4 
+Table 2: Project Boundaries (out of scope) ............................................................................................. 4 
+Table 3: Project Work Plan ................................................................................................................... 13 
+--- PAGE 7 ---
+
+Page 1 of 24 
+ 
+1. Introduction 
+Agriculture is the main livelihood for many people in the North Central Province (Rajarata). Even 
+though our farmers produce a large harvest, they face many problems when trying to sell their crops. 
+We noticed that there is a big gap between the farmers in villages and the buyers in big cities. 
+Because of this gap, farmers often don't get a fair price, and a lot of vegetables go to waste before 
+they even reach the market.[1] 
+ 
+Our project, "HarvestHub," is a software solution designed to solve this problem. It is a digital 
+platform that connects farmers directly with buyers Instead of relying on  middlemen, our system 
+creates a "Bidirectional Marketplace" where farmers can list what they have, and buyers can post 
+what they need.  
+ 
+The main motivation for this project is to fix the "Trust Gap." Usually, buyers in places like 
+Colombo are afraid to buy from remote farmers because they cannot check the quality of the 
+vegetables. To fix this, our system uses Agricultural Officers to manu ally check and approve the 
+quality of the harvest before it is sold. We also included a way to manage transport costs 
+automatically so that farmers don't have to worry about finding vehicles.  
+ 
+2. Problem Statement 
+Our team has analyzed the current agricultural system in the North Central Province (Rajarata) and 
+identified three main problems that our software, HarvestHub, will address: 
+2.1. Information Asymmetry (Farmers Don't Know Demand) 
+Currently, farmers harvest their crops without knowing the real demand in the market. They often 
+grow the same crops as everyone else at the same time, leading to an oversupply. This causes prices 
+to crash and results in farmers dumping their vegetables because they cannot find buyers.[2] 
+2.2. The Trust Gap (Buyers Can't Verify Quality) 
+Buyers in distant cities (like Colombo) are afraid to buy directly from small scale farmers because 
+they cannot verify the quality of the vegetables without seeing them. Because there is no one to 
+guarantee the quality, buyers prefer to use middlemen, which reduces the profit for the farmer. 
+2.3. Logistical Inefficiency (Transport is Hard to Find) 
+For small scale farmers, finding a vehicle to transport a small harvest is very difficult and expensive. 
+Often, there is no standard price for transport, and the delay in finding a vehicle causes the fresh 
+produce to spoil before it reaches the market.[3] 
+--- PAGE 8 ---
+
+Page 2 of 24 
+ 
+2.4. Financial Risk & Payment Uncertainty 
+In the current system, there is no secure way to handle payments. Farmers are afraid to send goods 
+without money, and buyers are afraid to pay without receiving goods. There is no central system to 
+manage advance payments or ensure fair transactions between strangers. 
+3. Proposed Solution 
+HarvestHub is a complete digital ecosystem designed to solve traditional agricultural supply chain 
+inefficiencies. It connects four key users in one unified platform: Farmers, Buyers, Agricultural 
+Officers, and Transporters. 
+Novelty Compared to Existing Marketplaces 
+Unlike existing agricultural platforms that only act as simple online classifieds or notice boards 
+(leaving users to independently figure out quality trust, transport, and delivery), HarvestHub 
+introduces three key features: 
+• Built-In Logistics Coordination:  Transport is automatically assigned according to harvest  
+capacity, rather than forcing buyers to hire independent trucks. 
+• Verified Quality Assurance: Instead of unverified seller claims, mandatory visual evidence 
+(photos/videos) must be certified by official Department of Agriculture officers before a listing 
+goes live. 
+• End-to-End Supply Chain Tracking: Real-time order and transport tracking from the farm 
+gate directly to the buyer's doorstep. 
+3.1. For Farmers 
+Farmers download the mobile app, register with their personal details and exact farm GPS location, 
+and create listings for their harvest. The app guides them to capture clear photos and a short video 
+of their freshly harvested crops. Once submitted, the li sting undergoes official quality verification 
+before going live on the marketplace. Farmers can also browse "Wanted" ads from buyers and 
+respond to direct demand. 
+3.2. For Buyers 
+Buyers (such as shop owners, supermarkets, or wholesalers) use the app to search for available 
+crops. They can filter listings by produce type, verified quality grade (A, B, or C),  They can also 
+post specific supply requests (e.g., "Need 200kg of Grade A tomatoes by Friday" ). Once a buyer 
+selects a listing, they can negotiate via in-app chat, finalize the purchase, and immediately arrange 
+integrated transport. 
+--- PAGE 9 ---
+
+Page 3 of 24 
+ 
+3.3. For Agricultural Officers 
+Officers from the Department of Agriculture access a secure desktop dashboard to review pending 
+crop submissions from local farmer s. Only approved and graded listings are published on the 
+marketplace to guarantee buyer trust. 
+3.3.1. Quality Review Method 
+To ensure fair and standardized grading without needing to travel to every farm 
+immediately, officers follow a systematic, digital-first evaluation process: 
+1. Media Authenticity Check: The system verifies the timestamp and GPS geotag of the 
+uploaded photos and videos to ensure the media was captured recently at the registered 
+farm location. 
+2. Visual Inspection: Officers examine the images and video footage to assess key visual 
+parameters: color uniformity, size consistency, surface blemishes, and signs of pest 
+or fungal damage. 
+3. Standardized Grading: Based on Department of Agriculture guidelines, the officer 
+assigns a grade: 
+o Grade A (Export/Supermarket Quality):  Uniform size and color, zero 
+visible damage or decay, optimal freshness. 
+o Grade B (Standard Retail Quality): Slight size variation or minor superficial 
+skin blemishes permitted; no rot or structural damage. 
+o Grade C (Processing/Bulk Quality):  Safe for consumption and food 
+processing (e.g., sauces, jams) but lacks visual uniformity or has noticeable 
+aesthetic defects. 
+3.4. For Transporters 
+Vehicle owners and independent drivers register on the app to view available delivery jobs. They 
+can accept requests that align with their geographic route and vehicle weight capacity. The system 
+automatically calculates a fair, transparent delivery fee ba sed on exact travel distance and cargo 
+weight, reducing transit times and post-harvest spoilage. 
+4. Scope of the project 
+The HarvestHub project is a digital solution designed to fix the current gaps in the agricultural supply 
+chain in the North Central Province. The scope covers building a "Trust Ecosystem" that connects 
+farmers, buyers, and transporters through a verified and managed platform. 
+--- PAGE 10 ---
+
+Page 4 of 24 
+ 
+4.1. In-Scope (Main Deliverables) 
+These are the specific features and activities the team will complete during the project: 
+Table 1: Main deliverables of Project (in scope) 
+Feature Description 
+User Registration & Roles We will create role-based access for four distinct users: 
+Farmers, Buyers, Transporters, and Agricultural Officers. 
+Bidirectional Marketplace This includes a search and filter system where Farmers list 
+their harvest (Supply) and Buyers post "Wanted" ads 
+(Demand). 
+Manual Quality Verification A JavaFX desktop portal for Agricultural Officers to manually 
+review photos and approve crop quality grades (e.g., Grade A). 
+Automated Vehicle Selector 
+& Logistics Calculator 
+An algorithm that automatically assigns the most suitable 
+transport vehicle and calculates dynamic transport fees based 
+on the total harvest weight and the travel distance. 
+Order Workflow Engine Logic to handle the full transaction cycle, including price 
+agreement, advance payments, and final delivery clearance. 
+2-Way Digital Handshake A security feature where an order is marked 'Complete,' and 
+funds are automatically released to the Farmer only after 
+synchronized delivery confirmation from both the 
+Transporter and the Buyer at the physical drop-off location." 
+Trust-Based Rating System A reputation module where Farmers and Buyers rate each 
+other based on their transaction history. 
+Live Tracking Integration of Google Maps API to allow Buyers to track their 
+shipments in real-time. 
+ 
+ 
+4.2. Excluded from Scope (Project Boundaries) 
+Table 2: Project Boundaries (out of scope) 
+Feature Description 
+AI Quality Check We will not use AI or image processing to automatically 
+grade crops; this is deferred for future implementation 
+Live Payment Gateway Real-world bank integration is excluded; we will use 
+mock (simulated) payments for demonstration purposes. 
+ 
+--- PAGE 11 ---
+
+Page 5 of 24 
+ 
+5. Aim and Objectives 
+5.1. Aim 
+The aim of this project is to develop a trusted agricultural marketplace and logistics ecosystem 
+that connects farmers directly with buyers, ensuring fair trade through officer -verified quality 
+checks, automated transport cost calculation, and a secure payment-first transaction workflow.  
+ 
+5.2. Objectives 
+The project will be achieved through the following six specific and measurable objectives:  
+1. To develop a GPS-Verified Crop Listing Module: To build an interface for farmers to view 
+current market demand and create crop supply listings using real-time, location-tagged photos 
+to ensure authenticity. 
+2. To implement an Officer Verification Dashboard:  To build a centralized desktop portal 
+for Agricultural Officers to manually review, grade (e.g., Grade A), and approve crop photos 
+and GPS data before they are published to buyers. 
+3. To create a Marketplace Negotiation System:  To develop an application module that 
+enables direct communication between farmers and buyers to negotiate prices and securely 
+schedule pickup dates. 
+4. To build an Automated Logistics and Dispatch Engine:  To implement a system that 
+automatically calculates transport costs based on weight and distance, assigns suitable vehicles, 
+processes advance payments, and dispatches drivers. 
+5. To build a Pre -Loading Quality Verification Feature:  To create a checkpoint in the 
+Transporter App where the transport helper inspects the crops and uploads photos, allowing the 
+buyer to remotely approve or reject the harvest quality before the advance payment is released 
+to the farmer. 
+6. To implement a 2-Way Final Delivery Confirmation: To build a final step where only the 
+transporter (confirming drop -off) and the buyer (confirming receipt) verify the delivery, 
+automatically completing the order and releasing final payments without requiring any manual 
+confirmation from the farmer. 
+ 
+ 
+ 
+--- PAGE 12 ---
+
+Page 6 of 24 
+ 
+6. Technical Approach 
+6.1. Overall System Architecture 
+ 
+Figure 1: System Workflow 
+View Full Image 
+  
+
+--- PAGE 13 ---
+
+Page 7 of 24 
+ 
+6.2.  Layered Architecture of the system 
+ 
+ 
+Figure 2: Layered Architecture of the system 
+View full image 
+ 
+The system will adopt a multi -tier architecture with separate front-end, back-end, and database layers 
+to ensure scalability, security, and maintainability.  
+Architecture Layers:  
+1. Frontend Layer  
+• JavaFX Desktop Application (Admin & Agri officer)  
+• Android Mobile Application (Farmers, Buyers, Transporters)  
+2. Backend Layer  
+
+--- PAGE 14 ---
+
+Page 8 of 24 
+ 
+• REST API developed using Java Spring Boot  
+3. Database Layer  
+• MongoDB Atlas (Cloud Database) 
+4. External Services  
+• Google Maps API (Distance & Route Calculation)  
+ 
+6.3. Frontend Design & Technologies 
+6.3.1. JavaFX (Admins) 
+• Used by Admin and Agri officers and for:  
+o Manual quality verification of crop listings  
+o Approving or rejecting listings  
+o Monitoring users, orders, and disputes  
+• Features:  
+o Secure login with role-based access  
+o Dashboard with tables and filters  
+o Listing approval workflow  
+• Communication:  
+o JavaFX client communicates with backend using REST APIs  
+6.3.2. Android Mobile Application (Java + XML) 
+• Used by:  
+o Farmers: Upload crop listings  
+o Buyers: Post demand requests & place orders  
+o Transporters: View delivery tasks 
+• Features:   
+• Role based UI  
+• Crop listing & buyer request creation  
+• Order tracking and confirmation  
+• Rating and feedback submission  
+6.4. Backend Design (Spring Boot) 
+6.4.1. Core Backend Responsibilities 
+• User authentication & authorization  
+• Marketplace logic  
+• Order workflow management  
+--- PAGE 15 ---
+
+Page 9 of 24 
+ 
+• Logistics cost calculation  
+• Rating and trust score generation 
+6.4.2. Security 
+• Spring Security with JWT-based authentication 
+• Role-based access control:  
+o Farmer  
+o Buyer  
+o Transport  
+o Admin  
+6.5. Database Design  
+The system utilizes a cloud -based NoSQL document database to ensure scalability, real -time 
+synchronization, and flexible data structures. The data is organized into the following primary 
+collections: 
+• Users Collection: Stores user documents including unique ObjectId, user role (Farmer, Buyer, 
+Driver, Officer), contact information, and dynamically updated trust rating scores used to 
+evaluate reliability. 
+• Listings Collection: Stores farmer crop submissions as documents. This includes the unique 
+ObjectId, a reference to the farmer, embedded geospatial data (GPS coordinates), media links 
+for the Smart Camera photos, available quantity, price, and the current verification status (e.g., 
+Pending, Under Review, Approved). 
+• Market Requests Collection:  Stores buyer demand documents, containing the buyer 
+reference, required crop type, requested quantity, and target location. 
+• Orders Collection: Acts as the central transaction record. It stores the current state -machine 
+status (e.g., Awaiting Payment, In Transit, Completed), advance payment confirmations, and 2-
+way completion signatures. 
+• Logistics & Tracking Collection:  Stores transportation metadata linked to specific orders, 
+including calculated travel distance in kilometers, total transport cost, and embedded location 
+data for route tracking. 
+• Chat Collection:  Efficiently stores real -time messaging documents between buyers and 
+farmers for negotiation and pickup scheduling. 
+6.6. Bidirectional Marketplace Logic  
+• Farmers post Supply Listings  
+• Buyers post Demand Requests  
+• Search and filtering based on:  
+--- PAGE 16 ---
+
+Page 10 of 24 
+ 
+o Crop type  
+o Location  
+o Quantity  
+o Price range  
+• Matching handled at backend using SQL queries and filters  
+6.7. Collaborative Quality Verification Queue 
+• Implemented using JavaFX · Workflow:      
+•  Farmer submits crop listing      
+• Status = PENDING (Visible in a global queue to all Agricultural Officers)      
+• Available Officer claims the listing from the queue      
+• Status changes to UNDER_REVIEW (Listing is temporarily locked to this officer to 
+prevent duplicate grading)      
+• Officer reviews the GPS data and Smart Camera photos      
+• Approves (assigns Quality Grade), Rejects, or Requests a Photo Retake · Approved 
+listings become visible in the marketplace to buyers 
+ 
+6.8. Algorithmic Vehicle Selector & Dynamic Cost Calculator 
+• Uses Google Maps API 
+• Fetch farmer and buyer GPS coordinates     
+• Calculate total travel distance in Km via Google Maps API      
+• Analyze total harvest weight to automatically assign the most suitable vehicle type (e.g., 
+matching a 1-ton lorry to an 800kg harvest)    
+• Calculate final dynamic transport fee using the multi-factor pricing formula (Distance + Weight 
++ Fuel rate) · Final transport details are stored as a document in the Logistics & Tracking 
+Collection (MongoDB) 
+6.9. Advanced Order Workflow & Liability Engine 
+The order lifecycle is managed using strict backend state -machine transitions to ensure financial 
+security and accountability: 
+• Automated Dispatch & Escrow Payment (Locks funds and loops for available drivers) 
+• Proof-of-Loading Checkpoint (Establishes liability baseline before transit) 
+• In-Transit Telemetry & Lock (Continuous GPS tracking) 
+--- PAGE 17 ---
+
+Page 11 of 24 
+ 
+• 2-Way Digital Handshake 
+o o Transporter (Confirms GPS drop-off) 
+o o Buyer (Confirms visual quality) 
+• Multi-Stage Dispute & Escrow Reversal  (Handles Pre -loading rejections, Post -delivery 
+rejections, and Reverse Logistics) 
+Order Status Values (Backend State Nodes): 
+• Pending (Awaiting Buyer payment) 
+• Paused (Polling for available transport vehicles) 
+• Loaded & Verified (Proof-of-loading evidence accepted) 
+• In Transit (Order locked; live telemetry active) 
+• Delivered (Awaiting 2-Way Handshake clearance) 
+• Completed (Escrow automatically disbursed to wallets) 
+• Rejected / Disputed (Escrow frozen; automated refunds triggered) 
+• Return Journey (Reverse logistics protocol active) 
+6.10. Rating & Trust Score System  
+• Users rate each other after order completion  
+• Backend calculates:  
+o Average rating  
+o Transaction count  
+o Completion reliability  
+• Trust score displayed in user profiles  
+  
+--- PAGE 18 ---
+
+Page 12 of 24 
+ 
+6.11. Project Methodology – Incremental 
+ 
+Figure 3:Project Methodology (Incremental Model) 
+View Full Image 
+ 
+We have chosen the incremental model for our project. Below are some of the main reasons for 
+choosing it.  
+1. Early Delivery of the Marketplace  
+While we are still developing complex  logistics and payment algorithms, farmers can start 
+registering their farms and “officially -verifying” their crops. This builds  a logistics database 
+early in the project lifecycle.  
+2. Complexity Management of Multi-Role Interactions  
+Trying to build all these interfaces at once is very complex. With this incremental model we 
+have:  
+• First, stabilize the Farmer/Officer relationship (Increment 1).  
+• Then, introduce the Buyer negotiation (Increment 2).  
+• Finally, integrate the Driver/Helper workflow (Increment 3)  
+3. Better Handling of Physical Verification  
+
+--- PAGE 19 ---
+
+Page 13 of 24 
+ 
+This is a technical challenge. By reserving this for a later increment, we ensure that the "smart 
+guidance capture" in Increment 1 has already been perfected and produces high -quality geo-
+tagged data for the driver to use during the verification phase. 
+6.12. Business & Revenue Model 
+To ensure long -term financial sustainability while driving massive user adoption, HarvestHub 
+employs a "Split Transaction Fee" model. The system acts as an automated accountant, securely 
+processing all payments and strictly deducting service commissions only upon successful 
+deliveries. This ensures platform goals are perfectly aligned with user satisfaction. 
+• Buyer Convenience Fee (3%): Applied to the Buyer’s total order value at checkout. This fee 
+monetizes the convenience of bypassing traditional middleman markups, saving travel time, 
+and securing verified quality crops. 
+• Transporter Commission (5%):  Deducted automatically from the final delivery fee. 
+HarvestHub acts as a guaranteed lead generator for logistics providers, eliminating empty return 
+trips and idle stand time, which easily justifies the commission. 
+• Farmer Fee (0%):  To heavily incentivize agricultural sector adoption and rapidly build the 
+platform’s supply side, Farmers are charged zero platform fees for listing or selling their 
+harvests. 
+• Refund Policy (Zero -Fee on Failure):  If a transaction results in a rejection or dispute, the 
+system automatically waives all platform fees, ensuring the Buyer receives a 100% refund of 
+both their core payment and the convenience fee to maintain absolute trust. 
+7. Project Work Plan 
+The Project Work Plan describes how the project will be managed, including a detailed timetable with 
+milestones. To ensure the "HarvestHub" system is built efficiently, we have planned a 12 -month 
+schedule using an Incremental development approach.[4] 
+7.1. Project Timeline and Milestones  
+The following table provides a breakdown of the key tasks, timelines, and the expected outputs for 
+each phase of the project.  
+Table 3: Project Work Plan 
+2.0 Increment 01: Trust & Verification 
+Build 
+Month 3-5 Core Verification Module  
+--- PAGE 20 ---
+
+Page 14 of 24 
+ 
+2.1 Environment Setup Month 3 (Week 1) Project Repo & Server 
+configuration  
+2.2 Backend: Auth System (JWT) & APIs Month 3 (Week 2 -
+4) 
+Secure Login & DB Connectivity  
+2.3 Android: Farmer View & Smart Camera Month 4 Guided Capture & GPS Locking  
+2.4 JavaFX: Admin Panel (Officer View) Month 5 (Week 1-
+3) 
+Desktop interface for crop grading  
+2.5 Inc. 01 Integration Testing Month 5 (Week 4) Testing Farmer Upload & 
+Approval  
+ 
+2.0 Increment 01: Trust & Verification Build Month 3-5 Core Verification Module  
+2.1 Environment Setup Month 3 (Week 1) Project Repo & Server configuration  
+2.2 Backend: Auth System (JWT) & APIs Month 3 (Week 2-4) Secure Login & DB Connectivity  
+2.3 Android: Farmer View & Smart Camera Month 4 Guided Capture & GPS Locking  
+2.4 JavaFX: Admin Panel (Officer View) Month 5 (Week 1-3) Desktop interface for crop grading  
+2.5 Inc. 01 Integration Testing Month 5 (Week 4) Testing Farmer Upload & Approval  
+3.0 Increment 02: Marketplace Build Month 6-8 Bidirectional Trading  
+3.1 Android: Buyer View (Search & Filter) Month 6 Listings Feed UI & Filtering Logic  
+3.2 Backend: Chat & Scheduling Logic Month 7 (Week 1-2) Socket.io Setup & Pickup Logic  
+3.3 Android: In-App Chat Module Month 7 (Week 3-4) Chat UI for Negotiation  
+3.4 Backend: Order State Machine (v1) Month 8 (Week 1-2) Status: Pending → Accepted  
+3.5 Inc. 02 System Testing Month 8 (Week 3-4) Testing Negotiation Flow 
+4.0 Increment 03: Logistics Ecosystem Build Month 9-11 Automation & Finance  
+4.1 Backend: Logistics Algo Month 9 Cost Calculation Logic ($/km $/kg)  
+4.2 Android: Transporter View Month 10 (Week 1-2) Driver UI & Status Updates  
+4.3 Android: Helper Verification Feature Month 10 (Week 3-4) Pre-Loading Check Interface  
+4.4 Backend: Payment & Rating Logic Month 11 (Week 1-3) Trust Scores & Fund Release  
+4.5 Inc. 03 Full Integration Testing Month 11 (Week 4) End-to-end workflow testing  
+5.0 Phase 3: Finalization & Deployment Month 12 Project Closure  
+5.1 User Acceptance Testing (UAT) Month 12 (Week 1-2) Final bug fixes and optimization  
+5.2 Final Report / Thesis Writing Month 12 (Week 3) Completing documentation  
+5.3 Viva Presentation Preparation Month 12 (Week 4) Preparing slides and demo video  
+ 
+--- PAGE 21 ---
+
+Page 15 of 24 
+ 
+7.2. Gantt Chart Description  
+8. Project Resources 
+8.1. Human Resources 
+The project is executed by a team of six undergraduates, covering the following key roles: 
+• UI/UX Designers:  Responsible for designing user -friendly interfaces and high -fidelity 
+prototypes. 
+• Development Team:  Android (Mobile), Spring Boot (Backend), and JavaFX (Desktop) 
+development. 
+• Quality Assurance (QA) Engineers:  Responsible for system testing, specifically verifying 
+GPS accuracy and camera modules. 
+• Project Supervisor: Provides academic guidance and monitors project milestones. 
+8.2. Physical & Software Resources 
+8.2.1. Hardware 
+Development laptops and physical Android smartphones are required to test hardware -
+dependent features, such as real-time GPS tracking and camera-based verification. 
+8.2.2. Software Stack: 
+• Development: Android Studio, IntelliJ IDEA, MongoDB Compass 
+• APIs & Testing: Google Maps API (Location Services), Postman (API Testing). 
+• Design & Collaboration: Figma (UI Design), Git/GitHub (Version Control). 
+Figure 4: Gantt Chart of the project work plan 
+View Full Image 
+--- PAGE 22 ---
+
+Page 16 of 24 
+ 
+ 
+9. Conclusion 
+In conclusion, the "HarvestHub" project is designed to provide a practical solution to the real -world 
+problems faced by the agricultural community in the North Central Province. By connecting farmers, 
+buyers, transporters, and agricultural officers through  a single digital platform, we aim 
+to eliminate the middleman and build a transparent "trust ecosystem".  
+The system focuses on solving the major issue of crop quality through a manual verification portal. It 
+also simplifies logistics by automating transport cost calculations based on weight and distance. By 
+following a structured 12 -month work plan and using modern technologies like Spring Boot and 
+Android, our team is confident that we can deliver a functional system that benefits boththe industry 
+and our technical skills development.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+--- PAGE 23 ---
+
+Page 17 of 24 
+ 
+10. References  
+[1] S. Lanka, “Crop Sown Extent (Ha) Production (Mt) Sown Extent (Ha) Production (Mt) Sown Extent 
+(Ha) Production (Mt) Extent Production Extent Production Summary of Paddy Cultivation-Targets.” 
+[2] “Agriculture and Food: Development news, research, data | World Bank.” Accessed: Jan. 13, 2026. 
+[Online]. Available: https://www.worldbank.org/en/topic/agriculture 
+[3] C. Karunanayaka, K. Vidanagamachchi, and R. Wickramarachchi, “Transforming Agriculture Supply 
+Chain with Technology Adoption-: A Critical Review of Literature.” 
+[4] “JWT Authentication with Spring Boot.” Accessed: Jan. 13, 2026. [Online].  
+Available:https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html 
+[5] “Incremental Model in Software Engineering.” Accessed: Jan. 13, 2026. [Online].  
+Available: https://www.geeksforgeeks.org/incremental-model-in-software-engineering/ 
+--- PAGE 24 ---
+
+ 
+ 
+ 
+ 

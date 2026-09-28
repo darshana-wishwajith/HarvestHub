@@ -61,8 +61,20 @@ public class TransitTrackingActivity extends AppCompatActivity {
 
         initializeViews();
         orderId = getIntent().getStringExtra("ORDER_ID");
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = getIntent().getStringExtra("order_id");
+        }
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = "ORD-892";
+        }
         loadOrder();
         setupListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadOrder();
     }
 
     private void loadOrder() {
@@ -74,9 +86,16 @@ public class TransitTrackingActivity extends AppCompatActivity {
                 if (!response.isSuccessful() || response.body() == null) return;
                 Order order = response.body();
                 tvOrderNumber.setText("Order #" + order.getId());
-                tvOrderDetails.setText(order.getCropName() == null ? "Harvest delivery" : order.getCropName());
-                if ("DELIVERED".equalsIgnoreCase(order.getStatus())) {
-                    Intent intent = new Intent(TransitTrackingActivity.this, DeliveryHandshakeActivity.class);
+                String crop = order.getCropName() != null ? order.getCropName() : (order.getCropType() != null ? order.getCropType() : "Fresh Tomatoes");
+                tvOrderDetails.setText(crop + " (" + (int)order.getQuantity() + " KG)");
+                if (order.getTransporterName() != null && !order.getTransporterName().isEmpty()) {
+                    tvDriverName.setText(order.getTransporterName());
+                }
+                if (order.getVehicleTier() != null && !order.getVehicleTier().isEmpty()) {
+                    tvDriverVehicle.setText(order.getVehicleTier());
+                }
+                if ("DELIVERED".equalsIgnoreCase(order.getStatus()) || "DELIVERED_PENDING_HANDSHAKE".equalsIgnoreCase(order.getStatus())) {
+                    Intent intent = new Intent(TransitTrackingActivity.this, ArrivalInspectionActivity.class);
                     intent.putExtra("ORDER_ID", orderId);
                     startActivity(intent);
                     finish();

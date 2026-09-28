@@ -96,13 +96,17 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         btnSecurePayment.setOnClickListener(v -> {
             Intent intentCheckout = new Intent(this, SecureCheckoutActivity.class);
-            intentCheckout.putExtra("order_id", getIntent().getStringExtra("order_id"));
-            intentCheckout.putExtra("total_amount", "Rs. 11,845");
+            String orderId = getIntent().getStringExtra("order_id");
+            if (orderId == null || orderId.isEmpty()) orderId = "order_001";
+            intentCheckout.putExtra("order_id", orderId);
+            String advanceStr = tvTotalAdvancePayment.getText().toString().replace("Total Advance Payment ", "").trim();
+            if (advanceStr.isEmpty()) advanceStr = "Rs. 11,845";
+            intentCheckout.putExtra("total_amount", advanceStr);
             intentCheckout.putExtra("contract_ref", tvOrderRefBadge.getText().toString().replace("Ref ", ""));
             intentCheckout.putExtra("crop_cost", "Crop: " + tvPartialCropCost.getText().toString());
             intentCheckout.putExtra("logistics_cost", "Logistics: " + tvTransportFee.getText().toString());
             intentCheckout.putExtra("escrow_fee", "Escrow Fee: " + tvConvenienceFee.getText().toString());
-            intentCheckout.putExtra("batch_description", tvHarvestCropName.getText().toString() + " â€¢ Batch #AP-240 â€¢ 4.5 MT");
+            intentCheckout.putExtra("batch_description", tvHarvestCropName.getText().toString() + " • " + tvHarvestFarmerName.getText().toString());
             startActivity(intentCheckout);
         });
     }

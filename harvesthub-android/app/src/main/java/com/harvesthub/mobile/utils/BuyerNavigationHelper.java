@@ -28,10 +28,18 @@ public final class BuyerNavigationHelper {
     }
 
     public static void setupNotifications(Activity activity, View root) {
+        if (root == null) return;
+        SessionManager session = new SessionManager(activity);
+        TextView tvSubtitle = root.findViewById(R.id.tvBuyerNavSubtitle);
+        if (tvSubtitle != null) {
+            String name = (session.getUser() != null && session.getUser().getFullName() != null && !session.getUser().getFullName().isEmpty())
+                    ? session.getUser().getFullName() : "Perera Supermarket";
+            tvSubtitle.setText("Hi, " + name);
+        }
         View notifications = root.findViewById(R.id.btnBuyerNotifications);
         if (notifications != null) {
             notifications.setOnClickListener(v -> Toast.makeText(activity,
-                    "Buyer notifications will appear here.", Toast.LENGTH_SHORT).show());
+                    "Notifications active for " + (session.getUser() != null && session.getUser().getFullName() != null ? session.getUser().getFullName() : "Buyer"), Toast.LENGTH_SHORT).show());
         }
     }
 

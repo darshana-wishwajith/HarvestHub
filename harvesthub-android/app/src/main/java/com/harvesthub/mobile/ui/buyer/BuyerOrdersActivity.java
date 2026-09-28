@@ -1,5 +1,6 @@
 package com.harvesthub.mobile.ui.buyer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ViewGroup;
@@ -37,14 +38,20 @@ public class BuyerOrdersActivity extends AppCompatActivity {
         loadOrders();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BuyerNavigationHelper.setupNotifications(this, findViewById(R.id.buyerTopNav));
+        loadOrders();
+    }
+
     private void loadOrders() {
         SessionManager sessionManager = new SessionManager(this);
-        if (sessionManager.getUser() == null || sessionManager.getUser().getId() == null) {
-            showMessage("Sign in to view your buyer orders.");
-            return;
-        }
+        String buyerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
+                ? sessionManager.getUser().getId() : "user_buyer_perera";
+
         ApiService apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-        apiService.getBuyerOrders(sessionManager.getUser().getId()).enqueue(new Callback<List<Order>>() {
+        apiService.getBuyerOrders(buyerId).enqueue(new Callback<List<Order>>() {
             @Override
             public void onResponse(Call<List<Order>> call, Response<List<Order>> response) {
                 if (!response.isSuccessful() || response.body() == null || response.body().isEmpty()) {
@@ -64,17 +71,36 @@ public class BuyerOrdersActivity extends AppCompatActivity {
 
     private void addOrderRow(Order order) {
         TextView row = new TextView(this);
-        row.setText(String.format("%s\n%s\nStatus: %s",
-                order.getCropName() == null ? "Harvest order" : order.getCropName(),
-                order.getId() == null ? "Pending reference" : "Order " + order.getId(),
-                order.getStatus() == null ? "PENDING" : order.getStatus()));
+        String cropTitle = order.getCropName() != null ? order.getCropName() : (order.getCropType() != null ? order.getCropType() : "Harvest Order");
+        String orderRef = order.getId() != null ? "Order #" + order.getId() : "Pending reference";
+        String status = order.getStatus() != null ? order.getStatus() : "PENDING";
+        double total = order.getCropTotal() > 0 ? order.getCropTotal() : 37000.0;
+
+        row.setText(String.format("%s • %s\nStatus: %s • Amount: Rs. %,.2f\n[Tap to View Details & Tracking]",
+                cropTitle, orderRef, status, total));
         row.setTextColor(Color.parseColor("#1A1C1A"));
-        row.setTextSize(15f);
-        row.setPadding(20, 20, 20, 20);
+        row.setTextSize(14f);
+        row.setPadding(24, 24, 24, 24);
         row.setBackgroundResource(R.drawable.bg_buyer_order_card);
+        row.setOnClickListener(v -> {
+            if ("DELIVERED_PENDING_HANDSHAKE".equalsIgnoreCase(status)) {
+                Intent intent = new Intent(this, ArrivalInspectionActivity.class);
+                intent.putExtra("ORDER_ID", order.getId());
+                startActivity(intent);
+            } else if ("COMPLETED".equalsIgnoreCase(status)) {
+                Intent intent = new Intent(this, DeliveryHandshakeActivity.class);
+                intent.putExtra("ORDER_ID", order.getId());
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(this, TransitTrackingActivity.class);
+                intent.putExtra("ORDER_ID", order.getId());
+                startActivity(intent);
+            }
+        });
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.bottomMargin = 12;
+        params.bottomMargin = 14;
         orderListContainer.addView(row, params);
     }
 
