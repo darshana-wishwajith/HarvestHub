@@ -2,10 +2,10 @@ package com.harvesthub.desktop.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/** Mirrors GET /api/dashboard/activity row shape — same fields as the existing ActivityLog model. */
+/** Mirrors GET /api/dashboard/activity row shape. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityLogDto {
-    public Long id;
+    public String id;
     public String cropName;
     public String variety;
     public String farmerName;

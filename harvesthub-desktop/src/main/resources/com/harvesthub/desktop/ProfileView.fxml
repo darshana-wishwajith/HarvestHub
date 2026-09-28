@@ -82,14 +82,14 @@
                                        prefWidth="100" prefHeight="100"
                                        minWidth="100" minHeight="100"
                                        maxWidth="100" maxHeight="100">
-                                <Label text="AK" styleClass="avatar-initials,avatar-initials-lg"/>
+                                <Label fx:id="avatarInitialsLabel" text="LS" styleClass="avatar-initials,avatar-initials-lg"/>
                             </StackPane>
                             
                             <VBox spacing="4" alignment="CENTER">
-                                <Label text="Insp. Amila K." style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
-                                <Label text="Verification Lead" style="-fx-font-size: 14px; -fx-text-fill: #6B7280;"/>
+                                <Label fx:id="officerNameLabel" text="Lahiru Sahan" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                <Label fx:id="officerRoleLabel" text="Agricultural Officer" style="-fx-font-size: 14px; -fx-text-fill: #6B7280;"/>
                                 <HBox alignment="CENTER">
-                                    <Label text="#HH-0942" style="-fx-background-color: #ECFDF5; -fx-text-fill: #059669; -fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="officerCodeLabel" text="#HH-0942" style="-fx-background-color: #ECFDF5; -fx-text-fill: #059669; -fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                                 </HBox>
                             </VBox>
                             
@@ -98,15 +98,15 @@
                             <VBox spacing="12">
                                 <HBox spacing="12" alignment="CENTER_LEFT">
                                     <FontIcon iconLiteral="fas-map-marker-alt" iconSize="14" iconColor="#6B7280"/>
-                                    <Label text="Central Province, Sri Lanka" style="-fx-text-fill: #4B5563;"/>
+                                    <Label fx:id="officerRegionLabel" text="Central Province, Sri Lanka" style="-fx-text-fill: #4B5563;"/>
                                 </HBox>
                                 <HBox spacing="12" alignment="CENTER_LEFT">
                                     <FontIcon iconLiteral="fas-envelope" iconSize="14" iconColor="#6B7280"/>
-                                    <Label text="amila.k@harvesthub.lk" style="-fx-text-fill: #4B5563;"/>
+                                    <Label fx:id="officerEmailLabel" text="lahiru@harvesthub.lk" style="-fx-text-fill: #4B5563;"/>
                                 </HBox>
                                 <HBox spacing="12" alignment="CENTER_LEFT">
                                     <FontIcon iconLiteral="fas-phone-alt" iconSize="14" iconColor="#6B7280"/>
-                                    <Label text="+94 71 234 5678" style="-fx-text-fill: #4B5563;"/>
+                                    <Label fx:id="officerPhoneLabel" text="+94 71 234 5678" style="-fx-text-fill: #4B5563;"/>
                                 </HBox>
                             </VBox>
                             

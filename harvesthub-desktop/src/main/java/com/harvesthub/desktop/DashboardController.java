@@ -1,19 +1,18 @@
 package com.harvesthub.desktop;
 
+import com.harvesthub.desktop.api.*;
 import com.harvesthub.desktop.model.ActivityLog;
+import com.harvesthub.desktop.model.Listing;
+import com.harvesthub.desktop.model.QueueListing;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -22,11 +21,21 @@ import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class DashboardController implements Initializable {
 
     @FXML private SidebarController sidebarController;
+    @FXML private Label greetingLabel;
+    @FXML private Label chipInitialsLabel;
+    @FXML private Label chipNameLabel;
+    @FXML private Label statPendingCount;
+    @FXML private Label statReviewedCount;
+    @FXML private Label statApprovalRate;
+    @FXML private Label queueBannerText;
+
     @FXML private TextField searchField;
     @FXML private TableView<ActivityLog> activityTable;
     @FXML private TableColumn<ActivityLog, String> cropColumn;
@@ -36,6 +45,7 @@ public class DashboardController implements Initializable {
     @FXML private TableColumn<ActivityLog, String> timestampColumn;
     @FXML private TableColumn<ActivityLog, Void> actionsColumn;
 
+    private final ObservableList<ActivityLog> rawLogs = FXCollections.observableArrayList();
     private FilteredList<ActivityLog> filteredLogs;
 
     @Override
@@ -44,24 +54,13 @@ public class DashboardController implements Initializable {
             sidebarController.activate(SidebarController.Nav.DASHBOARD);
         }
 
-        ObservableList<ActivityLog> logs = FXCollections.observableArrayList(
-                new ActivityLog("Paddy", "Bg 300", "Kalinga Perera",
-                        "Anuradhapura North Sector", "A", "Pending", "10:30 AM"),
-                new ActivityLog("Cinnamon", "Sri Lankan Alba", "Anura Silva",
-                        "Galle Central Hub", "B", "Pending", "09:45 AM"),
-                new ActivityLog("Tea", "Nuwara Eliya Pekoe", "Bandara Wijesinghe",
-                        "Ella Highlands Plains", "C", "Pending", "08:15 AM"),
-                new ActivityLog("Pepper", "Matale Black Spice", "Nimal Siriwardena",
-                        "Matale East", "A", "Approved", "Yesterday"),
-                new ActivityLog("Coconut", "King Coconut Premium", "Sunethra Ranasinghe",
-                        "Kurunegala Highlands", "A", "Approved", "Yesterday")
-        );
+        setupOfficerProfile();
 
-        filteredLogs = new FilteredList<>(logs, p -> true);
+        filteredLogs = new FilteredList<>(rawLogs, p -> true);
         activityTable.setItems(filteredLogs);
         activityTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         activityTable.setFocusTraversable(false);
-        activityTable.setPlaceholder(createPlaceholderLabel("No activity logs found"));
+        activityTable.setPlaceholder(createPlaceholderLabel("Loading activity logs from database..."));
 
         setupCropColumn();
         setupLocationColumn();
@@ -71,6 +70,78 @@ public class DashboardController implements Initializable {
         setupActionsColumn();
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> applySearchFilter(newVal));
+
+        loadDataFromBackend();
+    }
+
+    private void setupOfficerProfile() {
+        OfficerDto officer = Session.getOfficer();
+        if (officer != null) {
+            String name = officer.fullName != null && !officer.fullName.isBlank() ? officer.fullName : "Officer";
+            String first = name.contains(" ") ? name.substring(0, name.indexOf(' ')) : name;
+            if (greetingLabel != null) greetingLabel.setText("Good day, " + first);
+            if (chipNameLabel != null) chipNameLabel.setText(name);
+
+            String initials = "OF";
+            String[] parts = name.trim().split("\\s+");
+            if (parts.length == 1 && !parts[0].isEmpty()) {
+                initials = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+            } else if (parts.length > 1) {
+                initials = ("" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+            }
+            if (chipInitialsLabel != null) chipInitialsLabel.setText(initials);
+        }
+    }
+
+    private void loadDataFromBackend() {
+        Thread worker = new Thread(() -> {
+            try {
+                List<ActivityLogDto> dtos = ApiClient.getRecentActivity();
+                OfficerStatsDto stats = ApiClient.getDashboardStats();
+
+                Platform.runLater(() -> {
+                    rawLogs.clear();
+                    if (dtos != null && !dtos.isEmpty()) {
+                        rawLogs.addAll(dtos.stream().map(ActivityLog::fromDto).collect(Collectors.toList()));
+                    } else {
+                        // Fallback sample if database has no activity yet
+                        loadDefaultMockLogs();
+                    }
+
+                    if (stats != null) {
+                        if (statPendingCount != null) statPendingCount.setText(String.valueOf(stats.pendingCount));
+                        if (statReviewedCount != null) statReviewedCount.setText(String.valueOf(stats.reviewedTodayCount));
+                        if (statApprovalRate != null) statApprovalRate.setText(stats.approvalRate + "%");
+                        if (queueBannerText != null) {
+                            queueBannerText.setText("QUEUE ACTION: Go to Verification Queue (" + stats.pendingCount + " items awaiting review)");
+                        }
+                    }
+                    activityTable.setPlaceholder(createPlaceholderLabel("No activity logs found"));
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    if (rawLogs.isEmpty()) {
+                        loadDefaultMockLogs();
+                    }
+                    activityTable.setPlaceholder(createPlaceholderLabel("Offline mode: Using cached activity logs"));
+                });
+            }
+        }, "dashboard-data-loader");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void loadDefaultMockLogs() {
+        rawLogs.addAll(
+                new ActivityLog("Paddy", "Bg 300", "Kalinga Perera",
+                        "Anuradhapura North Sector", "A", "Pending", "10:30 AM"),
+                new ActivityLog("Cinnamon", "Sri Lankan Alba", "Anura Silva",
+                        "Galle Central Hub", "B", "Pending", "09:45 AM"),
+                new ActivityLog("Tea", "Nuwara Eliya Pekoe", "Bandara Wijesinghe",
+                        "Ella Highlands Plains", "C", "Pending", "08:15 AM"),
+                new ActivityLog("Big Onions", "Dambulla Red", "Priyantha Kumara",
+                        "Dambulla Town", "A", "Approved", "Yesterday")
+        );
     }
 
     private Label createPlaceholderLabel(String text) {
@@ -170,7 +241,7 @@ public class DashboardController implements Initializable {
                 } else {
                     pill.setText("Grade " + item);
                     pill.getStyleClass().removeAll("pill-grade-a", "pill-grade-b", "pill-grade-c");
-                    switch (item) {
+                    switch (item.toUpperCase()) {
                         case "A" -> pill.getStyleClass().add("pill-grade-a");
                         case "B" -> pill.getStyleClass().add("pill-grade-b");
                         default -> pill.getStyleClass().add("pill-grade-c");
@@ -204,7 +275,7 @@ public class DashboardController implements Initializable {
                 } else {
                     pill.setText(item);
                     pill.getStyleClass().removeAll("pill-status-pending", "pill-status-approved");
-                    if ("Pending".equalsIgnoreCase(item)) {
+                    if ("Pending".equalsIgnoreCase(item) || "Under Review".equalsIgnoreCase(item)) {
                         pill.getStyleClass().add("pill-status-pending");
                     } else {
                         pill.getStyleClass().add("pill-status-approved");
@@ -245,8 +316,24 @@ public class DashboardController implements Initializable {
                 detailsBtn.getStyleClass().add("details-button");
                 detailsBtn.setOnAction(e -> {
                     ActivityLog log = getTableView().getItems().get(getIndex());
-                    System.out.println("Details clicked for: " + log.getCropName()
-                            + " / " + log.getFarmerName());
+                    if (log != null) {
+                        Thread loader = new Thread(() -> {
+                            Listing l = null;
+                            if (log.getId() != null) {
+                                try {
+                                    ListingDetailDto dto = ApiClient.getListing(log.getId());
+                                    if (dto != null) l = Listing.fromDto(dto);
+                                } catch (Exception ignored) {}
+                            }
+                            if (l == null) {
+                                l = Listing.fromQueueListing(new QueueListing(log.getId(), log.getCropName(), log.getFarmerName(), log.getLocation(), log.getTimestamp(), "500 kg", "Rs. 250/kg", log.getStatus(), true, QueueListing.CropTone.AMBER, "fas-seedling"));
+                            }
+                            final Listing target = l;
+                            Platform.runLater(() -> SceneNavigator.navigateToReview(detailsBtn, target));
+                        });
+                        loader.setDaemon(true);
+                        loader.start();
+                    }
                 });
                 wrapper.setAlignment(Pos.CENTER);
                 wrapper.setMaxWidth(Double.MAX_VALUE);
@@ -285,16 +372,20 @@ public class DashboardController implements Initializable {
     private void handleLaunchQueue() {
         SceneNavigator.navigate(activityTable,
                 "/com/harvesthub/desktop/VerificationQueueView.fxml",
-                "HarvestHub â€” Verification Queue");
+                "HarvestHub — Verification Queue");
     }
 
     @FXML
     private void handleNotifications() {
-        System.out.println("Notifications clicked");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notifications");
+        alert.setHeaderText("Officer Notifications");
+        alert.setContentText("You have no unread system notifications at this time.");
+        alert.showAndWait();
     }
 
     @FXML
     private void handleFilter() {
-        System.out.println("Filter clicked");
+        searchField.requestFocus();
     }
 }

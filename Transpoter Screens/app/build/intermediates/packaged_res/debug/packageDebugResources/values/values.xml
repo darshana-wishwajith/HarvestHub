@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="badge_grade_a">#16A34A</color>
+    <color name="badge_grade_b">#D97706</color>
+    <color name="badge_grade_c">#5B7290</color>
+    <color name="border_color">#E5E7EB</color>
+    <color name="brand_dark_green">#19422D</color>
+    <color name="brand_green_icon">#2D6A4F</color>
+    <color name="brand_light_green">#E8F5E9</color>
+    <color name="input_hint">#94A3B8</color>
+    <color name="input_stroke">#94A3B8</color>
+    <color name="offers_banner_bg">#EAF5EE</color>
+    <color name="offers_banner_text">#16A34A</color>
+    <color name="screen_bg">#FFFFFF</color>
+    <color name="search_bg">#F9FAFB</color>
+    <color name="status_active_bg">#2563EB</color>
+    <color name="status_closed_bg">#475569</color>
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="white">#FFFFFF</color>
+    <item name="btnNavMyDemands" type="id"/>
+    <item name="btnNavOffers" type="id"/>
+    <string name="additional_details_hint">Additional details (e.g., Need 200kg of tomatoes by Friday morning for wholesale)...</string>
+    <string name="app_name">Project Part 2</string>
+    <string name="chip_all">All</string>
+    <string name="chip_bulk">Bulk</string>
+    <string name="chip_grade_a">Grade A</string>
+    <string name="chip_grade_b">Grade B</string>
+    <string name="chip_grade_c">Grade C</string>
+    <string name="deadline_hint">Deadline / Needed By</string>
+    <string name="edit_ad">Edit Ad</string>
+    <string name="grade_a">Grade A</string>
+    <string name="grade_b">Grade B</string>
+    <string name="grade_c">Grade C</string>
+    <string name="minimum_quality_grade">Minimum Quality Grade</string>
+    <string name="my_demand_requests_subtitle">Manage your active listings and review incoming farmer offers.</string>
+    <string name="my_demand_requests_title">My Demand Requests</string>
+    <string name="offered_price_label">OFFERED PRICE</string>
+    <string name="offers_received_format">%d Supply Offers Received</string>
+    <string name="post_demand_subtitle">Broadcast your exact crop requirements to verified farmers.</string>
+    <string name="post_demand_title">Post Demand Request</string>
+    <string name="publish_to_global_feed">Publish to Global Feed</string>
+    <string name="purchase_request">Purchase Request →</string>
+    <string name="republish_request">Republish Request</string>
+    <string name="required_quantity_hint">Required Quantity (KG)</string>
+    <string name="responding_to_ad">Responding to your ad: Need 200kg of Tomatoes</string>
+    <string name="search_hint">Search crops, locations...</string>
+    <string name="supply_offers_subtitle">Review proposals from verified farmers.</string>
+    <string name="supply_offers_title">Supply Offers</string>
+    <string name="tab_active_ads">Active Ads (2)</string>
+    <string name="tab_closed">Closed</string>
+    <string name="target_crop_hint">Target Crop (e.g., Big Onions)</string>
+    <string name="target_price_hint">Target Price per KG (Optional)</string>
+    <string name="unit_price_label">UNIT PRICE</string>
+    <string name="verified_harvests">Verified Harvests</string>
+    <string name="view_and_chat">View &amp; Chat</string>
+    <string name="view_offers">View Offers</string>
+    <style name="Theme.ProjectPart2" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_dark_green</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

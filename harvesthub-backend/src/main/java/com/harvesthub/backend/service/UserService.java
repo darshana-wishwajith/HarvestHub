@@ -36,10 +36,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findByEmailOrMobile(String emailOrMobile) {
-        return userRepository.findByEmail(emailOrMobile)
-                .or(() -> userRepository.findByMobileNumber(emailOrMobile));
+    public Optional<User> findByEmailOrMobile(String identifier) {
+        if (identifier == null || identifier.isBlank()) return Optional.empty();
+        String trimmed = identifier.trim();
+        Optional<User> user = userRepository.findByEmail(trimmed)
+                .or(() -> userRepository.findByMobileNumber(trimmed))
+                .or(() -> userRepository.findById(trimmed))
+                .or(() -> userRepository.findByNic(trimmed));
+        if (user.isPresent()) return user;
+
+        return userRepository.findAll().stream()
+                .filter(u -> (u.getEmail() != null && u.getEmail().split("@")[0].equalsIgnoreCase(trimmed))
+                        || (u.getFullName() != null && u.getFullName().toLowerCase().startsWith(trimmed.toLowerCase()))
+                        || (u.getId() != null && u.getId().toLowerCase().contains(trimmed.toLowerCase())))
+                .findFirst();
     }
+
 
     public void createPasswordResetTokenForUser(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);

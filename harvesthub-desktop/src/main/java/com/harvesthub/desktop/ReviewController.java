@@ -227,10 +227,12 @@ public class ReviewController implements Initializable {
 
     @FXML
     private void handleConfirmApproval() {
-        showDecisionAlert("Approval Confirmed",
+        String notes = approveNotesArea != null ? approveNotesArea.getText() : "";
+        com.harvesthub.desktop.api.ReviewDecisionRequestDto request =
+                new com.harvesthub.desktop.api.ReviewDecisionRequestDto("APPROVE", selectedGrade, notes);
+        submitDecisionAndExit("Approval Confirmed",
                 "Listing approved with Grade " + selectedGrade + " for "
-                        + listing.getFarmerName() + "'s " + listing.getCropName() + ".");
-        handleBackToQueue();
+                        + listing.getFarmerName() + "'s " + listing.getCropName() + ".", request);
     }
 
     @FXML
@@ -240,9 +242,11 @@ public class ReviewController implements Initializable {
             expandSection(DecisionSection.RETAKE);
             return;
         }
-        showDecisionAlert("Retake Requested",
-                "Media retake instructions sent to " + listing.getFarmerName() + ".");
-        handleBackToQueue();
+        String notes = retakeNotesArea.getText();
+        com.harvesthub.desktop.api.ReviewDecisionRequestDto request =
+                new com.harvesthub.desktop.api.ReviewDecisionRequestDto("RETAKE", null, notes);
+        submitDecisionAndExit("Retake Requested",
+                "Media retake instructions sent to " + listing.getFarmerName() + ".", request);
     }
 
     @FXML
@@ -252,9 +256,29 @@ public class ReviewController implements Initializable {
             expandSection(DecisionSection.REJECT);
             return;
         }
-        showDecisionAlert("Listing Rejected",
-                listing.getCropName() + " listing from " + listing.getFarmerName() + " has been rejected.");
-        handleBackToQueue();
+        String notes = rejectNotesArea.getText();
+        com.harvesthub.desktop.api.ReviewDecisionRequestDto request =
+                new com.harvesthub.desktop.api.ReviewDecisionRequestDto("REJECT", null, notes);
+        submitDecisionAndExit("Listing Rejected",
+                listing.getCropName() + " listing from " + listing.getFarmerName() + " has been rejected.", request);
+    }
+
+    private void submitDecisionAndExit(String title, String message, com.harvesthub.desktop.api.ReviewDecisionRequestDto request) {
+        Thread worker = new Thread(() -> {
+            try {
+                if (listing.getId() != null) {
+                    com.harvesthub.desktop.api.ApiClient.submitReview(listing.getId(), request);
+                }
+            } catch (Exception e) {
+                System.err.println("Review submission to backend error: " + e.getMessage());
+            }
+            javafx.application.Platform.runLater(() -> {
+                showDecisionAlert(title, message);
+                handleBackToQueue();
+            });
+        });
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void showDecisionAlert(String title, String message) {

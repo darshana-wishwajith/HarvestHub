@@ -32,7 +32,7 @@
                 <!-- Header: greeting + actions -->
                 <HBox alignment="CENTER_LEFT" spacing="16">
                     <VBox spacing="4" HBox.hgrow="ALWAYS">
-                        <Label text="Good morning, Lahiru" styleClass="page-heading"/>
+                        <Label fx:id="greetingLabel" text="Good morning, Officer" styleClass="page-heading"/>
                         <Label text="Here's your verification overview for today."
                                styleClass="page-subtitle"/>
                     </VBox>
@@ -64,9 +64,9 @@
                                        prefWidth="34" prefHeight="34"
                                        minWidth="34" minHeight="34"
                                        maxWidth="34" maxHeight="34">
-                                <Label text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
+                                <Label fx:id="chipInitialsLabel" text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
                             </StackPane>
-                            <Label text="Lahiru Sahan" styleClass="profile-chip-name"/>
+                            <Label fx:id="chipNameLabel" text="Lahiru Sahan" styleClass="profile-chip-name"/>
                         </HBox>
                     </HBox>
                 </HBox>
@@ -89,7 +89,7 @@
                             <Region HBox.hgrow="ALWAYS"/>
                             <Label text="Needs Attention" styleClass="stat-badge,stat-badge-amber"/>
                         </HBox>
-                        <Label text="3" styleClass="stat-number"/>
+                        <Label fx:id="statPendingCount" text="3" styleClass="stat-number"/>
                         <Label text="Pending Verifications" styleClass="stat-label"/>
                     </VBox>
 
@@ -109,7 +109,7 @@
                             <Region HBox.hgrow="ALWAYS"/>
                             <Label text="+15% Today" styleClass="stat-badge,stat-badge-green"/>
                         </HBox>
-                        <Label text="2" styleClass="stat-number"/>
+                        <Label fx:id="statReviewedCount" text="2" styleClass="stat-number"/>
                         <Label text="Reviewed Today" styleClass="stat-label"/>
                     </VBox>
 
@@ -129,7 +129,7 @@
                             <Region HBox.hgrow="ALWAYS"/>
                             <Label text="Last 30 Days" styleClass="stat-link"/>
                         </HBox>
-                        <Label text="94%" styleClass="stat-number"/>
+                        <Label fx:id="statApprovalRate" text="94%" styleClass="stat-number"/>
                         <Label text="Officer Approval Rate" styleClass="stat-label"/>
                     </VBox>
                 </HBox>
@@ -144,7 +144,7 @@
                             prefWidth="8" prefHeight="8"
                             minWidth="8" minHeight="8"
                             maxWidth="8" maxHeight="8"/>
-                    <Label text="QUEUE ACTION: Go to Verification Queue (3 items awaiting review)"
+                    <Label fx:id="queueBannerText" text="QUEUE ACTION: Go to Verification Queue (3 items awaiting review)"
                            styleClass="banner-text" HBox.hgrow="ALWAYS" wrapText="true"/>
                     <Button onAction="#handleLaunchQueue" styleClass="banner-launch-button"
                             mnemonicParsing="false" contentDisplay="RIGHT" graphicTextGap="8">

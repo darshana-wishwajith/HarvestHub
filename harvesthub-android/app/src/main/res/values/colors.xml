@@ -38,6 +38,19 @@
     <color name="escrow_card_footer_bg">#1B4332</color>
     <color name="tip_bg">#E8F5E9</color>
     <color name="pending_amber">#FFA000</color>
+    <color name="badge_grade_a">#2E7D32</color>
+    <color name="badge_grade_b">#558B2F</color>
+    <color name="badge_grade_c">#EF6C00</color>
+    <color name="status_active_bg">#E8F5E9</color>
+    <color name="status_closed_bg">#F5F5F5</color>
+    <color name="brand_dark_green">#1B4332</color>
+    <color name="brand_light_green">#E8F5E9</color>
+    <color name="border_color">#E0E0E0</color>
+    <color name="offers_banner_bg">#E8F5E9</color>
+    <color name="search_bg">#F5F7F5</color>
+    <color name="brand_green_icon">#1B4332</color>
+    <color name="screen_bg">#F8F9FA</color>
+    <color name="input_hint">#757575</color>
 
     <color name="bg_cream">#FDF8F3</color>
     <color name="primary_green">#1B4332</color>

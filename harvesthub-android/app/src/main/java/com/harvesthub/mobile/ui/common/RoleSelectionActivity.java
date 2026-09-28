@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.card.MaterialCardView;
 import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.ui.buyer.BuyerDashboardActivity;
 import com.harvesthub.mobile.ui.buyer.BuyerLoginActivity;
 import com.harvesthub.mobile.ui.farmer.FarmerLoginActivity;
 import com.harvesthub.mobile.ui.transporter.TransporterLoginActivity;
@@ -70,6 +71,13 @@ public class RoleSelectionActivity extends AppCompatActivity {
     }
 
     private void navigateToBuyerLogin() {
+        if (sessionManager.isLoggedIn() && "BUYER".equals(sessionManager.getUserRole())) {
+            Intent intent = new Intent(this, BuyerDashboardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
         Intent intent = new Intent(this, BuyerLoginActivity.class);
         startActivity(intent);
     }

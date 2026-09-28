@@ -1,5 +1,7 @@
 package com.harvesthub.desktop.model;
 
+import com.harvesthub.desktop.api.QueueListingDto;
+
 /**
  * Row model for a listing awaiting review on the Verification Queue screen.
  */
@@ -9,6 +11,7 @@ public class QueueListing {
         AMBER, BROWN, TEAL, PURPLE
     }
 
+    private final String id;
     private final String cropName;
     private final String farmerName;
     private final String location;
@@ -20,10 +23,11 @@ public class QueueListing {
     private final CropTone tone;
     private final String iconLiteral;
 
-    public QueueListing(String cropName, String farmerName, String location,
+    public QueueListing(String id, String cropName, String farmerName, String location,
                         String submittedAgo, String quantity, String pricePerKg,
                         String statusLabel, boolean claimable,
                         CropTone tone, String iconLiteral) {
+        this.id = id;
         this.cropName = cropName;
         this.farmerName = farmerName;
         this.location = location;
@@ -34,6 +38,37 @@ public class QueueListing {
         this.claimable = claimable;
         this.tone = tone;
         this.iconLiteral = iconLiteral;
+    }
+
+    public QueueListing(String cropName, String farmerName, String location,
+                        String submittedAgo, String quantity, String pricePerKg,
+                        String statusLabel, boolean claimable,
+                        CropTone tone, String iconLiteral) {
+        this("LIST-" + Math.abs(farmerName.hashCode() % 9000 + 1000), cropName, farmerName, location, submittedAgo, quantity, pricePerKg, statusLabel, claimable, tone, iconLiteral);
+    }
+
+    public static QueueListing fromDto(QueueListingDto dto) {
+        CropTone tone = CropTone.AMBER;
+        try {
+            if (dto.tone != null) tone = CropTone.valueOf(dto.tone.toUpperCase());
+        } catch (Exception ignored) {}
+        return new QueueListing(
+                dto.id,
+                dto.cropName,
+                dto.farmerName,
+                dto.location,
+                dto.submittedAgo != null ? dto.submittedAgo : "Recently",
+                dto.quantity,
+                dto.pricePerKg,
+                dto.statusLabel != null ? dto.statusLabel : "Pending",
+                dto.claimable,
+                tone,
+                dto.iconLiteral != null ? dto.iconLiteral : "fas-seedling"
+        );
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getCropName() {

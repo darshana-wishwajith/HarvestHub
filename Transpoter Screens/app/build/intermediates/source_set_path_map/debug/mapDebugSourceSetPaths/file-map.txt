@@ -1,0 +1,62 @@
+com.example.project_part_2.app-ui-release-0 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\023de28d207123f2b68bfe4b71512ff7\transformed\ui-release\res
+com.example.project_part_2.app-emoji2-views-helper-1.3.0-1 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\037b40b600041eba5ad16314158547ae\transformed\emoji2-views-helper-1.3.0\res
+com.example.project_part_2.app-appcompat-resources-1.6.1-2 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\0f7bf340b8216997fe850e353a1805ae\transformed\appcompat-resources-1.6.1\res
+com.example.project_part_2.app-material3-release-3 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\11d04ebd62c62b3485c96d4f5c345a45\transformed\material3-release\res
+com.example.project_part_2.app-emoji2-1.3.0-4 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\1588555683f7a18470b8ea740156cdf9\transformed\emoji2-1.3.0\res
+com.example.project_part_2.app-lifecycle-viewmodel-savedstate-2.7.0-5 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\1a7fa03155bd3b5662a64a96644fc7e5\transformed\lifecycle-viewmodel-savedstate-2.7.0\res
+com.example.project_part_2.app-ui-tooling-data-release-6 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\227502ab8af1c445553c812bb68d7717\transformed\ui-tooling-data-release\res
+com.example.project_part_2.app-lifecycle-livedata-core-ktx-2.7.0-7 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\365f2514f269353589e0cc71d9731703\transformed\lifecycle-livedata-core-ktx-2.7.0\res
+com.example.project_part_2.app-core-runtime-2.2.0-8 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\440d526163f3f019954ccf71a3b18988\transformed\core-runtime-2.2.0\res
+com.example.project_part_2.app-profileinstaller-1.3.0-9 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\477d0a53f612535935b322068f71b984\transformed\profileinstaller-1.3.0\res
+com.example.project_part_2.app-startup-runtime-1.1.1-10 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\482a43c8e3387d3eb3d4981f27d43c22\transformed\startup-runtime-1.1.1\res
+com.example.project_part_2.app-savedstate-ktx-1.2.1-11 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\5679bd2907a7e889dbb29ef8f88a1dd1\transformed\savedstate-ktx-1.2.1\res
+com.example.project_part_2.app-lifecycle-runtime-2.7.0-12 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\5a510a1a323656a60be6e52470df0bc7\transformed\lifecycle-runtime-2.7.0\res
+com.example.project_part_2.app-ui-geometry-release-13 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\5a6d703347aae293abf7869d8e7fbee4\transformed\ui-geometry-release\res
+com.example.project_part_2.app-ui-tooling-release-14 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\5ae2a585a09c579bed39e73670b2b714\transformed\ui-tooling-release\res
+com.example.project_part_2.app-ui-tooling-preview-release-15 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\6093ee95d52d5efc26c75a64ee94edb7\transformed\ui-tooling-preview-release\res
+com.example.project_part_2.app-constraintlayout-2.1.4-16 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\68c1e5c5944e5fc7501d9f33994ce8fb\transformed\constraintlayout-2.1.4\res
+com.example.project_part_2.app-ui-unit-release-17 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\6f651c14d93c1c85d3acceb37619673c\transformed\ui-unit-release\res
+com.example.project_part_2.app-foundation-release-18 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\746c523418614f357d5fa1530310d86c\transformed\foundation-release\res
+com.example.project_part_2.app-lifecycle-runtime-ktx-2.7.0-19 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\76a5d94efa890ded9cf42609cf6ffcf8\transformed\lifecycle-runtime-ktx-2.7.0\res
+com.example.project_part_2.app-cardview-1.0.0-20 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\776e3f6a5e29b0b342d0272d32c6cec2\transformed\cardview-1.0.0\res
+com.example.project_part_2.app-runtime-release-21 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\78ebbcfeb5a489454e2e15c03d7442bd\transformed\runtime-release\res
+com.example.project_part_2.app-foundation-layout-release-22 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\7916562bdd74bbb89148af74f9bbac55\transformed\foundation-layout-release\res
+com.example.project_part_2.app-lifecycle-process-2.7.0-23 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\7b68eb7b7c93d5ee6d67b7c006800059\transformed\lifecycle-process-2.7.0\res
+com.example.project_part_2.app-drawerlayout-1.1.1-24 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\7f4453a87a1f87dd51de57922b1fdac8\transformed\drawerlayout-1.1.1\res
+com.example.project_part_2.app-annotation-experimental-1.4.0-25 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\7fe1d83a51452df43488b177c6118176\transformed\annotation-experimental-1.4.0\res
+com.example.project_part_2.app-material-1.11.0-26 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\857a28b150982637d60aa76e3cc9c29f\transformed\material-1.11.0\res
+com.example.project_part_2.app-lifecycle-livedata-2.7.0-27 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\89197098db5b4d013592764e51525b78\transformed\lifecycle-livedata-2.7.0\res
+com.example.project_part_2.app-activity-ktx-1.8.2-28 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\8a773662f1bc6e9d4eb6e3b7cd9330a9\transformed\activity-ktx-1.8.2\res
+com.example.project_part_2.app-material-release-29 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\8bcb6b8cacac0f20aee0566228bb74b2\transformed\material-release\res
+com.example.project_part_2.app-animation-core-release-30 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\8f4c41977fa63e433aa170e49d264194\transformed\animation-core-release\res
+com.example.project_part_2.app-customview-poolingcontainer-1.0.0-31 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\a1c75f60ae57e741c74596480a8fe419\transformed\customview-poolingcontainer-1.0.0\res
+com.example.project_part_2.app-material-ripple-release-32 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\a2253a88ec443975886dba9a58370639\transformed\material-ripple-release\res
+com.example.project_part_2.app-core-ktx-1.12.0-33 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\a304e7ff48b8f6941c9db40e94b6d261\transformed\core-ktx-1.12.0\res
+com.example.project_part_2.app-coordinatorlayout-1.1.0-34 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\a97a8701359b6696454b298d1c12c9f4\transformed\coordinatorlayout-1.1.0\res
+com.example.project_part_2.app-lifecycle-livedata-core-2.7.0-35 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\aaf2289405131bd861d3bb0643a69436\transformed\lifecycle-livedata-core-2.7.0\res
+com.example.project_part_2.app-ui-text-release-36 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\ad416b9ac165438db756e09e4a28d1ce\transformed\ui-text-release\res
+com.example.project_part_2.app-savedstate-1.2.1-37 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\b020ef1252c811a8eff820e94a8899eb\transformed\savedstate-1.2.1\res
+com.example.project_part_2.app-transition-1.2.0-38 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\b2073b68699e9e8b4730232332d6510e\transformed\transition-1.2.0\res
+com.example.project_part_2.app-activity-compose-1.8.2-39 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\b8615aec66dd86f4b9ffd47c5ef5fa5f\transformed\activity-compose-1.8.2\res
+com.example.project_part_2.app-ui-graphics-release-40 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\b9c2d9b39d48319cf6d3c3208e717bfd\transformed\ui-graphics-release\res
+com.example.project_part_2.app-fragment-1.3.6-41 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\bd1bd03032738c4338e169cece9bd9b7\transformed\fragment-1.3.6\res
+com.example.project_part_2.app-appcompat-1.6.1-42 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\c7a8a2ea18845cfdb9430a8078509cdd\transformed\appcompat-1.6.1\res
+com.example.project_part_2.app-ui-test-manifest-1.6.2-43 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\d35c88ca6bc83ac9dc7e8d3a9ad5bafc\transformed\ui-test-manifest-1.6.2\res
+com.example.project_part_2.app-viewpager2-1.0.0-44 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\d5b45853579433c673cf2678de807965\transformed\viewpager2-1.0.0\res
+com.example.project_part_2.app-material-icons-extended-release-45 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\d8d453c7814b0d4af7f2aa0a9de381fd\transformed\material-icons-extended-release\res
+com.example.project_part_2.app-lifecycle-viewmodel-2.7.0-46 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\ddf041b17f7ff19305b293421a6f0e54\transformed\lifecycle-viewmodel-2.7.0\res
+com.example.project_part_2.app-recyclerview-1.1.0-47 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\dea65404fc8547d59097f19482c70deb\transformed\recyclerview-1.1.0\res
+com.example.project_part_2.app-activity-1.8.2-48 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\e22cd9f678b87936eb277dd23be519e7\transformed\activity-1.8.2\res
+com.example.project_part_2.app-animation-release-49 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\e457eda936058a324c80a70fb272b608\transformed\animation-release\res
+com.example.project_part_2.app-ui-util-release-50 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\e9bda3103e8741272aad35270312e378\transformed\ui-util-release\res
+com.example.project_part_2.app-core-1.12.0-51 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\ea9604ea5311d50b100c0c277d03adc6\transformed\core-1.12.0\res
+com.example.project_part_2.app-runtime-saveable-release-52 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\ed55f3bc831400aa06e3d8595314d3ab\transformed\runtime-saveable-release\res
+com.example.project_part_2.app-material-icons-core-release-53 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\f87911aec0ad117067345312941844b1\transformed\material-icons-core-release\res
+com.example.project_part_2.app-lifecycle-viewmodel-ktx-2.7.0-54 C:\Users\Ravidu\.gradle\caches\8.14.5\transforms\f9d037f66efeb4f71f9e8181d5da0b2f\transformed\lifecycle-viewmodel-ktx-2.7.0\res
+com.example.project_part_2.app-resValues-55 G:\2 year 2 semester\project_part_2\app\build\generated\res\resValues\debug
+com.example.project_part_2.app-updated_navigation_xml-56 G:\2 year 2 semester\project_part_2\app\build\generated\updated_navigation_xml\debug
+com.example.project_part_2.app-packageDebugResources-57 G:\2 year 2 semester\project_part_2\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.project_part_2.app-packageDebugResources-58 G:\2 year 2 semester\project_part_2\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.project_part_2.app-debug-59 G:\2 year 2 semester\project_part_2\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.project_part_2.app-debug-60 G:\2 year 2 semester\project_part_2\app\src\debug\res
+com.example.project_part_2.app-main-61 G:\2 year 2 semester\project_part_2\app\src\main\res

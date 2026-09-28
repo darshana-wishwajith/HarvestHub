@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Project Part 2</string>
+    <string name="verified_harvests">Verified Harvests</string>
+    <string name="search_hint">Search crops, locations...</string>
+    <string name="chip_all">All</string>
+    <string name="chip_grade_a">Grade A</string>
+    <string name="chip_grade_b">Grade B</string>
+    <string name="chip_grade_c">Grade C</string>
+    <string name="chip_bulk">Bulk</string>
+    <string name="unit_price_label">UNIT PRICE</string>
+    <string name="purchase_request">Purchase Request →</string>
+    <string name="post_demand_title">Post Demand Request</string>
+    <string name="post_demand_subtitle">Broadcast your exact crop requirements to verified farmers.</string>
+    <string name="target_crop_hint">Target Crop (e.g., Big Onions)</string>
+    <string name="required_quantity_hint">Required Quantity (KG)</string>
+    <string name="deadline_hint">Deadline / Needed By</string>
+    <string name="minimum_quality_grade">Minimum Quality Grade</string>
+    <string name="grade_a">Grade A</string>
+    <string name="grade_b">Grade B</string>
+    <string name="grade_c">Grade C</string>
+    <string name="target_price_hint">Target Price per KG (Optional)</string>
+    <string name="additional_details_hint">Additional details (e.g., Need 200kg of tomatoes by Friday morning for wholesale)...</string>
+    <string name="publish_to_global_feed">Publish to Global Feed</string>
+    <string name="my_demand_requests_title">My Demand Requests</string>
+    <string name="my_demand_requests_subtitle">Manage your active listings and review incoming farmer offers.</string>
+    <string name="tab_active_ads">Active Ads (2)</string>
+    <string name="tab_closed">Closed</string>
+    <string name="view_offers">View Offers</string>
+    <string name="edit_ad">Edit Ad</string>
+    <string name="republish_request">Republish Request</string>
+    <string name="offers_received_format">%d Supply Offers Received</string>
+    <!-- Page 3.1: Supply Offers -->
+    <string name="supply_offers_title">Supply Offers</string>
+    <string name="supply_offers_subtitle">Review proposals from verified farmers.</string>
+    <string name="responding_to_ad">Responding to your ad: Need 200kg of Tomatoes</string>
+    <string name="offered_price_label">OFFERED PRICE</string>
+    <string name="view_and_chat">View &amp; Chat</string>
+</resources>

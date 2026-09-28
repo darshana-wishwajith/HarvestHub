@@ -121,8 +121,31 @@ public class ListingRow extends HBox {
         if (!listing.isClaimable()) {
             button.getStyleClass().add("claim-review-button-disabled");
         } else {
-            button.setOnAction(e -> SceneNavigator.navigateToReview(
-                    button, Listing.fromQueueListing(listing)));
+            button.setOnAction(e -> {
+                button.setDisable(true);
+                button.setText("Loading...");
+                Thread worker = new Thread(() -> {
+                    Listing target = null;
+                    if (listing.getId() != null) {
+                        try {
+                            com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.claimListing(listing.getId());
+                            if (dto != null) target = Listing.fromDto(dto);
+                        } catch (Exception ignored) {
+                            try {
+                                com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.getListing(listing.getId());
+                                if (dto != null) target = Listing.fromDto(dto);
+                            } catch (Exception ignored2) {}
+                        }
+                    }
+                    if (target == null) {
+                        target = Listing.fromQueueListing(listing);
+                    }
+                    final Listing finalTarget = target;
+                    javafx.application.Platform.runLater(() -> SceneNavigator.navigateToReview(button, finalTarget));
+                });
+                worker.setDaemon(true);
+                worker.start();
+            });
         }
         return button;
     }

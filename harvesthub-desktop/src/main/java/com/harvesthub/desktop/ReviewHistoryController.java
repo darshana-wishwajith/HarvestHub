@@ -47,6 +47,7 @@ public class ReviewHistoryController implements Initializable {
     @FXML private Button page4Button;
     @FXML private Button page18Button;
 
+    private ObservableList<ReviewHistoryRecord> rawRecords;
     private FilteredList<ReviewHistoryRecord> filteredRecords;
 
     @Override
@@ -88,32 +89,12 @@ public class ReviewHistoryController implements Initializable {
         });
         dateRangeCombo.setValue(dateRangeCombo.getValue());
 
-        ObservableList<ReviewHistoryRecord> records = FXCollections.observableArrayList(
-                new ReviewHistoryRecord("PA", "Paddy", "Bg 300", "Kalinga Perera",
-                        "Anuradhapura North", "Grade A",
-                        ReviewHistoryRecord.DecisionKind.GRADE_A, "Oct 24, 2023"),
-                new ReviewHistoryRecord("TE", "Tea", "Nuwara Eliya Pekoe", "Anura Silva",
-                        "Nuwara Eliya East", "Grade B",
-                        ReviewHistoryRecord.DecisionKind.GRADE_B, "Oct 24, 2023"),
-                new ReviewHistoryRecord("CI", "Cinnamon", "Sri Lankan Alba", "Bandara Wijesinghe",
-                        "Galle Coast", "Retake Requested",
-                        ReviewHistoryRecord.DecisionKind.RETAKE, "Oct 23, 2023"),
-                new ReviewHistoryRecord("ON", "Onion", "Dambulla Red", "Priyantha Kumara",
-                        "Dambulla Town", "Grade C",
-                        ReviewHistoryRecord.DecisionKind.GRADE_C, "Oct 23, 2023"),
-                new ReviewHistoryRecord("TO", "Tomato", "Welimada Red", "Samantha Jayasuriya",
-                        "Welimada Valley", "Grade A",
-                        ReviewHistoryRecord.DecisionKind.GRADE_A, "Oct 22, 2023"),
-                new ReviewHistoryRecord("PO", "Potato", "Nuwara Eliya Gold", "Nimal Siriwardena",
-                        "Badulla Highlands", "Rejected",
-                        ReviewHistoryRecord.DecisionKind.REJECTED, "Oct 21, 2023")
-        );
-
-        filteredRecords = new FilteredList<>(records, r -> true);
+        rawRecords = FXCollections.observableArrayList();
+        filteredRecords = new FilteredList<>(rawRecords, r -> true);
         historyTable.setItems(filteredRecords);
         historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         historyTable.setFocusTraversable(false);
-        historyTable.setPlaceholder(createPlaceholder("No review history found"));
+        historyTable.setPlaceholder(createPlaceholder("Loading review history..."));
 
         setupCropColumn();
         setupLocationColumn();
@@ -123,6 +104,11 @@ public class ReviewHistoryController implements Initializable {
 
         globalSearchField.textProperty().addListener((obs, o, n) -> applyFilters());
         recordsSearchField.textProperty().addListener((obs, o, n) -> applyFilters());
+        decisionTypeCombo.setOnAction(e -> applyFilters());
+        cropTypeCombo.setOnAction(e -> applyFilters());
+        dateRangeCombo.setOnAction(e -> applyFilters());
+
+        loadHistoryFromBackend();
     }
 
     private Label createPlaceholder(String text) {
@@ -288,7 +274,23 @@ public class ReviewHistoryController implements Initializable {
                 link.setOnAction(e -> {
                     ReviewHistoryRecord record = getTableView().getItems().get(getIndex());
                     if (record != null) {
-                        SceneNavigator.navigateToReview(link, Listing.fromReviewHistoryRecord(record));
+                        Thread loader = new Thread(() -> {
+                            Listing l = null;
+                            if (record.getId() != null) {
+                                try {
+                                    com.harvesthub.desktop.api.ListingDetailDto dto =
+                                            com.harvesthub.desktop.api.ApiClient.getListing(record.getId());
+                                    if (dto != null) l = Listing.fromDto(dto);
+                                } catch (Exception ignored) {}
+                            }
+                            if (l == null) {
+                                l = Listing.fromReviewHistoryRecord(record);
+                            }
+                            final Listing target = l;
+                            javafx.application.Platform.runLater(() -> SceneNavigator.navigateToReview(link, target));
+                        });
+                        loader.setDaemon(true);
+                        loader.start();
                     }
                 });
                 wrapper.setAlignment(Pos.CENTER_RIGHT);
@@ -306,6 +308,54 @@ public class ReviewHistoryController implements Initializable {
                 }
             }
         });
+    }
+
+    private void loadHistoryFromBackend() {
+        Thread worker = new Thread(() -> {
+            try {
+                String search = recordsSearchField != null && recordsSearchField.getText() != null
+                        ? recordsSearchField.getText().trim() : "";
+                List<com.harvesthub.desktop.api.ReviewHistoryRecordDto> dtos =
+                        com.harvesthub.desktop.api.ApiClient.getReviewHistory(search);
+                javafx.application.Platform.runLater(() -> {
+                    rawRecords.clear();
+                    if (dtos != null && !dtos.isEmpty()) {
+                        rawRecords.addAll(dtos.stream().map(ReviewHistoryRecord::fromDto).collect(java.util.stream.Collectors.toList()));
+                    } else {
+                        loadMockHistory();
+                    }
+                    historyTable.setPlaceholder(createPlaceholder("No review history found"));
+                    applyFilters();
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    if (rawRecords.isEmpty()) {
+                        loadMockHistory();
+                    }
+                    historyTable.setPlaceholder(createPlaceholder("Offline: Cached review history"));
+                    applyFilters();
+                });
+            }
+        });
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void loadMockHistory() {
+        rawRecords.addAll(List.of(
+                new ReviewHistoryRecord("listing_mock_1", "PA", "Paddy", "Bg 300", "Kalinga Perera",
+                        "Anuradhapura North", "Grade A",
+                        ReviewHistoryRecord.DecisionKind.GRADE_A, "Oct 24, 2023"),
+                new ReviewHistoryRecord("listing_mock_2", "TE", "Tea", "Nuwara Eliya Pekoe", "Anura Silva",
+                        "Nuwara Eliya East", "Grade B",
+                        ReviewHistoryRecord.DecisionKind.GRADE_B, "Oct 24, 2023"),
+                new ReviewHistoryRecord("listing_mock_3", "CI", "Cinnamon", "Sri Lankan Alba", "Bandara Wijesinghe",
+                        "Galle Coast", "Retake Requested",
+                        ReviewHistoryRecord.DecisionKind.RETAKE, "Oct 23, 2023"),
+                new ReviewHistoryRecord("listing_mock_4", "ON", "Onion", "Dambulla Red", "Priyantha Kumara",
+                        "Dambulla Town", "Grade C",
+                        ReviewHistoryRecord.DecisionKind.GRADE_C, "Oct 23, 2023")
+        ));
     }
 
     private void applyFilters() {

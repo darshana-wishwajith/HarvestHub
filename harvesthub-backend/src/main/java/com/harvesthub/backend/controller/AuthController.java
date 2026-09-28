@@ -76,10 +76,27 @@ public class AuthController {
             User user = userOptional.get();
             final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             final String jwt = jwtUtil.generateToken(userDetails);
-            LoginResponse loginResponse = new LoginResponse(jwt, new UserDto(user.getId(), user.getEmail(), user.getRole()));
+
+            String region = user.getFarmLocation() != null ? user.getFarmLocation().getAddress() : "Central Province, Sri Lanka";
+            String username = user.getEmail() != null ? user.getEmail().split("@")[0] : user.getFullName();
+            String code = "#HH-" + (user.getNic() != null && user.getNic().length() >= 4 ? user.getNic().substring(user.getNic().length() - 4) : "0942");
+
+            OfficerDto officerDto = OfficerDto.builder()
+                    .id(user.getId())
+                    .username(username)
+                    .fullName(user.getFullName())
+                    .officerIdCode(code)
+                    .region(region)
+                    .email(user.getEmail())
+                    .phone(user.getMobileNumber() != null ? user.getMobileNumber() : user.getPhoneNumber())
+                    .role(user.getRole())
+                    .build();
+
+            LoginResponse loginResponse = new LoginResponse(jwt, new UserDto(user.getId(), user.getEmail(), user.getRole()), officerDto);
             return ResponseEntity.ok(loginResponse);
         }
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {

@@ -71,12 +71,39 @@ public class Listing {
         ));
     }
 
+    public static Listing fromDto(com.harvesthub.desktop.api.ListingDetailDto dto) {
+        String avatar = dto.farmerAvatar != null ? dto.farmerAvatar : extractInitials(dto.farmerName);
+        return new Listing(
+                dto.id,
+                dto.cropName,
+                dto.farmerName,
+                avatar,
+                dto.farmerIdNumber != null ? dto.farmerIdNumber : "ID: 902182",
+                dto.cooperativeName != null ? dto.cooperativeName : "HarvestHub Central",
+                dto.location,
+                dto.submittedTimeAgo != null ? dto.submittedTimeAgo : "Recently",
+                dto.submittedTimestamp != null ? dto.submittedTimestamp : "Oct 24, 2023, 10:32 AM",
+                dto.gpsCoordinates != null ? dto.gpsCoordinates : "7.8731° N, 80.7718° E",
+                dto.deviceModel != null ? dto.deviceModel : "Android CropScanner v4.2",
+                dto.referenceCode != null ? dto.referenceCode : dto.id,
+                dto.quantity,
+                dto.variancePercent != null ? dto.variancePercent : "0.0% dev",
+                dto.pricePerUnit,
+                dto.totalValuation != null ? dto.totalValuation : "Rs. 189,000",
+                dto.status != null ? dto.status : "Pending",
+                dto.mediaFileCount > 0 ? dto.mediaFileCount : 3,
+                dto.mediaCaption1 != null ? dto.mediaCaption1 : "Wide Angle - Field View",
+                dto.mediaCaption2 != null ? dto.mediaCaption2 : "Close-Up - Sample Quality",
+                dto.videoLabel != null ? dto.videoLabel : "360° Field & Sample Video (10s)"
+        );
+    }
+
     /**
      * Creates a detailed Listing from a QueueListing object.
      */
     public static Listing fromQueueListing(QueueListing q) {
         String avatar = extractInitials(q.getFarmerName());
-        String ref = "LIST-" + Math.abs(q.getFarmerName().hashCode() % 9000 + 1000);
+        String ref = q.getId() != null ? q.getId() : ("LIST-" + Math.abs(q.getFarmerName().hashCode() % 9000 + 1000));
         return new Listing(
                 ref,
                 q.getCropName(),

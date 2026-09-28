@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.project_part_2"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="24"
+        android:targetSdkVersion="34" />
+
+    <permission
+        android:name="com.example.project_part_2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.example.project_part_2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
+    <application
+        android:allowBackup="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        android:debuggable="true"
+        android:extractNativeLibs="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ProjectPart2" >
+
+        <!-- Page 2.1 (VerifiedHarvestsActivity) set as Launcher (Home Page) -->
+        <activity
+            android:name="com.example.project_part_2.VerifiedHarvestsActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Page 2.3 -->
+        <activity
+            android:name="com.example.project_part_2.PostDemandRequestActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 2.4 -->
+        <activity
+            android:name="com.example.project_part_2.MyDemandRequestsActivity"
+            android:exported="true" />
+
+        <!-- Page 3.1 -->
+        <activity
+            android:name="com.example.project_part_2.SupplyOffersActivity"
+            android:exported="true" />
+
+        <!-- Page 3.2 -->
+        <activity
+            android:name="com.example.project_part_2.NegotiationChatActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 4.1 -->
+        <activity
+            android:name="com.example.project_part_2.OrderSummaryActivity"
+            android:exported="true" />
+
+        <!-- Page 4.2 -->
+        <activity
+            android:name="com.example.project_part_2.SecureCheckoutActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 4.3 -->
+        <activity
+            android:name="com.example.project_part_2.TransactionLedgerActivity"
+            android:exported="true" />
+
+        <!-- Page 5.1 -->
+        <activity
+            android:name="com.example.project_part_2.VerifyCargoActivity"
+            android:exported="true" />
+
+        <!-- Page 5.2 -->
+        <activity
+            android:name="com.example.project_part_2.TransitTrackingActivity"
+            android:exported="true" />
+
+        <!-- Page 6.1 -->
+        <activity
+            android:name="com.example.project_part_2.ArrivalInspectionActivity"
+            android:exported="true" />
+
+        <!-- Page 6.2 -->
+        <activity
+            android:name="com.example.project_part_2.DeliveryHandshakeActivity"
+            android:exported="true" />
+
+        <!-- Page 6.3 -->
+        <activity
+            android:name="com.example.project_part_2.DisputeResolvedActivity"
+            android:exported="true" />
+
+        <!-- Page 6.4 -->
+        <activity
+            android:name="com.example.project_part_2.RateExperienceActivity"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <!-- Page 1.1 -->
+        <activity
+            android:name="com.example.project_part_2.SignInBuyerActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 1.2 -->
+        <activity
+            android:name="com.example.project_part_2.CreateAccountActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 1.3 -->
+        <activity
+            android:name="com.example.project_part_2.SetDeliveryAddressActivity"
+            android:exported="true" />
+
+        <!-- Page 1.3.6 -->
+        <activity
+            android:name="com.example.project_part_2.VerificationCodeActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 1.3.5 -->
+        <activity
+            android:name="com.example.project_part_2.VerificationCodeErrorActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Page 1.3.4 -->
+        <activity
+            android:name="com.example.project_part_2.CreateNewPasswordActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Setting: Transporter Portal Settings & Profile -->
+        <activity
+            android:name="com.example.project_part_2.TransporterSettingsActivity"
+            android:exported="true" />
+
+        <!-- Job History: Transporter Portal Trip History -->
+        <activity
+            android:name="com.example.project_part_2.JobHistoryActivity"
+            android:exported="true" />
+
+        <!-- Account Suspended / Locked Screen -->
+        <activity
+            android:name="com.example.project_part_2.AccountSuspendedActivity"
+            android:exported="true" />
+
+        <!-- Transporter Transit: Delivery Disputed Screen -->
+        <activity
+            android:name="com.example.project_part_2.DeliveryDisputedActivity"
+            android:exported="true" />
+
+        <!-- Handshake: Destination Arrived Screen -->
+        <activity
+            android:name="com.example.project_part_2.DestinationArrivedActivity"
+            android:exported="true" />
+
+        <!-- Navigation: Live In-Transit Navigation Screen -->
+        <activity
+            android:name="com.example.project_part_2.NavigationTrackingActivity"
+            android:exported="true" />
+
+        <!-- Loading: Cargo Rejected Screen -->
+        <activity
+            android:name="com.example.project_part_2.CargoRejectedActivity"
+            android:exported="true" />
+
+        <!-- Proof: Liability Checkpoint Screen -->
+        <activity
+            android:name="com.example.project_part_2.LiabilityCheckpointActivity"
+            android:exported="true" />
+
+        <!-- Pikup: Arriving at Pickup Hub Screen -->
+        <activity
+            android:name="com.example.project_part_2.ArrivingPickupActivity"
+            android:exported="true" />
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            android:exported="true" />
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="true" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="com.example.project_part_2.androidx-startup"
+            android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.DUMP" >
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

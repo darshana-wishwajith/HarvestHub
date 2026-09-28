@@ -63,12 +63,40 @@
         <!-- Buyer Activities -->
         <activity android:name=".ui.buyer.BuyerLoginActivity" />
         <activity android:name=".ui.buyer.BuyerDashboardActivity" />
+        <activity android:name=".ui.buyer.BuyerOrdersActivity" />
         <activity android:name=".ui.buyer.MarketplaceSearchActivity" />
+        <activity android:name=".ui.buyer.SignInBuyerActivity" />
+        <activity android:name=".ui.buyer.CreateAccountActivity" />
+        <activity android:name=".ui.buyer.SetDeliveryAddressActivity" />
+        <activity android:name=".ui.buyer.CreateNewPasswordActivity" />
+        <activity android:name=".ui.buyer.VerificationCodeActivity" />
+        <activity android:name=".ui.buyer.VerificationCodeErrorActivity" />
+        <activity android:name=".ui.buyer.VerifiedHarvestsActivity" />
+        <activity android:name=".ui.buyer.PostDemandRequestActivity" />
+        <activity android:name=".ui.buyer.MyDemandRequestsActivity" />
+        <activity android:name=".ui.buyer.SupplyOffersActivity" />
+        <activity android:name=".ui.buyer.NegotiationChatActivity" />
+        <activity android:name=".ui.buyer.OrderSummaryActivity" />
+        <activity android:name=".ui.buyer.SecureCheckoutActivity" />
+        <activity android:name=".ui.buyer.TransactionLedgerActivity" />
+        <activity android:name=".ui.buyer.TransitTrackingActivity" />
+        <activity android:name=".ui.buyer.VerifyCargoActivity" />
+        <activity android:name=".ui.buyer.DisputeResolvedActivity" />
 
         <!-- Transporter Activities -->
         <activity android:name=".ui.transporter.TransporterLoginActivity" />
         <activity android:name=".ui.transporter.DeliveryDashboardActivity" />
         <activity android:name=".ui.transporter.RouteMapActivity" />
+        <activity android:name=".ui.transporter.ArrivingPickupActivity" />
+        <activity android:name=".ui.transporter.NavigationTrackingActivity" />
+        <activity android:name=".ui.transporter.DestinationArrivedActivity" />
+        <activity android:name=".ui.transporter.LiabilityCheckpointActivity" />
+        <activity android:name=".ui.transporter.JobHistoryActivity" />
+        <activity android:name=".ui.transporter.CargoRejectedActivity" />
+        <activity android:name=".ui.transporter.DeliveryDisputedActivity" />
+        <activity android:name=".ui.transporter.RateExperienceActivity" />
+        <activity android:name=".ui.transporter.AccountSuspendedActivity" />
+        <activity android:name=".ui.transporter.TransporterSettingsActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

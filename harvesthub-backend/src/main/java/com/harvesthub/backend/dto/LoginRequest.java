@@ -1,14 +1,25 @@
 package com.harvesthub.backend.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequest {
 
-    @NotBlank(message = "Email or mobile number is required")
     private String emailOrMobile;
-
-    @NotBlank(message = "Password is required")
+    private String username;
     private String password;
+
+    public String getEmailOrMobile() {
+        if (emailOrMobile != null && !emailOrMobile.isBlank()) {
+            return emailOrMobile;
+        }
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        if (this.emailOrMobile == null || this.emailOrMobile.isBlank()) {
+            this.emailOrMobile = username;
+        }
+    }
 }
