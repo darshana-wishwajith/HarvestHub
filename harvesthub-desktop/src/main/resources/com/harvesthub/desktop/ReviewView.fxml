@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.harvesthub.desktop.ReviewController"
+            stylesheets="@styles.css"
+            styleClass="review-root">
+
+    <left>
+        <fx:include source="Sidebar.fxml" fx:id="sidebar"/>
+    </left>
+
+    <center>
+        <VBox spacing="0" BorderPane.alignment="TOP_LEFT">
+            <Region styleClass="top-strip" prefHeight="3" minHeight="3" maxHeight="3"
+                    maxWidth="Infinity"/>
+
+            <ScrollPane styleClass="review-scroll" fitToWidth="true"
+                        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS">
+                <VBox spacing="20" styleClass="main-content-inner">
+                    <padding>
+                        <Insets top="24" right="32" bottom="32" left="32"/>
+                    </padding>
+
+                    <!-- Header -->
+                    <VBox spacing="10">
+                        <Button fx:id="backButton" text="← Back to Queue"
+                                styleClass="back-link-button" mnemonicParsing="false"
+                                onAction="#handleBackToQueue"/>
+
+                        <HBox alignment="CENTER_LEFT" spacing="16">
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label fx:id="headerTitleLabel" styleClass="review-header-title"
+                                       text="Reviewing: Paddy – Kalinga Perera"/>
+                                <Label fx:id="headerSubLabel" styleClass="review-header-sub"
+                                       text="Anuradhapura North • Submitted 2 hours ago"/>
+                            </VBox>
+
+                            <HBox spacing="14" alignment="CENTER_RIGHT">
+                                <Button onAction="#handleNotifications" styleClass="notif-button"
+                                        mnemonicParsing="false">
+                                    <graphic>
+                                        <StackPane prefWidth="42" prefHeight="42">
+                                            <FontIcon iconLiteral="fas-bell" iconSize="16"
+                                                      styleClass="notif-bell-icon"/>
+                                            <Region styleClass="notif-dot"
+                                                    StackPane.alignment="TOP_RIGHT"
+                                                    translateX="-6" translateY="6"
+                                                    prefWidth="9" prefHeight="9"
+                                                    minWidth="9" minHeight="9"
+                                                    maxWidth="9" maxHeight="9"/>
+                                        </StackPane>
+                                    </graphic>
+                                </Button>
+
+                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="profile-chip">
+                                    <padding>
+                                        <Insets top="6" right="14" bottom="6" left="6"/>
+                                    </padding>
+                                    <StackPane styleClass="avatar-circle,avatar-header"
+                                               prefWidth="34" prefHeight="34"
+                                               minWidth="34" minHeight="34"
+                                               maxWidth="34" maxHeight="34">
+                                        <Label text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
+                                    </StackPane>
+                                    <Label text="Lahiru Sahan" styleClass="profile-chip-name"/>
+                                </HBox>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Two-column body -->
+                    <HBox spacing="20" alignment="TOP_LEFT">
+                        <!-- Left: evidence -->
+                        <VBox spacing="20" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+
+                            <!-- Submitted Media -->
+                            <VBox spacing="14" styleClass="review-card" maxWidth="Infinity">
+                                <padding>
+                                    <Insets top="18" right="18" bottom="18" left="18"/>
+                                </padding>
+
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label text="Submitted Media" styleClass="review-card-title"
+                                           HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                    <Label fx:id="mediaBadgeLabel" text="3 Files Total"
+                                           styleClass="review-badge-count"/>
+                                </HBox>
+
+                                <HBox spacing="12" alignment="TOP_LEFT">
+                                    <StackPane HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                               prefHeight="120" minHeight="120">
+                                        <Region styleClass="media-placeholder-tile"
+                                                maxWidth="Infinity" maxHeight="Infinity"/>
+                                        <Label fx:id="mediaCaption1Label"
+                                               text="Wide Angle - Field View"
+                                               styleClass="media-caption-overlay"
+                                               StackPane.alignment="BOTTOM_LEFT">
+                                            <StackPane.margin>
+                                                <Insets bottom="10" left="10"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </StackPane>
+
+                                    <StackPane HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                               prefHeight="120" minHeight="120">
+                                        <Region styleClass="media-placeholder-tile"
+                                                maxWidth="Infinity" maxHeight="Infinity"/>
+                                        <Label fx:id="mediaCaption2Label"
+                                               text="Close-Up - Sample Quality"
+                                               styleClass="media-caption-overlay"
+                                               StackPane.alignment="BOTTOM_LEFT">
+                                            <StackPane.margin>
+                                                <Insets bottom="10" left="10"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </StackPane>
+                                </HBox>
+
+                                <StackPane prefHeight="200" minHeight="200" maxWidth="Infinity">
+                                    <Region styleClass="media-placeholder-tile,media-video-tile"
+                                            maxWidth="Infinity" maxHeight="Infinity"/>
+                                    <FontIcon iconLiteral="fas-play-circle" iconSize="48"
+                                              styleClass="media-play-icon"/>
+                                    <Label fx:id="videoLabelText"
+                                           text="360° Field &amp; Sample Video (10s)"
+                                           styleClass="media-caption-overlay"
+                                           StackPane.alignment="BOTTOM_LEFT">
+                                        <StackPane.margin>
+                                            <Insets bottom="10" left="10"/>
+                                        </StackPane.margin>
+                                    </Label>
+                                    <Region styleClass="video-progress-bar"
+                                            StackPane.alignment="BOTTOM_CENTER"
+                                            maxWidth="Infinity" prefHeight="4" minHeight="4"
+                                            maxHeight="4">
+                                        <StackPane.margin>
+                                            <Insets bottom="0" left="0" right="0"/>
+                                        </StackPane.margin>
+                                    </Region>
+                                </StackPane>
+
+                                <HBox spacing="24" alignment="CENTER_LEFT" styleClass="review-meta-row">
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <FontIcon iconLiteral="fas-map-marker-alt" iconSize="12"
+                                                  styleClass="meta-icon-glyph"/>
+                                        <Label fx:id="gpsLabel" styleClass="meta-icon-text"
+                                               text="GPS: 7.8731° N, 80.7718° E"/>
+                                    </HBox>
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <FontIcon iconLiteral="fas-clock" iconSize="12"
+                                                  styleClass="meta-icon-glyph"/>
+                                        <Label fx:id="timestampLabel" styleClass="meta-icon-text"
+                                               text="Timestamp: Oct 24, 2023, 10:32 AM"/>
+                                    </HBox>
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <FontIcon iconLiteral="fas-mobile-alt" iconSize="12"
+                                                  styleClass="meta-icon-glyph"/>
+                                        <Label fx:id="deviceLabel" styleClass="meta-icon-text"
+                                               text="Device: Android CropScanner v4.2"/>
+                                    </HBox>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Farm Location -->
+                            <VBox spacing="14" styleClass="review-card" maxWidth="Infinity">
+                                <padding>
+                                    <Insets top="18" right="18" bottom="18" left="18"/>
+                                </padding>
+
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fas-map" iconSize="14"
+                                              styleClass="review-card-title-icon"/>
+                                    <Label text="Farm Location" styleClass="review-card-title"
+                                           HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                    <Label text="✓ Verified: Matches registered address"
+                                           styleClass="map-verified-badge"/>
+                                </HBox>
+
+                                <StackPane prefHeight="220" minHeight="220" maxWidth="Infinity">
+                                    <Region styleClass="map-placeholder"
+                                            maxWidth="Infinity" maxHeight="Infinity"/>
+                                    <FontIcon iconLiteral="fas-map-marked-alt" iconSize="36"
+                                              styleClass="map-icon-glyph"/>
+                                    <Label fx:id="mapParcelLabel"
+                                           text="KALINGA'S PARCEL (ANURADHAPURA)"
+                                           styleClass="map-parcel-label"
+                                           StackPane.alignment="CENTER"/>
+                                </StackPane>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Right: details + decision -->
+                        <VBox spacing="20" prefWidth="400" minWidth="360" maxWidth="420">
+
+                            <!-- Listing Details -->
+                            <VBox spacing="14" styleClass="review-card" maxWidth="Infinity">
+                                <padding>
+                                    <Insets top="18" right="18" bottom="18" left="18"/>
+                                </padding>
+
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label fx:id="refCodeLabel" text="HH-PA-2024-4837"
+                                           styleClass="ref-code-label" HBox.hgrow="ALWAYS"
+                                           maxWidth="Infinity"/>
+                                    <Label fx:id="statusPillLabel" text="Pending Verification"
+                                           styleClass="review-status-pill,review-status-pending"/>
+                                </HBox>
+
+                                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="farmer-sub-card">
+                                    <StackPane styleClass="farmer-avatar-review"
+                                               prefWidth="44" prefHeight="44"
+                                               minWidth="44" minHeight="44"
+                                               maxWidth="44" maxHeight="44">
+                                        <Label fx:id="farmerAvatarLabel" text="KP"
+                                               styleClass="farmer-avatar-initials"/>
+                                    </StackPane>
+                                    <VBox spacing="2" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                        <Label fx:id="farmerNameLabel" text="Kalinga Perera"
+                                               styleClass="farmer-name-label"/>
+                                        <Label fx:id="farmerMetaLabel"
+                                               text="ID: 902182  |  HarvestHub Central"
+                                               styleClass="farmer-meta-label"/>
+                                    </VBox>
+                                </HBox>
+
+                                <GridPane hgap="10" vgap="10" maxWidth="Infinity">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+
+                                    <VBox styleClass="stat-box" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                          maxWidth="Infinity">
+                                        <Label text="CROP" styleClass="stat-box-label"/>
+                                        <Label fx:id="cropValueLabel" text="Paddy" styleClass="stat-box-value"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-box" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                          maxWidth="Infinity">
+                                        <Label text="YIELD" styleClass="stat-box-label"/>
+                                        <Label fx:id="yieldValueLabel" text="450 kg" styleClass="stat-box-value"/>
+                                        <Label fx:id="yieldSubLabel" text="-1.1% dev" styleClass="stat-box-sub"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-box" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                          maxWidth="Infinity">
+                                        <Label text="PRICE" styleClass="stat-box-label"/>
+                                        <Label fx:id="priceValueLabel" text="LKR 120/kg" styleClass="stat-box-value"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-box" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                          maxWidth="Infinity">
+                                        <Label text="TOTAL VALUATION" styleClass="stat-box-label"/>
+                                        <Label fx:id="totalValueLabel" text="LKR 54,000"
+                                               styleClass="review-total-value"/>
+                                    </VBox>
+                                </GridPane>
+                            </VBox>
+
+                            <!-- Officer Decision -->
+                            <VBox spacing="0" maxWidth="Infinity">
+                                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="decision-card-header">
+                                    <FontIcon iconLiteral="fas-shield-alt" iconSize="16"
+                                              styleClass="decision-header-icon"/>
+                                    <Label text="Officer Decision" styleClass="decision-card-header-title"/>
+                                </HBox>
+
+                                <VBox spacing="10" styleClass="decision-card-body">
+
+                                    <!-- 1. Approve & Grade -->
+                                    <VBox spacing="0">
+                                        <HBox fx:id="accordionHeader1" styleClass="accordion-header,accordion-header-1-expanded"
+                                              alignment="CENTER_LEFT" spacing="10"
+                                              onMouseClicked="#handleAccordionApprove">
+                                            <Label text="1. Approve &amp; Grade"
+                                                   styleClass="accordion-header-text"
+                                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                            <FontIcon fx:id="chevron1" iconLiteral="fas-chevron-up"
+                                                      iconSize="12" styleClass="accordion-chevron"/>
+                                        </HBox>
+                                        <VBox fx:id="accordionBody1" spacing="12" styleClass="accordion-body">
+                                            <padding>
+                                                <Insets top="12"/>
+                                            </padding>
+                                            <Label text="Select Quality Grade" styleClass="decision-field-label"/>
+                                            <HBox spacing="8" alignment="CENTER">
+                                                <Button fx:id="gradeAButton" text="Grade A"
+                                                        styleClass="grade-toggle-btn,grade-toggle-btn-selected"
+                                                        maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                                        mnemonicParsing="false"
+                                                        onAction="#handleGradeA"/>
+                                                <Button fx:id="gradeBButton" text="Grade B"
+                                                        styleClass="grade-toggle-btn"
+                                                        maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                                        mnemonicParsing="false"
+                                                        onAction="#handleGradeB"/>
+                                                <Button fx:id="gradeCButton" text="Grade C"
+                                                        styleClass="grade-toggle-btn"
+                                                        maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                                        mnemonicParsing="false"
+                                                        onAction="#handleGradeC"/>
+                                            </HBox>
+                                            <Label text="Decision Notes" styleClass="decision-field-label"/>
+                                            <TextArea fx:id="approveNotesArea"
+                                                      promptText="Add inspection notes or comments regarding moisture content, quality parameters, and lab grading criteria..."
+                                                      styleClass="decision-textarea"
+                                                      prefRowCount="4" wrapText="true"/>
+                                            <Button text="Confirm Approval  ▷"
+                                                    styleClass="btn-approve-confirm"
+                                                    maxWidth="Infinity" mnemonicParsing="false"
+                                                    onAction="#handleConfirmApproval"/>
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- 2. Request Media Retake -->
+                                    <VBox spacing="0">
+                                        <HBox fx:id="accordionHeader2"
+                                              styleClass="accordion-header,accordion-header-2-collapsed"
+                                              alignment="CENTER_LEFT" spacing="10"
+                                              onMouseClicked="#handleAccordionRetake">
+                                            <Label text="2. Request Media Retake"
+                                                   styleClass="accordion-header-text,accordion-header-text-2"
+                                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                            <FontIcon fx:id="chevron2" iconLiteral="fas-chevron-down"
+                                                      iconSize="12" styleClass="accordion-chevron"/>
+                                        </HBox>
+                                        <VBox fx:id="accordionBody2" spacing="12" styleClass="accordion-body"
+                                              visible="false" managed="false">
+                                            <padding>
+                                                <Insets top="12"/>
+                                            </padding>
+                                            <Label text="RETAKE INSTRUCTIONS FOR FARMER"
+                                                   styleClass="decision-field-label"/>
+                                            <TextArea fx:id="retakeNotesArea"
+                                                      promptText="Provide detailed instructions e.g. 'Grain close-up is blurry. Please capture under direct bright sunlight...'"
+                                                      styleClass="decision-textarea"
+                                                      prefRowCount="4" wrapText="true"/>
+                                            <Button text="Submit Retake Request  ▷"
+                                                    styleClass="btn-retake-submit"
+                                                    maxWidth="Infinity" mnemonicParsing="false"
+                                                    onAction="#handleSubmitRetake"/>
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- 3. Reject Listing -->
+                                    <VBox spacing="0">
+                                        <HBox fx:id="accordionHeader3"
+                                              styleClass="accordion-header,accordion-header-3-collapsed"
+                                              alignment="CENTER_LEFT" spacing="10"
+                                              onMouseClicked="#handleAccordionReject">
+                                            <Label text="3. Reject Listing"
+                                                   styleClass="accordion-header-text,accordion-header-text-3"
+                                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                            <FontIcon fx:id="chevron3" iconLiteral="fas-chevron-down"
+                                                      iconSize="12" styleClass="accordion-chevron"/>
+                                        </HBox>
+                                        <VBox fx:id="accordionBody3" spacing="12" styleClass="accordion-body"
+                                              visible="false" managed="false">
+                                            <padding>
+                                                <Insets top="12"/>
+                                            </padding>
+                                            <Label text="REJECTION REASON"
+                                                   styleClass="decision-field-label"/>
+                                            <TextArea fx:id="rejectNotesArea"
+                                                      promptText="State the regulatory standard that was not met e.g. 'Moisture level exceeds 13.5% threshold standard...'"
+                                                      styleClass="decision-textarea"
+                                                      prefRowCount="4" wrapText="true"/>
+                                            <Button text="Submit Rejection  ▷"
+                                                    styleClass="btn-reject-submit"
+                                                    maxWidth="Infinity" mnemonicParsing="false"
+                                                    onAction="#handleSubmitRejection"/>
+                                        </VBox>
+                                    </VBox>
+
+                                </VBox>
+                            </VBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

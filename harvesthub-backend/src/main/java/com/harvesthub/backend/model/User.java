@@ -52,4 +52,8 @@ public class User {
     // Fields for password reset
     private String resetPasswordToken;
     private LocalDateTime resetPasswordTokenExpiry;
+
+    private String profilePhotoUrl;
+    private String passwordLastUpdated;
+    private String phoneNumber; // alias for mobileNumber for API compatibility
 }

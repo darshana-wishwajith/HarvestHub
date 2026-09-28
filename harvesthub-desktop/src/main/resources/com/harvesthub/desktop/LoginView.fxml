@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.harvesthub.desktop.LoginController"
+          stylesheets="@styles.css"
+          maxWidth="Infinity" maxHeight="Infinity">
+
+    <columnConstraints>
+        <ColumnConstraints percentWidth="42" hgrow="ALWAYS" minWidth="360"/>
+        <ColumnConstraints percentWidth="58" hgrow="ALWAYS"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="ALWAYS" fillHeight="true"/>
+    </rowConstraints>
+
+    <!-- ================================================================
+         LEFT PANEL — Dark green branding area
+         ================================================================ -->
+    <VBox styleClass="left-panel" alignment="TOP_LEFT"
+          GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <padding>
+            <Insets top="32" right="44" bottom="32" left="44"/>
+        </padding>
+
+        <!-- Brand logo header -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <FontIcon iconLiteral="fas-seedling" iconSize="22" iconColor="#4ADE80"/>
+            <Label text="HarvestHub" styleClass="logo-text"/>
+        </HBox>
+
+        <!-- Spacer — pushes hero text toward vertical center -->
+        <Region VBox.vgrow="ALWAYS" minHeight="20"/>
+
+        <!-- Hero text block -->
+        <VBox spacing="16" maxWidth="460">
+            <VBox spacing="4">
+                <Label text="Empowering Quality," styleClass="hero-heading" wrapText="true"/>
+                <Label text="Field by Field" styleClass="hero-heading" wrapText="true"/>
+            </VBox>
+            <Label text="Access high-precision verification tools designed for agricultural officers. Together, we maintain the integrity of global harvest data and build lasting trust in the farming ecosystem."
+                   styleClass="hero-description" wrapText="true" maxWidth="460"/>
+        </VBox>
+
+        <!-- Spacer — pushes stats badge to bottom -->
+        <Region VBox.vgrow="ALWAYS" minHeight="20"/>
+
+        <!-- Stats badge card -->
+        <HBox styleClass="stats-badge" spacing="14" alignment="CENTER_LEFT" maxWidth="440">
+            <padding>
+                <Insets top="12" right="16" bottom="12" left="14"/>
+            </padding>
+            <StackPane styleClass="stats-icon-container"
+                       prefWidth="42" prefHeight="42"
+                       minWidth="42" minHeight="42"
+                       maxWidth="42" maxHeight="42">
+                <FontIcon iconLiteral="fas-cog" iconSize="20" iconColor="WHITE"/>
+            </StackPane>
+            <VBox spacing="2" alignment="CENTER_LEFT">
+                <Label text="2,400+" styleClass="stats-number"/>
+                <Label text="Listings verified this month" styleClass="stats-label"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- ================================================================
+         RIGHT PANEL — White login form area
+         ================================================================ -->
+    <StackPane styleClass="right-panel"
+               GridPane.columnIndex="1" GridPane.rowIndex="0">
+
+        <!-- Centered login form -->
+        <VBox styleClass="login-form" maxWidth="460" alignment="CENTER_LEFT"
+              StackPane.alignment="CENTER">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Portal label -->
+            <Label text="AGRICULTURAL OFFICER PORTAL" styleClass="portal-label"/>
+            <Region prefHeight="8"/>
+
+            <!-- Heading -->
+            <Label text="Sign in to your account" styleClass="form-heading" wrapText="true"/>
+            <Region prefHeight="24"/>
+
+            <!-- ===== Officer ID Field ===== -->
+            <Label text="Officer ID / Username" styleClass="field-label"/>
+            <Region prefHeight="6"/>
+            <HBox styleClass="input-container" alignment="CENTER_LEFT" spacing="12">
+                <FontIcon iconLiteral="fas-briefcase" iconSize="16" styleClass="input-icon"/>
+                <TextField fx:id="usernameField" promptText="Enter your ID"
+                           HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <Region prefHeight="16"/>
+
+            <!-- ===== Password Field ===== -->
+            <Label text="Password" styleClass="field-label"/>
+            <Region prefHeight="6"/>
+            <HBox styleClass="input-container" alignment="CENTER_LEFT" spacing="12">
+                <FontIcon iconLiteral="fas-lock" iconSize="16" styleClass="input-icon"
+                          mouseTransparent="true" focusTraversable="false"/>
+                <!-- Side-by-side: only one field is managed/visible at a time -->
+                <PasswordField fx:id="passwordField" promptText="Enter your password"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                               focusTraversable="true"/>
+                <TextField fx:id="passwordTextField" promptText="Enter your password"
+                           HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                           visible="false" managed="false" mouseTransparent="true"
+                           focusTraversable="false"/>
+                <Button onAction="#togglePasswordVisibility"
+                        styleClass="eye-button" mnemonicParsing="false"
+                        focusTraversable="false">
+                    <graphic>
+                        <FontIcon fx:id="eyeIcon" iconLiteral="fas-eye"
+                                  iconSize="16" styleClass="eye-icon"/>
+                    </graphic>
+                </Button>
+            </HBox>
+            <Region prefHeight="14"/>
+
+            <!-- Remember me / Forgot Password row -->
+            <HBox alignment="CENTER_LEFT">
+                <CheckBox fx:id="rememberMeCheckBox" text="Remember me"
+                          styleClass="remember-checkbox"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Hyperlink text="Forgot Password?" styleClass="forgot-link"
+                           onAction="#handleForgotPassword"/>
+            </HBox>
+            <Region prefHeight="14"/>
+
+            <!-- Inline login error -->
+            <Label fx:id="loginErrorLabel" styleClass="login-error-label" wrapText="true"
+                   visible="false" managed="false" maxWidth="Infinity"/>
+            <Region prefHeight="10"/>
+
+            <!-- Login button -->
+            <Button fx:id="loginButton" text="Login" styleClass="login-button"
+                    defaultButton="true"
+                    maxWidth="1.7976931348623157E308"
+                    onAction="#handleLogin"
+                    contentDisplay="RIGHT" graphicTextGap="8"
+                    mnemonicParsing="false">
+                <graphic>
+                    <FontIcon iconLiteral="fas-arrow-right" iconSize="14"/>
+                </graphic>
+            </Button>
+            <Region prefHeight="22"/>
+
+            <!-- Divider -->
+            <Region styleClass="divider-line"/>
+            <Region prefHeight="18"/>
+
+            <!-- Copyright -->
+            <Label text="© 2024 HarvestHub. Authorized personnel only. Access monitored for security."
+                   styleClass="footer-text" wrapText="true" alignment="CENTER"
+                   maxWidth="1.7976931348623157E308"/>
+            <Region prefHeight="10"/>
+
+            <!-- Footer links -->
+            <HBox alignment="CENTER" spacing="24">
+                <Hyperlink text="Security Guidelines" styleClass="footer-link"/>
+                <Hyperlink text="Support" styleClass="footer-link"/>
+            </HBox>
+        </VBox>
+    </StackPane>
+
+</GridPane>

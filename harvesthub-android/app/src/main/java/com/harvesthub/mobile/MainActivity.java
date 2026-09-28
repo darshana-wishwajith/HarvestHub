@@ -130,21 +130,30 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        pill.setVisibility(View.VISIBLE);
+        pill.setBackgroundResource(R.drawable.bg_nav_item_active);
         icon.setImageResource(activeIconRes);
         icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_active_text));
-        label.setTextColor(ContextCompat.getColor(this, R.color.primary_green));
+        label.setTextColor(ContextCompat.getColor(this, R.color.nav_active_text));
     }
 
     private void resetAllTabs(BottomNavBarBinding nav) {
         View[] pills = {nav.pillHome, nav.pillMarket, nav.pillListings, nav.pillWallet, nav.pillSettings};
         ImageView[] icons = {nav.iconHome, nav.iconMarket, nav.iconListings, nav.iconWallet, nav.iconSettings};
         TextView[] labels = {nav.labelHome, nav.labelMarket, nav.labelListings, nav.labelWallet, nav.labelSettings};
+        int[] defaultIconRes = {
+            R.drawable.ic_home_bottom_bar,
+            R.drawable.ic_market_icon_bottom_bar,
+            R.drawable.ic_listings_icon_bottom_bar,
+            R.drawable.ic_wallet_bottom_bar,
+            R.drawable.ic_settings_bottom_bar
+        };
 
         int inactiveColor = ContextCompat.getColor(this, R.color.nav_inactive_text);
 
         for (int i = 0; i < pills.length; i++) {
-            pills[i].setVisibility(View.INVISIBLE);
+            pills[i].setVisibility(View.VISIBLE);
+            pills[i].setBackground(null);
+            icons[i].setImageResource(defaultIconRes[i]);
             icons[i].setColorFilter(inactiveColor);
             labels[i].setTextColor(inactiveColor);
         }

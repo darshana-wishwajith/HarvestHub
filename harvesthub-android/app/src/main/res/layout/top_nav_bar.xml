@@ -9,31 +9,30 @@
     android:padding="8dp"
     android:paddingHorizontal="16dp">
 
-    <!-- Logo Section -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+    <!-- Logo Icon -->
+    <ImageView
+        android:id="@+id/ivLogoIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:contentDescription="HarvestHub Logo"
+        android:src="@drawable/harvesthub_top_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_leaf"
-            app:tint="@color/primary_green" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
-            android:text="HarvestHub"
-            android:textColor="@color/text_title"
-            android:textSize="18sp" />
-    </LinearLayout>
+    <!-- Wordmark Logo -->
+    <ImageView
+        android:id="@+id/ivWordmark"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="HarvestHub"
+        android:src="@drawable/harvesthub_logo_given"
+        app:tint="@color/top_nav_icon_tint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivLogoIcon"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Notification Bell -->
     <FrameLayout

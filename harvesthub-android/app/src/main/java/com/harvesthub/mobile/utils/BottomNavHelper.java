@@ -72,24 +72,41 @@ public class BottomNavHelper {
         TextView label = navBarView.findViewById(labelId);
 
         pill.setVisibility(View.VISIBLE);
+        pill.setBackgroundResource(R.drawable.bg_nav_item_active);
         icon.setImageResource(activeIconRes);
         icon.setColorFilter(ContextCompat.getColor(context, R.color.nav_active_text));
-        label.setTextColor(ContextCompat.getColor(context, R.color.primary_green));
+        label.setTextColor(ContextCompat.getColor(context, R.color.nav_active_text));
     }
 
     private static void resetAllTabs(View navBarView, Context context) {
         int[] pills = {R.id.pill_home, R.id.pill_market, R.id.pill_listings, R.id.pill_wallet, R.id.pill_settings};
         int[] icons = {R.id.icon_home, R.id.icon_market, R.id.icon_listings, R.id.icon_wallet, R.id.icon_settings};
         int[] labels = {R.id.label_home, R.id.label_market, R.id.label_listings, R.id.label_wallet, R.id.label_settings};
+        int[] defaultIconRes = {
+            R.drawable.ic_home_bottom_bar,
+            R.drawable.ic_market_icon_bottom_bar,
+            R.drawable.ic_listings_icon_bottom_bar,
+            R.drawable.ic_wallet_bottom_bar,
+            R.drawable.ic_settings_bottom_bar
+        };
 
         int inactiveColor = ContextCompat.getColor(context, R.color.nav_inactive_text);
 
         for (int i = 0; i < pills.length; i++) {
-            navBarView.findViewById(pills[i]).setVisibility(View.INVISIBLE);
+            View pill = navBarView.findViewById(pills[i]);
+            if (pill != null) {
+                pill.setVisibility(View.VISIBLE);
+                pill.setBackground(null);
+            }
             ImageView icon = navBarView.findViewById(icons[i]);
-            icon.setColorFilter(inactiveColor);
+            if (icon != null) {
+                icon.setImageResource(defaultIconRes[i]);
+                icon.setColorFilter(inactiveColor);
+            }
             TextView label = navBarView.findViewById(labels[i]);
-            label.setTextColor(inactiveColor);
+            if (label != null) {
+                label.setTextColor(inactiveColor);
+            }
         }
     }
 
