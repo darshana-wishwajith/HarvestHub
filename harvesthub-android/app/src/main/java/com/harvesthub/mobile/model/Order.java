@@ -83,6 +83,22 @@ public class Order {
     public void setCropName(String cropName) { this.cropName = cropName; }
     public String getFarmerName() { return farmerName; }
     public void setFarmerName(String farmerName) { this.farmerName = farmerName; }
+    private String cropType;
+    private double cropTotal;
+    private String transporterName;
+    private String vehicleTier;
+    private double transportCost;
+
+    public String getCropType() { return cropType; }
+    public void setCropType(String cropType) { this.cropType = cropType; }
+    public double getCropTotal() { return cropTotal; }
+    public void setCropTotal(double cropTotal) { this.cropTotal = cropTotal; }
+    public String getTransporterName() { return transporterName; }
+    public void setTransporterName(String transporterName) { this.transporterName = transporterName; }
+    public String getVehicleTier() { return vehicleTier; }
+    public void setVehicleTier(String vehicleTier) { this.vehicleTier = vehicleTier; }
+    public double getTransportCost() { return transportCost; }
+    public void setTransportCost(double transportCost) { this.transportCost = transportCost; }
     public String getEscrowStatus() { return escrowStatus; }
     public void setEscrowStatus(String escrowStatus) { this.escrowStatus = escrowStatus; }
     public String getTransporterId() { return transporterId; }

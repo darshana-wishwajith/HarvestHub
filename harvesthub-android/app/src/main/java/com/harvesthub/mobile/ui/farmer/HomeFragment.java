@@ -89,11 +89,23 @@ public class HomeFragment extends Fragment {
             }
         };
 
-        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) ? sessionManager.getUser().getId() : "";
-        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null) ? sessionManager.getUser().getLocation() : "Dambulla, LK";
+        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
+                ? sessionManager.getUser().getId() : "user_farmer_kamal";
+        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null)
+                ? sessionManager.getUser().getLocation() : "Dambulla, LK";
+
+        if (sessionManager.getUser() != null && sessionManager.getUser().getFullName() != null) {
+            binding.tvGreetingTitle.setText("Good morning, " + sessionManager.getUser().getFullName() + "!");
+        }
 
         fetchDashboardData(farmerId, checkDone);
         fetchMarketTrend("Carrot", 7, checkDone);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshData();
     }
 
     @Override

@@ -45,6 +45,8 @@ public class WalletFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
         if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
             farmerId = sessionManager.getUser().getId();
+        } else {
+            farmerId = "user_farmer_kamal";
         }
 
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
@@ -53,6 +55,15 @@ public class WalletFragment extends Fragment {
         fetchRecentTransactions();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!farmerId.isEmpty()) {
+            fetchWalletSummary();
+            fetchRecentTransactions();
+        }
     }
 
     private void initViews(View v) {

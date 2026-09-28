@@ -45,7 +45,12 @@ public class ChatActivity extends AppCompatActivity {
         setupNavigation();
 
         orderId = getIntent().getStringExtra("ORDER_ID");
-        if (orderId == null) orderId = "demo-order";
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = getIntent().getStringExtra("order_id");
+        }
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = "order_001";
+        }
         sessionManager = new SessionManager(this);
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
 
@@ -67,7 +72,8 @@ public class ChatActivity extends AppCompatActivity {
         btnSendMessage.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();
             if (!message.isEmpty()) {
-                String senderId = sessionManager.getUser() != null ? sessionManager.getUser().getId() : "unknown";
+                String senderId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
+                        ? sessionManager.getUser().getId() : "user_farmer_kamal";
                 SendMessageRequest request = new SendMessageRequest(senderId, message);
                 apiService.sendMessage(orderId, request).enqueue(new Callback<ChatMessage>() {
                     @Override
@@ -122,6 +128,12 @@ public class ChatActivity extends AppCompatActivity {
         btnAttachment.setOnClickListener(v -> {
             Toast.makeText(this, "Attachment button clicked", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadMessages();
     }
 
     private void loadMessages() {

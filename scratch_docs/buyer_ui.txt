@@ -1,0 +1,69 @@
+# UI list of Buyer.docx
+
+UI Frames List
+
+Buyer View
+
+1. Onboarding & Identity Management
+
+1.1 Login & Registration Screen: Standard role-based portal welcoming the Buyer (e.g., wholesaler, shop owner).
+
+1.2 Delivery Address Configuration Map: An interactive map component for setting up primary and alternative drop-off locations, used to fetch GPS coordinates for automated logistics routing.
+
+2. Marketplace Discovery (The Demand Side)
+
+2.1 Main Marketplace Feed: The central hub where verified, officer-graded crop listings are displayed. Listings must prominently display the "Estimated Quantity" label, assigned Quality Grade (Grade A, B, C), and farmer location.
+
+2.2 Advanced Filter & Search Panel: A drawer or screen allowing buyers to query the marketplace by crop type, quality grade, quantity thresholds, and proximity/location.
+
+2.3 "Wanted Ads" Creation Form: A dedicated input screen where the buyer can post explicit demand requests (e.g., "Need 200kg of tomatoes by Friday") to the global feed.
+
+2.4 My Active "Wanted Ads" Manager: A tracking dashboard where buyers manage, edit, or close their active public demand requests.
+
+3. Engagement, Negotiation & Scheduling
+
+3.1 Received "Supply Offers" Hub: A repository screen displaying proposals sent by farmers who responded directly to the buyer's Wanted Ads.
+
+3.2 In-App Chat & Negotiation UI: A real-time chat workspace to finalize quantities, agree on a price per kg, and select a fixed pickup date. It must display a dynamic indicator when an order transitions to Status: Accepted.
+
+4. Checkout, Logistics & Secure Escrow
+
+4.1 Order Summary & Dynamic Billing Screen: A screen displaying the order breakdown once logistics are calculated. It must show the auto-assigned vehicle tier, calculated transit cost, and the explicit 3% Buyer Convenience Fee markup.
+
+4.2 Simulated Payment Gateway Portal: As bank integration is simulated per project scope, this UI serves as the transaction screen where the buyer executes the Secure Advance Payment.
+
+4.3 Payment Processing Ledger: A transitional screen tracking Status: Payment Processing / Dispatching while the background engine hunts for available transporters.
+
+5. Remote Verification & Live Order Execution
+
+5.1 Pre-Loading Evidence Review Panel: A critical liability checkpoint UI. The buyer remotely reviews live, timestamped, geotagged photos uploaded by the transport helper. Features distinct "Approve & Load" (triggers transit) and "Reject Cargo" (triggers a 100% refund) buttons.
+
+5.2 Live Delivery Tracking Dashboard: An integrated Google Maps telemetry screen showing the transporter's real-time physical progress moving toward the delivery address (Status: In Transit).
+
+6. Delivery Finalization, Disputes & Settlement
+
+6.1 Post-Delivery Action Screen: Triggered when the vehicle arrives at the buyer's site (Status: Delivered). Features two main options based on physical inspection:
+
+Accept Delivery: Proceeds to checkout to pay the remaining 80% balance.
+
+Reject Delivery (Transit Damage): Slams down a dispute trigger, routing the user to the Refund/Dispute layout.
+
+6.2 Delivery Handshake Confirmation UI: Part of the strict 2-way verification loop. Contains the final "Goods Received" button. Tapping this releases funds to the farmer and transporter simultaneously.
+
+6.3 Dispute & Refund Resolution View: An informational state view detailing transaction rollbacks—confirming zero platform fees on failure and displaying proof of a 100% refund when disputes close.
+
+6.4 Post-Transaction Rating Sheet: A final module to rate both the Farmer and Transporter out of 5 stars.
+
+Frame Relationships (Buyer User Flow)
+
+The Discovery Phase: The buyer opens the app and either directly explores verified, officer-graded options on the Main Marketplace Feed (2.1) using the Advanced Filter & Search Panel (2.2), or posts a custom demand request using the "Wanted Ads" Creation Form (2.3), managing it via the Wanted Ads Manager (2.4).
+
+The Deal & Negotiation: Once a crop is chosen or a farmer responds via the Received "Supply Offers" Hub (3.1), the buyer enters the In-App Chat & Negotiation UI (3.2) to iron out the final price, quantity, and specific pickup date.
+
+The Financial Commitment: When the order is accepted, the buyer shifts to the Order Summary & Dynamic Billing Screen (4.1) where the automated logistics fee and the 3% convenience markup are displayed. The buyer executes the transaction on the Simulated Payment Gateway Portal (4.2), tracking it through the Payment Processing Ledger (4.3) while a driver is being found.
+
+The Remote Quality Check: Before transit begins, the buyer evaluates the real-time, geotagged photos on the Pre-Loading Evidence Review Panel (5.1) uploaded by the transport team. If they approve, they unlock the shipment and watch its live progress via the Live Delivery Tracking Dashboard (5.2).
+
+The Unloading & Settlement: Upon physical arrival, the buyer reviews the cargo on the Post-Delivery Action Screen (6.1). If correct, they tap the final verification on the Delivery Handshake Confirmation UI (6.2) to trigger final crop payouts. If transit damage occurred, they route instead to the Dispute & Refund Resolution View (6.3) to verify their 100% refund. The cycle concludes on the Post-Transaction Rating Sheet (6.4).
+
+UI Frame Relationship (Buyer Journey)

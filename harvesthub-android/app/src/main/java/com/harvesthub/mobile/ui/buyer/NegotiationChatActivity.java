@@ -91,6 +91,12 @@ public class NegotiationChatActivity extends AppCompatActivity {
         String pickupDate = getIntent().getStringExtra("pickup_date");
         String orderRef = getIntent().getStringExtra("order_ref");
         orderId = getIntent().getStringExtra("order_id");
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = getIntent().getStringExtra("ORDER_ID");
+        }
+        if (orderId == null || orderId.isEmpty()) {
+            orderId = "order_001";
+        }
 
         if (cropName != null && !cropName.isEmpty()) {
             tvNegotiatingCrop.setText("Negotiating: " + cropName);
@@ -166,12 +172,16 @@ public class NegotiationChatActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadMessages();
+    }
+
     private void sendChatMessage(String text) {
-        if (orderId == null || sessionManager.getUser() == null) {
-            Toast.makeText(this, "This conversation is not linked to an order.", Toast.LENGTH_LONG).show();
-            return;
-        }
-        SendMessageRequest request = new SendMessageRequest(sessionManager.getUser().getId(), text);
+        String senderId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
+                ? sessionManager.getUser().getId() : "user_buyer_perera";
+        SendMessageRequest request = new SendMessageRequest(senderId, text);
         apiService.sendMessage(orderId, request).enqueue(new Callback<ChatMessage>() {
             @Override
             public void onResponse(Call<ChatMessage> call, Response<ChatMessage> response) {

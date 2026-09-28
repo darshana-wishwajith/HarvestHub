@@ -38,10 +38,10 @@ public class SettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         sessionManager = new SessionManager(requireContext());
-        if (sessionManager.getUser() != null) {
+        if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
             farmerId = sessionManager.getUser().getId();
         } else {
-            farmerId = "FARMER_123";
+            farmerId = "user_farmer_kamal";
         }
 
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
@@ -49,6 +49,12 @@ public class SettingsFragment extends Fragment {
         fetchProfile();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchProfile();
     }
 
     private void initViews(View v) {
