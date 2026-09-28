@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.harvesthub.desktop.SidebarController"
+      styleClass="sidebar" prefWidth="260" minWidth="260" maxWidth="260">
+    <padding>
+        <Insets top="28" right="18" bottom="24" left="18"/>
+    </padding>
+
+    <!-- Brand (text only) -->
+    <VBox spacing="4">
+        <Label text="HarvestHub" styleClass="sidebar-brand"/>
+        <Label text="OFFICER PORTAL" styleClass="sidebar-subtitle"/>
+    </VBox>
+
+    <Region prefHeight="36"/>
+
+    <!-- Navigation -->
+    <VBox spacing="6" VBox.vgrow="ALWAYS">
+        <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+              maxWidth="Infinity" onMouseClicked="#handleNavDashboard">
+            <padding>
+                <Insets top="11" right="14" bottom="11" left="14"/>
+            </padding>
+            <FontIcon iconLiteral="fas-home" iconSize="16" styleClass="nav-icon"/>
+            <Label text="Dashboard" styleClass="nav-item-label" HBox.hgrow="ALWAYS"
+                   maxWidth="Infinity"/>
+        </HBox>
+
+        <HBox fx:id="navVerificationQueue" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+              maxWidth="Infinity" onMouseClicked="#handleNavVerificationQueue">
+            <padding>
+                <Insets top="11" right="14" bottom="11" left="14"/>
+            </padding>
+            <FontIcon iconLiteral="fas-clipboard-list" iconSize="16" styleClass="nav-icon"/>
+            <Label text="Verification Queue" styleClass="nav-item-label"
+                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        </HBox>
+
+        <HBox fx:id="navReviewHistory" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+              maxWidth="Infinity" onMouseClicked="#handleNavReviewHistory">
+            <padding>
+                <Insets top="11" right="14" bottom="11" left="14"/>
+            </padding>
+            <FontIcon iconLiteral="fas-history" iconSize="16" styleClass="nav-icon"/>
+            <Label text="Review History" styleClass="nav-item-label"
+                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        </HBox>
+
+        <HBox fx:id="navProfile" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+              maxWidth="Infinity" onMouseClicked="#handleNavProfile">
+            <padding>
+                <Insets top="11" right="14" bottom="11" left="14"/>
+            </padding>
+            <FontIcon iconLiteral="fas-user" iconSize="16" styleClass="nav-icon"/>
+            <Label text="My Profile" styleClass="nav-item-label"
+                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        </HBox>
+    </VBox>
+
+    <!-- Bottom profile (pinned) -->
+    <VBox spacing="14">
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="sidebar-profile">
+            <StackPane styleClass="avatar-circle,avatar-sidebar"
+                       prefWidth="42" prefHeight="42"
+                       minWidth="42" minHeight="42"
+                       maxWidth="42" maxHeight="42">
+                <Label text="LS" styleClass="avatar-initials"/>
+            </StackPane>
+            <VBox spacing="2" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label text="Lahiru Sahan" styleClass="sidebar-profile-name"/>
+                <Label text="ID: #ITT-122" styleClass="sidebar-profile-id"/>
+            </VBox>
+        </HBox>
+
+        <Button onAction="#handleLogout" styleClass="logout-button"
+                maxWidth="Infinity" alignment="CENTER_LEFT"
+                mnemonicParsing="false" contentDisplay="LEFT" graphicTextGap="12">
+            <graphic>
+                <FontIcon iconLiteral="fas-sign-out-alt" iconSize="15"/>
+            </graphic>
+            <text>Log Out</text>
+        </Button>
+    </VBox>
+</VBox>

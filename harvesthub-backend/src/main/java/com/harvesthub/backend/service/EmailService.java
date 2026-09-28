@@ -22,4 +22,13 @@ public class EmailService {
         
         mailSender.send(message);
     }
+
+    @Async
+    public void sendOtpEmail(String to, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("HarvestHub - Verification Code");
+        message.setText("Your HarvestHub verification code is: " + otp + "\n\nThis code will expire in 10 minutes.\n\nIf you did not request this code, please ignore this email.");
+        mailSender.send(message);
+    }
 }

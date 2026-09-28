@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.harvesthub.desktop.VerificationQueueController"
+            stylesheets="@styles.css"
+            styleClass="dashboard-root">
+
+    <left>
+        <fx:include source="Sidebar.fxml" fx:id="sidebar"/>
+    </left>
+
+    <center>
+        <VBox styleClass="main-content" spacing="0" BorderPane.alignment="TOP_LEFT">
+            <Region styleClass="top-strip" prefHeight="3" minHeight="3" maxHeight="3"
+                    maxWidth="Infinity"/>
+
+            <VBox spacing="20" VBox.vgrow="ALWAYS" styleClass="main-content-inner">
+                <padding>
+                    <Insets top="28" right="32" bottom="28" left="32"/>
+                </padding>
+
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Verification Queue" styleClass="page-heading"/>
+                        <Label text="7 listings awaiting review across your region"
+                               styleClass="page-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="14" alignment="CENTER_RIGHT">
+                        <Button onAction="#handleNotifications" styleClass="notif-button"
+                                mnemonicParsing="false">
+                            <graphic>
+                                <StackPane prefWidth="42" prefHeight="42">
+                                    <FontIcon iconLiteral="fas-bell" iconSize="16"
+                                              styleClass="notif-bell-icon"/>
+                                    <Region styleClass="notif-dot"
+                                            StackPane.alignment="TOP_RIGHT"
+                                            translateX="-6" translateY="6"
+                                            prefWidth="9" prefHeight="9"
+                                            minWidth="9" minHeight="9"
+                                            maxWidth="9" maxHeight="9"/>
+                                </StackPane>
+                            </graphic>
+                        </Button>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="profile-chip">
+                            <padding>
+                                <Insets top="6" right="14" bottom="6" left="6"/>
+                            </padding>
+                            <StackPane styleClass="avatar-circle,avatar-header"
+                                       prefWidth="34" prefHeight="34"
+                                       minWidth="34" minHeight="34"
+                                       maxWidth="34" maxHeight="34">
+                                <Label text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
+                            </StackPane>
+                            <Label text="Lahiru Sahan" styleClass="profile-chip-name"/>
+                        </HBox>
+                    </HBox>
+                </HBox>
+
+                <!-- Filter / search card -->
+                <VBox spacing="16" styleClass="queue-filter-card" maxWidth="Infinity">
+                    <padding>
+                        <Insets top="18" right="18" bottom="18" left="18"/>
+                    </padding>
+
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="queue-search-box"
+                              HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                            <padding>
+                                <Insets top="0" right="12" bottom="0" left="14"/>
+                            </padding>
+                            <FontIcon iconLiteral="fas-search" iconSize="14"
+                                      styleClass="search-icon"/>
+                            <TextField fx:id="searchField"
+                                       promptText="Search Farmer or Crop..."
+                                       styleClass="search-field" HBox.hgrow="ALWAYS"
+                                       maxWidth="Infinity"/>
+                        </HBox>
+
+                        <Button styleClass="queue-filter-chip" mnemonicParsing="false"
+                                onAction="#handleFilterCropType"
+                                contentDisplay="RIGHT" graphicTextGap="8">
+                            <text>Crop Type</text>
+                            <graphic>
+                                <FontIcon iconLiteral="fas-chevron-down" iconSize="11"
+                                          styleClass="queue-filter-chevron"/>
+                            </graphic>
+                        </Button>
+
+                        <Button styleClass="queue-filter-chip" mnemonicParsing="false"
+                                onAction="#handleFilterLocation"
+                                contentDisplay="RIGHT" graphicTextGap="8">
+                            <text>Location</text>
+                            <graphic>
+                                <FontIcon iconLiteral="fas-chevron-down" iconSize="11"
+                                          styleClass="queue-filter-chevron"/>
+                            </graphic>
+                        </Button>
+
+                        <Button styleClass="queue-filter-chip" mnemonicParsing="false"
+                                onAction="#handleFilterSubmittedDate"
+                                contentDisplay="RIGHT" graphicTextGap="8">
+                            <text>Submitted Date</text>
+                            <graphic>
+                                <FontIcon iconLiteral="fas-chevron-down" iconSize="11"
+                                          styleClass="queue-filter-chevron"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+
+                    <!-- Segmented tabs -->
+                    <HBox spacing="4" alignment="CENTER_LEFT" styleClass="queue-segment">
+                        <padding>
+                            <Insets top="4" right="4" bottom="4" left="4"/>
+                        </padding>
+                        <Button fx:id="tabAll" text="All" styleClass="queue-segment-btn,queue-segment-active"
+                                mnemonicParsing="false" onAction="#handleTabAll"/>
+                        <Button fx:id="tabUnclaimed" text="Unclaimed" styleClass="queue-segment-btn"
+                                mnemonicParsing="false" onAction="#handleTabUnclaimed"/>
+                        <Button fx:id="tabClaimedByMe" text="Claimed by Me" styleClass="queue-segment-btn"
+                                mnemonicParsing="false" onAction="#handleTabClaimedByMe"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Listings + pagination card -->
+                <VBox styleClass="queue-list-card" VBox.vgrow="ALWAYS" maxWidth="Infinity"
+                      maxHeight="Infinity" spacing="0">
+                    <ScrollPane fx:id="listingsScroll" styleClass="queue-scroll"
+                                fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                                VBox.vgrow="ALWAYS" maxHeight="Infinity">
+                        <VBox fx:id="listingsContainer" styleClass="queue-listings"
+                              spacing="0" maxWidth="Infinity"/>
+                    </ScrollPane>
+
+                    <Region styleClass="queue-divider" maxWidth="Infinity"/>
+
+                    <HBox alignment="CENTER_LEFT" styleClass="queue-pagination-bar">
+                        <padding>
+                            <Insets top="14" right="20" bottom="14" left="20"/>
+                        </padding>
+                        <Label text="Showing 1-5 of 12 listings" styleClass="queue-pagination-text"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+
+                        <HBox spacing="6" alignment="CENTER_RIGHT">
+                            <Button styleClass="page-nav-button" mnemonicParsing="false"
+                                    onAction="#handlePagePrev">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-chevron-left" iconSize="12"
+                                              styleClass="page-nav-icon"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="page1Button" text="1"
+                                    styleClass="page-number-button,page-number-active"
+                                    mnemonicParsing="false" onAction="#handlePage1"/>
+                            <Button fx:id="page2Button" text="2"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage2"/>
+                            <Button fx:id="page3Button" text="3"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage3"/>
+                            <Button styleClass="page-nav-button" mnemonicParsing="false"
+                                    onAction="#handlePageNext">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-chevron-right" iconSize="12"
+                                              styleClass="page-nav-icon"/>
+                                </graphic>
+                            </Button>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

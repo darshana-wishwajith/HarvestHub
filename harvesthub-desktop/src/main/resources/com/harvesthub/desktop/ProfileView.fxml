@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.harvesthub.desktop.ProfileController"
+            stylesheets="@styles.css"
+            styleClass="dashboard-root">
+
+    <left>
+        <fx:include source="Sidebar.fxml" fx:id="sidebar"/>
+    </left>
+
+    <!-- ================================================================
+         MAIN CONTENT
+         ================================================================ -->
+    <center>
+        <VBox styleClass="main-content" spacing="0" BorderPane.alignment="TOP_LEFT">
+            <!-- Thin dark top strip -->
+            <Region styleClass="top-strip" prefHeight="3" minHeight="3" maxHeight="3"
+                    maxWidth="Infinity"/>
+
+            <VBox spacing="22" VBox.vgrow="ALWAYS" styleClass="main-content-inner">
+                <padding>
+                    <Insets top="28" right="32" bottom="28" left="32"/>
+                </padding>
+
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="My Profile" styleClass="page-heading"/>
+                        <Label text="Manage your account and view your performance"
+                               styleClass="page-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="14" alignment="CENTER_RIGHT">
+                        <!-- Notification bell -->
+                        <Button onAction="#handleNotifications" styleClass="notif-button"
+                                mnemonicParsing="false">
+                            <graphic>
+                                <StackPane prefWidth="42" prefHeight="42">
+                                    <FontIcon iconLiteral="fas-bell" iconSize="16"
+                                              styleClass="notif-bell-icon"/>
+                                    <Region styleClass="notif-dot"
+                                            StackPane.alignment="TOP_RIGHT"
+                                            translateX="-6" translateY="6"
+                                            prefWidth="9" prefHeight="9"
+                                            minWidth="9" minHeight="9"
+                                            maxWidth="9" maxHeight="9"/>
+                                </StackPane>
+                            </graphic>
+                        </Button>
+                        
+                        <!-- Settings gear -->
+                        <Button onAction="#handleSettings" styleClass="notif-button"
+                                mnemonicParsing="false">
+                            <graphic>
+                                <StackPane prefWidth="42" prefHeight="42">
+                                    <FontIcon iconLiteral="fas-cog" iconSize="16"
+                                              styleClass="notif-bell-icon"/>
+                                </StackPane>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </HBox>
+
+                <!-- Profile Content Layout -->
+                <HBox spacing="24" VBox.vgrow="ALWAYS">
+                    <!-- Left Column -->
+                    <VBox spacing="24" prefWidth="320" minWidth="320" maxWidth="320">
+                        <!-- Profile Card -->
+                        <VBox styleClass="activity-card" spacing="16" alignment="TOP_CENTER">
+                            <padding>
+                                <Insets top="32" right="24" bottom="24" left="24"/>
+                            </padding>
+                            
+                            <StackPane styleClass="avatar-circle,avatar-profile-large"
+                                       prefWidth="100" prefHeight="100"
+                                       minWidth="100" minHeight="100"
+                                       maxWidth="100" maxHeight="100">
+                                <Label text="AK" styleClass="avatar-initials,avatar-initials-lg"/>
+                            </StackPane>
+                            
+                            <VBox spacing="4" alignment="CENTER">
+                                <Label text="Insp. Amila K." style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                <Label text="Verification Lead" style="-fx-font-size: 14px; -fx-text-fill: #6B7280;"/>
+                                <HBox alignment="CENTER">
+                                    <Label text="#HH-0942" style="-fx-background-color: #ECFDF5; -fx-text-fill: #059669; -fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <Region prefHeight="12"/>
+                            
+                            <VBox spacing="12">
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <FontIcon iconLiteral="fas-map-marker-alt" iconSize="14" iconColor="#6B7280"/>
+                                    <Label text="Central Province, Sri Lanka" style="-fx-text-fill: #4B5563;"/>
+                                </HBox>
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <FontIcon iconLiteral="fas-envelope" iconSize="14" iconColor="#6B7280"/>
+                                    <Label text="amila.k@harvesthub.lk" style="-fx-text-fill: #4B5563;"/>
+                                </HBox>
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <FontIcon iconLiteral="fas-phone-alt" iconSize="14" iconColor="#6B7280"/>
+                                    <Label text="+94 71 234 5678" style="-fx-text-fill: #4B5563;"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <Region prefHeight="16"/>
+                            
+                            <Button text="Edit Profile" onAction="#handleEditProfile" styleClass="outline-button" maxWidth="Infinity" alignment="CENTER">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-pen" iconSize="12"/>
+                                </graphic>
+                                <padding>
+                                    <Insets top="10" right="16" bottom="10" left="16"/>
+                                </padding>
+                            </Button>
+                        </VBox>
+                        
+                        <!-- Elite Verification Status -->
+                        <VBox style="-fx-background-color: #0C2F1F; -fx-background-radius: 12;" spacing="16">
+                            <padding>
+                                <Insets top="24" right="24" bottom="24" left="24"/>
+                            </padding>
+                            <HBox alignment="CENTER_LEFT">
+                                <FontIcon iconLiteral="fas-shield-alt" iconSize="20" iconColor="#A7F3D0"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="ACTIVE TENURE: 5Y 2M" style="-fx-background-color: #064E3B; -fx-text-fill: #A7F3D0; -fx-padding: 4 8; -fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                            </HBox>
+                            <Label text="Elite Verification Status" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                            <Label text="Your account is currently within the top 2% of precision rankings across the HarvestHub network." style="-fx-text-fill: rgba(255,255,255,0.7); -fx-wrap-text: true; -fx-line-spacing: 4;"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Right Column -->
+                    <VBox spacing="24" HBox.hgrow="ALWAYS">
+                        
+                        <!-- Performance Overview -->
+                        <VBox styleClass="activity-card" spacing="16">
+                            <padding>
+                                <Insets top="24" right="24" bottom="24" left="24"/>
+                            </padding>
+                            
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Performance Overview" styleClass="activity-heading"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="View Full Analytics →" onAction="#handleViewAnalytics" style="-fx-background-color: transparent; -fx-text-fill: #059669; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0;"/>
+                            </HBox>
+                            
+                            <HBox spacing="16">
+                                <!-- Stat 1 -->
+                                <VBox style="-fx-background-color: #F9FAFB; -fx-background-radius: 8; -fx-padding: 16;" HBox.hgrow="ALWAYS">
+                                    <Label text="TOTAL REVIEWS" style="-fx-text-fill: #6B7280; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                    <HBox alignment="BOTTOM_LEFT" spacing="8">
+                                        <Label text="1,248" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                        <HBox alignment="CENTER" spacing="4" style="-fx-padding: 0 0 6 0;">
+                                            <FontIcon iconLiteral="fas-arrow-up" iconSize="10" iconColor="#059669"/>
+                                            <Label text="+12%" style="-fx-text-fill: #059669; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                        </HBox>
+                                    </HBox>
+                                </VBox>
+                                <!-- Stat 2 -->
+                                <VBox style="-fx-background-color: #F9FAFB; -fx-background-radius: 8; -fx-padding: 16;" HBox.hgrow="ALWAYS">
+                                    <Label text="AVG. REVIEW TIME" style="-fx-text-fill: #6B7280; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                    <HBox alignment="BOTTOM_LEFT" spacing="8">
+                                        <Label text="4.2" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                        <Label text="min" style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 6 0;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <HBox alignment="BOTTOM_CENTER" style="-fx-padding: 0 0 6 0;">
+                                            <FontIcon iconLiteral="fas-clock" iconSize="16" iconColor="#10B981"/>
+                                        </HBox>
+                                    </HBox>
+                                </VBox>
+                                <!-- Stat 3 -->
+                                <VBox style="-fx-background-color: #F9FAFB; -fx-background-radius: 8; -fx-padding: 16;" HBox.hgrow="ALWAYS">
+                                    <Label text="ACCURACY SCORE" style="-fx-text-fill: #6B7280; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                    <HBox alignment="BOTTOM_LEFT" spacing="8">
+                                        <Label text="98.5%" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <HBox alignment="BOTTOM_CENTER" style="-fx-padding: 0 0 6 0;">
+                                            <FontIcon iconLiteral="fas-check-circle" iconSize="16" iconColor="#10B981"/>
+                                        </HBox>
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        
+                        <!-- Assigned Coverage Area -->
+                        <VBox styleClass="activity-card" spacing="16">
+                            <padding>
+                                <Insets top="24" right="24" bottom="24" left="24"/>
+                            </padding>
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Assigned Coverage Area" styleClass="activity-heading"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="Central Province" style="-fx-background-color: #D1FAE5; -fx-text-fill: #059669; -fx-padding: 4 12; -fx-background-radius: 16; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                            </HBox>
+                            
+                            <HBox spacing="24">
+                                <VBox style="-fx-background-color: #E5E7EB; -fx-background-radius: 8;" prefWidth="200" prefHeight="150" minWidth="200" minHeight="150" alignment="CENTER">
+                                    <FontIcon iconLiteral="fas-map" iconSize="32" iconColor="#9CA3AF"/>
+                                </VBox>
+                                
+                                <VBox spacing="16" HBox.hgrow="ALWAYS">
+                                    <Label text="You are currently authorized for field verification in the following jurisdictions:" style="-fx-text-fill: #6B7280; -fx-wrap-text: true;"/>
+                                    <HBox spacing="8" style="-fx-wrap-text: true;">
+                                        <Label text="• Kandy" style="-fx-background-color: #F3F4F6; -fx-text-fill: #374151; -fx-padding: 6 12; -fx-background-radius: 16; -fx-font-weight: bold;"/>
+                                        <Label text="• Nuwara Eliya" style="-fx-background-color: #F3F4F6; -fx-text-fill: #374151; -fx-padding: 6 12; -fx-background-radius: 16; -fx-font-weight: bold;"/>
+                                        <Label text="• Matale" style="-fx-background-color: #F3F4F6; -fx-text-fill: #374151; -fx-padding: 6 12; -fx-background-radius: 16; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <HBox>
+                                        <Button text="+ Request Region Expansion" onAction="#handleRequestRegionExpansion" style="-fx-background-color: transparent; -fx-border-color: #10B981; -fx-border-style: dashed; -fx-border-radius: 16; -fx-text-fill: #059669; -fx-font-weight: bold; -fx-padding: 6 16; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        
+                        <!-- Account Settings -->
+                        <VBox styleClass="activity-card" spacing="0">
+                            <padding>
+                                <Insets top="24" right="24" bottom="24" left="24"/>
+                            </padding>
+                            <Label text="Account Settings" styleClass="activity-heading" style="-fx-padding: 0 0 16 0;"/>
+                            
+                            <!-- Setting 1 -->
+                            <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 16 0; -fx-border-color: #F3F4F6; -fx-border-width: 0 0 1 0;">
+                                <StackPane style="-fx-background-color: #F3F4F6; -fx-background-radius: 20;" prefWidth="40" prefHeight="40">
+                                    <FontIcon iconLiteral="fas-history" iconSize="16" iconColor="#4B5563"/>
+                                </StackPane>
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label text="Change Password" style="-fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                    <Label text="Update your login credentials regularly for security" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"/>
+                                </VBox>
+                                <FontIcon iconLiteral="fas-chevron-right" iconSize="14" iconColor="#9CA3AF"/>
+                            </HBox>
+                            
+                            <!-- Setting 2 -->
+                            <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 16 0; -fx-border-color: #F3F4F6; -fx-border-width: 0 0 1 0;">
+                                <StackPane style="-fx-background-color: #F3F4F6; -fx-background-radius: 20;" prefWidth="40" prefHeight="40">
+                                    <FontIcon iconLiteral="fas-bell" iconSize="16" iconColor="#4B5563"/>
+                                </StackPane>
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label text="Notification Preferences" style="-fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                    <Label text="Configure email and push alerts for new reviews" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"/>
+                                </VBox>
+                                <FontIcon iconLiteral="fas-chevron-right" iconSize="14" iconColor="#9CA3AF"/>
+                            </HBox>
+                            
+                            <!-- Setting 3 -->
+                            <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 16 0; -fx-border-color: #F3F4F6; -fx-border-width: 0 0 1 0;">
+                                <StackPane style="-fx-background-color: #F3F4F6; -fx-background-radius: 20;" prefWidth="40" prefHeight="40">
+                                    <FontIcon iconLiteral="fas-globe" iconSize="16" iconColor="#4B5563"/>
+                                </StackPane>
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label text="Language" style="-fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                    <Label text="Selected: English (Sri Lanka)" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"/>
+                                </VBox>
+                                <HBox alignment="CENTER" spacing="8">
+                                    <Label text="English" style="-fx-font-weight: bold; -fx-text-fill: #059669;"/>
+                                    <FontIcon iconLiteral="fas-chevron-right" iconSize="14" iconColor="#9CA3AF"/>
+                                </HBox>
+                            </HBox>
+                            
+                            <!-- Setting 4 -->
+                            <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 16 0;">
+                                <StackPane style="-fx-background-color: #F3F4F6; -fx-background-radius: 20;" prefWidth="40" prefHeight="40">
+                                    <FontIcon iconLiteral="fas-shield-alt" iconSize="16" iconColor="#4B5563"/>
+                                </StackPane>
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label text="Two-Factor Authentication" style="-fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                    <Label text="Extra layer of security via mobile authenticator" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"/>
+                                </VBox>
+                                <!-- Toggle Switch Mockup fixed -->
+                                <StackPane style="-fx-background-color: #0C2F1F; -fx-background-radius: 14;" prefWidth="44" prefHeight="24" minWidth="44" minHeight="24" maxWidth="44" maxHeight="24">
+                                    <Region style="-fx-background-color: white; -fx-background-radius: 100;" prefWidth="18" prefHeight="18" minWidth="18" minHeight="18" maxWidth="18" maxHeight="18" StackPane.alignment="CENTER_RIGHT" translateX="-3"/>
+                                </StackPane>
+                            </HBox>
+                            
+                        </VBox>
+                        
+                    </VBox>
+                </HBox>
+                
+                <HBox alignment="CENTER_RIGHT" style="-fx-padding: 0 0 16 0;">
+                    <Button text="Logout Securely" onAction="#handleLogoutSecurely" style="-fx-background-color: transparent; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-cursor: hand;">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" iconColor="#DC2626"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

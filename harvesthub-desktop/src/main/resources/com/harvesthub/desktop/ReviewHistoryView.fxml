@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.harvesthub.desktop.ReviewHistoryController"
+            stylesheets="@styles.css"
+            styleClass="dashboard-root">
+
+    <left>
+        <fx:include source="Sidebar.fxml" fx:id="sidebar"/>
+    </left>
+
+    <center>
+        <VBox styleClass="main-content" spacing="0" BorderPane.alignment="TOP_LEFT">
+            <Region styleClass="top-strip" prefHeight="3" minHeight="3" maxHeight="3"
+                    maxWidth="Infinity"/>
+
+            <VBox spacing="18" VBox.vgrow="ALWAYS" styleClass="main-content-inner">
+                <padding>
+                    <Insets top="28" right="32" bottom="28" left="32"/>
+                </padding>
+
+                <!-- Header: title + wide search only -->
+                <HBox alignment="CENTER_LEFT" spacing="24">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Review History" styleClass="page-heading"/>
+                        <Label text="All listings you've reviewed — 107 total"
+                               styleClass="page-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="history-global-search"
+                          prefWidth="440" minWidth="400" maxWidth="520">
+                        <padding>
+                            <Insets top="0" right="14" bottom="0" left="14"/>
+                        </padding>
+                        <FontIcon iconLiteral="fas-search" iconSize="14" styleClass="search-icon"/>
+                        <TextField fx:id="globalSearchField"
+                                   promptText="Global search history..."
+                                   styleClass="search-field"
+                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    </HBox>
+                </HBox>
+
+                <!-- Summary badges -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <HBox spacing="8" alignment="CENTER_LEFT" styleClass="history-summary-pill,history-summary-approved">
+                        <padding>
+                            <Insets top="8" right="14" bottom="8" left="12"/>
+                        </padding>
+                        <Region styleClass="history-summary-dot,history-dot-approved"
+                                prefWidth="8" prefHeight="8"
+                                minWidth="8" minHeight="8" maxWidth="8" maxHeight="8"/>
+                        <Label text="145 Approved" styleClass="history-summary-text,history-summary-text-approved"/>
+                    </HBox>
+
+                    <HBox spacing="8" alignment="CENTER_LEFT" styleClass="history-summary-pill,history-summary-retake">
+                        <padding>
+                            <Insets top="8" right="14" bottom="8" left="12"/>
+                        </padding>
+                        <Region styleClass="history-summary-dot,history-dot-retake"
+                                prefWidth="8" prefHeight="8"
+                                minWidth="8" minHeight="8" maxWidth="8" maxHeight="8"/>
+                        <Label text="7 Retake Requested" styleClass="history-summary-text,history-summary-text-retake"/>
+                    </HBox>
+
+                    <HBox spacing="8" alignment="CENTER_LEFT" styleClass="history-summary-pill,history-summary-rejected">
+                        <padding>
+                            <Insets top="8" right="14" bottom="8" left="12"/>
+                        </padding>
+                        <Region styleClass="history-summary-dot,history-dot-rejected"
+                                prefWidth="8" prefHeight="8"
+                                minWidth="8" minHeight="8" maxWidth="8" maxHeight="8"/>
+                        <Label text="4 Rejected" styleClass="history-summary-text,history-summary-text-rejected"/>
+                    </HBox>
+                </HBox>
+
+                <!-- Filter panel -->
+                <VBox spacing="16" styleClass="history-filter-card" maxWidth="Infinity">
+                    <padding>
+                        <Insets top="18" right="18" bottom="18" left="18"/>
+                    </padding>
+
+                    <HBox spacing="14" alignment="TOP_LEFT">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                            <Label text="SEARCH RECORDS" styleClass="history-filter-label"/>
+                            <HBox spacing="8" alignment="CENTER_LEFT" styleClass="history-filter-input"
+                                  maxWidth="Infinity">
+                                <padding>
+                                    <Insets top="0" right="12" bottom="0" left="12"/>
+                                </padding>
+                                <FontIcon iconLiteral="fas-search" iconSize="13" styleClass="search-icon"/>
+                                <TextField fx:id="recordsSearchField"
+                                           promptText="Farmer name or crop type..."
+                                           styleClass="search-field"
+                                           HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="6" prefWidth="180" minWidth="160">
+                            <Label text="DECISION TYPE" styleClass="history-filter-label"/>
+                            <ComboBox fx:id="decisionTypeCombo" styleClass="history-combo"
+                                      maxWidth="Infinity" prefWidth="180"/>
+                        </VBox>
+
+                        <VBox spacing="6" prefWidth="170" minWidth="150">
+                            <Label text="CROP TYPE" styleClass="history-filter-label"/>
+                            <ComboBox fx:id="cropTypeCombo" styleClass="history-combo"
+                                      maxWidth="Infinity" prefWidth="170"/>
+                        </VBox>
+
+                        <VBox spacing="6" prefWidth="180" minWidth="160">
+                            <Label text="DATE RANGE" styleClass="history-filter-label"/>
+                            <ComboBox fx:id="dateRangeCombo" styleClass="history-combo,history-date-combo"
+                                      maxWidth="Infinity" prefWidth="180"/>
+                        </VBox>
+                    </HBox>
+
+                    <Button text="Apply Filters" styleClass="history-apply-button"
+                            mnemonicParsing="false" onAction="#handleApplyFilters"/>
+                </VBox>
+
+                <!-- History table card -->
+                <VBox styleClass="history-table-card" VBox.vgrow="ALWAYS" maxWidth="Infinity"
+                      maxHeight="Infinity" spacing="0">
+                    <padding>
+                        <Insets top="0" right="0" bottom="0" left="0"/>
+                    </padding>
+
+                    <TableView fx:id="historyTable" styleClass="history-table"
+                               fixedCellSize="64" VBox.vgrow="ALWAYS" maxHeight="Infinity">
+                        <columns>
+                            <TableColumn fx:id="cropColumn" text="CROP &amp; FARMER"
+                                         prefWidth="280" minWidth="240"/>
+                            <TableColumn fx:id="locationColumn" text="LOCATION"
+                                         prefWidth="200" minWidth="160"/>
+                            <TableColumn fx:id="decisionColumn" text="GRADE / DECISION"
+                                         prefWidth="170" minWidth="140"
+                                         styleClass="history-col-center"/>
+                            <TableColumn fx:id="dateColumn" text="DATE REVIEWED"
+                                         prefWidth="140" minWidth="120"/>
+                            <TableColumn fx:id="actionColumn" text="ACTION"
+                                         prefWidth="120" minWidth="100" sortable="false"
+                                         styleClass="history-col-right"/>
+                        </columns>
+                    </TableView>
+
+                    <Region styleClass="queue-divider" maxWidth="Infinity"/>
+
+                    <HBox alignment="CENTER_LEFT" styleClass="queue-pagination-bar">
+                        <padding>
+                            <Insets top="14" right="20" bottom="14" left="20"/>
+                        </padding>
+                        <Label text="Showing 1-6 of 107 records" styleClass="queue-pagination-text"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+
+                        <HBox spacing="6" alignment="CENTER_RIGHT">
+                            <Button styleClass="page-nav-button" mnemonicParsing="false"
+                                    onAction="#handlePagePrev">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-chevron-left" iconSize="12"
+                                              styleClass="page-nav-icon"/>
+                                </graphic>
+                            </Button>
+                            <Button fx:id="page1Button" text="1"
+                                    styleClass="page-number-button,page-number-active"
+                                    mnemonicParsing="false" onAction="#handlePage1"/>
+                            <Button fx:id="page2Button" text="2"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage2"/>
+                            <Button fx:id="page3Button" text="3"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage3"/>
+                            <Button fx:id="page4Button" text="4"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage4"/>
+                            <Label text="..." styleClass="page-ellipsis"/>
+                            <Button fx:id="page18Button" text="18"
+                                    styleClass="page-number-button"
+                                    mnemonicParsing="false" onAction="#handlePage18"/>
+                            <Button styleClass="page-nav-button" mnemonicParsing="false"
+                                    onAction="#handlePageNext">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-chevron-right" iconSize="12"
+                                              styleClass="page-nav-icon"/>
+                                </graphic>
+                            </Button>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

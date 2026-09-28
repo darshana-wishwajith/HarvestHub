@@ -45,14 +45,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .requestCache(cache -> cache.disable()) // Disable request caching
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasic -> httpBasic.disable());
 
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        // http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Temporarily disabled
 
         return http.build();
     }

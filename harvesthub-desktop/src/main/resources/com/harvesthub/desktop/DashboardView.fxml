@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.harvesthub.desktop.DashboardController"
+            stylesheets="@styles.css"
+            styleClass="dashboard-root">
+
+    <left>
+        <fx:include source="Sidebar.fxml" fx:id="sidebar"/>
+    </left>
+
+    <!-- ================================================================
+         MAIN CONTENT
+         ================================================================ -->
+    <center>
+        <VBox styleClass="main-content" spacing="0" BorderPane.alignment="TOP_LEFT">
+            <!-- Thin dark top strip -->
+            <Region styleClass="top-strip" prefHeight="3" minHeight="3" maxHeight="3"
+                    maxWidth="Infinity"/>
+
+            <VBox spacing="22" VBox.vgrow="ALWAYS" styleClass="main-content-inner">
+                <padding>
+                    <Insets top="28" right="32" bottom="28" left="32"/>
+                </padding>
+
+                <!-- Header: greeting + actions -->
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Good morning, Lahiru" styleClass="page-heading"/>
+                        <Label text="Here's your verification overview for today."
+                               styleClass="page-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="14" alignment="CENTER_RIGHT">
+                        <!-- Notification bell -->
+                        <Button onAction="#handleNotifications" styleClass="notif-button"
+                                mnemonicParsing="false">
+                            <graphic>
+                                <StackPane prefWidth="42" prefHeight="42">
+                                    <FontIcon iconLiteral="fas-bell" iconSize="16"
+                                              styleClass="notif-bell-icon"/>
+                                    <Region styleClass="notif-dot"
+                                            StackPane.alignment="TOP_RIGHT"
+                                            translateX="-6" translateY="6"
+                                            prefWidth="9" prefHeight="9"
+                                            minWidth="9" minHeight="9"
+                                            maxWidth="9" maxHeight="9"/>
+                                </StackPane>
+                            </graphic>
+                        </Button>
+
+                        <!-- Profile chip -->
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="profile-chip">
+                            <padding>
+                                <Insets top="6" right="14" bottom="6" left="6"/>
+                            </padding>
+                            <StackPane styleClass="avatar-circle,avatar-header"
+                                       prefWidth="34" prefHeight="34"
+                                       minWidth="34" minHeight="34"
+                                       maxWidth="34" maxHeight="34">
+                                <Label text="LS" styleClass="avatar-initials,avatar-initials-sm"/>
+                            </StackPane>
+                            <Label text="Lahiru Sahan" styleClass="profile-chip-name"/>
+                        </HBox>
+                    </HBox>
+                </HBox>
+
+                <!-- Stats cards -->
+                <HBox spacing="18" alignment="TOP_CENTER">
+                    <!-- Card 1: Pending -->
+                    <VBox spacing="14" styleClass="stat-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT">
+                            <StackPane styleClass="stat-icon-box,stat-icon-amber"
+                                       prefWidth="40" prefHeight="40"
+                                       minWidth="40" minHeight="40"
+                                       maxWidth="40" maxHeight="40">
+                                <FontIcon iconLiteral="fas-clock" iconSize="16"
+                                          styleClass="stat-icon-amber-fill"/>
+                            </StackPane>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="Needs Attention" styleClass="stat-badge,stat-badge-amber"/>
+                        </HBox>
+                        <Label text="3" styleClass="stat-number"/>
+                        <Label text="Pending Verifications" styleClass="stat-label"/>
+                    </VBox>
+
+                    <!-- Card 2: Reviewed -->
+                    <VBox spacing="14" styleClass="stat-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT">
+                            <StackPane styleClass="stat-icon-box,stat-icon-green"
+                                       prefWidth="40" prefHeight="40"
+                                       minWidth="40" minHeight="40"
+                                       maxWidth="40" maxHeight="40">
+                                <FontIcon iconLiteral="fas-check-circle" iconSize="16"
+                                          styleClass="stat-icon-green-fill"/>
+                            </StackPane>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="+15% Today" styleClass="stat-badge,stat-badge-green"/>
+                        </HBox>
+                        <Label text="2" styleClass="stat-number"/>
+                        <Label text="Reviewed Today" styleClass="stat-label"/>
+                    </VBox>
+
+                    <!-- Card 3: Approval rate -->
+                    <VBox spacing="14" styleClass="stat-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT">
+                            <StackPane styleClass="stat-icon-box,stat-icon-blue"
+                                       prefWidth="40" prefHeight="40"
+                                       minWidth="40" minHeight="40"
+                                       maxWidth="40" maxHeight="40">
+                                <FontIcon iconLiteral="fas-shield-alt" iconSize="16"
+                                          styleClass="stat-icon-blue-fill"/>
+                            </StackPane>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="Last 30 Days" styleClass="stat-link"/>
+                        </HBox>
+                        <Label text="94%" styleClass="stat-number"/>
+                        <Label text="Officer Approval Rate" styleClass="stat-label"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Action banner -->
+                <HBox styleClass="action-banner" alignment="CENTER_LEFT" spacing="12"
+                      maxWidth="Infinity">
+                    <padding>
+                        <Insets top="16" right="22" bottom="16" left="22"/>
+                    </padding>
+                    <Region styleClass="banner-dot"
+                            prefWidth="8" prefHeight="8"
+                            minWidth="8" minHeight="8"
+                            maxWidth="8" maxHeight="8"/>
+                    <Label text="QUEUE ACTION: Go to Verification Queue (3 items awaiting review)"
+                           styleClass="banner-text" HBox.hgrow="ALWAYS" wrapText="true"/>
+                    <Button onAction="#handleLaunchQueue" styleClass="banner-launch-button"
+                            mnemonicParsing="false" contentDisplay="RIGHT" graphicTextGap="8">
+                        <text>Launch Queue</text>
+                        <graphic>
+                            <FontIcon iconLiteral="fas-arrow-right" iconSize="13"
+                                      styleClass="banner-arrow-icon"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <!-- Activity logs card -->
+                <VBox spacing="16" styleClass="activity-card" VBox.vgrow="ALWAYS" maxWidth="Infinity">
+                    <padding>
+                        <Insets top="20" right="20" bottom="16" left="20"/>
+                    </padding>
+
+                    <!-- Card header -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="Recent Activity Logs" styleClass="activity-heading"
+                               HBox.hgrow="ALWAYS"/>
+                        <HBox spacing="8" alignment="CENTER_LEFT" styleClass="search-box">
+                            <padding>
+                                <Insets top="0" right="10" bottom="0" left="12"/>
+                            </padding>
+                            <FontIcon iconLiteral="fas-search" iconSize="13"
+                                      styleClass="search-icon"/>
+                            <TextField fx:id="searchField" promptText="Search crops, farmers..."
+                                       styleClass="search-field" prefWidth="220"/>
+                        </HBox>
+                        <Button onAction="#handleFilter" styleClass="filter-button"
+                                mnemonicParsing="false" prefWidth="38" prefHeight="38"
+                                minWidth="38" minHeight="38">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-filter" iconSize="14"
+                                          styleClass="filter-icon"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+
+                    <!-- Table -->
+                    <TableView fx:id="activityTable" styleClass="activity-table"
+                               fixedCellSize="58" VBox.vgrow="ALWAYS" maxHeight="Infinity">
+                        <columns>
+                            <TableColumn fx:id="cropColumn" text="CROP &amp; FARMER" prefWidth="240"
+                                         minWidth="200"/>
+                            <TableColumn fx:id="locationColumn" text="LOCATION" prefWidth="220"
+                                         minWidth="160"/>
+                            <TableColumn fx:id="gradeColumn" text="GRADE" prefWidth="110"
+                                         minWidth="100" styleClass="activity-col-center"/>
+                            <TableColumn fx:id="statusColumn" text="STATUS" prefWidth="110"
+                                         minWidth="100" styleClass="activity-col-center"/>
+                            <TableColumn fx:id="timestampColumn" text="TIMESTAMP" prefWidth="110"
+                                         minWidth="90"/>
+                            <TableColumn fx:id="actionsColumn" text="ACTIONS" prefWidth="100"
+                                         minWidth="90" sortable="false"
+                                         styleClass="activity-col-center"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
