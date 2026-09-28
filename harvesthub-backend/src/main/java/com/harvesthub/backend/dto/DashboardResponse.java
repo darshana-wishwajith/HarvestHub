@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DashboardResponse {
     private String farmerName;
+    private String greeting;
     private String totalRevenue;
     private String revenueChange;
     private String previousRevenue;

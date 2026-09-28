@@ -27,4 +27,9 @@ public class MarketController {
             @RequestParam(value = "search", required = false) String searchQuery) {
         return ResponseEntity.ok(marketService.getWantedAds(cropFilter, searchQuery));
     }
+
+    @GetMapping("/market/centers")
+    public ResponseEntity<List<java.util.Map<String, Object>>> getMarketCenters() {
+        return ResponseEntity.ok(marketService.getMarketCenters());
+    }
 }

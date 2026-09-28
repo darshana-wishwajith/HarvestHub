@@ -31,6 +31,7 @@ import com.harvesthub.mobile.model.WantedAd;
 import com.harvesthub.mobile.model.WeatherResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -39,24 +40,29 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+
+import com.harvesthub.mobile.model.Listing;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.model.MarketCenter;
 
 public interface ApiService {
     @GET("/api/users")
     Call<List<User>> getAllUsers();
 
-    @POST("auth/verify-otp")
+    @POST("api/auth/verify-otp")
     Call<VerifyOtpResponse> verifyOtp(@Body VerifyOtpRequest request);
 
     @POST("api/auth/login")
     Call<LoginResponse> login(@Body LoginRequest request);
 
-    @POST("auth/send-otp")
+    @POST("api/auth/send-otp")
     Call<GenericResponse> sendVerificationCode(@Body SendOtpRequest request);
 
-    @POST("auth/resend-otp")
+    @POST("api/auth/resend-otp")
     Call<okhttp3.ResponseBody> resendOtp(@Body ResendOtpRequest request);
 
     @GET("dashboard/farmer/{id}")
@@ -134,4 +140,28 @@ public interface ApiService {
             @Part("nic") RequestBody nic,
             @Part MultipartBody.Part photo
     );
+
+    @POST("listings/create")
+    Call<GenericResponse> createListing(@Body Listing listing);
+
+    @PUT("listings/{id}")
+    Call<GenericResponse> updateListing(@Path("id") String id, @Body Listing listing);
+
+    @PUT("listings/{id}/status")
+    Call<GenericResponse> changeListingStatus(@Path("id") String id, @Body Map<String, String> status);
+
+    @GET("orders/farmer/{farmerId}")
+    Call<List<Order>> getFarmerOrders(@Path("farmerId") String farmerId);
+
+    @GET("orders/{orderId}")
+    Call<Order> getOrder(@Path("orderId") String orderId);
+
+    @PUT("orders/{orderId}/status")
+    Call<GenericResponse> updateOrderStatus(@Path("orderId") String orderId, @Body Map<String, String> status);
+
+    @POST("orders/{orderId}/rate")
+    Call<GenericResponse> submitRating(@Path("orderId") String orderId, @Body Map<String, Object> rating);
+
+    @GET("market/centers")
+    Call<List<MarketCenter>> getMarketCenters();
 }

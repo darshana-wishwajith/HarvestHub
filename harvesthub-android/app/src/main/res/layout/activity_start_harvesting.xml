@@ -25,178 +25,217 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Order Details Card -->
-            <LinearLayout
+            <!-- Alert Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_order_details_gray"
-                android:orientation="vertical"
-                android:padding="20dp">
+                app:cardBackgroundColor="#EAF5EE"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="24dp">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_listings_nav"
-                        app:tint="@color/text_black_bold" />
+                    <!-- Bell Icon Badge -->
+                    <FrameLayout
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/bg_circle_white">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Notification Alert"
+                            android:src="@drawable/ic_bell"
+                            app:tint="#10B981" />
+                    </FrameLayout>
+
+                    <!-- Title & Subtitle -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:text="Time to Harvest!"
+                        android:textColor="#073B27"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/order_details_title"
-                        android:textColor="@color/text_black_bold"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:gravity="center"
+                        android:text="The transport vehicle is 45 minutes away from your farm."
+                        android:textColor="#4B5563"
+                        android:textSize="14sp" />
+
+                    <!-- Order Chip -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <TextView
+                            android:id="@+id/tvOrderChip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:gravity="center"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="16dp"
+                            android:text="Order: #ORD-4082 | 500 KG Big Onions"
+                            android:textColor="#111827"
+                            android:textSize="13sp" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Instructions Checklist -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_check_circle"
+                                app:tint="#10B981" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Cut and clean crops thoroughly."
+                                android:textColor="#374151"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_check_circle"
+                                app:tint="#10B981" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Pack into standard 25KG crates."
+                                android:textColor="#374151"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_check_circle"
+                                app:tint="#10B981" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Keep in shaded area until truck arrives."
+                                android:textColor="#374151"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Start Harvesting Action Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStartHarvesting"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="24dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Acknowledge &amp; Start Harvesting"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#1D3B2D"
+                        app:cornerRadius="12dp"
+                        app:elevation="2dp" />
+
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/commodity_label"
-                        android:textColor="@color/text_gray_medium"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:text="@string/commodity_value"
-                        android:textColor="@color/text_black_bold"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider_gray"
-                    android:layout_marginBottom="16dp"/>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/quantity_label"
-                        android:textColor="@color/text_gray_medium"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:text="@string/quantity_value_bold"
-                        android:textColor="@color/text_black_bold"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider_gray"
-                    android:layout_marginBottom="16dp"/>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/total_value_label"
-                        android:textColor="@color/text_gray_medium"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:text="@string/total_value_amount"
-                        android:textColor="@color/status_text_green"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <!-- Advance Received Card -->
-            <LinearLayout
+            <!-- Live Field Status Photo Banner -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/bg_order_details_card"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="32dp">
+                android:layout_height="130dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <FrameLayout
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:background="@drawable/bg_success_badge"
-                    android:layout_marginBottom="24dp">
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/bg_circle_success" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_check_mark"
-                        app:tint="@color/white" />
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Field Status"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/harvest_png" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_gravity="bottom"
+                        android:background="#80000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:layout_margin="14dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:text="Live Field Status: Zone A-12"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
                 </FrameLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/advance_received_title"
-                    android:textColor="@color/text_black_bold"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center"
-                    android:text="@string/escrow_notice"
-                    android:textColor="@color/text_gray_medium"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStartHarvesting"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="32dp"
-                android:backgroundTint="@color/nav_selected_bg"
-                android:text="@string/acknowledge_start_harvesting"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                app:cornerRadius="12dp"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>

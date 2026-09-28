@@ -84,7 +84,7 @@ public class FarmerLoginActivity extends AppCompatActivity {
             return;
         }
 
-        String hashedPassword = PasswordUtils.hashPassword(password);
+        String hashedPassword = password; // Backend handles BCrypt hashing
 
         ApiService apiService = ApiClient.getApiService();
         LoginRequest loginRequest = new LoginRequest(emailOrMobile, hashedPassword);

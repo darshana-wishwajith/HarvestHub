@@ -11,14 +11,35 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
 import com.harvesthub.mobile.utils.BottomNavHelper;
+import com.harvesthub.mobile.utils.SessionManager;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HarvestReadyActivity extends AppCompatActivity {
+
+    private ApiService apiService;
+    private SessionManager sessionManager;
+    private String orderId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_harvest_ready);
+
+        orderId = getIntent().getStringExtra("ORDER_ID");
+        if (orderId == null) orderId = "demo-order";
+
+        sessionManager = new SessionManager(this);
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
 
         setupNavigation();
 
@@ -33,11 +54,28 @@ public class HarvestReadyActivity extends AppCompatActivity {
         });
 
         btnConfirmReady.setOnClickListener(v -> {
-            Toast.makeText(this, "Harvest confirmed as ready!", Toast.LENGTH_SHORT).show();
-            // Proceed to Vehicle Arrival tracking
-            Intent intent = new Intent(this, VehicleArrivalActivity.class);
-            startActivity(intent);
-            finish();
+            Map<String, String> statusMap = new HashMap<>();
+            statusMap.put("status", "HARVEST_READY");
+            
+            apiService.updateOrderStatus(orderId, statusMap).enqueue(new Callback<GenericResponse>() {
+                @Override
+                public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(HarvestReadyActivity.this, "Harvest confirmed as ready!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(HarvestReadyActivity.this, VehicleArrivalActivity.class);
+                        intent.putExtra("ORDER_ID", orderId);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(HarvestReadyActivity.this, "Failed to update status", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GenericResponse> call, Throwable t) {
+                    Toast.makeText(HarvestReadyActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

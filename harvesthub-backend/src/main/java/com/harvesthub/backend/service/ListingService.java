@@ -34,8 +34,41 @@ public class ListingService {
     }
 
     public Listing createListing(Listing listing) {
-        listing.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        listing.setStatus("ACTIVE");
+        if (listing.getCreatedDate() == null) {
+            listing.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+        if (listing.getStatus() == null) {
+            listing.setStatus("ACTIVE");
+        }
         return listingRepository.save(listing);
+    }
+
+    public Listing getListingById(String id) {
+        return listingRepository.findById(id).orElse(null);
+    }
+
+    public Listing updateListing(String id, Listing updates) {
+        Listing existing = listingRepository.findById(id).orElse(null);
+        if (existing != null) {
+            // Update fields (simplistic approach)
+            if (updates.getCropName() != null) existing.setCropName(updates.getCropName());
+            if (updates.getQuantity() > 0) existing.setQuantity(updates.getQuantity());
+            if (updates.getPricePerKg() > 0) existing.setPricePerKg(updates.getPricePerKg());
+            return listingRepository.save(existing);
+        }
+        return null;
+    }
+
+    public Listing changeStatus(String id, String newStatus) {
+        Listing existing = listingRepository.findById(id).orElse(null);
+        if (existing != null) {
+            existing.setStatus(newStatus);
+            return listingRepository.save(existing);
+        }
+        return null;
+    }
+
+    public void deleteListing(String id) {
+        listingRepository.deleteById(id);
     }
 }

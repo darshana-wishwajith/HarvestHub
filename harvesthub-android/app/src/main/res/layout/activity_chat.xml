@@ -230,98 +230,14 @@
     </LinearLayout>
 
     <!-- Chat Messages -->
-    <ScrollView
-        android:id="@+id/chatScrollView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMessages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@id/inputBar"
-        app:layout_constraintTop_toBottomOf="@id/orderCard">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginVertical="24dp"
-                android:background="@drawable/bg_date_pill"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="4dp"
-                android:text="@string/today"
-                android:textColor="@color/text_gray_medium"
-                android:textSize="11sp" />
-
-            <!-- Incoming Message -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="64dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chat_bubble_incoming"
-                    android:padding="12dp"
-                    android:text="@string/msg_incoming_content"
-                    android:textColor="@color/msg_text"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/msg_incoming_time"
-                    android:textColor="@color/msg_time"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <!-- Outgoing Message -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginStart="64dp"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chat_bubble_outgoing"
-                    android:padding="12dp"
-                    android:text="@string/msg_outgoing_content"
-                    android:textColor="@color/msg_text"
-                    android:textSize="14sp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/msg_outgoing_time"
-                        android:textColor="@color/msg_time"
-                        android:textSize="11sp" />
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
-                        android:src="@drawable/ic_double_check" />
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@id/orderCard" />
 
     <!-- Bottom Input Bar -->
     <LinearLayout
