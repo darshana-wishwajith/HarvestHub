@@ -21,4 +21,25 @@ public class Order {
     private String deliveryDate;
     private String status;
     private String createdDate;
+    
+    private double totalAmount;
+    private String buyerName;
+    private String cropName;
+    private String farmerName;
+    private String transporterId;
+    private String escrowStatus;
+    private java.util.List<StatusChange> statusHistory;
+    private Integer rating;
+    private String ratingComment;
+    private String pickupDate;
+    private String actualDeliveryDate;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StatusChange {
+        private String status;
+        private String timestamp;
+        private String note;
+    }
 }

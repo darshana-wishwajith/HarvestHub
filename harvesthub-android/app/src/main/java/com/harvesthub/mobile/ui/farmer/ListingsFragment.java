@@ -28,6 +28,8 @@ import com.harvesthub.mobile.model.WantedAd;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
+import com.harvesthub.mobile.utils.SessionManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,8 @@ public class ListingsFragment extends Fragment {
     private final List<ListingItem> allItems = new ArrayList<>();
     private final List<ListingItem> filteredItems = new ArrayList<>();
     private ApiService apiService;
-    private final String farmerId = "FARMER_123";
+    private SessionManager sessionManager;
+    private String farmerId = "";
     private String currentTab = "Active";
     private ListingItem.Status selectedFilter = null;
 
@@ -51,7 +54,11 @@ public class ListingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentListingsBinding.inflate(inflater, container, false);
 
-        apiService = ApiClient.getApiService();
+        sessionManager = new SessionManager(requireContext());
+        if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
+            farmerId = sessionManager.getUser().getId();
+        }
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initRecyclerView();
         setupTabs();
         setupSearch();

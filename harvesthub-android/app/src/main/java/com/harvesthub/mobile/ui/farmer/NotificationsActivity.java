@@ -20,6 +20,7 @@ import com.harvesthub.mobile.network.ApiService;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.harvesthub.mobile.utils.SessionManager;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -36,13 +37,18 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private ApiService apiService;
     private ProgressBar progressBar;
     private String farmerId = "FARMER_ID_HERE";
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
-        apiService = ApiClient.getClient().create(ApiService.class);
+        sessionManager = new SessionManager(this);
+        if (sessionManager.getUser() != null) {
+            farmerId = sessionManager.getUser().getId();
+        }
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initViews();
         handleNavigationVisibility();
         setupRecyclerView();

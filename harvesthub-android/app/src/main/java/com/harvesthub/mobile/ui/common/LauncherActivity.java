@@ -4,14 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.harvesthub.mobile.MainActivity;
+import com.harvesthub.mobile.utils.SessionManager;
+
 public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Always show the role selection screen when opening the app
-        startActivity(new Intent(this, RoleSelectionActivity.class));
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isLoggedIn() && sessionManager.getUser() != null && "FARMER".equals(sessionManager.getUser().getRole())) {
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            startActivity(new Intent(this, RoleSelectionActivity.class));
+        }
         finish();
     }
 }

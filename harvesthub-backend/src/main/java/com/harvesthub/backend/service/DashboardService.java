@@ -47,6 +47,16 @@ public class DashboardService {
 
         DashboardResponse response = new DashboardResponse();
         response.setFarmerName(farmerName);
+        
+        java.time.LocalTime now = java.time.LocalTime.now();
+        String greeting = "Good evening";
+        if (now.isBefore(java.time.LocalTime.NOON)) {
+            greeting = "Good morning";
+        } else if (now.isBefore(java.time.LocalTime.of(17, 0))) {
+            greeting = "Good afternoon";
+        }
+        response.setGreeting(greeting);
+
         response.setTotalRevenue(String.format("Rs. %,.2f", totalRevenue));
         response.setRevenueChange("+12.5%");
         response.setPreviousRevenue(String.format("Rs. %,.2f", totalRevenue * 0.89));

@@ -26,6 +26,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.databinding.FragmentCreateListingBinding;
 import com.harvesthub.mobile.databinding.ItemPhotoThumbnailBinding;
+import com.harvesthub.mobile.model.Listing;
+import com.harvesthub.mobile.model.GenericResponse;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,13 +149,41 @@ public class CreateListingFragment extends Fragment {
         binding.btnSubmit.setEnabled(false);
         binding.progressBar.setVisibility(View.VISIBLE);
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                Toast.makeText(requireContext(), "Listing Submitted for Verification!", Toast.LENGTH_SHORT).show();
-                getParentFragmentManager().popBackStack();
+        String cropName = binding.actvCrop.getText().toString().trim();
+        String yieldStr = binding.etYield.getText().toString().trim();
+        String priceStr = binding.etPrice.getText().toString().trim();
+
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) ? sessionManager.getUser().getId() : "";
+        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null) ? sessionManager.getUser().getLocation() : "Unknown";
+
+        Listing newListing = new Listing(farmerId, cropName, location, yieldStr, priceStr, "PENDING");
+
+        ApiService apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
+        apiService.createListing(newListing).enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                if (isAdded()) {
+                    binding.progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        Toast.makeText(requireContext(), "Listing Submitted for Verification!", Toast.LENGTH_SHORT).show();
+                        getParentFragmentManager().popBackStack();
+                    } else {
+                        binding.btnSubmit.setEnabled(true);
+                        Toast.makeText(requireContext(), "Failed to submit listing", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
-        }, 2000);
+
+            @Override
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                if (isAdded()) {
+                    binding.btnSubmit.setEnabled(true);
+                    binding.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(requireContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override

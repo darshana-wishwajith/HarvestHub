@@ -19,6 +19,8 @@ import com.harvesthub.mobile.model.WalletSummaryResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
 
+import com.harvesthub.mobile.utils.SessionManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +34,20 @@ public class WalletFragment extends Fragment {
     private TransactionAdapter adapter;
     private final List<Transaction> transactionList = new ArrayList<>();
     private ApiService apiService;
-    private final String farmerId = "FARMER_123";
+    private SessionManager sessionManager;
+    private String farmerId = "";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_wallet, container, false);
 
-        apiService = ApiClient.getClient().create(ApiService.class);
+        sessionManager = new SessionManager(requireContext());
+        if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
+            farmerId = sessionManager.getUser().getId();
+        }
+
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initViews(view);
         fetchWalletSummary();
         fetchRecentTransactions();

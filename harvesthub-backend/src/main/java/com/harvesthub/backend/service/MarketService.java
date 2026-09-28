@@ -55,4 +55,13 @@ public class MarketService {
         }
         return ads;
     }
+
+    public List<java.util.Map<String, Object>> getMarketCenters() {
+        return Arrays.asList(
+            java.util.Map.of("name", "Dambulla", "supplyLevel", "High", "demandLevel", "High"),
+            java.util.Map.of("name", "Keppetipola", "supplyLevel", "Medium", "demandLevel", "High"),
+            java.util.Map.of("name", "Meegoda", "supplyLevel", "High", "demandLevel", "Medium"),
+            java.util.Map.of("name", "Narahenpita", "supplyLevel", "Medium", "demandLevel", "Low")
+        );
+    }
 }

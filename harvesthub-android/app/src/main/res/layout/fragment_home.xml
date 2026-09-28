@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/home_bg">
+    android:background="#FFFFFF">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -23,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingStart="20dp"
-                android:paddingTop="24dp"
+                android:paddingTop="20dp"
                 android:paddingEnd="20dp"
                 android:paddingBottom="100dp">
 
@@ -33,362 +34,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="Good morning, Kamal!"
-                    android:textColor="@color/home_greeting_title"
-                    android:textSize="24sp" />
+                    android:text="Welcome back, Kamal!"
+                    android:textColor="#111827"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:text="Here's what's happening at your farm today."
-                    android:textColor="@color/home_greeting_subtext"
-                    android:textSize="14sp" />
-
-                <!-- Weather Card -->
+                <!-- Total Earnings Card -->
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="16dp"
-                    app:cardBackgroundColor="@color/weather_card_bg"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/weather_card_stroke"
-                    app:strokeWidth="1dp">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="14dp">
-
-                        <ImageView
-                            android:id="@+id/ivWeatherIcon"
-                            android:layout_width="26dp"
-                            android:layout_height="26dp"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="Weather"
-                            android:src="@drawable/ic_weather_cloud"
-                            app:tint="#D08846" />
-
-                        <TextView
-                            android:id="@+id/tvWeatherTemp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginStart="10dp"
-                            android:layout_toEndOf="@id/ivWeatherIcon"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:text="28°C, Cloudy"
-                            android:textColor="@color/weather_text_temp"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/tvWeatherLocation"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="Dambulla, LK"
-                            android:textColor="@color/weather_text_location"
-                            android:textSize="14sp" />
-                    </RelativeLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Revenue Card -->
-                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTotalEarnings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    app:cardBackgroundColor="@color/revenue_card_bg"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="24dp">
-
-                        <!-- Background Pattern -->
-                        <ImageView
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
-                            android:layout_gravity="bottom|end"
-                            android:layout_marginEnd="-30dp"
-                            android:layout_marginBottom="-30dp"
-                            android:alpha="0.1"
-                            android:contentDescription="@null"
-                            android:src="@drawable/harvesthub_logo_icon"
-                            app:tint="#FFFFFF" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:layout_width="14dp"
-                                    android:layout_height="14dp"
-                                    android:contentDescription="@null"
-                                    android:src="@drawable/ic_trending_up"
-                                    app:tint="@color/revenue_card_text_secondary" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="TOTAL REVENUE"
-                                    android:textColor="@color/revenue_card_text_secondary"
-                                    android:textSize="13sp"
-                                    android:letterSpacing="0.05" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:id="@+id/tvTotalRevenue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
-                                android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:text="LKR 125,000"
-                                android:textColor="@color/revenue_card_text_primary"
-                                android:textSize="28sp" />
-
-                            <TextView
-                                android:id="@+id/tvRevenueChange"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:background="@drawable/bg_revenue_badge"
-                                android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:gravity="center"
-                                android:paddingStart="8dp"
-                                android:paddingTop="2dp"
-                                android:paddingEnd="8dp"
-                                android:paddingBottom="2dp"
-                                android:text="+12%"
-                                android:textColor="@color/revenue_card_text_primary"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/tvPreviousRevenueSubtext"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
-                                android:fontFamily="@font/plus_jakarta_sans"
-                                android:text="Increased from LKR 111,600 last month"
-                                android:textColor="@color/revenue_card_text_sub"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Stat Cards -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:orientation="vertical">
-
-                    <!-- Active Listings -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp"
-                        android:layout_marginBottom="12dp"
-                        app:cardBackgroundColor="@color/stat_card_bg"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/stat_card_stroke"
-                        app:strokeWidth="1dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans"
-                                    android:text="ACTIVE LISTINGS"
-                                    android:textColor="@color/stat_text_label"
-                                    android:textSize="12sp"
-                                    android:letterSpacing="0.05" />
-
-                                <TextView
-                                    android:id="@+id/tvActiveListings"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="02"
-                                    android:textColor="@color/stat_text_value"
-                                    android:textSize="22sp" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:background="@drawable/bg_stat_icon_mint">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:contentDescription="@null"
-                                    android:src="@drawable/ic_package"
-                                    app:tint="@color/stat_icon_mint_tint" />
-                            </FrameLayout>
-                        </RelativeLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Completed -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp"
-                        android:layout_marginBottom="12dp"
-                        app:cardBackgroundColor="@color/stat_card_bg"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/stat_card_stroke"
-                        app:strokeWidth="1dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/plus_jakarta_sans"
-                                android:text="COMPLETED"
-                                android:textColor="@color/stat_text_label"
-                                android:textSize="12sp"
-                                android:letterSpacing="0.05" />
-
-                            <TextView
-                                android:id="@+id/tvCompletedOrders"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:text="05"
-                                android:textColor="@color/stat_text_value"
-                                android:textSize="22sp" />
-                        </LinearLayout>
-
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:background="@drawable/bg_stat_icon_lime">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="@null"
-                                android:src="@drawable/ic_truck"
-                                app:tint="@color/stat_icon_lime_tint" />
-                        </FrameLayout>
-                        </RelativeLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Trust Score -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp"
-                        android:layout_marginBottom="12dp"
-                        app:cardBackgroundColor="@color/stat_card_bg"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/stat_card_stroke"
-                        app:strokeWidth="1dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans"
-                                    android:text="TRUST SCORE"
-                                    android:textColor="@color/stat_text_label"
-                                    android:textSize="12sp"
-                                    android:letterSpacing="0.05" />
-
-                                <TextView
-                                    android:id="@+id/tvTrustScore"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="94%"
-                                    android:textColor="@color/stat_text_value"
-                                    android:textSize="22sp" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:background="@drawable/bg_stat_icon_gray">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:contentDescription="@null"
-                                    android:src="@drawable/ic_verified_simple"
-                                    app:tint="@color/stat_icon_gray_tint" />
-                            </FrameLayout>
-                        </RelativeLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-
-                <!-- Market Insights Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:cardBackgroundColor="@color/stat_card_bg"
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="#EAF5EE"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/stat_card_stroke"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -396,149 +56,266 @@
                         android:orientation="vertical"
                         android:padding="20dp">
 
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_trending_up"
+                                app:tint="#4A7C59" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:text="Total Earnings"
+                                android:textColor="#4A7C59"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvTotalRevenue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="LKR 125,000"
+                            android:textColor="#1E3F20"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Stats Row (Active Listings & Completed) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <!-- Active Listings Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardActiveListings"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#F9FAFB"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#E5E7EB"
+                        app:strokeWidth="1dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/ivActiveIcon"
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_package"
+                                app:tint="#D97706" />
+
+                            <TextView
+                                android:id="@+id/tvActiveListings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentEnd="true"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="2"
+                                android:textColor="#111827"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/ivActiveIcon"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:letterSpacing="0.05"
+                                android:text="ACTIVE LISTINGS"
+                                android:textColor="#6B7280"
+                                android:textSize="11sp" />
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Completed Orders Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardCompletedOrders"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#F9FAFB"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#E5E7EB"
+                        app:strokeWidth="1dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/ivCompletedIcon"
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_check_circle"
+                                app:tint="#10B981" />
+
+                            <TextView
+                                android:id="@+id/tvCompletedOrders"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentEnd="true"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="18"
+                                android:textColor="#111827"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/ivCompletedIcon"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:letterSpacing="0.05"
+                                android:text="COMPLETED"
+                                android:textColor="#6B7280"
+                                android:textSize="11sp" />
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Market Trends Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMarketTrends"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <!-- Header Row -->
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="Market Trends"
+                                android:textColor="#111827"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans"
-                                    android:text="Current Market Avg."
-                                    android:textColor="@color/market_avg_label"
-                                    android:textSize="14sp" />
-
-                                <TextView
-                                    android:id="@+id/tvMarketAvg"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="LKR 185.00 /kg"
-                                    android:textColor="@color/home_greeting_title"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                            <ImageView
+                                android:id="@+id/btnMarketInsightsMenu"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:layout_alignParentEnd="true"
-                                android:gravity="end"
-                                android:orientation="vertical">
-
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="12dp"
-                                        android:layout_height="12dp"
-                                        android:contentDescription="@null"
-                                        android:src="@drawable/ic_trending_up"
-                                        app:tint="#10A34A" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginStart="4dp"
-                                        android:fontFamily="@font/plus_jakarta_sans_bold"
-                                        android:text="+12.5%"
-                                        android:textColor="#10A34A"
-                                        android:textSize="13sp" />
-                                </LinearLayout>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="PAST 7 DAYS"
-                                    android:textColor="@color/market_chart_axis"
-                                    android:textSize="11sp"
-                                    android:letterSpacing="0.05" />
-                            </LinearLayout>
+                                android:layout_centerVertical="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Market Insights Menu"
+                                android:padding="4dp"
+                                android:src="@drawable/ic_more_horiz"
+                                app:tint="#6B7280" />
                         </RelativeLayout>
 
-                        <!-- Chart Placeholder / Component -->
+                        <!-- Chart -->
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/marketChart"
                             android:layout_width="match_parent"
                             android:layout_height="160dp"
-                            android:layout_marginTop="16dp" />
+                            android:layout_marginTop="12dp" />
 
-                        <!-- Tip Box -->
+                        <!-- Alert Pill Chip -->
                         <LinearLayout
+                            android:id="@+id/layoutMarketTrendAlert"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:background="@drawable/bg_market_tip"
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/bg_market_alert_chip"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="14dp">
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="12dp">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:contentDescription="@null"
                                 android:src="@drawable/ic_trending_up"
-                                app:tint="#047A35" />
+                                app:tint="#10B981" />
 
                             <TextView
+                                android:id="@+id/tvMarketTrendAlert"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="10dp"
                                 android:layout_weight="1"
-                                android:fontFamily="@font/plus_jakarta_sans"
-                                android:text="Prices are expected to peak this weekend. Consider listing now."
-                                android:textColor="#047A35"
-                                android:textSize="14sp"
-                                android:lineSpacingExtra="4dp" />
+                                android:fontFamily="@font/plus_jakarta_sans_medium"
+                                android:text="High demand for Big Onions in Dambulla"
+                                android:textColor="#111827"
+                                android:textSize="13sp" />
                         </LinearLayout>
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnViewMarketInsights"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:layout_marginTop="16dp"
-                            android:backgroundTint="@color/insight_button_bg"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:text="View Market Insights"
-                            android:textAllCaps="false"
-                            android:textColor="@color/insight_button_text"
-                            android:textSize="15sp"
-                            app:cornerRadius="10dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Create Listing Button -->
+                <!-- Create New Listing Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCreateListing"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="24dp"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:text="Create New Listing"
                     android:textAllCaps="false"
-                    android:textColor="@color/create_button_text"
+                    android:textColor="#FFFFFF"
                     android:textSize="16sp"
-                    app:backgroundTint="@color/create_button_bg"
-                    app:cornerRadius="12dp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#1D3B2D"
+                    app:cornerRadius="16dp"
+                    app:elevation="2dp"
                     app:icon="@drawable/ic_add_circle"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     app:iconSize="20dp"
-                    app:iconTint="@color/create_button_text" />
+                    app:iconTint="#FFFFFF" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

@@ -2,15 +2,12 @@ package com.harvesthub.mobile.ui.farmer;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -32,6 +29,7 @@ import com.harvesthub.mobile.model.MarketTrendResponse;
 import com.harvesthub.mobile.model.WeatherResponse;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,13 +43,15 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private ApiService apiService;
+    private SessionManager sessionManager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         
-        apiService = ApiClient.getApiService();
+        sessionManager = new SessionManager(requireContext());
+        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         setupLineChart();
         setupRefreshLayout();
 
@@ -63,8 +63,11 @@ public class HomeFragment extends Fragment {
                         .addToBackStack(null)
                         .commit());
 
-        binding.btnViewMarketInsights.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Navigating to Market Insights...", Toast.LENGTH_SHORT).show());
+        binding.btnMarketInsightsMenu.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), MarketInsightsActivity.class)));
+
+        binding.cardMarketTrends.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), MarketInsightsActivity.class)));
 
         return binding.getRoot();
     }
@@ -78,8 +81,7 @@ public class HomeFragment extends Fragment {
         if (binding != null) binding.swipeRefreshLayout.setRefreshing(true);
         renderChart(defaultTrendValues(), 7);
         
-        // Track multiple requests
-        final int[] pending = {3};
+        final int[] pending = {2};
         Runnable checkDone = () -> {
             pending[0]--;
             if (pending[0] <= 0 && binding != null) {
@@ -87,8 +89,10 @@ public class HomeFragment extends Fragment {
             }
         };
 
-        fetchDashboardData("FARMER_ID_HERE", checkDone);
-        fetchWeatherData("Dambulla, LK", checkDone);
+        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) ? sessionManager.getUser().getId() : "";
+        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null) ? sessionManager.getUser().getLocation() : "Dambulla, LK";
+
+        fetchDashboardData(farmerId, checkDone);
         fetchMarketTrend("Carrot", 7, checkDone);
     }
 
@@ -127,12 +131,8 @@ public class HomeFragment extends Fragment {
         }
         
         animateValue(binding.tvTotalRevenue, data.getTotalRevenue(), "LKR ", "");
-        binding.tvRevenueChange.setText(data.getRevenueChange());
-        binding.tvPreviousRevenueSubtext.setText(data.getPreviousRevenue());
-        
         animateValue(binding.tvActiveListings, data.getActiveListings(), "", "");
         animateValue(binding.tvCompletedOrders, data.getCompletedOrders(), "", "");
-        animateValue(binding.tvTrustScore, data.getTrustScore(), "", "%");
     }
 
     private void animateValue(TextView textView, String valueStr, String prefix, String suffix) {
@@ -152,8 +152,6 @@ public class HomeFragment extends Fragment {
                 if (prefix.contains("LKR")) {
                     textView.setText(prefix + String.format(Locale.US, "%,d", val) + suffix);
                 } else {
-                    textView.setText(prefix + String.format(Locale.US, "%02d", val).replace("0", val < 10 && suffix.isEmpty() ? "0" : "") + val + suffix);
-                    // Simple logic for 02 style if needed, but let's just do standard
                     textView.setText(prefix + (val < 10 && suffix.isEmpty() && !valueStr.startsWith("0") ? val : String.format(Locale.US, "%02d", val)) + suffix);
                 }
             });
@@ -161,27 +159,6 @@ public class HomeFragment extends Fragment {
         } catch (Exception e) {
             textView.setText(prefix + valueStr + suffix);
         }
-    }
-
-    private void fetchWeatherData(String location, Runnable onDone) {
-        apiService.getWeather(location).enqueue(new Callback<WeatherResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
-                if (onDone != null) onDone.run();
-                if (isAdded() && response.isSuccessful() && response.body() != null) {
-                    binding.tvWeatherTemp.setText(response.body().getTemperature() + ", " + response.body().getCondition());
-                    binding.tvWeatherLocation.setText(response.body().getLocation());
-                    
-                    binding.tvWeatherTemp.setAlpha(0f);
-                    binding.tvWeatherTemp.animate().alpha(1f).setDuration(400).start();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
-                if (onDone != null) onDone.run();
-            }
-        });
     }
 
     private void fetchMarketTrend(String crop, int days, Runnable onDone) {

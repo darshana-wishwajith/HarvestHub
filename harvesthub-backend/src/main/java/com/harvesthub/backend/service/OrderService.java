@@ -27,4 +27,45 @@ public class OrderService {
         orderRepository.save(order);
         return new GenericResponse(true, "Deal confirmed successfully");
     }
+
+    public Order createOrder(Order order) {
+        order.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        if (order.getStatus() == null) {
+            order.setStatus("PENDING_BUYER_APPROVAL");
+        }
+        order.setStatusHistory(new java.util.ArrayList<>());
+        order.getStatusHistory().add(new Order.StatusChange(order.getStatus(), order.getCreatedDate(), "Order created"));
+        return orderRepository.save(order);
+    }
+
+    public Order updateOrderStatus(String orderId, String newStatus, String note) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order != null) {
+            order.setStatus(newStatus);
+            if (order.getStatusHistory() == null) {
+                order.setStatusHistory(new java.util.ArrayList<>());
+            }
+            order.getStatusHistory().add(new Order.StatusChange(newStatus, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), note));
+            return orderRepository.save(order);
+        }
+        return null;
+    }
+
+    public java.util.List<Order> getOrdersByFarmer(String farmerId) {
+        return orderRepository.findByFarmerId(farmerId);
+    }
+
+    public Order getOrderById(String orderId) {
+        return orderRepository.findById(orderId).orElse(null);
+    }
+
+    public Order rateOrder(String orderId, Integer rating, String comment) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order != null) {
+            order.setRating(rating);
+            order.setRatingComment(comment);
+            return orderRepository.save(order);
+        }
+        return null;
+    }
 }
