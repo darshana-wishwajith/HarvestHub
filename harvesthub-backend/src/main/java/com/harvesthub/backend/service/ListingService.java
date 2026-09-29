@@ -17,8 +17,14 @@ public class ListingService {
     private ListingRepository listingRepository;
 
     public List<Listing> getActiveListings(String farmerId) {
-        return listingRepository.findByFarmerIdAndStatusIn(
-                farmerId, Arrays.asList("ACTIVE", "LISTED", "ONGOING", "PENDING"));
+        List<Listing> list = new java.util.ArrayList<>(listingRepository.findByFarmerIdAndStatusIn(
+                farmerId, Arrays.asList("ACTIVE", "LISTED", "ONGOING", "PENDING", "DRAFT", "UNDER_REVIEW", "RETAKE_REQUESTED", "DEACTIVATED", "APPROVED")));
+        list.sort((a, b) -> {
+            String dateA = a.getCreatedDate() != null ? a.getCreatedDate() : "";
+            String dateB = b.getCreatedDate() != null ? b.getCreatedDate() : "";
+            return dateB.compareTo(dateA);
+        });
+        return list;
     }
 
         public List<Listing> getMarketplaceListings(String searchQuery, String grade) {

@@ -4,7 +4,34 @@ import com.google.gson.annotations.SerializedName;
 
 public class ListingItem {
     public enum Status {
-        DRAFT, PENDING, UNDER_REVIEW, LISTED, ONGOING, DEACTIVATED, WANTED, COMPLETED, CANCELLED, ACTIVE, HISTORY
+        @SerializedName(value = "DRAFT", alternate = {"draft", "Draft", "DRAFTING", "Drafting"})
+        DRAFT,
+        @SerializedName(value = "PENDING", alternate = {"pending", "Pending"})
+        PENDING,
+        @SerializedName(value = "UNDER_REVIEW", alternate = {"under_review", "Under Review", "UNDER REVIEW", "under review"})
+        UNDER_REVIEW,
+        @SerializedName(value = "LISTED", alternate = {"listed", "Listed"})
+        LISTED,
+        @SerializedName(value = "ONGOING", alternate = {"ongoing", "Ongoing"})
+        ONGOING,
+        @SerializedName(value = "DEACTIVATED", alternate = {"deactivated", "Deactivated"})
+        DEACTIVATED,
+        @SerializedName(value = "WANTED", alternate = {"wanted", "Wanted"})
+        WANTED,
+        @SerializedName(value = "COMPLETED", alternate = {"completed", "Completed"})
+        COMPLETED,
+        @SerializedName(value = "CANCELLED", alternate = {"cancelled", "Cancelled", "CANCELED"})
+        CANCELLED,
+        @SerializedName(value = "ACTIVE", alternate = {"active", "Active"})
+        ACTIVE,
+        @SerializedName(value = "APPROVED", alternate = {"approved", "Approved"})
+        APPROVED,
+        @SerializedName(value = "RETAKE_REQUESTED", alternate = {"retake_requested", "Retake Requested", "RETAKE"})
+        RETAKE_REQUESTED,
+        @SerializedName(value = "REJECTED", alternate = {"rejected", "Rejected"})
+        REJECTED,
+        @SerializedName(value = "HISTORY", alternate = {"history", "History"})
+        HISTORY
     }
 
     @SerializedName("id")
@@ -83,7 +110,7 @@ public class ListingItem {
     public String getPrice() { return price; }
     public String getCreatedDate() { return createdDate; }
     public String getUpdatedTime() { return updatedTime; }
-    public Status getStatus() { return status; }
+    public Status getStatus() { return status != null ? status : Status.PENDING; }
     public String getGrade() { return grade; }
     public int getImageResource() { return imageResource; }
     

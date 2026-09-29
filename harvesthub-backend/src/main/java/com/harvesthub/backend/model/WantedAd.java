@@ -20,4 +20,8 @@ public class WantedAd {
     private boolean isUrgent;
     private String buyerId;
     private String createdDate;
+    private String deadline;
+    private String targetGrade;
+    private String status;
 }
+

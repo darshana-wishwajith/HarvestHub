@@ -17,8 +17,39 @@ import java.util.Map;
  */
 public final class ApiClient {
 
-    /** Change this if the backend runs somewhere other than localhost:8080. */
-    private static final String BASE_URL = "http://localhost:8080";
+    /** Default AWS cloud backend URL. Can be overridden via env var HARVESTHUB_BACKEND_URL or system property -Dharvesthub.backend.url */
+    public static final String DEFAULT_BASE_URL = "https://harvesthubapp.tech";
+    private static volatile String baseUrl = resolveBaseUrl();
+
+    public static String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public static void setBaseUrl(String url) {
+        if (url != null && !url.isBlank()) {
+            baseUrl = cleanUrl(url);
+        }
+    }
+
+    private static String resolveBaseUrl() {
+        String env = System.getenv("HARVESTHUB_BACKEND_URL");
+        if (env != null && !env.isBlank()) {
+            return cleanUrl(env);
+        }
+        String prop = System.getProperty("harvesthub.backend.url");
+        if (prop != null && !prop.isBlank()) {
+            return cleanUrl(prop);
+        }
+        return DEFAULT_BASE_URL;
+    }
+
+    private static String cleanUrl(String url) {
+        String trimmed = url.trim();
+        while (trimmed.endsWith("/")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 1);
+        }
+        return trimmed;
+    }
 
     private static final HttpClient HTTP = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
@@ -121,8 +152,9 @@ public final class ApiClient {
     }
 
     private static HttpRequest.Builder requestBuilder(String path) {
+        String targetPath = (path != null && path.startsWith("/")) ? path : ("/" + (path == null ? "" : path));
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + path))
+                .uri(URI.create(baseUrl + targetPath))
                 .timeout(Duration.ofSeconds(10))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json");

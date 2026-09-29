@@ -64,4 +64,28 @@ public class MarketService {
             java.util.Map.of("name", "Narahenpita", "supplyLevel", "Medium", "demandLevel", "Low")
         );
     }
+
+    public List<WantedAd> getWantedAdsByBuyer(String buyerId) {
+        if (buyerId == null || buyerId.trim().isEmpty() || "all".equalsIgnoreCase(buyerId)) {
+            return wantedAdRepository.findAll();
+        }
+        List<WantedAd> ads = wantedAdRepository.findByBuyerId(buyerId);
+        if (ads == null || ads.isEmpty()) {
+            return wantedAdRepository.findAll();
+        }
+        return ads;
+    }
+
+    public WantedAd createWantedAd(WantedAd ad) {
+        if (ad.getRequestId() == null || ad.getRequestId().trim().isEmpty()) {
+            ad.setRequestId("REQ-" + System.currentTimeMillis());
+        }
+        if (ad.getCreatedDate() == null || ad.getCreatedDate().trim().isEmpty()) {
+            ad.setCreatedDate(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+        }
+        if (ad.getStatus() == null || ad.getStatus().trim().isEmpty()) {
+            ad.setStatus("ACTIVE");
+        }
+        return wantedAdRepository.save(ad);
+    }
 }

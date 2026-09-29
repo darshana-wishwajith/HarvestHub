@@ -36,13 +36,15 @@ public class FarmerController {
         List<Map<String, Object>> result = listings.stream().map(l -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", l.getId());
+            map.put("farmerId", l.getFarmerId());
             map.put("cropName", l.getCropName());
             map.put("location", l.getLocation());
             map.put("quantity", l.getQuantity());
             map.put("price", l.getPrice());
             map.put("createdDate", l.getCreatedDate());
             map.put("updatedTime", l.getUpdatedTime());
-            map.put("status", l.getStatus());
+            map.put("status", l.getStatus() != null ? l.getStatus().trim().toUpperCase() : "PENDING");
+            map.put("grade", l.getGrade());
             return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(result);

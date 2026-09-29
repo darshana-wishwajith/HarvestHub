@@ -83,6 +83,13 @@ public class RoleSelectionActivity extends AppCompatActivity {
     }
 
     private void navigateToTransporterLogin() {
+        if (sessionManager.isLoggedIn() && "TRANSPORTER".equals(sessionManager.getUserRole())) {
+            Intent intent = new Intent(this, com.harvesthub.mobile.ui.transporter.DeliveryDashboardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
         Intent intent = new Intent(this, TransporterLoginActivity.class);
         startActivity(intent);
     }

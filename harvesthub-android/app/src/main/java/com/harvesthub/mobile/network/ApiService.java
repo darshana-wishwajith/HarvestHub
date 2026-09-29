@@ -143,7 +143,7 @@ public interface ApiService {
     );
 
     @POST("listings/create")
-    Call<GenericResponse> createListing(@Body Listing listing);
+    Call<Listing> createListing(@Body Listing listing);
 
     @PUT("listings/{id}")
     Call<GenericResponse> updateListing(@Path("id") String id, @Body Listing listing);
@@ -183,4 +183,16 @@ public interface ApiService {
 
     @GET("buyer/listings")
     Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grade);
+
+    @GET("wanted-ads/buyer/{buyerId}")
+    Call<List<WantedAd>> getBuyerWantedAds(@Path("buyerId") String buyerId);
+
+    @POST("wanted-ads/create")
+    Call<WantedAd> createWantedAd(@Body WantedAd ad);
+
+    @GET("offers/buyer/{buyerId}")
+    Call<List<com.harvesthub.mobile.model.SupplyOffer>> getOffersForBuyer(@Path("buyerId") String buyerId);
+
+    @GET("offers")
+    Call<List<com.harvesthub.mobile.model.SupplyOffer>> getAllOffers();
 }

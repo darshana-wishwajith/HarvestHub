@@ -82,19 +82,24 @@ public class VerificationQueueController implements Initializable {
 
                 Platform.runLater(() -> {
                     allListings.clear();
-                    if (dtos != null && !dtos.isEmpty()) {
+                    if (dtos != null) {
                         allListings.addAll(dtos.stream().map(QueueListing::fromDto).collect(Collectors.toList()));
-                    } else {
+                    }
+                    if (allListings.isEmpty() && "all".equalsIgnoreCase(activeTab) && search.isBlank()) {
                         loadDefaultMockListings();
                     }
                     if (queueSubtitleLabel != null) {
-                        queueSubtitleLabel.setText(allListings.size() + " listings awaiting review across your region");
+                        if ("claimed".equalsIgnoreCase(activeTab)) {
+                            queueSubtitleLabel.setText(allListings.size() + " listings claimed or reviewed by you");
+                        } else {
+                            queueSubtitleLabel.setText(allListings.size() + " listings awaiting review across your region");
+                        }
                     }
                     refreshListings();
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    if (allListings.isEmpty()) {
+                    if (allListings.isEmpty() && "all".equalsIgnoreCase(activeTab)) {
                         loadDefaultMockListings();
                     }
                     refreshListings();
@@ -144,7 +149,10 @@ public class VerificationQueueController implements Initializable {
     private boolean matchesTab(QueueListing listing) {
         return switch (activeTab) {
             case "unclaimed" -> listing.isClaimable();
-            case "claimed" -> !listing.isClaimable();
+            case "claimed" -> !listing.isClaimable()
+                    || "Listed".equalsIgnoreCase(listing.getStatusLabel())
+                    || "Rejected".equalsIgnoreCase(listing.getStatusLabel())
+                    || "In Review".equalsIgnoreCase(listing.getStatusLabel());
             default -> true;
         };
     }

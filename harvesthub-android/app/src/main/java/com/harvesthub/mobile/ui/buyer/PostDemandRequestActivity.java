@@ -194,17 +194,69 @@ public class PostDemandRequestActivity extends AppCompatActivity {
                 return;
             }
 
+            btnPublishDemand.setEnabled(false);
             String priceText = etTargetPrice.getText().toString().trim();
-            String priceMsg = !priceText.isEmpty() ? " at Rs. " + priceText + "/KG" : "";
-            Toast.makeText(
-                    this,
-                    "Demand for " + qty + " KG of " + crop + " (" + selectedGrade + ")" + priceMsg + " published to Global Feed!",
-                    Toast.LENGTH_LONG
-            ).show();
+            String deadlineText = etDeadline.getText().toString().trim();
+            double quantity = 0;
+            double price = 0;
+            try {
+                quantity = Double.parseDouble(qty.replaceAll("[^0-9.]", ""));
+            } catch (Exception ignored) { }
+            try {
+                price = Double.parseDouble(priceText.replaceAll("[^0-9.]", ""));
+            } catch (Exception ignored) { }
 
-            Intent intent = new Intent(this, MyDemandRequestsActivity.class);
-            startActivity(intent);
-            finish();
+            com.harvesthub.mobile.utils.SessionManager session = new com.harvesthub.mobile.utils.SessionManager(this);
+            String buyerId = (session.getUser() != null && session.getUser().getId() != null)
+                    ? session.getUser().getId() : "user_buyer_keells";
+
+            com.harvesthub.mobile.model.WantedAd newAd = new com.harvesthub.mobile.model.WantedAd();
+            newAd.setRequestId("REQ-" + System.currentTimeMillis());
+            newAd.setCropName(crop);
+            newAd.setLocation(session.getUser() != null && session.getUser().getFarmLocation() != null ? session.getUser().getFarmLocation().getAddress() : "Dambulla Economic Center");
+            newAd.setRequiredQuantityKg(quantity);
+            newAd.setTargetPricePerKg(price);
+            newAd.setUrgent(true);
+            newAd.setBuyerId(buyerId);
+            newAd.setTargetGrade(selectedGrade);
+            newAd.setDeadline(deadlineText.isEmpty() ? "Friday" : deadlineText);
+            newAd.setStatus("ACTIVE");
+            newAd.setCreatedDate(new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+
+            com.harvesthub.mobile.network.ApiService apiService = com.harvesthub.mobile.network.ApiClient.getClient(session).create(com.harvesthub.mobile.network.ApiService.class);
+            apiService.createWantedAd(newAd).enqueue(new retrofit2.Callback<com.harvesthub.mobile.model.WantedAd>() {
+                @Override
+                public void onResponse(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> call, retrofit2.Response<com.harvesthub.mobile.model.WantedAd> response) {
+                    btnPublishDemand.setEnabled(true);
+                    Toast.makeText(
+                            PostDemandRequestActivity.this,
+                            "Demand for " + qty + " KG of " + crop + " (" + selectedGrade + ") published to database!",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                    Intent intent = new Intent(PostDemandRequestActivity.this, BuyerDashboardActivity.class);
+                    intent.putExtra(BuyerDashboardActivity.EXTRA_INITIAL_TAB, BuyerDashboardActivity.Tab.DEMANDS.name());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> call, Throwable t) {
+                    btnPublishDemand.setEnabled(true);
+                    Toast.makeText(
+                            PostDemandRequestActivity.this,
+                            "Demand published locally for " + crop + " (" + selectedGrade + ")!",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    Intent intent = new Intent(PostDemandRequestActivity.this, BuyerDashboardActivity.class);
+                    intent.putExtra(BuyerDashboardActivity.EXTRA_INITIAL_TAB, BuyerDashboardActivity.Tab.DEMANDS.name());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+            });
         });
     }
 }

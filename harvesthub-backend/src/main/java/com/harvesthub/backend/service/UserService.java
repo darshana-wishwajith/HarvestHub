@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -20,7 +20,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-        @Autowired
+    @Autowired
     private EmailService emailService;
 
     public List<User> getAllUsers() {
@@ -57,28 +57,47 @@ public class UserService {
                 .findFirst();
     }
 
-
-    public void createPasswordResetTokenForUser(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            // Don't reveal that the user doesn't exist
+    public void createPasswordResetTokenForUser(String emailOrMobile) {
+        if (emailOrMobile == null || emailOrMobile.isBlank()) {
             return;
         }
+        Optional<User> userOptional = findByEmailOrMobile(emailOrMobile.trim());
+        if (userOptional.isEmpty()) {
+            return;
+        }
+
         User user = userOptional.get();
-        String token = UUID.randomUUID().toString();
-        user.setResetPasswordToken(token);
-        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1)); // Token is valid for 1 hour
+        // Generate a 6-digit numerical OTP code
+        String sixDigitOtp = String.format("%06d", new Random().nextInt(1000000));
+        user.setResetPasswordToken(sixDigitOtp);
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
-        emailService.sendPasswordResetEmail(user.getEmail(), token);
+
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            emailService.sendPasswordResetEmail(user.getEmail(), sixDigitOtp);
+        }
     }
 
     public void resetPassword(String token, String newPassword) {
-        Optional<User> userOptional = userRepository.findByResetPasswordToken(token);
-        if (userOptional.isEmpty() || userOptional.get().getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Invalid or expired password reset token.");
+        if (token == null || token.trim().isEmpty()) {
+            throw new IllegalStateException("Verification code is required.");
         }
+        String cleanToken = token.trim();
+
+        Optional<User> userOptional = userRepository.findByResetPasswordToken(cleanToken);
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findAll().stream()
+                    .filter(u -> cleanToken.equalsIgnoreCase(u.getResetPasswordToken()))
+                    .findFirst();
+        }
+
+        if (userOptional.isEmpty() || userOptional.get().getResetPasswordTokenExpiry() == null
+                || userOptional.get().getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Invalid or expired 6-digit verification code.");
+        }
+
         User user = userOptional.get();
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(newPassword.trim()));
         user.setResetPasswordToken(null);
         user.setResetPasswordTokenExpiry(null);
         userRepository.save(user);

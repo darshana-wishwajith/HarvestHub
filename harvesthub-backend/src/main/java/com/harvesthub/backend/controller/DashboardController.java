@@ -9,18 +9,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping({"/api", ""})
 public class DashboardController {
     @Autowired
     private DashboardService dashboardService;
     @Autowired
     private MarketService marketService;
 
-    @GetMapping("dashboard/farmer/{id}")
+    @GetMapping({"/dashboard/farmer/{id}", "/api/dashboard/farmer/{id}"})
     public ResponseEntity<DashboardResponse> getFarmerDashboard(@PathVariable String id) {
         return ResponseEntity.ok(dashboardService.getFarmerDashboard(id));
     }
 
-    @GetMapping("weather")
+    @GetMapping({"/weather", "/api/weather"})
     public ResponseEntity<WeatherResponse> getWeather(@RequestParam(value = "location", required = false) String location) {
         return ResponseEntity.ok(marketService.getWeather(location));
     }

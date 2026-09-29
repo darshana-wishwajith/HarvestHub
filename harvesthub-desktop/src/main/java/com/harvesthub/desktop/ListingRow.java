@@ -94,12 +94,17 @@ public class ListingRow extends HBox {
     }
 
     private StackPane buildStatusPill(QueueListing listing) {
-        Label pill = new Label(listing.getStatusLabel());
+        String label = listing.getStatusLabel() != null ? listing.getStatusLabel() : "Pending";
+        Label pill = new Label(label);
         pill.getStyleClass().add("listing-status-pill");
-        if (listing.isPending()) {
-            pill.getStyleClass().add("listing-status-pending");
-        } else {
+        if (label.startsWith("Grade") || "Approved".equalsIgnoreCase(label) || "Active".equalsIgnoreCase(label) || "Listed".equalsIgnoreCase(label)) {
+            pill.getStyleClass().add("listing-status-approved");
+        } else if ("Rejected".equalsIgnoreCase(label)) {
+            pill.getStyleClass().add("listing-status-rejected");
+        } else if ("In Review".equalsIgnoreCase(label) || "Under Review".equalsIgnoreCase(label)) {
             pill.getStyleClass().add("listing-status-review");
+        } else {
+            pill.getStyleClass().add("listing-status-pending");
         }
 
         StackPane wrapper = new StackPane(pill);
@@ -111,14 +116,32 @@ public class ListingRow extends HBox {
     }
 
     private Button buildClaimButton(QueueListing listing) {
-        Button button = new Button("Claim & Review");
+        String label = listing.getStatusLabel();
+        boolean isReviewed = label != null && (label.startsWith("Grade")
+                || "Approved".equalsIgnoreCase(label)
+                || "Active".equalsIgnoreCase(label)
+                || "Listed".equalsIgnoreCase(label)
+                || "Rejected".equalsIgnoreCase(label));
+        boolean isInReview = label != null && ("In Review".equalsIgnoreCase(label) || "Under Review".equalsIgnoreCase(label));
+
+        String buttonText;
+        if (isReviewed) {
+            buttonText = "Details";
+        } else if (isInReview) {
+            buttonText = "Review";
+        } else {
+            buttonText = "Claim & Review";
+        }
+
+        Button button = new Button(buttonText);
         button.getStyleClass().add("claim-review-button");
         button.setMnemonicParsing(false);
         button.setMinWidth(140);
         button.setPrefWidth(140);
         button.setMaxWidth(140);
-        button.setDisable(!listing.isClaimable());
-        if (!listing.isClaimable()) {
+
+        if (!listing.isClaimable() && !isReviewed && !isInReview) {
+            button.setDisable(true);
             button.getStyleClass().add("claim-review-button-disabled");
         } else {
             button.setOnAction(e -> {
@@ -127,14 +150,17 @@ public class ListingRow extends HBox {
                 Thread worker = new Thread(() -> {
                     Listing target = null;
                     if (listing.getId() != null) {
-                        try {
-                            com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.claimListing(listing.getId());
-                            if (dto != null) target = Listing.fromDto(dto);
-                        } catch (Exception ignored) {
+                        if (!isReviewed && !isInReview) {
+                            try {
+                                com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.claimListing(listing.getId());
+                                if (dto != null) target = Listing.fromDto(dto);
+                            } catch (Exception ignored) {}
+                        }
+                        if (target == null) {
                             try {
                                 com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.getListing(listing.getId());
                                 if (dto != null) target = Listing.fromDto(dto);
-                            } catch (Exception ignored2) {}
+                            } catch (Exception ignored) {}
                         }
                     }
                     if (target == null) {
