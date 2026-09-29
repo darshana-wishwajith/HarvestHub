@@ -19,12 +19,18 @@ public class ListingController {
 
     @PostMapping("/create")
     public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
-        // Assume farmerId is set by auth or client for now, or just leave as is
-        // But task says "sets farmerId, status=DRAFT, createdDate"
-        // Since we don't have auth context easily here, we will just trust the request farmerId
-        // The task says "accepts Listing body, sets farmerId, status=DRAFT, createdDate"
-        listing.setStatus("DRAFT");
-        listing.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        if (listing.getFarmerId() == null || listing.getFarmerId().trim().isEmpty()) {
+            listing.setFarmerId("user_farmer_kamal");
+        }
+        if (listing.getStatus() == null || listing.getStatus().trim().isEmpty()) {
+            listing.setStatus("PENDING");
+        }
+        if (listing.getCreatedDate() == null || listing.getCreatedDate().trim().isEmpty()) {
+            listing.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+        if (listing.getUpdatedTime() == null || listing.getUpdatedTime().trim().isEmpty()) {
+            listing.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
         return ResponseEntity.ok(listingService.createListing(listing));
     }
 

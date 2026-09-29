@@ -16,6 +16,10 @@ public class SupplyOffer {
     private String requestId;
     private String batchId;
     private String farmerId;
+    private String farmerName;
+    private String cropName;
+    private String location;
+    private String grade;
     private double quantity;
     private double pricePerKg;
     private String status;

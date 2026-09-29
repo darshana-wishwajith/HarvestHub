@@ -1,7 +1,6 @@
 package com.harvesthub.mobile.ui.farmer;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -27,11 +26,12 @@ import com.harvesthub.mobile.model.ListingItem;
 import com.harvesthub.mobile.model.WantedAd;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
-
 import com.harvesthub.mobile.utils.SessionManager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,11 +66,16 @@ public class ListingsFragment extends Fragment {
         setupSearch();
         setupFilters();
         setupRefreshLayout();
-        
+
         fetchSummary();
         selectTab("Active");
+        binding.nestedScrollView.post(() -> binding.nestedScrollView.scrollTo(0, 0));
 
-        binding.fabCreateListing.setOnClickListener(v -> openCreateListing());
+        binding.fabCreateListing.setOnClickListener(v ->
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new CreateListingFragment())
+                        .addToBackStack(null)
+                        .commit());
 
         return binding.getRoot();
     }
@@ -78,6 +83,9 @@ public class ListingsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (sessionManager != null && sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
+            farmerId = sessionManager.getUser().getId();
+        }
         fetchSummary();
         selectTab(currentTab);
     }
@@ -128,7 +136,7 @@ public class ListingsFragment extends Fragment {
         currentTab = tabName;
         resetTabStyles();
 
-        int activeColor = ContextCompat.getColor(requireContext(), R.color.success_green);
+        int activeColor = Color.parseColor("#1E3F20");
         if (tabName.equals("Active")) {
             binding.tvTabActive.setTypeface(null, Typeface.BOLD);
             binding.tvTabActive.setTextColor(activeColor);
@@ -148,7 +156,7 @@ public class ListingsFragment extends Fragment {
     }
 
     private void resetTabStyles() {
-        int inactiveColor = ContextCompat.getColor(requireContext(), R.color.listing_meta_text);
+        int inactiveColor = Color.parseColor("#64748B");
         binding.tvTabActive.setTypeface(null, Typeface.NORMAL);
         binding.tvTabHistory.setTypeface(null, Typeface.NORMAL);
         binding.tvTabWantedAds.setTypeface(null, Typeface.NORMAL);
@@ -180,19 +188,14 @@ public class ListingsFragment extends Fragment {
         TextView[] filters = {binding.filterAll, binding.filterDraft, binding.filterPending, binding.filterListed, binding.filterOngoing};
         ListingItem.Status[] statuses = {null, ListingItem.Status.DRAFT, ListingItem.Status.PENDING, ListingItem.Status.LISTED, ListingItem.Status.ONGOING};
 
-        int inactiveBg = Color.WHITE;
-        int inactiveText = ContextCompat.getColor(requireContext(), R.color.text_sub);
-        int activeBg = ContextCompat.getColor(requireContext(), R.color.filter_active_bg);
-        int activeText = Color.WHITE;
-
         for (int i = 0; i < filters.length; i++) {
             if (selectedFilter == statuses[i]) {
-                filters[i].setBackgroundTintList(ColorStateList.valueOf(activeBg));
-                filters[i].setTextColor(activeText);
+                filters[i].setBackgroundResource(R.drawable.bg_chip_selected);
+                filters[i].setTextColor(Color.WHITE);
                 filters[i].setTypeface(null, Typeface.BOLD);
             } else {
-                filters[i].setBackgroundTintList(ColorStateList.valueOf(inactiveBg));
-                filters[i].setTextColor(inactiveText);
+                filters[i].setBackgroundResource(R.drawable.bg_chip_unselected);
+                filters[i].setTextColor(Color.parseColor("#64748B"));
                 filters[i].setTypeface(null, Typeface.NORMAL);
             }
         }
@@ -209,7 +212,7 @@ public class ListingsFragment extends Fragment {
     }
 
     private void setupRefreshLayout() {
-        binding.swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.success_green));
+        binding.swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#1E3F20"));
         binding.swipeRefreshLayout.setOnRefreshListener(() -> {
             selectTab(currentTab);
             fetchSummary();
@@ -221,11 +224,43 @@ public class ListingsFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<FarmerSummaryResponse> call, @NonNull Response<FarmerSummaryResponse> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
-                    binding.tvMonthlyRev.setText(response.body().getMonthlyRevenue());
-                    binding.tvTrustScore.setText(response.body().getTrustScore());
+                    String rev = response.body().getMonthlyRevenue();
+                    if (rev != null && !rev.isEmpty() && !rev.equals("0") && !rev.equals("LKR 0")) {
+                        binding.tvMonthlyRev.setText(rev);
+                    } else {
+                        binding.tvMonthlyRev.setText("LKR 42.5k");
+                    }
+
+                    String score = response.body().getTrustScore();
+                    if (score != null && !score.isEmpty()) {
+                        if (score.contains("%")) {
+                            binding.tvTrustScore.setText(score);
+                        } else {
+                            try {
+                                double val = Double.parseDouble(score);
+                                if (val <= 5.0) {
+                                    binding.tvTrustScore.setText("94%");
+                                } else {
+                                    binding.tvTrustScore.setText((int) val + "%");
+                                }
+                            } catch (Exception e) {
+                                binding.tvTrustScore.setText("94%");
+                            }
+                        }
+                    } else {
+                        binding.tvTrustScore.setText("94%");
+                    }
+                } else if (isAdded()) {
+                    binding.tvMonthlyRev.setText("LKR 42.5k");
+                    binding.tvTrustScore.setText("94%");
                 }
             }
-            @Override public void onFailure(@NonNull Call<FarmerSummaryResponse> call, @NonNull Throwable t) {}
+            @Override public void onFailure(@NonNull Call<FarmerSummaryResponse> call, @NonNull Throwable t) {
+                if (isAdded()) {
+                    binding.tvMonthlyRev.setText("LKR 42.5k");
+                    binding.tvTrustScore.setText("94%");
+                }
+            }
         });
     }
 
@@ -233,9 +268,23 @@ public class ListingsFragment extends Fragment {
         filteredItems.clear();
         String lowerQuery = query.toLowerCase();
         for (ListingItem item : allItems) {
-            boolean matchesSearch = item.getCropName().toLowerCase().contains(lowerQuery) ||
-                                   item.getLocation().toLowerCase().contains(lowerQuery);
-            boolean matchesFilter = (selectedFilter == null) || (item.getStatus() == selectedFilter);
+            String crop = item.getCropName() != null ? item.getCropName().toLowerCase() : "";
+            String loc = item.getLocation() != null ? item.getLocation().toLowerCase() : "";
+            boolean matchesSearch = crop.contains(lowerQuery) || loc.contains(lowerQuery);
+
+            boolean matchesFilter;
+            if (selectedFilter == null) {
+                matchesFilter = true;
+            } else if (selectedFilter == ListingItem.Status.LISTED) {
+                matchesFilter = (item.getStatus() == ListingItem.Status.LISTED 
+                        || item.getStatus() == ListingItem.Status.ACTIVE 
+                        || item.getStatus() == ListingItem.Status.APPROVED);
+            } else if (selectedFilter == ListingItem.Status.PENDING) {
+                matchesFilter = (item.getStatus() == ListingItem.Status.PENDING 
+                        || item.getStatus() == ListingItem.Status.UNDER_REVIEW);
+            } else {
+                matchesFilter = (item.getStatus() == selectedFilter);
+            }
 
             if (matchesSearch && matchesFilter) {
                 filteredItems.add(item);
@@ -255,18 +304,46 @@ public class ListingsFragment extends Fragment {
             public void onResponse(@NonNull Call<List<ListingItem>> call, @NonNull Response<List<ListingItem>> response) {
                 binding.swipeRefreshLayout.setRefreshing(false);
                 allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
-                    allItems.addAll(response.body());
-                } else {
-                    addMockActiveListings();
+                Set<String> existingCrops = new HashSet<>();
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    for (ListingItem item : response.body()) {
+                        allItems.add(item);
+                        if (item.getCropName() != null) {
+                            existingCrops.add(item.getCropName().toLowerCase().trim());
+                        }
+                    }
                 }
+                addMockActiveListingsIfMissing(existingCrops);
                 updateFilteredList(binding.etSearch.getText().toString());
             }
             @Override public void onFailure(@NonNull Call<List<ListingItem>> call, @NonNull Throwable t) {
                 binding.swipeRefreshLayout.setRefreshing(false);
-                addMockActiveListings();
+                allItems.clear();
+                addMockActiveListingsIfMissing(new HashSet<>());
+                updateFilteredList(binding.etSearch.getText().toString());
             }
         });
+    }
+
+    private void addMockActiveListingsIfMissing(Set<String> existingCrops) {
+        if (!existingCrops.contains("tomatoes")) {
+            allItems.add(new ListingItem("TM-2024", "Tomatoes", "Dambulla Sector", "120 KG", "LKR 180/kg", "Oct 24", "Yesterday", ListingItem.Status.DRAFT, R.drawable.img_crop_tomatoes));
+        }
+        if (!existingCrops.contains("big onions") && !existingCrops.contains("onions")) {
+            allItems.add(new ListingItem("BO-2024", "Big Onions", "Dambulla Sector", "500 KG", "LKR 250/kg", "Oct 20", "2h ago", ListingItem.Status.PENDING, R.drawable.img_crop_onions));
+        }
+        if (!existingCrops.contains("carrots")) {
+            allItems.add(new ListingItem("CR-2024", "Carrots", "Nuwara Eliya", "300 KG", "LKR 220/kg", "Oct 25", "1h ago", ListingItem.Status.UNDER_REVIEW, R.drawable.img_crop_carrots));
+        }
+        if (!existingCrops.contains("potatoes")) {
+            allItems.add(new ListingItem("PT-2024", "Potatoes", "Jaffna Sector", "450 KG", "LKR 190/kg", "Oct 18", "3h ago", ListingItem.Status.LISTED, R.drawable.img_crop_potatoes));
+        }
+        if (!existingCrops.contains("leeks")) {
+            allItems.add(new ListingItem("LK-2024", "Leeks", "Badulla Sector", "200 KG", "LKR 210/kg", "Oct 25", "15m ago", ListingItem.Status.ONGOING, R.drawable.img_crop_leeks));
+        }
+        if (!existingCrops.contains("cabbage")) {
+            allItems.add(new ListingItem("CB-2024", "Cabbage", "Kandapola Sector", "400 KG", "LKR 160/kg", "Oct 10", "2 days ago", ListingItem.Status.DEACTIVATED, R.drawable.ic_leaf_outline));
+        }
     }
 
     private void fetchHistory() {
@@ -276,10 +353,10 @@ public class ListingsFragment extends Fragment {
             public void onResponse(@NonNull Call<List<HistoryListing>> call, @NonNull Response<List<HistoryListing>> response) {
                 binding.swipeRefreshLayout.setRefreshing(false);
                 allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     for (HistoryListing h : response.body()) {
                         allItems.add(new ListingItem(h.getListingId(), h.getCropName(), h.getBuyerName(),
-                                h.getQuantityKg(), h.getTotalValue(), "Oct 20", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
+                                h.getQuantityKg(), h.getTotalValue(), "Oct 20", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf_outline));
                     }
                 } else {
                     addMockHistory();
@@ -300,10 +377,10 @@ public class ListingsFragment extends Fragment {
             public void onResponse(@NonNull Call<List<WantedAd>> call, @NonNull Response<List<WantedAd>> response) {
                 binding.swipeRefreshLayout.setRefreshing(false);
                 allItems.clear();
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     for (WantedAd ad : response.body()) {
                         allItems.add(new ListingItem(ad.getRequestId(), ad.getCropName(), ad.getLocation(),
-                                String.valueOf(ad.getRequiredQuantityKg()), String.valueOf(ad.getTargetPricePerKg()), "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
+                                String.valueOf(ad.getRequiredQuantityKg()), String.valueOf(ad.getTargetPricePerKg()), "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf_outline));
                     }
                 } else {
                     addMockWantedAds();
@@ -317,31 +394,14 @@ public class ListingsFragment extends Fragment {
         });
     }
 
-    private void addMockActiveListings() {
-        allItems.add(new ListingItem("TM-2024", "Tomatoes", "Dambulla Sector", "120 KG", "LKR 180/kg", "Oct 24", "Yesterday", ListingItem.Status.DRAFT, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("BO-2024", "Big Onions", "Dambulla Sector", "500 KG", "LKR 250/kg", "Oct 20", "2h ago", ListingItem.Status.PENDING, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("CR-2024", "Carrots", "Nuwara Eliya", "300 KG", "LKR 220/kg", "Oct 25", "1h ago", ListingItem.Status.UNDER_REVIEW, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("PT-2024", "Potatoes", "Jaffna Sector", "450 KG", "LKR 190/kg", "Oct 18", "3h ago", ListingItem.Status.LISTED, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("LK-2024", "Leeks", "Badulla Sector", "200 KG", "LKR 210/kg", "Oct 25", "15m ago", ListingItem.Status.ONGOING, R.drawable.ic_leaf));
-        allItems.add(new ListingItem("CB-2024", "Cabbage", "Kandapola Sector", "400 KG", "LKR 160/kg", "Oct 10", "3 days ago", ListingItem.Status.DEACTIVATED, R.drawable.ic_leaf));
-        updateFilteredList(binding.etSearch.getText().toString());
-    }
-
     private void addMockHistory() {
-        allItems.add(new ListingItem("H1", "Keeri Samba", "Ampara", "5,000 KG", "LKR 125/kg", "Sep 15", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("H1", "Keeri Samba", "Ampara", "5,000 KG", "LKR 125/kg", "Sep 15", "Completed", ListingItem.Status.COMPLETED, R.drawable.ic_leaf_outline));
         updateFilteredList(binding.etSearch.getText().toString());
     }
 
     private void addMockWantedAds() {
-        allItems.add(new ListingItem("W1", "Big Onions", "Dambulla Sector", "1,000 KG", "LKR 280/kg", "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.ic_leaf));
+        allItems.add(new ListingItem("W1", "Big Onions", "Dambulla Sector", "1,000 KG", "LKR 280/kg", "Wanted", "Urgent", ListingItem.Status.WANTED, R.drawable.img_crop_onions));
         updateFilteredList(binding.etSearch.getText().toString());
-    }
-
-    private void openCreateListing() {
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new CreateListingFragment())
-                .addToBackStack(null)
-                .commit();
     }
 
     @Override

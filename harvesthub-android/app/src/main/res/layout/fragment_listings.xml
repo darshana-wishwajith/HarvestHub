@@ -11,20 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:fillViewport="true">
+            android:fillViewport="false">
 
             <LinearLayout
-                android:id="@+id/mainContentContainer"
+                android:id="@+id/mainContentContainer" android:focusable="true" android:focusableInTouchMode="true" android:descendantFocusability="beforeDescendants"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="20dp"
+                android:paddingHorizontal="18dp"
                 android:paddingTop="16dp"
-                android:paddingBottom="100dp">
+                android:paddingBottom="40dp">
 
                 <!-- Summary Row -->
                 <LinearLayout
@@ -33,12 +33,13 @@
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
+                    <!-- Monthly Rev Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
-                        android:layout_height="80dp"
+                        android:layout_height="82dp"
                         android:layout_weight="1.2"
-                        app:cardBackgroundColor="@color/success_green"
-                        app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="#388E3C"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
@@ -50,40 +51,42 @@
                             android:paddingHorizontal="16dp">
 
                             <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:src="@drawable/ic_banknote"
                                 app:tint="#FFFFFF" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="5dp"
                                 android:fontFamily="@font/plus_jakarta_sans"
                                 android:text="Monthly Rev"
-                                android:textColor="#E2E8F0"
-                                android:textSize="11sp" />
+                                android:textColor="#E0F2E9"
+                                android:textSize="11.5sp" />
 
                             <TextView
                                 android:id="@+id/tvMonthlyRev"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="LKR 42.5k"
                                 android:textColor="#FFFFFF"
-                                android:textSize="18sp"
+                                android:textSize="18.5sp"
                                 tools:text="LKR 42.5k" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Trust Score Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
-                        android:layout_height="80dp"
+                        android:layout_height="82dp"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="@color/stat_card_bg"
-                        app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
-                        app:strokeColor="@color/stat_card_stroke"
+                        app:strokeColor="#E2E8F0"
                         app:strokeWidth="1dp">
 
                         <LinearLayout
@@ -94,27 +97,28 @@
                             android:paddingHorizontal="16dp">
 
                             <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:src="@drawable/ic_leaf"
-                                app:tint="@color/accent_green" />
+                                app:tint="#2E7D32" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="5dp"
                                 android:fontFamily="@font/plus_jakarta_sans"
                                 android:text="Trust Score"
-                                android:textColor="@color/listing_meta_text"
-                                android:textSize="11sp" />
+                                android:textColor="#64748B"
+                                android:textSize="11.5sp" />
 
                             <TextView
                                 android:id="@+id/tvTrustScore"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:textColor="@color/stat_text_value"
-                                android:textSize="18sp"
+                                android:text="94%"
+                                android:textColor="#1E293B"
+                                android:textSize="18.5sp"
                                 tools:text="94%" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -124,10 +128,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
+                    android:layout_marginTop="24dp"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
                     android:text="Listings &amp; Demands"
-                    android:textColor="@color/home_greeting_title"
+                    android:textColor="#1E293B"
                     android:textSize="22sp" />
 
                 <!-- Tabs -->
@@ -137,15 +141,16 @@
                     android:layout_marginTop="16dp"
                     android:orientation="horizontal">
 
+                    <!-- Active Tab -->
                     <LinearLayout
                         android:id="@+id/tabActive"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/tvTabActive"
@@ -153,27 +158,28 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="Active"
-                            android:textColor="@color/success_green"
+                            android:textColor="#1E3F20"
                             android:textSize="14sp" />
 
                         <View
                             android:id="@+id/indicatorActive"
                             android:layout_width="match_parent"
                             android:layout_height="2.5dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@color/success_green"
+                            android:layout_marginTop="10dp"
+                            android:background="#1E3F20"
                             android:visibility="visible" />
                     </LinearLayout>
 
+                    <!-- History Tab -->
                     <LinearLayout
                         android:id="@+id/tabHistory"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/tvTabHistory"
@@ -181,27 +187,28 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:text="History"
-                            android:textColor="@color/listing_meta_text"
+                            android:textColor="#64748B"
                             android:textSize="14sp" />
 
                         <View
                             android:id="@+id/indicatorHistory"
                             android:layout_width="match_parent"
-                            android:layout_height="2dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@color/success_green"
+                            android:layout_height="2.5dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#1E3F20"
                             android:visibility="invisible" />
                     </LinearLayout>
 
+                    <!-- Wanted Ads Tab -->
                     <LinearLayout
                         android:id="@+id/tabWantedAds"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/tvTabWantedAds"
@@ -209,15 +216,15 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:text="Wanted Ads"
-                            android:textColor="@color/listing_meta_text"
+                            android:textColor="#64748B"
                             android:textSize="14sp" />
 
                         <View
                             android:id="@+id/indicatorWantedAds"
                             android:layout_width="match_parent"
-                            android:layout_height="2dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@color/success_green"
+                            android:layout_height="2.5dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#1E3F20"
                             android:visibility="invisible" />
                     </LinearLayout>
                 </LinearLayout>
@@ -225,17 +232,17 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/stat_card_stroke" />
+                    android:background="#E2E8F0" />
 
                 <!-- Search Bar -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="20dp"
-                    app:cardBackgroundColor="@color/search_bar_bg"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="#F8FAFC"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/stat_card_stroke"
+                    app:strokeColor="#E2E8F0"
                     app:strokeWidth="1dp">
 
                     <RelativeLayout
@@ -245,24 +252,24 @@
 
                         <ImageView
                             android:id="@+id/ivSearch"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
                             android:layout_centerVertical="true"
                             android:src="@drawable/ic_search"
-                            app:tint="@color/listing_meta_text" />
+                            app:tint="#94A3B8" />
 
                         <EditText
                             android:id="@+id/etSearch"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_marginStart="12dp"
+                            android:layout_marginStart="10dp"
                             android:layout_toEndOf="@id/ivSearch"
                             android:background="@android:color/transparent"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:hint="Search listings..."
                             android:inputType="text"
-                            android:textColor="@color/stat_text_value"
-                            android:textColorHint="@color/listing_label_text"
+                            android:textColor="#1E293B"
+                            android:textColorHint="#94A3B8"
                             android:textSize="14sp" />
                     </RelativeLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -271,7 +278,7 @@
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="16dp"
                     android:scrollbars="none">
 
                     <LinearLayout
@@ -284,80 +291,75 @@
                             android:id="@+id/filterAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_badge"
-                            android:backgroundTint="#2D3748"
+                            android:background="@drawable/bg_chip_selected"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:paddingHorizontal="18dp"
-                            android:paddingVertical="9dp"
+                            android:paddingVertical="7.5dp"
                             android:text="All"
                             android:textColor="@color/white"
-                            android:textSize="13sp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/filterDraft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_outlined_button_chat"
-                            android:backgroundTint="@color/stat_card_bg"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:paddingHorizontal="18dp"
-                            android:paddingVertical="9dp"
+                            android:paddingVertical="7.5dp"
                             android:text="Draft"
-                            android:textColor="@color/listing_meta_text"
-                            android:textSize="13sp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/filterPending"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_outlined_button_chat"
-                            android:backgroundTint="@color/stat_card_bg"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:paddingHorizontal="18dp"
-                            android:paddingVertical="9dp"
+                            android:paddingVertical="7.5dp"
                             android:text="Pending"
-                            android:textColor="@color/listing_meta_text"
-                            android:textSize="13sp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/filterListed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_outlined_button_chat"
-                            android:backgroundTint="@color/stat_card_bg"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:paddingHorizontal="18dp"
-                            android:paddingVertical="9dp"
+                            android:paddingVertical="7.5dp"
                             android:text="Listed"
-                            android:textColor="@color/listing_meta_text"
-                            android:textSize="13sp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/filterOngoing"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_outlined_button_chat"
-                            android:backgroundTint="@color/stat_card_bg"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:paddingHorizontal="18dp"
-                            android:paddingVertical="9dp"
+                            android:paddingVertical="7.5dp"
                             android:text="Ongoing"
-                            android:textColor="@color/listing_meta_text"
-                            android:textSize="13sp"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </HorizontalScrollView>
 
@@ -377,25 +379,27 @@
                     android:fontFamily="@font/plus_jakarta_sans"
                     android:gravity="center"
                     android:text="No listings found"
-                    android:textColor="@color/listing_meta_text"
+                    android:textColor="#64748B"
                     android:textSize="14sp"
                     android:visibility="gone" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- FAB -->
+ 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabCreateListing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        app:backgroundTint="@color/success_green"
-        app:srcCompat="@drawable/ic_plus"
-        app:tint="@color/white"
-        app:fabSize="normal"
-        app:elevation="6dp" />
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Create Listing"
+        android:src="@drawable/ic_plus"
+        app:backgroundTint="#0A6C32"
+        app:elevation="6dp"
+        app:fabCustomSize="56dp"
+        app:maxImageSize="28dp"
+        app:tint="#FFFFFF" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -22,6 +22,7 @@ public class Listing {
     private String pricePerUnit;
     private String totalValuation;
     private String status;
+    private String grade;
     private int mediaFileCount;
     private String mediaCaption1;
     private String mediaCaption2;
@@ -228,6 +229,9 @@ public class Listing {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getGrade() { return grade; }
+    public void setGrade(String grade) { this.grade = grade; }
 
     public int getMediaFileCount() { return mediaFileCount; }
     public void setMediaFileCount(int mediaFileCount) { this.mediaFileCount = mediaFileCount; }

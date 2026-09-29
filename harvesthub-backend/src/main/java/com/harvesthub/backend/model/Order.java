@@ -35,6 +35,14 @@ public class Order {
     private String actualDeliveryDate;
     private java.util.List<TransportEvent> transportEvents;
 
+    public double getTotalPrice() {
+        return totalAmount > 0 ? totalAmount : (quantity * pricePerKg);
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalAmount = totalPrice;
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

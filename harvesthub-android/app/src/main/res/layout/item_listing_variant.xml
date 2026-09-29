@@ -5,12 +5,11 @@
     android:id="@+id/listingCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="2dp"
-    android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/stat_card_bg"
+    android:layout_marginBottom="14dp"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/stat_card_stroke"
+    app:strokeColor="#E2E8F0"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -31,9 +30,9 @@
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:scaleType="centerCrop"
-                android:background="@color/bg_light"
+                android:background="#F1F5F9"
                 app:shapeAppearanceOverlay="@style/RoundedSquare"
-                tools:src="@drawable/ic_leaf" />
+                tools:src="@drawable/img_crop_tomatoes" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -47,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:textColor="@color/stat_text_value"
+                    android:textColor="#1E293B"
                     android:textSize="17sp"
                     tools:text="Tomatoes" />
 
@@ -55,9 +54,9 @@
                     android:id="@+id/tvListingId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:textColor="@color/listing_id_text"
+                    android:textColor="#64748B"
                     android:textSize="12.5sp"
                     tools:text="Listing #TM-2024" />
             </LinearLayout>
@@ -67,25 +66,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_pill_badge"
+                android:backgroundTint="#50667F"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:paddingHorizontal="12dp"
-                android:paddingVertical="5dp"
+                android:paddingVertical="4.5dp"
                 android:textAllCaps="true"
-                android:textSize="10sp"
+                android:textColor="@color/white"
+                android:textSize="10.5sp"
                 android:letterSpacing="0.02"
-                tools:backgroundTint="#718096"
-                tools:text="DRAFT"
-                tools:textColor="@color/white" />
+                tools:text="DRAFT" />
         </LinearLayout>
 
         <!-- Yield and Price -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="18dp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
+            <!-- EST YIELD -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -94,35 +94,38 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/ic_yield"
-                    app:tint="@color/listing_label_text" />
+                    app:tint="#64748B" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:letterSpacing="0.05"
                         android:text="EST. YIELD"
-                        android:textColor="@color/listing_label_text"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.05" />
+                        android:textColor="#64748B"
+                        android:textSize="10sp" />
+
                     <TextView
                         android:id="@+id/tvYieldValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:textColor="@color/listing_data_value_text"
-                        android:textSize="14sp"
+                        android:textColor="#1E293B"
+                        android:textSize="15sp"
                         tools:text="120 KG" />
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- EXPECTED -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -131,31 +134,33 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/ic_price"
-                    app:tint="@color/listing_label_text" />
+                    app:tint="#64748B" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:letterSpacing="0.05"
                         android:text="EXPECTED"
-                        android:textColor="@color/listing_label_text"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.05" />
+                        android:textColor="#64748B"
+                        android:textSize="10sp" />
+
                     <TextView
                         android:id="@+id/tvExpectedValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:textColor="@color/listing_data_value_text"
-                        android:textSize="14sp"
+                        android:textColor="#1E293B"
+                        android:textSize="15sp"
                         tools:text="LKR 180/kg" />
                 </LinearLayout>
             </LinearLayout>
@@ -165,63 +170,85 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_calendar"
-                app:tint="@color/listing_meta_text" />
-
-            <TextView
-                android:id="@+id/tvCreatedDate"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="@color/listing_meta_text"
-                android:textSize="12sp"
-                tools:text="Created: Oct 24" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="#64748B" />
+                <TextView
+                    android:id="@+id/tvCreatedDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="#64748B"
+                    android:textSize="11.5sp"
+                    tools:text="Created: Oct 24" />
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/ic_clock"
-                app:tint="@color/listing_meta_text" />
-
-            <TextView
-                android:id="@+id/tvUpdatedTime"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="@color/listing_meta_text"
-                android:textSize="12sp"
-                tools:text="Updated: Yesterday" />
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="#64748B" />
+                <TextView
+                    android:id="@+id/tvUpdatedTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="#64748B"
+                    android:textSize="11.5sp"
+                    tools:text="Updated: Yesterday" />
+            </LinearLayout>
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_location_pin"
-                app:tint="@color/listing_meta_text" />
-
-            <TextView
-                android:id="@+id/tvLocation"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:textColor="@color/listing_meta_text"
-                android:textSize="12sp"
-                tools:text="Dambulla Sector" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_location_pin"
+                    app:tint="#64748B" />
+                <TextView
+                    android:id="@+id/tvLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="#64748B"
+                    android:textSize="11.5sp"
+                    tools:text="Dambulla Sector" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Verification/Review Note -->
@@ -232,7 +259,7 @@
             android:layout_marginTop="16dp"
             android:fontFamily="@font/plus_jakarta_sans"
             android:text="Our team is verifying your listing details."
-            android:textColor="@color/listing_review_text"
+            android:textColor="#64748B"
             android:textSize="13sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -242,43 +269,50 @@
             android:id="@+id/llActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPrimary"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="52dp"
+                android:layout_height="46dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:textAllCaps="false"
+                android:textColor="#1E293B"
                 android:textSize="14sp"
-                app:cornerRadius="12dp"
-                app:iconSize="18dp"
-                app:strokeColor="@color/border_gray"
-                android:textColor="@color/stat_text_value"
-                tools:icon="@drawable/ic_edit_chat"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_edit_chat"
+                app:iconGravity="textStart"
+                app:iconSize="16dp"
+                app:iconTint="#1E293B"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp"
                 tools:text="Edit" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSecondary"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="52dp"
+                android:layout_height="46dp"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:textAllCaps="false"
+                android:textColor="#64748B"
                 android:textSize="14sp"
-                app:cornerRadius="12dp"
-                app:iconSize="18dp"
-                app:strokeColor="@color/listing_deactivate_stroke"
-                android:textColor="@color/listing_deactivate_text"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_circle_slash"
+                app:iconGravity="textStart"
+                app:iconSize="16dp"
+                app:iconTint="#64748B"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp"
                 tools:text="Deactivate" />
         </LinearLayout>
 

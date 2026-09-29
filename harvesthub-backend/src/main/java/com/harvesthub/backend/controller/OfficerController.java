@@ -122,7 +122,7 @@ public class OfficerController {
             return ResponseEntity.notFound().build();
         }
         Listing listing = opt.get();
-        listing.setClaimedByOfficerId("officer_current");
+        listing.setClaimedByOfficerId("user_officer_lahiru");
         listing.setClaimedByOfficerName("Lahiru Sahan");
         listing.setStatus("UNDER_REVIEW");
         listing.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -167,14 +167,20 @@ public class OfficerController {
         if ("APPROVE".equals(decision)) {
             listing.setStatus("ACTIVE");
             listing.setGrade(request.getGrade() != null ? request.getGrade() : "A");
+            listing.setClaimedByOfficerId("user_officer_lahiru");
+            listing.setClaimedByOfficerName("Lahiru Sahan");
             notifTitle = "Listing Approved: " + listing.getCropName();
             notifBody = "Your " + listing.getCropName() + " listing has been verified and approved as Grade " + listing.getGrade() + ". It is now active on the marketplace.";
         } else if ("RETAKE".equals(decision)) {
             listing.setStatus("RETAKE_REQUESTED");
+            listing.setClaimedByOfficerId("user_officer_lahiru");
+            listing.setClaimedByOfficerName("Lahiru Sahan");
             notifTitle = "Media Retake Requested: " + listing.getCropName();
             notifBody = "Officer requested retake of verification photos/video. Reason: " + (request.getNotes() != null ? request.getNotes() : "Please provide clearer crop photos.");
         } else {
             listing.setStatus("REJECTED");
+            listing.setClaimedByOfficerId("user_officer_lahiru");
+            listing.setClaimedByOfficerName("Lahiru Sahan");
             notifTitle = "Listing Rejected: " + listing.getCropName();
             notifBody = "Your " + listing.getCropName() + " listing was rejected. Reason: " + (request.getNotes() != null ? request.getNotes() : "Crop quality does not meet marketplace standards.");
         }
@@ -228,10 +234,22 @@ public class OfficerController {
     }
 
     private boolean matchesTab(Listing l, String tab) {
+        String status = l.getStatus() != null ? l.getStatus().toUpperCase() : "PENDING";
+        boolean isPending = isPendingStatus(status);
+
+        if ("claimed".equalsIgnoreCase(tab)) {
+            return (l.getReviewedByOfficerId() != null && !l.getReviewedByOfficerId().isBlank())
+                    || (l.getClaimedByOfficerId() != null && !l.getClaimedByOfficerId().isBlank())
+                    || "ACTIVE".equals(status) || "APPROVED".equals(status) || "REJECTED".equals(status);
+        }
+
+        // Verification queue should only show listings that require verification
+        if (!isPending && !"all_records".equalsIgnoreCase(tab)) {
+            return false;
+        }
+
         if ("unclaimed".equalsIgnoreCase(tab)) {
             return l.getClaimedByOfficerId() == null || l.getClaimedByOfficerId().isBlank();
-        } else if ("claimed".equalsIgnoreCase(tab)) {
-            return l.getClaimedByOfficerId() != null && !l.getClaimedByOfficerId().isBlank();
         }
         return true;
     }
@@ -247,8 +265,20 @@ public class OfficerController {
 
     private ActivityLogDto toActivityLogDto(Listing l) {
         String farmer = resolveFarmerName(l);
-        String grade = l.getGrade() != null ? l.getGrade() : "A";
-        String status = isPendingStatus(l.getStatus()) ? "Pending" : "Approved";
+        String grade = l.getGrade() != null ? l.getGrade() : "-";
+        String rawStatus = l.getStatus() != null ? l.getStatus().toUpperCase() : "PENDING";
+        String status;
+        if ("ACTIVE".equals(rawStatus) || "APPROVED".equals(rawStatus)) {
+            status = "Approved";
+        } else if ("REJECTED".equals(rawStatus)) {
+            status = "Rejected";
+        } else if ("RETAKE_REQUESTED".equals(rawStatus)) {
+            status = "Retake Requested";
+        } else if ("UNDER_REVIEW".equals(rawStatus)) {
+            status = "In Review";
+        } else {
+            status = "Pending";
+        }
         String time = l.getUpdatedTime() != null ? formatTime(l.getUpdatedTime()) : "10:30 AM";
 
         return ActivityLogDto.builder()
@@ -265,8 +295,27 @@ public class OfficerController {
 
     private QueueListingDto toQueueListingDto(Listing l) {
         String farmer = resolveFarmerName(l);
-        boolean claimable = l.getClaimedByOfficerId() == null || l.getClaimedByOfficerId().isBlank();
-        String statusLabel = isPendingStatus(l.getStatus()) ? "Pending" : (claimable ? "Pending" : "In Review");
+        String rawStatus = l.getStatus() != null ? l.getStatus().toUpperCase() : "PENDING";
+        boolean claimable;
+        String statusLabel;
+
+        if ("ACTIVE".equals(rawStatus) || "APPROVED".equals(rawStatus)) {
+            statusLabel = "Listed";
+            claimable = false;
+        } else if ("REJECTED".equals(rawStatus)) {
+            statusLabel = "Rejected";
+            claimable = false;
+        } else if ("RETAKE_REQUESTED".equals(rawStatus)) {
+            statusLabel = "Retake Requested";
+            claimable = false;
+        } else if ("UNDER_REVIEW".equals(rawStatus)) {
+            statusLabel = "In Review";
+            claimable = (l.getClaimedByOfficerId() == null || l.getClaimedByOfficerId().isBlank());
+        } else {
+            statusLabel = "Pending";
+            claimable = (l.getClaimedByOfficerId() == null || l.getClaimedByOfficerId().isBlank());
+        }
+
         String tone = resolveTone(l.getCropName());
         String icon = resolveIcon(l.getCropName());
 
@@ -292,6 +341,20 @@ public class OfficerController {
         String price = l.getPrice() != null ? l.getPrice() : "Rs. 250/kg";
         String total = l.getTotalValue() != null ? l.getTotalValue() : "Rs. 375,000";
 
+        String rawStatus = l.getStatus() != null ? l.getStatus().toUpperCase() : "PENDING";
+        String displayStatus;
+        if ("ACTIVE".equals(rawStatus) || "APPROVED".equals(rawStatus)) {
+            displayStatus = l.getGrade() != null ? "Approved (Grade " + l.getGrade() + ")" : "Approved";
+        } else if ("REJECTED".equals(rawStatus)) {
+            displayStatus = "Rejected";
+        } else if ("RETAKE_REQUESTED".equals(rawStatus)) {
+            displayStatus = "Retake Requested";
+        } else if ("UNDER_REVIEW".equals(rawStatus)) {
+            displayStatus = "Under Review";
+        } else {
+            displayStatus = "Pending Review";
+        }
+
         return ListingDetailDto.builder()
                 .id(l.getId())
                 .cropName(l.getCropName() != null ? l.getCropName() : "Crop")
@@ -309,7 +372,7 @@ public class OfficerController {
                 .variancePercent(l.getVariancePercent() != null ? l.getVariancePercent() : "-0.8% dev")
                 .pricePerUnit(price)
                 .totalValuation(total)
-                .status(isPendingStatus(l.getStatus()) ? "Pending Review" : l.getStatus())
+                .status(displayStatus)
                 .mediaFileCount(l.getMediaFileCount() != null ? l.getMediaFileCount() : 3)
                 .mediaCaption1(l.getMediaCaption1() != null ? l.getMediaCaption1() : "Wide Angle - Field View")
                 .mediaCaption2(l.getMediaCaption2() != null ? l.getMediaCaption2() : "Close-Up - Harvest Quality")

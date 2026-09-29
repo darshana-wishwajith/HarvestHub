@@ -6,4 +6,5 @@ import java.util.List;
 public interface SupplyOfferRepository extends MongoRepository<SupplyOffer, String> {
     List<SupplyOffer> findByFarmerId(String farmerId);
     List<SupplyOffer> findByRequestId(String requestId);
+    List<SupplyOffer> findByRequestIdIn(List<String> requestIds);
 }

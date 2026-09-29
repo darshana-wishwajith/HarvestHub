@@ -12,14 +12,19 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Async // This annotation tells Spring to run this method on a background thread
+    @Async
     public void sendPasswordResetEmail(String to, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("HarvestHub - Password Reset Request");
-        message.setText("To reset your password, please use the following token: " + token +
-                "\n\nIf you did not request a password reset, please ignore this email.");
-        
+        message.setSubject("HarvestHub - Password Reset Verification Code");
+        message.setText("Hello,\n\n" +
+                "Your 6-digit password reset verification code is:\n\n" +
+                "    " + token + "\n\n" +
+                "This code is valid for 15 minutes. Enter this code in your HarvestHub app to set a new password.\n\n" +
+                "If you did not request a password reset, please ignore this email.\n\n" +
+                "Regards,\n" +
+                "HarvestHub Security Team");
+
         mailSender.send(message);
     }
 

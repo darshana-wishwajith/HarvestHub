@@ -1051,6 +1051,16 @@
     -fx-text-fill: #B45309;
 }
 
+.listing-status-approved {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #16A34A;
+}
+
+.listing-status-rejected {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #DC2626;
+}
+
 .claim-review-button {
     -fx-background-color: #0C2F1F;
     -fx-text-fill: white;

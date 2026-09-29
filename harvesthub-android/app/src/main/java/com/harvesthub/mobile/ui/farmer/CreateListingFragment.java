@@ -154,18 +154,22 @@ public class CreateListingFragment extends Fragment {
         String priceStr = binding.etPrice.getText().toString().trim();
 
         SessionManager sessionManager = new SessionManager(requireContext());
-        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) ? sessionManager.getUser().getId() : "";
-        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null) ? sessionManager.getUser().getLocation() : "Unknown";
+        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null && !sessionManager.getUser().getId().isEmpty()) 
+                ? sessionManager.getUser().getId() 
+                : "user_farmer_kamal";
+        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null && !sessionManager.getUser().getLocation().isEmpty()) 
+                ? sessionManager.getUser().getLocation() 
+                : "Dambulla Sector";
 
         Listing newListing = new Listing(farmerId, cropName, location, yieldStr, priceStr, "PENDING");
 
         ApiService apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-        apiService.createListing(newListing).enqueue(new Callback<GenericResponse>() {
+        apiService.createListing(newListing).enqueue(new Callback<Listing>() {
             @Override
-            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+            public void onResponse(@NonNull Call<Listing> call, @NonNull Response<Listing> response) {
                 if (isAdded()) {
                     binding.progressBar.setVisibility(View.GONE);
-                    if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful()) {
                         Toast.makeText(requireContext(), "Listing Submitted for Verification!", Toast.LENGTH_SHORT).show();
                         getParentFragmentManager().popBackStack();
                     } else {
@@ -176,7 +180,7 @@ public class CreateListingFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Listing> call, @NonNull Throwable t) {
                 if (isAdded()) {
                     binding.btnSubmit.setEnabled(true);
                     binding.progressBar.setVisibility(View.GONE);

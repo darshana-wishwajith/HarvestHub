@@ -165,8 +165,7 @@ public class SignInBuyerActivity extends AppCompatActivity {
     }
 
     protected String getExpectedRole() {
-        return this instanceof com.harvesthub.mobile.ui.transporter.TransporterLoginActivity
-                ? "TRANSPORTER" : "BUYER";
+        return "BUYER";
     }
 
     private void showForgotPasswordDialog() {

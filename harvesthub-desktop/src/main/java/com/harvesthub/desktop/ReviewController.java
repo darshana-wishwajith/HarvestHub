@@ -264,6 +264,12 @@ public class ReviewController implements Initializable {
     }
 
     private void submitDecisionAndExit(String title, String message, com.harvesthub.desktop.api.ReviewDecisionRequestDto request) {
+        String newStatus = "APPROVE".equalsIgnoreCase(request.decision) ? "ACTIVE" :
+                ("RETAKE".equalsIgnoreCase(request.decision) ? "RETAKE_REQUESTED" : "REJECTED");
+        listing.setStatus(newStatus);
+        if (request.grade != null) {
+            listing.setGrade(request.grade);
+        }
         Thread worker = new Thread(() -> {
             try {
                 if (listing.getId() != null) {

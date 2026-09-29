@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface WantedAdRepository extends MongoRepository<WantedAd, String> {
     List<WantedAd> findByCropNameContainingIgnoreCase(String cropName);
+    List<WantedAd> findByBuyerId(String buyerId);
 }
