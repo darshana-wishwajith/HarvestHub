@@ -1,6 +1,6 @@
-/.github
-/.idea
-/.vscode
-/mongo-init
-/out
+.github/
+.idea/
+.vscode/
+mongo-init/
+out/
 deploy2.ps1
