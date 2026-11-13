@@ -36,7 +36,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private List<NotificationItem> notificationList = new ArrayList<>();
     private ApiService apiService;
     private ProgressBar progressBar;
-    private String farmerId = "FARMER_ID_HERE";
+    private String farmerId = "";
     private SessionManager sessionManager;
 
     @Override

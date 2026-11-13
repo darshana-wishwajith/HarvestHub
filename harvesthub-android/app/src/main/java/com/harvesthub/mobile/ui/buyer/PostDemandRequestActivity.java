@@ -207,8 +207,7 @@ public class PostDemandRequestActivity extends AppCompatActivity {
             } catch (Exception ignored) { }
 
             com.harvesthub.mobile.utils.SessionManager session = new com.harvesthub.mobile.utils.SessionManager(this);
-            String buyerId = (session.getUser() != null && session.getUser().getId() != null)
-                    ? session.getUser().getId() : "user_buyer_keells";
+            String buyerId = session.getUserId();
 
             com.harvesthub.mobile.model.WantedAd newAd = new com.harvesthub.mobile.model.WantedAd();
             newAd.setRequestId("REQ-" + System.currentTimeMillis());

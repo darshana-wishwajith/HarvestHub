@@ -12,6 +12,9 @@ import java.util.List;
 @RestController
 @RequestMapping({"/api", ""})
 public class MarketController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private MarketService marketService;
 
@@ -36,11 +39,19 @@ public class MarketController {
 
     @PostMapping({"/wanted-ads", "/api/wanted-ads", "/wanted-ads/create", "/api/wanted-ads/create"})
     public ResponseEntity<WantedAd> createWantedAd(@RequestBody WantedAd ad) {
+        currentUser.requireRole("BUYER");
+        if (ad.getCropName() == null || ad.getCropName().isBlank() || ad.getRequiredQuantityKg() <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        ad.setRequestId(null); // never let a client overwrite an existing ad by id
+        ad.setBuyerId(currentUser.id());
+        ad.setStatus("OPEN");
         return ResponseEntity.ok(marketService.createWantedAd(ad));
     }
 
     @GetMapping({"/wanted-ads/buyer/{buyerId}", "/api/wanted-ads/buyer/{buyerId}"})
     public ResponseEntity<List<WantedAd>> getBuyerWantedAds(@PathVariable String buyerId) {
+        currentUser.requireSelfOrStaff(buyerId);
         return ResponseEntity.ok(marketService.getWantedAdsByBuyer(buyerId));
     }
 }

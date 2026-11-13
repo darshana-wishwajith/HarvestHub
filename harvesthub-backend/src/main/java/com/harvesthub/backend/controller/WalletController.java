@@ -11,11 +11,15 @@ import java.util.List;
 
 @RestController
 public class WalletController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private WalletService walletService;
 
     @GetMapping("wallet/{farmerId}/summary")
     public ResponseEntity<WalletSummaryResponse> getWalletSummary(@PathVariable String farmerId) {
+        currentUser.requireSelfOrStaff(farmerId);
         return ResponseEntity.ok(walletService.getWalletSummary(farmerId));
     }
 
@@ -23,6 +27,7 @@ public class WalletController {
     public ResponseEntity<List<Transaction>> getRecentTransactions(
             @PathVariable String farmerId,
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        currentUser.requireSelfOrStaff(farmerId);
         return ResponseEntity.ok(walletService.getRecentTransactions(farmerId, limit));
     }
 }

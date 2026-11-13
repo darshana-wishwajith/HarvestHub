@@ -4,3 +4,15 @@
 mongo-init/
 out/
 deploy2.ps1
+# --- Secrets & local config (never commit) ---
+*.pem
+*.jks
+*.keystore
+.env
+.env.*
+application-local.properties
+harvesthub-backend/uploads/
+
+# --- JVM crash dumps ---
+hs_err_pid*.log
+replay_pid*.log

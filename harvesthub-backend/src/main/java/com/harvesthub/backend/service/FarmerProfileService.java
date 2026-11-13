@@ -18,6 +18,8 @@ import java.util.UUID;
 @Service
 public class FarmerProfileService {
     @Autowired
+    private MediaStorageService mediaStorageService;
+    @Autowired
     private UserRepository userRepository;
 
     private static final String UPLOAD_DIR = "uploads/photos/";
@@ -39,21 +41,15 @@ public class FarmerProfileService {
         User user = userRepository.findById(farmerId).orElse(null);
         if (user == null) return false;
 
-        if (fullName != null) user.setFullName(fullName);
-        if (phoneNumber != null) user.setMobileNumber(phoneNumber);
-        if (nic != null) user.setNic(nic);
+        if (fullName != null && !fullName.isBlank()) user.setFullName(fullName.trim());
+        if (phoneNumber != null && phoneNumber.matches("^\\d{10}$")) {
+            user.setMobileNumber(phoneNumber);
+            user.setPhoneNumber(phoneNumber);
+        }
+        // NIC is a verified identity attribute and is not self-editable.
 
         if (photo != null && !photo.isEmpty()) {
-            try {
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                Files.createDirectories(uploadPath);
-                String fileName = UUID.randomUUID() + "_" + photo.getOriginalFilename();
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                user.setProfilePhotoUrl("/uploads/photos/" + fileName);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            user.setProfilePhotoUrl(mediaStorageService.store(photo, false));
         }
 
         userRepository.save(user);

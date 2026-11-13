@@ -271,14 +271,22 @@ public class ReviewController implements Initializable {
             listing.setGrade(request.grade);
         }
         Thread worker = new Thread(() -> {
+            String error = null;
             try {
-                if (listing.getId() != null) {
+                if (listing.getId() == null) {
+                    error = "This listing has no server id and cannot be reviewed.";
+                } else {
                     com.harvesthub.desktop.api.ApiClient.submitReview(listing.getId(), request);
                 }
             } catch (Exception e) {
-                System.err.println("Review submission to backend error: " + e.getMessage());
+                error = e.getMessage() != null ? e.getMessage() : "Could not submit the decision.";
             }
+            final String failure = error;
             javafx.application.Platform.runLater(() -> {
+                if (failure != null) {
+                    showWarning("Decision not saved: " + failure);
+                    return;
+                }
                 showDecisionAlert(title, message);
                 handleBackToQueue();
             });

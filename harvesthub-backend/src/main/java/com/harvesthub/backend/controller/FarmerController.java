@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 
 @RestController
 public class FarmerController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private FarmerProfileService farmerProfileService;
     @Autowired
@@ -26,11 +29,13 @@ public class FarmerController {
 
     @GetMapping("farmer/{id}/summary")
     public ResponseEntity<FarmerSummaryResponse> getFarmerSummary(@PathVariable String id) {
+        currentUser.requireSelfOrStaff(id);
         return ResponseEntity.ok(dashboardService.getFarmerSummary(id));
     }
 
     @GetMapping("farmer/{id}/active-listings")
     public ResponseEntity<?> getActiveListings(@PathVariable String id) {
+        currentUser.requireSelfOrStaff(id);
         List<Listing> listings = listingService.getActiveListings(id);
         // Transform to match Android's ListingItem format
         List<Map<String, Object>> result = listings.stream().map(l -> {
@@ -54,6 +59,7 @@ public class FarmerController {
     public ResponseEntity<?> getListingHistory(
             @PathVariable String id,
             @RequestParam(value = "search", required = false) String searchQuery) {
+        currentUser.requireSelfOrStaff(id);
         List<Listing> listings = listingService.getListingHistory(id, searchQuery);
         // Transform to match Android's HistoryListing format
         List<Map<String, Object>> result = listings.stream().map(l -> {
@@ -73,6 +79,7 @@ public class FarmerController {
 
     @GetMapping("farmer/{id}/profile")
     public ResponseEntity<?> getFarmerProfile(@PathVariable String id) {
+        currentUser.requireSelfOrStaff(id);
         FarmerProfileResponse profile = farmerProfileService.getFarmerProfile(id);
         if (profile == null) {
             return ResponseEntity.notFound().build();
@@ -87,6 +94,7 @@ public class FarmerController {
             @RequestPart(value = "phoneNumber", required = false) String phoneNumber,
             @RequestPart(value = "nic", required = false) String nic,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
+        currentUser.requireSelfOrStaff(id);
         boolean updated = farmerProfileService.updateProfile(id, fullName, phoneNumber, nic, photo);
         if (updated) {
             Map<String, String> response = new HashMap<>();
@@ -98,7 +106,7 @@ public class FarmerController {
 
     @PostMapping("farmer/location")
     public ResponseEntity<?> saveFarmLocation(@RequestBody LocationRequest request) {
-        farmerProfileService.saveFarmLocation(request.getFarmerId(), request.getLatitude(), request.getLongitude());
+        farmerProfileService.saveFarmLocation(currentUser.id(), request.getLatitude(), request.getLongitude());
         Map<String, String> response = new HashMap<>();
         response.put("message", "Location saved successfully");
         return ResponseEntity.ok(response);

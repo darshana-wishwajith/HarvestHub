@@ -15,7 +15,6 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.PasswordUtils;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -47,8 +46,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 return;
             }
 
-            if (newPassword.isEmpty()) {
-                Toast.makeText(this, "Please enter a new password", Toast.LENGTH_SHORT).show();
+            if (newPassword.length() < 8) {
+                Toast.makeText(this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -59,9 +58,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void resetPassword(String token, String newPassword) {
         setLoading(true);
         
-        // Hash the new password before sending (as per requirement)
-        String hashedPassword = PasswordUtils.hashPassword(newPassword);
-        ResetPasswordRequest request = new ResetPasswordRequest(token, hashedPassword);
+        String email = getIntent().getStringExtra("email");
+        ResetPasswordRequest request = new ResetPasswordRequest(email, token, newPassword);
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         apiService.resetPassword(request).enqueue(new Callback<ResponseBody>() {

@@ -55,7 +55,6 @@ public class OtpService {
         }
         
         // For development, log the OTP
-        System.out.println("OTP for " + identifier + ": " + otp);
         
         return new GenericResponse(true, "OTP sent successfully");
     }

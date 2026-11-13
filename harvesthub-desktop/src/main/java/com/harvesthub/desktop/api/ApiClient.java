@@ -198,11 +198,20 @@ public final class ApiClient {
         String message = "Request failed (HTTP " + status + ")";
         try {
             Map<?, ?> error = MAPPER.readValue(response.body(), Map.class);
-            if (error.get("message") != null) {
+            if (error.get("error") != null) {
+                message = error.get("error").toString();
+            } else if (error.get("message") != null) {
                 message = error.get("message").toString();
             }
         } catch (Exception ignored) {
             // Body wasn't JSON — fall back to the generic message above.
+        }
+        if (status == 401) {
+            message = "Your session has expired. Please sign in again.";
+        } else if (status == 403) {
+            message = "You do not have permission to perform this action.";
+        } else if (status == 409) {
+            message = "This listing is already being reviewed by another officer, or its status has changed.";
         }
         throw new ApiException(message, status);
     }

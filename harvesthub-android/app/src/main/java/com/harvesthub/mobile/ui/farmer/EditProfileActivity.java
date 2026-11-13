@@ -29,7 +29,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private ActivityEditProfileBinding binding;
     private ApiService apiService;
-    private final String farmerId = "FARMER_123";
+    private String farmerId = "";
     private Uri selectedImageUri;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
@@ -45,6 +45,7 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        farmerId = new com.harvesthub.mobile.utils.SessionManager(this).getUserId();
         binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

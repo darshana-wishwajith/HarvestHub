@@ -12,17 +12,21 @@ import java.util.Map;
 
 @RestController
 public class NotificationController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private NotificationService notificationService;
 
     @GetMapping("notifications/{farmerId}")
     public ResponseEntity<List<NotificationItem>> getNotifications(@PathVariable String farmerId) {
+        currentUser.requireSelfOrStaff(farmerId);
         return ResponseEntity.ok(notificationService.getNotifications(farmerId));
     }
 
     @PostMapping("notifications/{id}/read")
     public ResponseEntity<?> markNotificationRead(@PathVariable String id) {
-        notificationService.markAsRead(id);
+        notificationService.markAsRead(id, currentUser.id());
         Map<String, String> response = new HashMap<>();
         response.put("message", "Notification marked as read");
         return ResponseEntity.ok(response);
@@ -30,6 +34,7 @@ public class NotificationController {
 
     @PostMapping("notifications/mark-all-read")
     public ResponseEntity<?> markAllNotificationsRead(@RequestParam("farmerId") String farmerId) {
+        currentUser.requireSelfOrStaff(farmerId);
         notificationService.markAllAsRead(farmerId);
         Map<String, String> response = new HashMap<>();
         response.put("message", "All notifications marked as read");
