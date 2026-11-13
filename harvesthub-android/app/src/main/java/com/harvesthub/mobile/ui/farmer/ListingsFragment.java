@@ -55,11 +55,7 @@ public class ListingsFragment extends Fragment {
         binding = FragmentListingsBinding.inflate(inflater, container, false);
 
         sessionManager = new SessionManager(requireContext());
-        if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
-            farmerId = sessionManager.getUser().getId();
-        } else {
-            farmerId = "user_farmer_kamal";
-        }
+        farmerId = sessionManager.getUserId();
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initRecyclerView();
         setupTabs();

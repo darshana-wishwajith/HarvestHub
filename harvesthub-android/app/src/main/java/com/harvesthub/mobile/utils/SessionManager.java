@@ -72,6 +72,12 @@ public class SessionManager {
         return gson.fromJson(userJson, User.class);
     }
 
+    /** Id of the logged-in user, or "" when no user is stored (the server will then reject the call). */
+    public String getUserId() {
+        User user = getUser();
+        return user != null && user.getId() != null ? user.getId() : "";
+    }
+
     public boolean isLoggedIn() {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }

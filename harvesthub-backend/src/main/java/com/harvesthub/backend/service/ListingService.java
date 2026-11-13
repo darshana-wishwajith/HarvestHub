@@ -71,11 +71,19 @@ public class ListingService {
         Listing existing = listingRepository.findById(id).orElse(null);
         if (existing != null) {
             // Update fields (simplistic approach)
+            boolean materialChange = (updates.getCropName() != null && !updates.getCropName().equals(existing.getCropName()))
+                    || (updates.getLocation() != null && !updates.getLocation().equals(existing.getLocation()));
             if (updates.getCropName() != null) existing.setCropName(updates.getCropName());
             if (updates.getQuantity() != null) existing.setQuantity(updates.getQuantity());
             if (updates.getPrice() != null) existing.setPrice(updates.getPrice());
             if (updates.getLocation() != null) existing.setLocation(updates.getLocation());
-            if (updates.getStatus() != null) existing.setStatus(updates.getStatus());
+            // Status is never taken from the client. Changing what/where is sold invalidates the grade.
+            if (materialChange && "ACTIVE".equals(existing.getStatus())) {
+                existing.setStatus("PENDING");
+                existing.setGrade(null);
+                existing.setClaimedByOfficerId(null);
+                existing.setClaimedByOfficerName(null);
+            }
             existing.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             return listingRepository.save(existing);
         }
