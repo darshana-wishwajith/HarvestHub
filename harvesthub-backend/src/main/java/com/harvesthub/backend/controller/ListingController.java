@@ -15,22 +15,30 @@ import java.util.Map;
 public class ListingController {
 
     @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
+
+    @Autowired
     private ListingService listingService;
 
     @PostMapping("/create")
     public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
-        if (listing.getFarmerId() == null || listing.getFarmerId().trim().isEmpty()) {
-            listing.setFarmerId("user_farmer_kamal");
-        }
-        if (listing.getStatus() == null || listing.getStatus().trim().isEmpty()) {
-            listing.setStatus("PENDING");
-        }
-        if (listing.getCreatedDate() == null || listing.getCreatedDate().trim().isEmpty()) {
-            listing.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        }
-        if (listing.getUpdatedTime() == null || listing.getUpdatedTime().trim().isEmpty()) {
-            listing.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        }
+        currentUser.requireRole("FARMER");
+        // Server-owned fields: owner, verification state and timestamps never come from the client.
+        var me = currentUser.get();
+        listing.setId(null);
+        listing.setFarmerId(me.id());
+        listing.setFarmerName(me.fullName());
+        listing.setStatus("PENDING");
+        listing.setGrade(null);
+        listing.setReviewNotes(null);
+        listing.setClaimedByOfficerId(null);
+        listing.setClaimedByOfficerName(null);
+        listing.setReviewedByOfficerId(null);
+        listing.setReviewedByOfficerName(null);
+        listing.setReviewedAt(null);
+        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        listing.setCreatedDate(now);
+        listing.setUpdatedTime(now);
         return ResponseEntity.ok(listingService.createListing(listing));
     }
 
@@ -40,6 +48,7 @@ public class ListingController {
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
+        currentUser.requireSelfOrStaff(existing.getFarmerId());
         if (!"DRAFT".equals(existing.getStatus()) && !"ACTIVE".equals(existing.getStatus())) {
             return ResponseEntity.badRequest().body("Can only update DRAFT or ACTIVE listings");
         }
@@ -53,10 +62,11 @@ public class ListingController {
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
+        currentUser.requireSelfOrStaff(existing.getFarmerId());
         String currentStatus = existing.getStatus();
         boolean validTransition = false;
         
-        if ("DRAFT".equals(currentStatus) && "ACTIVE".equals(newStatus)) validTransition = true;
+        if ("DRAFT".equals(currentStatus) && "PENDING".equals(newStatus)) validTransition = true; // submit for verification
         else if ("ACTIVE".equals(currentStatus) && "DEACTIVATED".equals(newStatus)) validTransition = true;
         else if ("DEACTIVATED".equals(currentStatus) && "ACTIVE".equals(newStatus)) validTransition = true;
 
@@ -72,6 +82,7 @@ public class ListingController {
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
+        currentUser.requireSelfOrStaff(existing.getFarmerId());
         if (!"DRAFT".equals(existing.getStatus()) && !"DEACTIVATED".equals(existing.getStatus())) {
             return ResponseEntity.badRequest().body("Can only delete DRAFT or DEACTIVATED listings");
         }

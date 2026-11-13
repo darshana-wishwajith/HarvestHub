@@ -30,40 +30,61 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @org.springframework.beans.factory.annotation.Value("${harvesthub.seed-demo-data:false}")
+    private boolean seedDemoData;
+
+    @org.springframework.beans.factory.annotation.Value("${harvesthub.demo-password:}")
+    private String demoPassword;
+
     @Override
     public void run(String... args) {
+        if (!seedDemoData) {
+            return; // production: never seed or modify data automatically
+        }
         try {
-            seedOfficerUsers();
+            seedDemoUsers();
             seedVerificationListings();
         } catch (Exception e) {
             logger.warn("Data initialization encountered an exception (continuing gracefully): {}", e.getMessage());
         }
     }
 
-    private void seedOfficerUsers() {
-        // Ensure default demo officer 'lahiru' exists
-        if (userRepository.findByEmail("lahiru@harvesthub.lk").isEmpty()) {
-            User lahiru = new User();
-            lahiru.setId("user_officer_lahiru");
-            lahiru.setFullName("Lahiru Sahan");
-            lahiru.setEmail("lahiru@harvesthub.lk");
-            lahiru.setMobileNumber("0712345679");
-            lahiru.setPhoneNumber("0712345679");
-            lahiru.setNic("951234567V");
-            lahiru.setPassword(passwordEncoder.encode("officer123"));
-            lahiru.setRole("OFFICER");
-            lahiru.setFarmLocation(new FarmLocation("Agrarian Service Center, Peradeniya", 7.2618, 80.5975));
-            userRepository.save(lahiru);
-            logger.info("Initialized default officer user: lahiru@harvesthub.lk (password: officer123)");
+    /**
+     * Creates one demo account per role if it does not exist yet. Passwords come from DEMO_PASSWORD;
+     * nothing is created without it, and existing accounts are never modified.
+     */
+    private void seedDemoUsers() {
+        if (demoPassword == null || demoPassword.length() < 8) {
+            logger.info("DEMO_PASSWORD not set (min 8 chars); skipping demo accounts.");
+            return;
         }
+        createIfMissing("user_officer_lahiru", "Lahiru Sahan", "officer@harvesthub.lk", "0712345679", "951234567V", "OFFICER",
+                new FarmLocation("Agrarian Service Center, Peradeniya", 7.2618, 80.5975));
+        createIfMissing("user_admin", "HarvestHub Admin", "admin@harvesthub.lk", "0712345670", "901234567V", "ADMIN", null);
+        createIfMissing("user_farmer_kamal", "Kamal Perera", "farmer@harvesthub.lk", "0771234567", "881234567V", "FARMER",
+                new FarmLocation("Dambulla, Matale", 7.8731, 80.6512));
+        createIfMissing("user_buyer_nimal", "Nimal Fernando", "buyer@harvesthub.lk", "0761234567", "871234567V", "BUYER",
+                new FarmLocation("Pettah, Colombo 11", 6.9375, 79.8500));
+        createIfMissing("user_transporter_priyantha", "Priyantha Kumara", "transporter@harvesthub.lk", "0751234567", "861234567V", "TRANSPORTER",
+                new FarmLocation("Kurunegala", 7.4863, 80.3647));
+    }
 
-        // Ensure dilani officer has correct password for testing
-        userRepository.findByEmail("dilani.silva@doa.gov.lk").ifPresent(user -> {
-            if (!passwordEncoder.matches("password123", user.getPassword()) && !passwordEncoder.matches("officer123", user.getPassword())) {
-                user.setPassword(passwordEncoder.encode("password123"));
-                userRepository.save(user);
-            }
-        });
+    private void createIfMissing(String id, String name, String email, String mobile, String nic, String role, FarmLocation loc) {
+        if (userRepository.existsById(id) || userRepository.findByEmail(email).isPresent()) {
+            return;
+        }
+        User u = new User();
+        u.setId(id);
+        u.setFullName(name);
+        u.setEmail(email);
+        u.setMobileNumber(mobile);
+        u.setPhoneNumber(mobile);
+        u.setNic(nic);
+        u.setRole(role);
+        u.setFarmLocation(loc);
+        u.setPassword(passwordEncoder.encode(demoPassword));
+        userRepository.save(u);
+        logger.info("Created demo {} account {}", role, email);
     }
 
     private void seedVerificationListings() {

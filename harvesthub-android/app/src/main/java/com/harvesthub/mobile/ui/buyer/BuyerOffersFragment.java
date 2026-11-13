@@ -92,8 +92,7 @@ public class BuyerOffersFragment extends Fragment {
     public void loadOffersFromDatabase() {
         if (!isAdded()) return;
         SessionManager sessionManager = new SessionManager(requireContext());
-        String buyerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
-                ? sessionManager.getUser().getId() : "user_buyer_keells";
+        String buyerId = sessionManager.getUserId();
 
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (tvEmptyOffers != null) tvEmptyOffers.setVisibility(View.GONE);

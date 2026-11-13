@@ -43,11 +43,7 @@ public class WalletFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_wallet, container, false);
 
         sessionManager = new SessionManager(requireContext());
-        if (sessionManager.getUser() != null && sessionManager.getUser().getId() != null) {
-            farmerId = sessionManager.getUser().getId();
-        } else {
-            farmerId = "user_farmer_kamal";
-        }
+        farmerId = sessionManager.getUserId();
 
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         initViews(view);

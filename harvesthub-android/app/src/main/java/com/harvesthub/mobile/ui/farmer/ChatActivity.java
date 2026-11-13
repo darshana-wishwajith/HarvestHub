@@ -72,8 +72,7 @@ public class ChatActivity extends AppCompatActivity {
         btnSendMessage.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();
             if (!message.isEmpty()) {
-                String senderId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
-                        ? sessionManager.getUser().getId() : "user_farmer_kamal";
+                String senderId = sessionManager.getUserId();
                 SendMessageRequest request = new SendMessageRequest(senderId, message);
                 apiService.sendMessage(orderId, request).enqueue(new Callback<ChatMessage>() {
                     @Override

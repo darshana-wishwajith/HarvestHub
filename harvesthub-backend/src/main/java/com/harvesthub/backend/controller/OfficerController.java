@@ -8,6 +8,15 @@ import com.harvesthub.backend.repository.ListingRepository;
 import com.harvesthub.backend.repository.NotificationRepository;
 import com.harvesthub.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.harvesthub.backend.security.AuthUser;
+import com.harvesthub.backend.security.CurrentUser;
+import com.harvesthub.backend.security.Roles;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +27,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class OfficerController {
 
     @Autowired
@@ -32,37 +40,33 @@ public class OfficerController {
 
     // ---- Current Officer Profile --------------------------------------------
 
+    @Autowired
+    private CurrentUser currentUser;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     @GetMapping("/officers/me")
     public ResponseEntity<OfficerDto> getCurrentOfficer() {
-        Optional<User> officerUser = userRepository.findAll().stream()
-                .filter(u -> "OFFICER".equalsIgnoreCase(u.getRole()))
-                .findFirst();
+        return userRepository.findById(currentUser.id())
+                .map(u -> ResponseEntity.ok(toOfficerDto(u)))
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-        User user = officerUser.orElseGet(() -> {
-            User demo = new User();
-            demo.setId("user_officer_lahiru");
-            demo.setFullName("Lahiru Sahan");
-            demo.setEmail("lahiru@harvesthub.lk");
-            demo.setMobileNumber("0712345679");
-            demo.setRole("OFFICER");
-            return demo;
-        });
-
-        String region = user.getFarmLocation() != null ? user.getFarmLocation().getAddress() : "Central Province, Sri Lanka";
-        String code = "#HH-" + (user.getNic() != null && user.getNic().length() >= 4 ? user.getNic().substring(user.getNic().length() - 4) : "0942");
-
-        OfficerDto dto = OfficerDto.builder()
+    public static OfficerDto toOfficerDto(User user) {
+        String region = user.getFarmLocation() != null ? user.getFarmLocation().getAddress() : "";
+        String nic = user.getNic();
+        String code = nic != null && nic.length() >= 4 ? "#HH-" + nic.substring(nic.length() - 4) : "";
+        return OfficerDto.builder()
                 .id(user.getId())
-                .username(user.getEmail() != null ? user.getEmail().split("@")[0] : "lahiru")
+                .username(user.getEmail() != null ? user.getEmail().split("@")[0] : user.getId())
                 .fullName(user.getFullName())
                 .officerIdCode(code)
                 .region(region)
                 .email(user.getEmail())
-                .phone(user.getMobileNumber() != null ? user.getMobileNumber() : "+94 71 234 5678")
+                .phone(user.getMobileNumber() != null ? user.getMobileNumber() : user.getPhoneNumber())
                 .role(user.getRole())
                 .build();
-
-        return ResponseEntity.ok(dto);
     }
 
     // ---- Dashboard Activity & Stats -----------------------------------------
@@ -87,11 +91,10 @@ public class OfficerController {
                 .filter(l -> l.getReviewedAt() != null || "ACTIVE".equalsIgnoreCase(l.getStatus()) || "APPROVED".equalsIgnoreCase(l.getStatus()))
                 .count();
 
-        int rate = 95;
+        int rate = 0;
         if (!listings.isEmpty()) {
             long approved = listings.stream().filter(l -> "ACTIVE".equalsIgnoreCase(l.getStatus()) || "APPROVED".equalsIgnoreCase(l.getStatus())).count();
             rate = (int) Math.round(((double) approved / (double) listings.size()) * 100);
-            if (rate == 0) rate = 92;
         }
 
         return ResponseEntity.ok(new OfficerStatsDto(pending, reviewedToday, rate));
@@ -117,18 +120,27 @@ public class OfficerController {
 
     @PostMapping("/queue/{listingId}/claim")
     public ResponseEntity<ListingDetailDto> claimListing(@PathVariable String listingId) {
-        Optional<Listing> opt = listingRepository.findById(listingId);
-        if (opt.isEmpty()) {
+        if (!listingRepository.existsById(listingId)) {
             return ResponseEntity.notFound().build();
         }
-        Listing listing = opt.get();
-        listing.setClaimedByOfficerId("user_officer_lahiru");
-        listing.setClaimedByOfficerName("Lahiru Sahan");
-        listing.setStatus("UNDER_REVIEW");
-        listing.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        listingRepository.save(listing);
-
-        return ResponseEntity.ok(toListingDetailDto(listing));
+        AuthUser me = currentUser.get();
+        // Atomic claim: succeeds only if the listing is still pending and unclaimed (or already claimed by me),
+        // so two officers can never grade the same listing at the same time (proposal 6.7).
+        Query query = new Query(Criteria.where("_id").is(listingId).andOperator(
+                new Criteria().orOperator(
+                        Criteria.where("status").in("PENDING", "PENDING_VERIFICATION").and("claimedByOfficerId").in(null, ""),
+                        Criteria.where("status").is("UNDER_REVIEW").and("claimedByOfficerId").is(me.id()))));
+        Update update = new Update()
+                .set("status", "UNDER_REVIEW")
+                .set("claimedByOfficerId", me.id())
+                .set("claimedByOfficerName", me.fullName())
+                .set("updatedTime", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        Listing claimed = mongoTemplate.findAndModify(query, update,
+                FindAndModifyOptions.options().returnNew(true), Listing.class);
+        if (claimed == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // already claimed by another officer or not pending
+        }
+        return ResponseEntity.ok(toListingDetailDto(claimed));
     }
 
     // ---- Listing Detail & Review Decision -----------------------------------
@@ -152,12 +164,25 @@ public class OfficerController {
             return ResponseEntity.notFound().build();
         }
         Listing listing = opt.get();
-        String decision = request.getDecision() != null ? request.getDecision().toUpperCase() : "APPROVE";
+        AuthUser me = currentUser.get();
+        // Only the officer holding the claim may grade (admins may override).
+        if (!"UNDER_REVIEW".equals(listing.getStatus())
+                || (!me.id().equals(listing.getClaimedByOfficerId()) && !Roles.ADMIN.equals(me.role()))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        if (request.getDecision() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        String decision = request.getDecision().toUpperCase();
+        if ("APPROVE".equals(decision) && (request.getGrade() == null
+                || !Set.of("A", "B", "C").contains(request.getGrade().toUpperCase()))) {
+            return ResponseEntity.badRequest().build(); // a grade A/B/C is mandatory on approval
+        }
         String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         listing.setReviewedAt(now);
-        listing.setReviewedByOfficerId("user_officer_lahiru");
-        listing.setReviewedByOfficerName("Lahiru Sahan");
+        listing.setReviewedByOfficerId(me.id());
+        listing.setReviewedByOfficerName(me.fullName());
         listing.setReviewNotes(request.getNotes());
 
         String notifType = "VERIFICATION";
@@ -166,21 +191,15 @@ public class OfficerController {
 
         if ("APPROVE".equals(decision)) {
             listing.setStatus("ACTIVE");
-            listing.setGrade(request.getGrade() != null ? request.getGrade() : "A");
-            listing.setClaimedByOfficerId("user_officer_lahiru");
-            listing.setClaimedByOfficerName("Lahiru Sahan");
+            listing.setGrade(request.getGrade().toUpperCase());
             notifTitle = "Listing Approved: " + listing.getCropName();
             notifBody = "Your " + listing.getCropName() + " listing has been verified and approved as Grade " + listing.getGrade() + ". It is now active on the marketplace.";
         } else if ("RETAKE".equals(decision)) {
             listing.setStatus("RETAKE_REQUESTED");
-            listing.setClaimedByOfficerId("user_officer_lahiru");
-            listing.setClaimedByOfficerName("Lahiru Sahan");
             notifTitle = "Media Retake Requested: " + listing.getCropName();
             notifBody = "Officer requested retake of verification photos/video. Reason: " + (request.getNotes() != null ? request.getNotes() : "Please provide clearer crop photos.");
         } else {
             listing.setStatus("REJECTED");
-            listing.setClaimedByOfficerId("user_officer_lahiru");
-            listing.setClaimedByOfficerName("Lahiru Sahan");
             notifTitle = "Listing Rejected: " + listing.getCropName();
             notifBody = "Your " + listing.getCropName() + " listing was rejected. Reason: " + (request.getNotes() != null ? request.getNotes() : "Crop quality does not meet marketplace standards.");
         }

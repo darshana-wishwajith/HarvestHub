@@ -39,11 +39,12 @@ public class ListingsHistoryActivity extends AppCompatActivity {
     private final List<HistoryListing> filteredItems = new ArrayList<>();
     
     private ApiService apiService;
-    private final String farmerId = "FARMER_123";
+    private String farmerId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        farmerId = new com.harvesthub.mobile.utils.SessionManager(this).getUserId();
         setContentView(R.layout.history_listings);
 
         apiService = ApiClient.getClient().create(ApiService.class);

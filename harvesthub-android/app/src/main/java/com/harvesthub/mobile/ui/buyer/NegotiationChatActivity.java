@@ -179,8 +179,7 @@ public class NegotiationChatActivity extends AppCompatActivity {
     }
 
     private void sendChatMessage(String text) {
-        String senderId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
-                ? sessionManager.getUser().getId() : "user_buyer_perera";
+        String senderId = sessionManager.getUserId();
         SendMessageRequest request = new SendMessageRequest(senderId, text);
         apiService.sendMessage(orderId, request).enqueue(new Callback<ChatMessage>() {
             @Override

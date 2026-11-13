@@ -16,8 +16,9 @@ public class NotificationService {
         return notificationRepository.findByFarmerIdOrderByTimestampDesc(farmerId);
     }
 
-    public void markAsRead(String notificationId) {
-        notificationRepository.findById(notificationId).ifPresent(n -> {
+    /** Marks a notification read only if it belongs to the given user. */
+    public void markAsRead(String notificationId, String userId) {
+        notificationRepository.findById(notificationId).filter(n -> userId.equals(n.getFarmerId())).ifPresent(n -> {
             n.setRead(true);
             notificationRepository.save(n);
         });
