@@ -51,8 +51,7 @@ public class DeliveryDashboardActivity extends AppCompatActivity {
 
     private void loadJobs() {
         SessionManager session = new SessionManager(this);
-        String transporterId = (session.getUser() != null && session.getUser().getId() != null)
-                ? session.getUser().getId() : "user_transporter_priyantha";
+        String transporterId = session.getUserId();
 
         ApiService api = ApiClient.getClient(session).create(ApiService.class);
         api.getTransporterOrders(transporterId, null).enqueue(new Callback<List<Order>>() {

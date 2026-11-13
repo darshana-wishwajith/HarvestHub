@@ -94,7 +94,7 @@
             <Region prefHeight="6"/>
             <HBox styleClass="input-container" alignment="CENTER_LEFT" spacing="12">
                 <FontIcon iconLiteral="fas-briefcase" iconSize="16" styleClass="input-icon"/>
-                <TextField fx:id="usernameField" promptText="Enter your ID"
+                <TextField fx:id="usernameField" promptText="Email, mobile or NIC"
                            HBox.hgrow="ALWAYS"/>
             </HBox>
             <Region prefHeight="16"/>

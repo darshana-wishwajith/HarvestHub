@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping({"/api", ""})
 public class DashboardController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private DashboardService dashboardService;
     @Autowired
@@ -18,6 +21,7 @@ public class DashboardController {
 
     @GetMapping({"/dashboard/farmer/{id}", "/api/dashboard/farmer/{id}"})
     public ResponseEntity<DashboardResponse> getFarmerDashboard(@PathVariable String id) {
+        currentUser.requireSelfOrStaff(id);
         return ResponseEntity.ok(dashboardService.getFarmerDashboard(id));
     }
 

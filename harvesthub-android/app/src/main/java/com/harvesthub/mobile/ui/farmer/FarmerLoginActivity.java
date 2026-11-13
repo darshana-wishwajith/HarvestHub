@@ -18,7 +18,6 @@ import com.harvesthub.mobile.model.LoginResponse;
 import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.PasswordUtils;
 import com.harvesthub.mobile.utils.SessionManager;
 
 import okhttp3.ResponseBody;
@@ -103,8 +102,11 @@ public class FarmerLoginActivity extends AppCompatActivity {
                     SessionManager sessionManager = new SessionManager(FarmerLoginActivity.this);
                     
                     User user = loginResponse.getUser();
-                    if (user != null && (user.getRole() == null || user.getRole().isEmpty())) {
-                        user.setRole("FARMER");
+                    if (user == null || !"FARMER".equalsIgnoreCase(user.getRole())) {
+                        Toast.makeText(FarmerLoginActivity.this,
+                                "This account is not a farmer account. Please use the correct sign-in option.",
+                                Toast.LENGTH_LONG).show();
+                        return;
                     }
                     
                     sessionManager.saveAuthToken(loginResponse.getToken());

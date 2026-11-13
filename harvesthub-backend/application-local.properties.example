@@ -1,0 +1,12 @@
+# Copy to application-local.properties (git-ignored) for local development,
+# or set the same keys as environment variables on the server.
+MONGODB_URI=mongodb://localhost:27017/harvesthub_dev
+MONGODB_DATABASE=harvesthub_dev
+# Generate: powershell "[Convert]::ToBase64String((1..48|%{Get-Random -Max 256}))"
+JWT_SECRET=replace-with-a-random-string-of-at-least-32-bytes
+MAIL_USERNAME=
+MAIL_PASSWORD=
+GOOGLE_MAPS_API_KEY=
+SEED_DEMO_DATA=true
+# Password for the seeded demo accounts (farmer@, buyer@, transporter@, officer@, admin@harvesthub.lk)
+DEMO_PASSWORD=

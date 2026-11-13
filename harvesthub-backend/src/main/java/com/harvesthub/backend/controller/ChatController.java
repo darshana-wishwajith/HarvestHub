@@ -11,11 +11,24 @@ import java.util.List;
 
 @RestController
 public class ChatController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
+
+    @Autowired
+    private com.harvesthub.backend.repository.OrderRepository orderRepository;
+
+    private void requireParticipant(String orderId) {
+        var order = orderRepository.findById(orderId).orElseThrow(() ->
+                new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Order not found"));
+        currentUser.requireParticipantOrStaff(order.getFarmerId(), order.getBuyerId(), order.getTransporterId());
+    }
     @Autowired
     private ChatService chatService;
 
     @GetMapping("chat/{orderId}/messages")
     public ResponseEntity<List<ChatMessage>> getChatMessages(@PathVariable String orderId) {
+        requireParticipant(orderId);
         return ResponseEntity.ok(chatService.getMessages(orderId));
     }
 
@@ -23,7 +36,11 @@ public class ChatController {
     public ResponseEntity<ChatMessage> sendMessage(
             @PathVariable String orderId,
             @RequestBody SendMessageRequest request) {
-        ChatMessage message = chatService.sendMessage(orderId, request.getText(), request.getSenderId());
+        requireParticipant(orderId);
+        if (request.getText() == null || request.getText().isBlank() || request.getText().length() > 2000) {
+            return ResponseEntity.badRequest().build();
+        }
+        ChatMessage message = chatService.sendMessage(orderId, request.getText().trim(), currentUser.id());
         return ResponseEntity.ok(message);
     }
 }

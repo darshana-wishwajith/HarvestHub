@@ -129,7 +129,7 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
     }
 
     private void fetchVerifiedBatches() {
-        String farmerId = "FARMER_123"; // Should be from session/auth
+        String farmerId = new com.harvesthub.mobile.utils.SessionManager(this).getUserId();
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         apiService.getFarmerVerifiedBatches(farmerId, cropName).enqueue(new Callback<List<CropBatch>>() {
             @Override

@@ -15,7 +15,6 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
 import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.PasswordUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -88,8 +87,8 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
         btnSave.setEnabled(false);
         btnSave.setText("Updating...");
 
-        String hashedPassword = PasswordUtils.hashPassword(newPassword);
-        ResetPasswordRequest request = new ResetPasswordRequest(resetToken, hashedPassword);
+        ResetPasswordRequest request = new ResetPasswordRequest(
+                getIntent().getStringExtra("email"), resetToken, newPassword);
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
         apiService.resetPassword(request).enqueue(new Callback<okhttp3.ResponseBody>() {

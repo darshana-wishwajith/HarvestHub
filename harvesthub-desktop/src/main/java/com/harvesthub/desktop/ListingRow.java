@@ -154,7 +154,17 @@ public class ListingRow extends HBox {
                             try {
                                 com.harvesthub.desktop.api.ListingDetailDto dto = com.harvesthub.desktop.api.ApiClient.claimListing(listing.getId());
                                 if (dto != null) target = Listing.fromDto(dto);
-                            } catch (Exception ignored) {}
+                            } catch (com.harvesthub.desktop.api.ApiException claimError) {
+                                javafx.application.Platform.runLater(() -> {
+                                    button.setDisable(false);
+                                    button.setText(buttonText);
+                                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                                            javafx.scene.control.Alert.AlertType.WARNING, claimError.getMessage());
+                                    alert.setHeaderText("Cannot open this listing");
+                                    alert.showAndWait();
+                                });
+                                return;
+                            }
                         }
                         if (target == null) {
                             try {

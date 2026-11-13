@@ -12,6 +12,9 @@ import java.util.List;
 
 @RestController
 public class BatchController {
+
+    @Autowired
+    private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
     private BatchService batchService;
 
@@ -19,11 +22,9 @@ public class BatchController {
     public ResponseEntity<List<CropBatch>> getVerifiedBatches(
             @RequestParam("farmerId") String farmerId,
             @RequestParam("cropType") String cropType) {
+        currentUser.requireSelfOrStaff(farmerId);
         return ResponseEntity.ok(batchService.getVerifiedBatches(farmerId, cropType));
     }
 
-    @PostMapping("offers/create")
-    public ResponseEntity<GenericResponse> createSupplyOffer(@RequestBody SupplyOfferRequest request) {
-        return ResponseEntity.ok(batchService.createSupplyOffer(request, "current-user"));
-    }
+
 }

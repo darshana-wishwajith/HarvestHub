@@ -89,8 +89,7 @@ public class HomeFragment extends Fragment {
             }
         };
 
-        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null)
-                ? sessionManager.getUser().getId() : "user_farmer_kamal";
+        String farmerId = sessionManager.getUserId();
         String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null)
                 ? sessionManager.getUser().getLocation() : "Dambulla, LK";
 

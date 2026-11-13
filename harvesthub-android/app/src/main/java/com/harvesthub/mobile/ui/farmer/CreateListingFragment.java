@@ -154,9 +154,7 @@ public class CreateListingFragment extends Fragment {
         String priceStr = binding.etPrice.getText().toString().trim();
 
         SessionManager sessionManager = new SessionManager(requireContext());
-        String farmerId = (sessionManager.getUser() != null && sessionManager.getUser().getId() != null && !sessionManager.getUser().getId().isEmpty()) 
-                ? sessionManager.getUser().getId() 
-                : "user_farmer_kamal";
+        String farmerId = sessionManager.getUserId();
         String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null && !sessionManager.getUser().getLocation().isEmpty()) 
                 ? sessionManager.getUser().getLocation() 
                 : "Dambulla Sector";
