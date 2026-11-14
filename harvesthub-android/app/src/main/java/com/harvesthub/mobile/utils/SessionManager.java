@@ -16,7 +16,8 @@ public class SessionManager {
     private static final String KEY_USER_ROLE = "userRole";
     private static final String KEY_AUTH_TOKEN = "authToken";
     private static final String KEY_USER_DATA = "userData";
-    
+    private static final String KEY_STAY_SIGNED_IN = "staySignedIn";
+
     private SharedPreferences pref;
     private final Gson gson;
 
@@ -86,6 +87,15 @@ public class SessionManager {
         return pref.getString(KEY_USER_ROLE, "");
     }
 
+    /** "Stay signed in" on a login screen. When false, LauncherActivity logs out on the next app start. */
+    public void setStaySignedIn(boolean stay) {
+        pref.edit().putBoolean(KEY_STAY_SIGNED_IN, stay).apply();
+    }
+
+    public boolean isStaySignedIn() {
+        return pref.getBoolean(KEY_STAY_SIGNED_IN, true);
+    }
+
     public void logoutUser() {
         // Individual key removal is safer for EncryptedSharedPreferences
         try {
@@ -94,6 +104,7 @@ public class SessionManager {
                 .remove(KEY_USER_ROLE)
                 .remove(KEY_AUTH_TOKEN)
                 .remove(KEY_USER_DATA)
+                .remove(KEY_STAY_SIGNED_IN)
                 .commit();
         } catch (Exception e) {
             // Fallback to clear if remove fails

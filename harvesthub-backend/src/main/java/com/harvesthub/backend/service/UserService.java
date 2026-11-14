@@ -55,6 +55,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    /** true = value is free to use. Blank values are reported as available (nothing to check). */
+    public java.util.Map<String, Boolean> checkAvailability(String email, String mobile, String nic) {
+        java.util.Map<String, Boolean> out = new java.util.LinkedHashMap<>();
+        out.put("email", email == null || email.isBlank()
+                || userRepository.findByEmail(email.trim().toLowerCase()).isEmpty());
+        out.put("mobileNumber", mobile == null || mobile.isBlank()
+                || userRepository.findByMobileNumber(mobile.trim()).isEmpty());
+        out.put("nic", nic == null || nic.isBlank()
+                || userRepository.findByNic(nic.trim().toUpperCase()).isEmpty());
+        return out;
+    }
+
     public User registerUser(RegisterRequest req) {
         String role = req.getRole() == null || req.getRole().isBlank() ? Roles.FARMER : req.getRole().trim().toUpperCase();
         if (!Roles.SELF_REGISTERABLE.contains(role)) {
@@ -62,6 +74,13 @@ public class UserService {
         }
         if (Roles.FARMER.equals(role) && req.getFarmLocation() == null) {
             throw new IllegalStateException("Farm location is required for farmers");
+        }
+        if (req.getFarmLocation() != null) {
+            double lat = req.getFarmLocation().getLatitude(), lng = req.getFarmLocation().getLongitude();
+            // Sri Lanka bounding box (with a small margin) - rejects 0,0 and other unset / bogus pins.
+            if (lat < 5.7 || lat > 10.1 || lng < 79.3 || lng > 82.1) {
+                throw new IllegalStateException("Farm location must be inside Sri Lanka");
+            }
         }
         String email = req.getEmail().trim().toLowerCase();
         if (userRepository.findByEmail(email).isPresent()) {

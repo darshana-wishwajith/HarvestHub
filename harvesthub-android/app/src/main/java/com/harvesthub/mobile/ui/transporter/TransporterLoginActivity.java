@@ -1,14 +1,16 @@
 package com.harvesthub.mobile.ui.transporter;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.ForgotPasswordRequest;
@@ -25,26 +28,28 @@ import com.harvesthub.mobile.network.ApiClient;
 import com.harvesthub.mobile.ui.buyer.CreateAccountActivity;
 import com.harvesthub.mobile.utils.SessionManager;
 
-import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Transporter Login Activity
- * Dedicated authentication portal for agricultural freight haulers and logistics fleet.
+ * Transporter login. Figma: HarvestHub-UI, frame "1.1 Login" (node 623:2819).
+ * Signs in with a Sri Lankan mobile number (+94) or, after "Use Email instead", an email address.
  */
 public class TransporterLoginActivity extends AppCompatActivity {
 
     private EditText etIdentifier;
     private EditText etPassword;
     private ImageView ivTogglePassword;
+    private ImageView ivIdentifierIcon;
+    private View layoutCountryPrefix;
+    private TextView tvIdentifierLabel;
+    private TextView tvUseEmail;
+    private CheckBox cbStaySignedIn;
     private Button btnSignIn;
-    private TextView tvForgotPassword;
-    private TextView tvRegisterTransporter;
 
     private boolean isPasswordVisible = false;
+    private boolean emailMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +58,7 @@ public class TransporterLoginActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            getWindow().setStatusBarColor(Color.WHITE);
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.tl_background));
         }
 
         initViews();
@@ -64,56 +69,97 @@ public class TransporterLoginActivity extends AppCompatActivity {
         etIdentifier = findViewById(R.id.etIdentifier);
         etPassword = findViewById(R.id.etPassword);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivIdentifierIcon = findViewById(R.id.ivIdentifierIcon);
+        layoutCountryPrefix = findViewById(R.id.layoutCountryPrefix);
+        tvIdentifierLabel = findViewById(R.id.tvIdentifierLabel);
+        tvUseEmail = findViewById(R.id.tvUseEmail);
+        cbStaySignedIn = findViewById(R.id.cbStaySignedIn);
         btnSignIn = findViewById(R.id.btnSignIn);
-        tvForgotPassword = findViewById(R.id.tvForgotPassword);
-        tvRegisterTransporter = findViewById(R.id.tvRegisterTransporter);
     }
 
     private void setupListeners() {
         ivTogglePassword.setOnClickListener(v -> {
-            if (isPasswordVisible) {
-                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                ivTogglePassword.setImageResource(R.drawable.ic_visibility_eye);
-                isPasswordVisible = false;
-            } else {
-                etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                ivTogglePassword.setImageResource(R.drawable.ic_visibility_eye_off);
-                isPasswordVisible = true;
-            }
+            isPasswordVisible = !isPasswordVisible;
+            etPassword.setTransformationMethod(isPasswordVisible
+                    ? HideReturnsTransformationMethod.getInstance()
+                    : PasswordTransformationMethod.getInstance());
+            ivTogglePassword.setImageResource(isPasswordVisible
+                    ? R.drawable.ic_visibility_eye_off
+                    : R.drawable.ic_tl_eye);
             etPassword.setSelection(etPassword.getText().length());
         });
 
+        tvUseEmail.setOnClickListener(v -> setEmailMode(!emailMode));
+
         btnSignIn.setOnClickListener(v -> handleSignIn());
 
-        tvForgotPassword.setOnClickListener(v -> showForgotPasswordDialog());
+        findViewById(R.id.tvForgotPassword).setOnClickListener(v -> showForgotPasswordDialog());
 
-        if (tvRegisterTransporter != null) {
-            tvRegisterTransporter.setOnClickListener(v -> {
-                Intent intent = new Intent(TransporterLoginActivity.this, CreateAccountActivity.class);
-                intent.putExtra("TARGET_ROLE", "TRANSPORTER");
-                startActivity(intent);
-            });
+        findViewById(R.id.tvRegisterTransporter).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CreateAccountActivity.class);
+            intent.putExtra("TARGET_ROLE", "TRANSPORTER");
+            startActivity(intent);
+        });
+    }
+
+    /** Switches the first field between "+94 mobile" and "email". */
+    private void setEmailMode(boolean email) {
+        emailMode = email;
+        etIdentifier.setText("");
+        etIdentifier.setError(null);
+        tvIdentifierLabel.setText(email ? R.string.tl_label_email : R.string.tl_label_mobile);
+        tvUseEmail.setText(email ? R.string.tl_use_mobile : R.string.tl_use_email);
+        etIdentifier.setHint(email ? R.string.tl_hint_email : R.string.tl_hint_mobile);
+        etIdentifier.setInputType(email
+                ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                : InputType.TYPE_CLASS_PHONE);
+        layoutCountryPrefix.setVisibility(email ? View.GONE : View.VISIBLE);
+        ivIdentifierIcon.setVisibility(email ? View.GONE : View.VISIBLE);
+        etIdentifier.requestFocus();
+    }
+
+    /**
+     * Accounts store mobiles as 07XXXXXXXX. Accepts "077 123 4567", "771234567", "+94771234567" or "94771234567".
+     * Returns null if it is not a valid Sri Lankan mobile number.
+     */
+    static String normaliseMobile(String raw) {
+        String digits = raw.replaceAll("[^0-9]", "");
+        if (digits.startsWith("94") && digits.length() == 11) {
+            digits = "0" + digits.substring(2);
+        } else if (digits.length() == 9 && digits.startsWith("7")) {
+            digits = "0" + digits;
         }
+        return digits.matches("07\\d{8}") ? digits : null;
     }
 
     private void handleSignIn() {
-        String identifier = etIdentifier.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+        String input = etIdentifier.getText().toString().trim();
+        String password = etPassword.getText().toString();
 
-        if (TextUtils.isEmpty(identifier)) {
-            etIdentifier.setError("Please enter your mobile number or email");
-            etIdentifier.requestFocus();
-            return;
+        String identifier;
+        if (emailMode) {
+            if (!Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
+                etIdentifier.setError("Enter a valid email address");
+                etIdentifier.requestFocus();
+                return;
+            }
+            identifier = input.toLowerCase();
+        } else {
+            identifier = normaliseMobile(input);
+            if (identifier == null) {
+                etIdentifier.setError("Enter a valid mobile number, e.g. 077 123 4567");
+                etIdentifier.requestFocus();
+                return;
+            }
         }
 
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("Please enter your password");
+            etPassword.setError("Enter your PIN or password");
             etPassword.requestFocus();
             return;
         }
 
         btnSignIn.setEnabled(false);
-        Toast.makeText(this, "Signing in to Transporter Portal...", Toast.LENGTH_SHORT).show();
 
         ApiClient.getApiService().login(new LoginRequest(identifier, password))
                 .enqueue(new Callback<LoginResponse>() {
@@ -122,18 +168,18 @@ public class TransporterLoginActivity extends AppCompatActivity {
                         btnSignIn.setEnabled(true);
                         LoginResponse loginResponse = response.body();
 
+                        if (response.code() == 429) {
+                            toast("Too many failed attempts. Try again in 15 minutes.");
+                            return;
+                        }
                         if (!response.isSuccessful() || loginResponse == null || loginResponse.getUser() == null) {
-                            Toast.makeText(TransporterLoginActivity.this,
-                                    "Invalid credentials. Please verify your mobile or password.",
-                                    Toast.LENGTH_LONG).show();
+                            toast("Incorrect mobile/email or password.");
                             return;
                         }
 
                         String userRole = loginResponse.getUser().getRole();
-                        if (userRole == null || !"TRANSPORTER".equalsIgnoreCase(userRole)) {
-                            Toast.makeText(TransporterLoginActivity.this,
-                                    "This account is registered as " + userRole + ". Please use the Transporter portal with a transporter account.",
-                                    Toast.LENGTH_LONG).show();
+                        if (!"TRANSPORTER".equalsIgnoreCase(userRole)) {
+                            toast("This is not a transporter account. Go back and choose your account type.");
                             return;
                         }
 
@@ -141,6 +187,7 @@ public class TransporterLoginActivity extends AppCompatActivity {
                         sessionManager.saveAuthToken(loginResponse.getToken());
                         sessionManager.saveUser(loginResponse.getUser());
                         sessionManager.setLogin(true, "TRANSPORTER");
+                        sessionManager.setStaySignedIn(cbStaySignedIn.isChecked());
 
                         Intent intent = new Intent(TransporterLoginActivity.this, DeliveryDashboardActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -151,40 +198,41 @@ public class TransporterLoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<LoginResponse> call, Throwable throwable) {
                         btnSignIn.setEnabled(true);
-                        Toast.makeText(TransporterLoginActivity.this,
-                                "Network connection failed. Please check your internet connection.",
-                                Toast.LENGTH_LONG).show();
+                        toast("Can't reach the server. Check your internet connection.");
                     }
                 });
     }
 
     private void showForgotPasswordDialog() {
         String identifier = etIdentifier.getText().toString().trim();
-        if (TextUtils.isEmpty(identifier) || !identifier.contains("@")) {
+        if (!emailMode || !Patterns.EMAIL_ADDRESS.matcher(identifier).matches()) {
             new AlertDialog.Builder(this)
-                    .setTitle("Reset Password")
-                    .setMessage("Please enter your registered email address in the field above to receive a password reset token.")
+                    .setTitle("Reset PIN / password")
+                    .setMessage("Reset codes are sent by email. Tap \"Use Email instead\", enter your registered email, then tap \"Forgot PIN?\" again.")
                     .setPositiveButton("OK", null)
                     .show();
             return;
         }
 
-        Toast.makeText(this, "Dispatching reset email...", Toast.LENGTH_SHORT).show();
         ApiClient.getApiService().forgotPassword(new ForgotPasswordRequest(identifier))
                 .enqueue(new Callback<okhttp3.ResponseBody>() {
                     @Override
                     public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
                         new AlertDialog.Builder(TransporterLoginActivity.this)
-                                .setTitle("Password Reset Dispatched")
-                                .setMessage("A secure password reset token has been sent to " + identifier + ". Please check your inbox.")
+                                .setTitle("Check your email")
+                                .setMessage("If " + identifier + " is registered, a reset code has been sent to it.")
                                 .setPositiveButton("OK", null)
                                 .show();
                     }
 
                     @Override
                     public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
-                        Toast.makeText(TransporterLoginActivity.this, "Failed to send reset email. Check connection.", Toast.LENGTH_SHORT).show();
+                        toast("Can't reach the server. Check your internet connection.");
                     }
                 });
+    }
+
+    private void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

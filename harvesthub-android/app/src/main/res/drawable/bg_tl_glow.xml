@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Soft green glow in the hero card's bottom-right corner (Figma: 128px circle, 24px blur). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient
+        android:centerColor="#1A91F78E"
+        android:endColor="#0091F78E"
+        android:gradientRadius="88dp"
+        android:startColor="@color/tl_glow"
+        android:type="radial" />
+</shape>

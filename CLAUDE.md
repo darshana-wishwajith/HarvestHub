@@ -51,7 +51,7 @@ cd harvesthub-android && ./gradlew.bat assembleDebug lintDebug testDebugUnitTest
 
 ## Rules
 - **Never commit secrets** (PEM keys, Mongo URI with credentials, JWT secret, mail password, Maps key). Config comes from env vars / untracked `application-local.properties`. Never print secret values in output or docs.
-- The dev backend uses the team's **MongoDB Atlas** database (user's choice, 2026-11-13), configured in `application-local.properties`. Treat it as shared live data: no destructive operations, no bulk test data, no probes that create accounts/listings unless the user asks. Automated tests use `src/test/resources` and never touch Atlas. Never run `deploy*.ps1` unless the user asks.
+- The dev backend uses the team's **MongoDB Atlas** database (user's choice, 2026-11-13), configured in `application-local.properties`. Treat it as shared live data. Decision 2026-11-14: develop and test directly against Atlas; test accounts/listings are allowed (use `@test.harvesthub.lk` emails so they are easy to find), and the data will be cleaned and re-seeded before the release. No destructive operations (deletes, drops, truncation) without the user's explicit go-ahead at that time, and take a backup first. Automated tests use `src/test/resources` and never touch Atlas. Never run `deploy*.ps1` unless the user asks.
 - Every non-auth endpoint must require a valid JWT and the right role; derive the acting user from the token, never from a path/body `userId`.
 - Return DTOs, never `@Document` entities (no password hashes / reset tokens in responses).
 - Order status changes go through the state machine in `OrderService`; no free-form `PUT /orders/{id}/status` for clients.

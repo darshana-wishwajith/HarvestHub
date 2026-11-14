@@ -102,6 +102,34 @@ Legend: ✅ **verified** = built, ran, or called locally · 🔍 **inspected** =
 | 13 Nov | Android `assembleDebug lintDebug testDebugUnitTest` on `main` | ✅ debug APK + unit tests pass · ❌ `lintDebug` fails: **31 errors** (29 `InvalidVectorPath`: `.01`-style numbers in `ic_device_handshake`, `ic_dock_terminal`, `ic_tag`, `transporter_ic_call` and others, which crash on some devices; 2 `NotSibling` in `activity_negotiation_chat.xml:29,31`) and 2,550 warnings (1,127 HardcodedText, 524 UnusedResources) |
 | 13 Nov (Day 1) | backend `mvnw test` 7/7; 46/46 local security probes; desktop compile; Android `assembleDebug lintDebug testDebugUnitTest` | ✅ all green (lint 0 errors / 2,558 warnings) |
 | 13 Nov | Android build on `darshana-branch` | ❌ 16 missing color resources (`fragment_home.xml`, `fragment_create_listing.xml`); the branch is stale, so not a `main` issue |
+| 14 Nov | Atlas connection check (backend start on :8091, no data changes) | ✅ connected, auth OK |
+| 14 Nov | Deployed `fix/day1-security` backend to AWS EC2 `13.228.18.33` (harvesthubapp.tech). Config in `/etc/harvesthub/harvesthub.env` via systemd override; app binds 127.0.0.1 behind nginx (landing page `index.html` at `/`). Backup: `~/app.jar.bak-20261114` | ✅ started, Atlas connected, new endpoint live, unauthenticated → 401, :8080 closed |
+| 14 Nov | Farmer registration rework (see below) | ⏳ not built yet; user to run and report |
+| 14 Nov | Landing / role selection screen restyled from Figma (see below) | ⏳ not built yet; user to run and report |
+| 14 Nov | Transporter login rebuilt from Figma (see below) | ⏳ not built yet; user to run and report |
+
+**14 Nov: farmer registration rework (AUTH-1)**
+- Registration screen validates every field itself (name, 07XXXXXXXX mobile, email, NIC format + birth-day check, password ≥8 with letters and numbers, confirm). Then it calls new `POST /api/auth/check-availability` (public, returns only booleans) so "already registered" errors show on the form, before the map.
+- Location screen: Google Map (hybrid view) with a fixed centre pin; asks permission, prompts to turn on GPS, takes a fresh high-accuracy fix (falls back to last known), search by place name (Geocoder, biased to Sri Lanka), shows the address under the pin. Confirm requires the pin inside Sri Lanka and zoom ≥13. Then it registers user + farm location in one call.
+- Backend rejects farm locations outside Sri Lanka.
+- Maps key: `MAPS_API_KEY=` in `harvesthub-android/local.properties` (untracked) → manifest placeholder. It was the placeholder `YOUR_GOOGLE_MAPS_API_KEY_HERE`, which is why the map never loaded.
+- Figma has no email field; email is kept because password reset is by email (user decision, 14 Nov).
+
+**14 Nov: landing / role selection from Figma (`HarvestHub-UI`, frame `1.Landing Screen`, node 125:900)**
+- Figma is now read through the Figma connector, one frame link per screen.
+- `activity_role_selection.xml` rebuilt to the frame's spacing, type and colours. New resources: `values/styles_landing.xml`, `color/landing_role_*.xml`, `drawable/bg_landing_role_icon.xml`, `landing_*` colours in `colors.xml`. The logo and hero images are cropped from the Figma originals into `drawable-nodpi/img_landing_{logo,hero}.png`, replacing the low-res ones. The old `ic_harvesthublogo` / `img_harvest_eco` are kept (`activity_waiting_for_advance_payment.xml` uses one of them).
+- Farmer card is selected on open (as in Figma). Selected = dark-green 2dp border, green icon circle, green title.
+- No backend/API change: this screen comes before login.
+- `LauncherActivity` now sends a logged-in Transporter to `DeliveryDashboardActivity`; before, they landed back on role selection.
+
+**14 Nov: transporter login from Figma (frame `1.1 Login`, node 623:2819)**
+- `activity_transporter_login.xml` rebuilt: hero card with stats, Log In / Register Driver switcher, form card, legal footer. Icons converted from Figma into `drawable/ic_tl_*.xml`; shapes in `drawable/bg_tl_*.xml`; colours `tl_*`; strings `tl_*`.
+- Uses the existing `POST /api/auth/login` (accepts email or mobile); no backend change.
+- Mobile entered as +94 and normalised to `07XXXXXXXX` (how accounts are stored); unit test `TransporterLoginMobileTest`. "Use Email instead" switches the field to email.
+- "Stay signed in" (`SessionManager.setStaySignedIn`): when unticked, `LauncherActivity` logs out on the next app start.
+- "Register Driver" still opens `CreateAccountActivity` with `TARGET_ROLE=TRANSPORTER` until that Figma screen is built. "Forgot PIN?" works only in email mode (reset is by email).
+- **TEMP:** `RoleSelectionActivity.TEMP_ALWAYS_SHOW_TRANSPORTER_LOGIN = true` makes the Transporter card always open this login, even when already signed in. Set it to false (or delete it) after testing.
+- Open questions: "Carrier ID" in the label is not a backend concept (login is mobile or email only). The hero stats "1,420+ Active Routes" and "100% Fair Carrier Payout" are static text from the design, not real data. "FAST TRANSIT ACCESS" divider has nothing under it in the frame. Carrier Terms / Fair Transit Standards links are not clickable (no pages exist).
 
 ## 7. Task board
 Current task: Day 1 complete on `fix/day1-security` (uncommitted), waiting for review/commit. Next: Day 2 core logic.
