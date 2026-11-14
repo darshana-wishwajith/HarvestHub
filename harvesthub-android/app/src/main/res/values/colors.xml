@@ -223,4 +223,27 @@
     <color name="filter_active_bg">#1B4332</color>
     <color name="badge_delay_bg">#FED7D7</color>
     <color name="badge_delay_text">#C53030</color>
+
+    <!-- Landing / role selection (Figma 125:900) -->
+    <color name="landing_heading">#1A1A1A</color>
+    <color name="landing_body">#64748B</color>
+    <color name="landing_body_active">#414844</color>
+    <color name="landing_icon_muted">#717973</color>
+    <color name="landing_icon_bg_active">#E8F5EA</color>
+    <color name="landing_icon_bg">#EEEEEB</color>
+
+    <!-- Transporter login (Figma 623:2819) -->
+    <color name="tl_background">#FCF9F8</color>
+    <color name="tl_surface_low">#F6F3F2</color>
+    <color name="tl_surface_mid">#F0EDED</color>
+    <color name="tl_on_surface">#1C1B1B</color>
+    <color name="tl_on_surface_variant">#414844</color>
+    <color name="tl_outline">#717973</color>
+    <color name="tl_outline_soft">#EAE7E7</color>
+    <color name="tl_primary_deep">#012D1D</color>
+    <color name="tl_green_text">#006E1C</color>
+    <color name="tl_badge_bg">#1A012D1D</color>
+    <color name="tl_stat_routes_bg">#66C1ECD4</color>
+    <color name="tl_stat_payout_bg">#8091F78E</color>
+    <color name="tl_glow">#3391F78E</color>
 </resources>

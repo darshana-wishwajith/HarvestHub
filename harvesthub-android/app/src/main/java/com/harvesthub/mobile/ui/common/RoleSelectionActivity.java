@@ -31,6 +31,9 @@ public class RoleSelectionActivity extends AppCompatActivity {
         MaterialCardView cardBuyer = findViewById(R.id.cardBuyer);
         MaterialCardView cardTransporter = findViewById(R.id.cardTransporter);
 
+        // Figma shows Farmer as the active card on first open.
+        updateSelection(cardFarmer, cardBuyer, cardTransporter);
+
         cardFarmer.setOnClickListener(v -> {
             updateSelection(cardFarmer, cardBuyer, cardTransporter);
             handleFarmerSelection();
@@ -82,8 +85,12 @@ public class RoleSelectionActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TEMP (14 Nov, for testing the new Figma login): always open the login screen, even when a
+    // transporter is already signed in. Remove this flag to restore the skip-to-dashboard behaviour.
+    private static final boolean TEMP_ALWAYS_SHOW_TRANSPORTER_LOGIN = true;
+
     private void navigateToTransporterLogin() {
-        if (sessionManager.isLoggedIn() && "TRANSPORTER".equals(sessionManager.getUserRole())) {
+        if (!TEMP_ALWAYS_SHOW_TRANSPORTER_LOGIN && sessionManager.isLoggedIn() && "TRANSPORTER".equals(sessionManager.getUserRole())) {
             Intent intent = new Intent(this, com.harvesthub.mobile.ui.transporter.DeliveryDashboardActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
