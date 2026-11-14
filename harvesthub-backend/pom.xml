@@ -19,6 +19,8 @@
 	<properties>
 		<java.version>21</java.version>
 		<lombok.version>1.18.48</lombok.version>
+		<!-- Tests only: Mockito's Byte Buddy 1.14 rejects JDKs newer than 22 (dev machines run JDK 25/26). -->
+		<argLine>-Dnet.bytebuddy.experimental=true</argLine>
 	</properties>
 
 	<dependencies>
