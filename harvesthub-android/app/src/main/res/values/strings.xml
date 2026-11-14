@@ -130,6 +130,40 @@
     <string name="tl_fast_access">Fast transit access</string>
     <string name="tl_footer">By continuing you agree to HarvestHub\'s <u><font color="#414844">Carrier Terms</font></u> &amp; <u><font color="#414844">Fair Transit Standards</font></u>.</string>
 
+    <!-- Farmer forgot-password (Figma frames 3-7). The design text says "4-digit"; codes are 6 digits. -->
+    <string name="fp_back">Go back</string>
+    <string name="fp_title_forgot">Forgot Password?</string>
+    <string name="fp_desc_forgot">Enter your registered email address or mobile number. We will send you a 6-digit verification code to reset your password.</string>
+    <string name="fp_hint_identifier">Email or Mobile Number</string>
+    <string name="fp_send_code">Send Verification Code</string>
+    <string name="fp_sending">Sending…</string>
+    <string name="fp_err_identifier">Enter a valid email address or mobile number (e.g. 077 123 4567)</string>
+    <string name="fp_title_code">Enter Verification Code</string>
+    <string name="fp_code_sent_to">We have sent a 6-digit verification code to %1$s. Please enter it below.</string>
+    <string name="fp_code_sent_generic">We have sent a 6-digit verification code to the email address registered with %1$s. Please enter it below.</string>
+    <string name="fp_verify_code">Verify Code</string>
+    <string name="fp_verifying">Verifying…</string>
+    <string name="fp_err_code_incomplete">Enter all 6 digits of the code.</string>
+    <string name="fp_err_code_invalid">Invalid verification code. Please try again.</string>
+    <string name="fp_resend_prefix">Didn\'t receive the code? </string>
+    <string name="fp_resend_in">Resend in %1$s</string>
+    <string name="fp_resend">Resend</string>
+    <string name="fp_resent">A new code has been sent.</string>
+    <string name="fp_title_verified">Account Verified!</string>
+    <string name="fp_desc_verified">Your identity has been successfully verified. You can now proceed to set a new password for your account.</string>
+    <string name="fp_reset_password">Reset Password</string>
+    <string name="fp_title_new_password">Create New Password</string>
+    <string name="fp_desc_new_password">Your new password must be at least 8 characters long and different from your previously used passwords.</string>
+    <string name="fp_hint_new_password">Enter new password</string>
+    <string name="fp_hint_confirm_password">Confirm new password</string>
+    <string name="fp_toggle_password">Show or hide password</string>
+    <string name="fp_save_login">Save &amp; Login</string>
+    <string name="fp_saving">Saving…</string>
+    <string name="fp_err_password_rule">Use at least 8 characters with letters and numbers.</string>
+    <string name="fp_err_password_mismatch">Passwords do not match.</string>
+    <string name="fp_password_updated">Password updated. Please sign in with your new password.</string>
+    <string name="fp_network_error">Can\'t reach the server. Check your internet connection.</string>
+
     <!-- Rating & Feedback Strings -->
     <string name="notifications">Notifications</string>
     <string name="transaction_complete">Transaction Complete</string>

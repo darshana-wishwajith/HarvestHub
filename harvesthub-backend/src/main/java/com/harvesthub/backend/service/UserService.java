@@ -154,15 +154,29 @@ public class UserService {
         return userOpt;
     }
 
+    static final Duration RESET_CODE_VALIDITY = Duration.ofMinutes(15);
+    /** A new code is not issued (or emailed) again within this time; matches the app's "Resend in 01:00". */
+    static final Duration RESET_CODE_RESEND_COOLDOWN = Duration.ofSeconds(60);
+    private static final String INVALID_CODE = "Invalid or expired verification code.";
+
+    /**
+     * Step 1 of forgot-password: issue a 6-digit code (stored only as a bcrypt hash) and email it.
+     * Silent when the account does not exist, so the endpoint does not reveal which accounts exist.
+     */
     public void createPasswordResetTokenForUser(String identifier) {
         Optional<User> userOptional = findByIdentifier(identifier);
         if (userOptional.isEmpty()) {
             return; // don't reveal whether the account exists
         }
         User user = userOptional.get();
+        LocalDateTime expiry = user.getResetPasswordTokenExpiry();
+        if (user.getResetPasswordToken() != null && expiry != null
+                && expiry.minus(RESET_CODE_VALIDITY).plus(RESET_CODE_RESEND_COOLDOWN).isAfter(LocalDateTime.now())) {
+            return; // a code was sent less than a minute ago; stops email flooding
+        }
         String code = String.format("%06d", random.nextInt(1_000_000));
         user.setResetPasswordToken(passwordEncoder.encode(code)); // store only a hash of the code
-        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15));
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plus(RESET_CODE_VALIDITY));
         userRepository.save(user);
         resetAttempts.remove(user.getId());
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
@@ -171,26 +185,26 @@ public class UserService {
             } catch (Exception e) {
                 log.warn("Password reset email could not be sent for user {}", user.getId());
             }
+        } else {
+            log.warn("User {} has no email; password reset code could not be delivered", user.getId());
         }
     }
 
+    /**
+     * Step 2: check the code without using it up, so the app can show the success / error state
+     * before asking for the new password. Wrong guesses count towards the same 5-attempt limit.
+     */
+    public void verifyResetCode(String identifier, String code) {
+        User user = findByIdentifier(identifier).orElseThrow(() -> new IllegalStateException(INVALID_CODE));
+        requireValidResetCode(user, code);
+    }
+
+    /** Step 3: set the new password. The code is checked again and then cleared. */
     public void resetPassword(String identifier, String code, String newPassword) {
-        User user = findByIdentifier(identifier)
-                .orElseThrow(() -> new IllegalStateException("Invalid or expired verification code."));
-        String stored = user.getResetPasswordToken();
-        if (stored == null || !stored.startsWith("$2") || user.getResetPasswordTokenExpiry() == null
-                || user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Invalid or expired verification code.");
-        }
-        if (!passwordEncoder.matches(code.trim(), stored)) {
-            int attempts = resetAttempts.merge(user.getId(), 1, Integer::sum);
-            if (attempts >= MAX_RESET_ATTEMPTS) { // burn the code after repeated wrong guesses
-                user.setResetPasswordToken(null);
-                user.setResetPasswordTokenExpiry(null);
-                userRepository.save(user);
-                resetAttempts.remove(user.getId());
-            }
-            throw new IllegalStateException("Invalid or expired verification code.");
+        User user = findByIdentifier(identifier).orElseThrow(() -> new IllegalStateException(INVALID_CODE));
+        requireValidResetCode(user, code);
+        if (user.getPassword() != null && passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalStateException("New password must be different from your current password.");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setPasswordLastUpdated(LocalDateTime.now().toString());
@@ -198,6 +212,24 @@ public class UserService {
         user.setResetPasswordTokenExpiry(null);
         userRepository.save(user);
         resetAttempts.remove(user.getId());
+    }
+
+    private void requireValidResetCode(User user, String code) {
+        String stored = user.getResetPasswordToken();
+        if (stored == null || !stored.startsWith("$2") || user.getResetPasswordTokenExpiry() == null
+                || user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException(INVALID_CODE);
+        }
+        if (code == null || !passwordEncoder.matches(code.trim(), stored)) {
+            int attempts = resetAttempts.merge(user.getId(), 1, Integer::sum);
+            if (attempts >= MAX_RESET_ATTEMPTS) { // burn the code after repeated wrong guesses
+                user.setResetPasswordToken(null);
+                user.setResetPasswordTokenExpiry(null);
+                userRepository.save(user);
+                resetAttempts.remove(user.getId());
+            }
+            throw new IllegalStateException(INVALID_CODE);
+        }
     }
 
     private static String sha256Hex(String s) {

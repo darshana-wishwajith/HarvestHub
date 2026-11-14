@@ -30,9 +30,15 @@ android {
 
     buildTypes {
         debug {
-            // Local testing: ./gradlew assembleDebug -PapiUrl=http://<laptop-ip>:8080/
-            // (scripts/run-mobile.ps1 passes the laptop's Wi-Fi IP automatically)
-            def apiUrl = project.findProperty('apiUrl') ?: 'https://harvesthubapp.tech/'
+            // Backend for debug builds, first match wins:
+            //   1. -PapiUrl=http://<laptop-ip>:8080/  (scripts/run-mobile.ps1 passes the laptop's Wi-Fi IP)
+            //   2. API_URL=... in local.properties (untracked; used by Android Studio's Run button)
+            //   3. production https://harvesthubapp.tech/
+            def debugProps = new Properties()
+            def debugLp = rootProject.file('local.properties')
+            if (debugLp.exists()) debugLp.withInputStream { debugProps.load(it) }
+            def apiUrl = project.findProperty('apiUrl') ?: debugProps.getProperty('API_URL', 'https://harvesthubapp.tech/')
+            if (!apiUrl.endsWith('/')) apiUrl += '/'
             buildConfigField 'String', 'API_BASE_URL', "\"${apiUrl}\""
         }
         release {

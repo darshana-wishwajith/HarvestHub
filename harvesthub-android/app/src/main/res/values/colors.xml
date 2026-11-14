@@ -246,4 +246,15 @@
     <color name="tl_stat_routes_bg">#66C1ECD4</color>
     <color name="tl_stat_payout_bg">#8091F78E</color>
     <color name="tl_glow">#3391F78E</color>
+
+    <!-- Farmer forgot-password (Figma 82:41, 660:111, 83:265, 660:21, 137:2, 82:142) -->
+    <color name="fp_title">#1A1A1A</color>
+    <color name="fp_body">#64748B</color>
+    <color name="fp_body_strong">#1A1C1A</color>
+    <color name="fp_hint">#9964748B</color>
+    <color name="fp_outline">#64748B</color>
+    <color name="fp_success">#16A34A</color>
+    <color name="fp_error">#DC2626</color>
+    <color name="fp_error_bg">#FFDAD6</color>
+    <color name="fp_link">#4CAF50</color>
 </resources>

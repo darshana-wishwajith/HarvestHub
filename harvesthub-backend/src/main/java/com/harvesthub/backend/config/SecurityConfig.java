@@ -32,8 +32,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_AUTH = {
-            "/api/auth/login", "/api/auth/register", "/api/auth/check-availability", "/api/auth/forgot-password", "/api/auth/reset-password",
-            "/api/login", "/api/register", "/api/check-availability", "/api/forgot-password", "/api/reset-password",
+            "/api/auth/login", "/api/auth/register", "/api/auth/check-availability", "/api/auth/forgot-password", "/api/auth/verify-reset-code", "/api/auth/reset-password",
+            "/api/login", "/api/register", "/api/check-availability", "/api/forgot-password", "/api/verify-reset-code", "/api/reset-password",
             "/auth/send-otp", "/auth/resend-otp", "/auth/verify-otp"
     };
 

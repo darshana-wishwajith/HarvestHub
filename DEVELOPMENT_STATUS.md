@@ -107,6 +107,10 @@ Legend: ✅ **verified** = built, ran, or called locally · 🔍 **inspected** =
 | 14 Nov | Farmer registration rework (see below) | ⏳ not built yet; user to run and report |
 | 14 Nov | Landing / role selection screen restyled from Figma (see below) | ⏳ not built yet; user to run and report |
 | 14 Nov | Transporter login rebuilt from Figma (see below) | ⏳ not built yet; user to run and report |
+| 14 Nov | Farmer forgot-password: backend verify step + 4 screens from Figma (see below) | ✅ backend `mvnw test` 18/18 (incl. HTTP flow forgot → verify → reset → login without a token) · ⏳ app flow: user to retest after restarting the backend |
+| 14 Nov | "Authentication required" after entering the correct code | Cause: backend on :8080 was started 13:07, before `verify-reset-code` existed, so the old security rules answered 401. Fix: restart the backend. Also: `pom.xml` sets `argLine=-Dnet.bytebuddy.experimental=true` so Mockito works on JDK 25/26 |
+| 14 Nov | App was calling production | Debug builds from Android Studio had no `-PapiUrl`, so they used https://harvesthubapp.tech/ (no `verify-reset-code` there yet). `app/build.gradle` now also reads `API_URL` from untracked `local.properties`; set to the laptop's Wi-Fi IP. Generated `BuildConfig.API_BASE_URL` = `http://172.31.99.217:8080/` ✅ |
+| 14 Nov 18:27 | Deployed `fix/day1-security` (uncommitted working tree: forgot-password verify step) to EC2 `13.228.18.33` / harvesthubapp.tech. JAR sha256 `6ffd0f1a…cda0`. Backup of previous JAR: `~/app.jar.bak-20261114-forgotpw` (rollback: `cp ~/app.jar.bak-20261114-forgotpw ~/app.jar && sudo systemctl restart harvesthub`) | ✅ started in 8 s, Atlas connected. HTTPS checks: `verify-reset-code` wrong code → 400 "Invalid or expired verification code", bad format → 400, `forgot-password` unknown account → 200, `reset-password` wrong code → 400, `GET /api/users` no token → 401 |
 
 **14 Nov: farmer registration rework (AUTH-1)**
 - Registration screen validates every field itself (name, 07XXXXXXXX mobile, email, NIC format + birth-day check, password ≥8 with letters and numbers, confirm). Then it calls new `POST /api/auth/check-availability` (public, returns only booleans) so "already registered" errors show on the form, before the map.
@@ -130,6 +134,15 @@ Legend: ✅ **verified** = built, ran, or called locally · 🔍 **inspected** =
 - "Register Driver" still opens `CreateAccountActivity` with `TARGET_ROLE=TRANSPORTER` until that Figma screen is built. "Forgot PIN?" works only in email mode (reset is by email).
 - **TEMP:** `RoleSelectionActivity.TEMP_ALWAYS_SHOW_TRANSPORTER_LOGIN = true` makes the Transporter card always open this login, even when already signed in. Set it to false (or delete it) after testing.
 - Open questions: "Carrier ID" in the label is not a backend concept (login is mobile or email only). The hero stats "1,420+ Active Routes" and "100% Fair Carrier Payout" are static text from the design, not real data. "FAST TRANSIT ACCESS" divider has nothing under it in the frame. Carrier Terms / Fair Transit Standards links are not clickable (no pages exist).
+
+**14 Nov: farmer forgot-password (Figma page "Mobile App Farmer View", frames 3–7)**
+- Flow: `ForgotPasswordActivity` (frame 3, email or +94 mobile) → `VerifyOtpActivity` (frame 4; green boxes = frame 5, red boxes + banner = frame 6) → `AccountVerifiedActivity` (137:2) → `CreateNewPasswordActivity` (frame 7, "Save & Login" resets then signs in).
+- Bugs fixed: "Send code" went straight to `ResetPasswordActivity`; the code screen had 4 boxes (server sends 6 digits) and faked verification with `"mock_token"`; the final reset call never sent the email, so the server always rejected it.
+- Backend: new public `POST /api/auth/verify-reset-code` {email, code} checks the code without using it up (shares the 5-wrong-tries limit). `forgot-password` no longer re-sends within 60 s. `reset-password` rejects a new password equal to the current one. Tests: `PasswordResetFlowTests`, `SecurityRulesTests.forgotPasswordStepsArePublicAndValidateInput`.
+- Android: `AuthInputUtils` (identifier/mobile normalising, email masking, password rule, error-body parsing) + `AuthInputUtilsTest`. Resources prefixed `fp_` / `ic_fp_` / `bg_fp_`, styles in `values/styles_forgot_password.xml`.
+- Codes are sent by **email only** (no SMS gateway). A mobile number works as the identifier; the code goes to that account's email.
+- Figma says "4-digit verification code"; the app says 6-digit (matches the 6 boxes and the server).
+- Not changed: `ResetPasswordActivity` (opened from Settings / Edit Profile as "change password") still calls the reset endpoint, which needs an emailed code, so in-app change password does not work. Needs its own endpoint (current + new password).
 
 ## 7. Task board
 Current task: Day 1 complete on `fix/day1-security` (uncommitted), waiting for review/commit. Next: Day 2 core logic.

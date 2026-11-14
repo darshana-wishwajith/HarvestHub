@@ -78,6 +78,10 @@ public interface ApiService {
     @POST("api/auth/forgot-password")
     Call<okhttp3.ResponseBody> forgotPassword(@Body ForgotPasswordRequest request);
 
+    /** Forgot-password step 2: 200 if the code is right (does not use it up), 400 otherwise. */
+    @POST("api/auth/verify-reset-code")
+    Call<okhttp3.ResponseBody> verifyResetCode(@Body com.harvesthub.mobile.model.VerifyResetCodeRequest request);
+
     @POST("api/auth/reset-password")
     Call<okhttp3.ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 

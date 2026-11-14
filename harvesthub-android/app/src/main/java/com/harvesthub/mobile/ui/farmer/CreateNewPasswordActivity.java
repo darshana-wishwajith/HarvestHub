@@ -2,159 +2,168 @@ package com.harvesthub.mobile.ui.farmer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.button.MaterialButton;
+import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.LoginRequest;
+import com.harvesthub.mobile.model.LoginResponse;
 import com.harvesthub.mobile.model.ResetPasswordRequest;
+import com.harvesthub.mobile.model.User;
 import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
+import com.harvesthub.mobile.utils.AuthInputUtils;
+import com.harvesthub.mobile.utils.SessionManager;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Forgot password, step 4 (Figma "7.Forgot password - Create New Password").
+ * "Save &amp; Login" sets the new password with the verified code, then signs the farmer in with it.
+ */
 public class CreateNewPasswordActivity extends AppCompatActivity {
 
-    private TextInputLayout tilNewPassword, tilConfirmPassword;
-    private TextInputEditText etNewPassword, etConfirmPassword;
-    private Button btnSave;
-    private com.google.android.material.card.MaterialCardView cvError;
-    private android.widget.TextView tvErrorMessage;
-    private View ivCloseError;
-    private String resetToken;
+    private EditText etNewPassword, etConfirmPassword;
+    private TextView tvNewPasswordError, tvConfirmPasswordError, tvError;
+    private View llErrorContainer;
+    private MaterialButton btnSave;
+    private String identifier, code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_password);
 
-        tilNewPassword = findViewById(R.id.tilNewPassword);
-        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
+        identifier = getIntent().getStringExtra(ForgotPasswordActivity.EXTRA_IDENTIFIER);
+        code = getIntent().getStringExtra(VerifyOtpActivity.EXTRA_CODE);
+        if (identifier == null || code == null) { // only reachable through the forgot-password flow
+            finish();
+            return;
+        }
+
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        tvNewPasswordError = findViewById(R.id.tvNewPasswordError);
+        tvConfirmPasswordError = findViewById(R.id.tvConfirmPasswordError);
+        tvError = findViewById(R.id.tvError);
+        llErrorContainer = findViewById(R.id.llErrorContainer);
         btnSave = findViewById(R.id.btnSave);
-        cvError = findViewById(R.id.cvError);
-        tvErrorMessage = findViewById(R.id.tvErrorMessage);
-        ivCloseError = findViewById(R.id.ivCloseError);
-        View btnBack = findViewById(R.id.btnBack);
 
-        resetToken = getIntent().getStringExtra("resetToken");
-
-        btnBack.setOnClickListener(v -> finish());
-        btnSave.setOnClickListener(v -> validateAndReset());
-        ivCloseError.setOnClickListener(v -> cvError.setVisibility(View.GONE));
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        setupToggle(findViewById(R.id.ivToggleNew), etNewPassword);
+        setupToggle(findViewById(R.id.ivToggleConfirm), etConfirmPassword);
+        btnSave.setOnClickListener(v -> validateAndSave());
     }
 
-    private void validateAndReset() {
-        String newPassword = etNewPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
-
-        tilNewPassword.setError(null);
-        tilConfirmPassword.setError(null);
-
-        boolean isValid = true;
-
-        if (newPassword.isEmpty()) {
-            tilNewPassword.setError("Password cannot be empty");
-            isValid = false;
-        } else if (newPassword.length() < 8) {
-            tilNewPassword.setError("Password must be at least 8 characters");
-            isValid = false;
-        }
-
-        if (confirmPassword.isEmpty()) {
-            tilConfirmPassword.setError("Please confirm your password");
-            isValid = false;
-        } else if (!confirmPassword.equals(newPassword)) {
-            tilConfirmPassword.setError("Passwords do not match");
-            isValid = false;
-        }
-
-        if (isValid) {
-            performResetPassword(newPassword);
-        }
-    }
-
-    private void performResetPassword(String newPassword) {
-        cvError.setVisibility(View.GONE);
-        btnSave.setEnabled(false);
-        btnSave.setText("Updating...");
-
-        ResetPasswordRequest request = new ResetPasswordRequest(
-                getIntent().getStringExtra("email"), resetToken, newPassword);
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-
-        apiService.resetPassword(request).enqueue(new Callback<okhttp3.ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Response<okhttp3.ResponseBody> response) {
-                btnSave.setEnabled(true);
-                btnSave.setText("Save & Login");
-
-                if (response.isSuccessful()) {
-                    Toast.makeText(CreateNewPasswordActivity.this, "Password updated successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(CreateNewPasswordActivity.this, FarmerLoginActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    String detailedErrorMessage = "Failed to update password";
-                    try (okhttp3.ResponseBody errorBody = response.errorBody()) {
-                        if (errorBody != null) {
-                            String bodyString = errorBody.string();
-                            if (bodyString != null && !bodyString.trim().isEmpty()) {
-                                detailedErrorMessage = formatError(bodyString);
-                            } else {
-                                detailedErrorMessage = "Update Failed: " + response.code() + " " + response.message();
-                            }
-                        } else {
-                            detailedErrorMessage = "Update Failed: " + response.code() + " " + response.message();
-                        }
-                    } catch (Exception e) {
-                        android.util.Log.e("ResetPasswordError", "Error parsing error body", e);
-                        detailedErrorMessage = "Update Failed: " + response.code();
-                    }
-                    tvErrorMessage.setText(detailedErrorMessage);
-                    cvError.setVisibility(View.VISIBLE);
-                    android.util.Log.e("ResetPasswordError", "HTTP Code: " + response.code() + ", Error: " + detailedErrorMessage);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<okhttp3.ResponseBody> call, @NonNull Throwable t) {
-                btnSave.setEnabled(true);
-                btnSave.setText("Save & Login");
-                String errorMessage = "Network error: " + t.getMessage();
-                tvErrorMessage.setText(errorMessage);
-                cvError.setVisibility(View.VISIBLE);
-                android.util.Log.e("ResetPasswordError", errorMessage, t);
-            }
+    private void setupToggle(ImageView toggle, EditText field) {
+        toggle.setOnClickListener(v -> {
+            boolean hidden = field.getTransformationMethod() instanceof PasswordTransformationMethod;
+            field.setTransformationMethod(hidden
+                    ? HideReturnsTransformationMethod.getInstance()
+                    : PasswordTransformationMethod.getInstance());
+            toggle.setImageResource(hidden ? R.drawable.ic_tl_eye : R.drawable.ic_fp_eye_off);
+            field.setSelection(field.getText().length());
         });
     }
 
-    private String formatError(String errorBody) {
-        try {
-            if (errorBody.trim().startsWith("{")) {
-                org.json.JSONObject jsonObject = new org.json.JSONObject(errorBody);
-                StringBuilder sb = new StringBuilder();
-                java.util.Iterator<String> keys = jsonObject.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    String message = jsonObject.optString(key);
-                    if (sb.length() > 0) sb.append("\n");
-                    sb.append("• ").append(message);
-                }
-                return sb.toString();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void validateAndSave() {
+        String password = etNewPassword.getText().toString();
+        String confirm = etConfirmPassword.getText().toString();
+        tvNewPasswordError.setVisibility(View.GONE);
+        tvConfirmPasswordError.setVisibility(View.GONE);
+        llErrorContainer.setVisibility(View.GONE);
+
+        if (!AuthInputUtils.isStrongEnough(password)) {
+            tvNewPasswordError.setText(R.string.fp_err_password_rule);
+            tvNewPasswordError.setVisibility(View.VISIBLE);
+            etNewPassword.requestFocus();
+            return;
         }
-        return errorBody;
+        if (!password.equals(confirm)) {
+            tvConfirmPasswordError.setText(R.string.fp_err_password_mismatch);
+            tvConfirmPasswordError.setVisibility(View.VISIBLE);
+            etConfirmPassword.requestFocus();
+            return;
+        }
+
+        setBusy(true);
+        ApiClient.getApiService().resetPassword(new ResetPasswordRequest(identifier, code, password))
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            signIn(password);
+                        } else {
+                            setBusy(false);
+                            showError(AuthInputUtils.errorMessage(response, getString(R.string.fp_err_code_invalid)));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                        setBusy(false);
+                        showError(getString(R.string.fp_network_error));
+                    }
+                });
+    }
+
+    /** The "Login" half of "Save & Login". If it fails, the password is still changed: go to sign-in. */
+    private void signIn(String password) {
+        ApiClient.getApiService().login(new LoginRequest(identifier, password))
+                .enqueue(new Callback<LoginResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+                        LoginResponse body = response.body();
+                        User user = body == null ? null : body.getUser();
+                        if (response.isSuccessful() && user != null && "FARMER".equalsIgnoreCase(user.getRole())) {
+                            SessionManager session = new SessionManager(CreateNewPasswordActivity.this);
+                            session.saveAuthToken(body.getToken());
+                            session.saveUser(user);
+                            session.setLogin(true, "FARMER");
+                            openAndClearTask(MainActivity.class);
+                        } else {
+                            goToSignIn();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                        goToSignIn();
+                    }
+                });
+    }
+
+    private void goToSignIn() {
+        Toast.makeText(this, R.string.fp_password_updated, Toast.LENGTH_LONG).show();
+        openAndClearTask(FarmerLoginActivity.class);
+    }
+
+    private void openAndClearTask(Class<?> target) {
+        Intent intent = new Intent(this, target);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showError(String message) {
+        tvError.setText(message);
+        llErrorContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void setBusy(boolean busy) {
+        btnSave.setEnabled(!busy);
+        btnSave.setText(busy ? R.string.fp_saving : R.string.fp_save_login);
     }
 }
