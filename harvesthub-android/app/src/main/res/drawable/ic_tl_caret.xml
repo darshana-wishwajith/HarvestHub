@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma HarvestHub-UI, Transporter 1.1 Login (623:2819) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="6.67dp"
+    android:height="3.33dp"
+    android:viewportWidth="6.66667"
+    android:viewportHeight="3.33333">
+    <path
+        android:fillColor="#414844"
+        android:pathData="M3.33333 3.33333L0 0H6.66667L3.33333 3.33333V3.33333" />
+</vector>

@@ -49,6 +49,16 @@ public class AuthController {
         }
     }
 
+    /**
+     * Lets the registration screen tell the user up front which of email / mobile / NIC is already registered,
+     * before they go on to pin their farm location. Only booleans are returned.
+     */
+    @PostMapping("/check-availability")
+    public ResponseEntity<?> checkAvailability(@RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(userService.checkAvailability(
+                body.get("email"), body.get("mobileNumber"), body.get("nic")));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String identifier = loginRequest.getEmailOrMobile();

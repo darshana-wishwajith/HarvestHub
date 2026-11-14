@@ -81,6 +81,10 @@ public interface ApiService {
     @POST("api/auth/reset-password")
     Call<okhttp3.ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
+    /** Returns {"email":bool,"mobileNumber":bool,"nic":bool}; true = not yet registered. */
+    @POST("api/auth/check-availability")
+    Call<java.util.Map<String, Boolean>> checkAvailability(@Body java.util.Map<String, String> body);
+
     @POST("api/auth/register")
     Call<okhttp3.ResponseBody> registerFarmer(@Body RegisterRequest request);
 

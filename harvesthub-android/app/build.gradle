@@ -15,6 +15,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        // Google Maps SDK key: put MAPS_API_KEY=... in local.properties (untracked) or pass -PmapsApiKey=...
+        def localProps = new Properties()
+        def lp = rootProject.file('local.properties')
+        if (lp.exists()) lp.withInputStream { localProps.load(it) }
+        manifestPlaceholders = [mapsApiKey: project.findProperty('mapsApiKey') ?: localProps.getProperty('MAPS_API_KEY', '')]
     }
 
     buildFeatures {
