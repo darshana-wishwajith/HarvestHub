@@ -104,6 +104,32 @@
     <string name="transporter_desc">Accept delivery jobs</string>
     <string name="terms_and_privacy">Terms of Service &amp; Privacy Policy</string>
 
+    <!-- Transporter login (Figma 623:2819) -->
+    <string name="tl_badge">Driver Partner Portal</string>
+    <string name="tl_heading">Empowering Local <font color="#006E1C">Harvest</font>\nLogistics</string>
+    <string name="tl_subtitle">Log in or register your agricultural transport vehicle to access fresh daily delivery manifests.</string>
+    <string name="tl_stat_routes_value">1,420+</string>
+    <string name="tl_stat_routes_label">Active Routes</string>
+    <string name="tl_stat_payout_value">100% Fair</string>
+    <string name="tl_stat_payout_label">Carrier Payout</string>
+    <string name="tl_tab_login">Log In</string>
+    <string name="tl_tab_register">Register Driver</string>
+    <string name="tl_label_mobile">Mobile Number or Carrier ID</string>
+    <string name="tl_label_email">Email Address</string>
+    <string name="tl_use_email">Use Email instead</string>
+    <string name="tl_use_mobile">Use Mobile instead</string>
+    <string name="tl_country_code">+94</string>
+    <string name="tl_hint_mobile">e.g. 077 123 4567</string>
+    <string name="tl_hint_email">e.g. driver@example.com</string>
+    <string name="tl_label_password">PIN or Cab Password</string>
+    <string name="tl_forgot_pin">Forgot PIN?</string>
+    <string name="tl_hint_password">Enter 6-digit PIN or password</string>
+    <string name="tl_toggle_password">Show or hide password</string>
+    <string name="tl_stay_signed_in">Stay signed in on this tablet</string>
+    <string name="tl_sign_in">Sign In to Drive</string>
+    <string name="tl_fast_access">Fast transit access</string>
+    <string name="tl_footer">By continuing you agree to HarvestHub\'s <u><font color="#414844">Carrier Terms</font></u> &amp; <u><font color="#414844">Fair Transit Standards</font></u>.</string>
+
     <!-- Rating & Feedback Strings -->
     <string name="notifications">Notifications</string>
     <string name="transaction_complete">Transaction Complete</string>

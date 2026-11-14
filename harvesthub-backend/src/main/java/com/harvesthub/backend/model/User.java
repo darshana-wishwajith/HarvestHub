@@ -28,16 +28,16 @@ public class User {
 
     @NotBlank(message = "Mobile number is required")
     @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
-    @Indexed(unique = true)
+    @Indexed(unique = true, name = "mobileNumber_1")
     private String mobileNumber;
 
     @NotBlank(message = "NIC is required")
-    @Indexed(unique = true)
+    @Indexed(unique = true, name = "nic_1")
     private String nic;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-    @Indexed(unique = true)
+    @Indexed(unique = true, name = "email_1")
     private String email;
 
     @NotBlank(message = "Password is required")
