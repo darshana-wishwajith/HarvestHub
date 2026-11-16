@@ -20,7 +20,7 @@ import com.harvesthub.mobile.utils.NotificationPanelHelper;
 public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_INITIAL_TAB = "extra_initial_tab";
-    
+
     public enum Tab { HOME, MARKET, LISTINGS, WALLET, SETTINGS }
     private Tab currentTab;
     private ActivityMainBinding binding;
@@ -42,7 +42,19 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception ignored) {}
             }
             loadFragment(initialTab, createFragmentForTab(initialTab));
+            openCreateListingIfCaptured(getIntent());
         }
+    }
+
+    /** Extras set by CameraCaptureActivity after the location lock + guided capture (workflow 1.2-1.3). */
+    public static final String EXTRA_CAPTURED_MEDIA = "capturedMedia";
+
+    private void openCreateListingIfCaptured(Intent intent) {
+        if (intent == null || !intent.hasExtra(EXTRA_CAPTURED_MEDIA)) return;
+        com.harvesthub.mobile.ui.farmer.CreateListingFragment f = new com.harvesthub.mobile.ui.farmer.CreateListingFragment();
+        f.setArguments(intent.getExtras());
+        intent.removeExtra(EXTRA_CAPTURED_MEDIA);
+        loadFragment(Tab.LISTINGS, f);
     }
 
     @Override
@@ -55,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(targetTab, createFragmentForTab(targetTab));
             } catch (Exception ignored) {}
         }
+        openCreateListingIfCaptured(intent);
     }
 
     private void setupTopNav() {

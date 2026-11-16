@@ -17,9 +17,29 @@ public class UserDto {
     private String fullName;
     private String mobileNumber;
     private FarmLocation farmLocation;
+    // transporter only (null for other roles)
+    private String vehicleType;
+    private String vehiclePlate;
+    private Double vehicleCapacityKg;
+    private String vehicleBodyType;
+    private Boolean online;
+    private boolean licenceUploaded;
+
+    public UserDto(String id, String email, String role, String fullName, String mobileNumber, FarmLocation farmLocation) {
+        this(id, email, role, fullName, mobileNumber, farmLocation, null, null, null, null, null, false);
+    }
 
     public static UserDto from(User u) {
-        return new UserDto(u.getId(), u.getEmail(), u.getRole(), u.getFullName(),
+        UserDto d = new UserDto(u.getId(), u.getEmail(), u.getRole(), u.getFullName(),
                 u.getMobileNumber(), u.getFarmLocation());
+        if ("TRANSPORTER".equals(u.getRole())) {
+            d.setVehicleType(u.getVehicleType());
+            d.setVehiclePlate(u.getVehiclePlate());
+            d.setVehicleCapacityKg(u.getVehicleCapacityKg());
+            d.setVehicleBodyType(u.getVehicleBodyType());
+            d.setOnline(!Boolean.FALSE.equals(u.getOnline()));
+            d.setLicenceUploaded(u.getLicenceUrl() != null);
+        }
+        return d;
     }
 }

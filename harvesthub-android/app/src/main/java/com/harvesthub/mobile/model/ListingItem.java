@@ -113,8 +113,25 @@ public class ListingItem {
     public Status getStatus() { return status != null ? status : Status.PENDING; }
     public String getGrade() { return grade; }
     public int getImageResource() { return imageResource; }
-    
+
     // For compatibility with previous code
     public String getType() { return status.name(); }
-    public boolean isUrgent() { return false; }
+
+    // from the backend (14 Nov): order link and officer feedback
+    @SerializedName("activeOrderId")
+    private String activeOrderId;
+    @SerializedName("reviewNotes")
+    private String reviewNotes;
+    @SerializedName("referenceCode")
+    private String referenceCode;
+    @SerializedName("cropPending")
+    private boolean cropPending;
+    private boolean urgent;
+
+    public String getActiveOrderId() { return activeOrderId; }
+    public String getReviewNotes() { return reviewNotes; }
+    public String getReferenceCode() { return referenceCode; }
+    public boolean isCropPending() { return cropPending; }
+    public boolean isUrgent() { return urgent; }
+    public void setUrgent(boolean urgent) { this.urgent = urgent; }
 }

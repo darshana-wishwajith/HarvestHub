@@ -56,4 +56,40 @@ public class User {
     private String profilePhotoUrl;
     private String passwordLastUpdated;
     private String phoneNumber; // alias for mobileNumber for API compatibility
+
+    // ---- Trust (proposal §6.10), maintained by TrustService ----
+    private Double ratingAverage;      // 1..5, null until rated
+    private Integer ratingCount;
+    private Integer completedOrders;
+    private Integer failedOrders;      // disputes caused, cancellations
+    private Integer trustScore;        // 0..100 %
+
+    // ---- Transporter vehicle + availability (dispatch, workflow 3.3) ----
+    private String vehicleType;        // THREE_WHEELER, MINI_LORRY, LORRY, TRUCK
+    private String vehiclePlate;
+    private Double vehicleCapacityKg;
+    private Boolean available;         // transporter has no active job (set by the order workflow)
+    private Boolean online;            // driver's own online/offline switch (decision 15 Nov); null = online
+    private String vehicleBodyType;    // REEFER | FLATBED | BOX – label only, not used in dispatch (decision 15 Nov)
+    private String licenceUrl;         // driving-licence photo (decision 15 Nov), stored for officers
+    private String licenceUploadedAt;
+    private Double lastLatitude;
+    private Double lastLongitude;
+
+    // ---- Settings ----
+    private java.util.Map<String, Boolean> notificationPreferences;
+    private String language;           // "en" only for now
+
+    // ---- Account suspension by an Agricultural Officer (desktop decision 15 Nov) ----
+    // Separate from the wallet suspension (negative balance, workflow 5.3). Blocks login and every API call.
+    private Boolean accountSuspended;
+    private String suspensionReason;
+    private String suspendedAt;
+    private String suspendedById;
+    private String suspendedByName;
+    private String reactivatedAt;
+
+    public boolean isAccountSuspended() {
+        return Boolean.TRUE.equals(accountSuspended);
+    }
 }

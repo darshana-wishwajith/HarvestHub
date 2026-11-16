@@ -29,7 +29,11 @@ public class ChatController {
     @GetMapping("chat/{orderId}/messages")
     public ResponseEntity<List<ChatMessage>> getChatMessages(@PathVariable String orderId) {
         requireParticipant(orderId);
-        return ResponseEntity.ok(chatService.getMessages(orderId));
+        String me = currentUser.id();
+        List<ChatMessage> messages = chatService.getMessages(orderId);
+        // "sent by me" depends on who is reading, not on who stored the message
+        messages.forEach(m -> m.setSentByMe(me.equals(m.getSenderId())));
+        return ResponseEntity.ok(messages);
     }
 
     @PostMapping("chat/{orderId}/send")

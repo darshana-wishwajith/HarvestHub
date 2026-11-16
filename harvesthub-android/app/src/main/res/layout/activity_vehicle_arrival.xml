@@ -39,7 +39,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/vehicle_status_on_way"
+                android:id="@+id/tvVehicleStatus"
+            android:text="@string/vehicle_status_on_way"
                 android:textColor="@color/status_text_green"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -50,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="28dp"
             android:layout_marginTop="4dp"
+            android:id="@+id/tvOrderNumber"
             android:text="@string/order_number_arrival"
             android:textColor="@color/status_text_green"
             android:textSize="14sp" />
@@ -92,7 +94,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:letterSpacing="0.1"
-                    android:text="@string/estimated_arrival_label"
+                    android:id="@+id/tvEtaLabel"
+            android:text="@string/estimated_arrival_label"
                     android:textColor="@color/primary_dark_green"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -101,7 +104,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/eta_value"
+                    android:id="@+id/tvEta"
+            android:text="@string/eta_value"
                     android:textColor="@color/primary_dark_green"
                     android:textSize="40sp"
                     android:textStyle="bold" />
@@ -152,7 +156,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/driver_name"
+                            android:id="@+id/tvDriverName"
+            android:text="@string/driver_name"
                             android:textColor="@color/text_black_bold"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -199,7 +204,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/vehicle_value"
+                        android:id="@+id/tvVehicleValue"
+            android:text="@string/vehicle_value"
                         android:textColor="@color/text_black_bold"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -224,7 +230,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/capacity_value"
+                        android:id="@+id/tvCapacity"
+            android:text="@string/capacity_value"
                         android:textColor="@color/text_black_bold"
                         android:textSize="14sp"
                         android:textStyle="bold" />

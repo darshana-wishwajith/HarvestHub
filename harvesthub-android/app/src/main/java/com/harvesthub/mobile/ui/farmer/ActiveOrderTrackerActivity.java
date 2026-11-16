@@ -1,64 +1,73 @@
 package com.harvesthub.mobile.ui.farmer;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.utils.BottomNavHelper;
+import com.harvesthub.mobile.model.Order;
 
-public class ActiveOrderTrackerActivity extends AppCompatActivity {
+/** Figma 22: overview of any order (escrow state, buyer, driver, current step). Does not auto-advance. */
+public class ActiveOrderTrackerActivity extends BaseOrderActivity {
 
-    private GestureDetector gestureDetector;
-
-    @SuppressLint("ClickableViewAccessibility")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_active_order_tracker);
-
-        setupNavigation();
-        setupGestureDetector();
-
-        getWindow().getDecorView().setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });
+    protected int layout() {
+        return R.layout.activity_active_order_tracker;
     }
 
-    private void setupNavigation() {
-        // Setup Top Navigation
-        View topNav = findViewById(R.id.included_top_nav);
-        View btnNotification = topNav.findViewById(R.id.btnNotification);
-        btnNotification.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-        });
-
-        // Setup Bottom Navigation
-        View navBar = findViewById(R.id.included_nav);
-        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
+    @Override
+    protected boolean followStatus() {
+        return false;
     }
 
-    private void setupGestureDetector() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(@NonNull MotionEvent e) {
-                startActivity(new Intent(ActiveOrderTrackerActivity.this, RatingFeedbackActivity.class));
-                finish();
-                return true;
-            }
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvOrderNumber, orderLabel(o));
+        setText(R.id.tvEscrow, escrowLabel(o));
+        setText(R.id.tvOrderCrop, kg(o.getQuantity()) + " " + o.getCropName());
+        setText(R.id.tvBuyer, "Buyer: " + (o.getBuyerName() != null ? o.getBuyerName() : "—"));
+        setText(R.id.tvCurrentStep, stepLabel(o));
+        setText(R.id.tvDriver, driverLine(o));
+        setText(R.id.tvVehicle, "(" + vehicleLine(o) + ")");
+    }
 
-            @Override
-            public boolean onDown(@NonNull MotionEvent e) {
-                return true;
-            }
-        });
+    static String escrowLabel(Order o) {
+        String e = o.getEscrowStatus() == null ? "" : o.getEscrowStatus();
+        switch (e) {
+            case "ADVANCE_HELD":
+            case "FULLY_PAID":
+                return "FUNDS IN ESCROW";
+            case "RELEASED":
+                return "FUNDS RELEASED";
+            case "REFUNDED":
+                return "REFUNDED";
+            default:
+                return "AWAITING PAYMENT";
+        }
+    }
+
+    static String stepLabel(Order o) {
+        Order.Payment p = o.getPayment();
+        switch (o.getStatus() == null ? "" : o.getStatus()) {
+            case "NEGOTIATING": return "Negotiating the final deal";
+            case "AWAITING_PAYMENT": return "Waiting for the buyer's advance payment";
+            case "DISPATCHING":
+            case "TRANSPORTER_ASSIGNED": return "Buyer payment cleared – finding a vehicle";
+            case "PAUSED": return "Buyer payment cleared – no vehicle free yet, retrying";
+            case "TRANSPORTER_ACCEPTED": return "Transporter assigned – you can start harvesting";
+            case "HARVESTING": return "Harvesting in progress";
+            case "HARVEST_READY": return "Harvest ready – vehicle on the way";
+            case "ARRIVED_AT_PICKUP": return "Vehicle at the farm";
+            case "AWAITING_BUYER_LOADING_APPROVAL": return "Buyer checking the pre-loading photos";
+            case "LOADING_APPROVED": return "Approved – loading the goods";
+            case "IN_TRANSIT": return "In transit to the buyer";
+            case "ARRIVED_AT_DESTINATION": return "Arrived – buyer inspecting the goods";
+            case "BALANCE_PAID":
+            case "DELIVERED": return "Delivered – waiting for both confirmations";
+            case "COMPLETED": return "Completed – " + (p != null ? lkr(p.cropValue) : "") + " paid to your wallet";
+            case "PRELOAD_REJECTED": return "Rejected before loading – Empty Trip Fee "
+                    + (p != null ? lkr(p.emptyTripFee) : "") + " charged";
+            case "RETURN_JOURNEY": return "Rejected after delivery – you keep the advance";
+            case "CANCELLED": return "Cancelled";
+            default: return o.getStatus();
+        }
     }
 }

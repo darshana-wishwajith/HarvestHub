@@ -103,4 +103,136 @@ public class Order {
     public void setEscrowStatus(String escrowStatus) { this.escrowStatus = escrowStatus; }
     public String getTransporterId() { return transporterId; }
     public void setTransporterId(String transporterId) { this.transporterId = transporterId; }
+
+    // ---- fields from the backend order workflow (OrderService) ----
+    private String buyerName;
+    private String pickupDate;
+    private String actualDeliveryDate;
+    private String origin;
+    private boolean farmerConfirmed;
+    private boolean buyerConfirmed;
+    private Payment payment;
+    private String vehicleType;
+    private String vehicleLabel;
+    private Double distanceKm;
+    private String transporterPhone;
+    private String vehiclePlate;
+    private String pickupAddress;
+    private String dropAddress;
+    private java.util.List<String> ratedBy;
+    private java.util.List<StatusChange> statusHistory;
+    // buyer flow (15 Nov)
+    private String advancePaymentMethod;
+    private String balancePaymentMethod;
+    private java.util.List<String> loadingEvidenceUrls;
+    private String loadingEvidenceAt;
+    private Long loadingApprovalDeadline;   // epoch ms
+    private boolean loadingAutoApproved;
+    private boolean disputeOpen;
+    private boolean transporterConfirmedDelivery;
+    private boolean buyerConfirmedReceipt;
+    private String supplyOfferId;
+    private String wantedAdId;
+    private java.util.List<TransportEvent> transportEvents;
+    // transporter flow (15 Nov)
+    private Long transportRequestExpiresAt;   // epoch ms, pending job request
+    private String goodsReturnedAt;
+    public Long getTransportRequestExpiresAt() { return transportRequestExpiresAt; }
+    public String getGoodsReturnedAt() { return goodsReturnedAt; }
+
+    /** What the driver earns for this trip: 95% of the transport fee. */
+    public double driverPayout() {
+        if (payment == null) return 0;
+        return payment.transporterPayout > 0 ? payment.transporterPayout : Math.round(payment.transportFee * 95) / 100.0;
+    }
+
+    public String getAdvancePaymentMethod() { return advancePaymentMethod; }
+    public String getBalancePaymentMethod() { return balancePaymentMethod; }
+    public java.util.List<String> getLoadingEvidenceUrls() { return loadingEvidenceUrls; }
+    public String getLoadingEvidenceAt() { return loadingEvidenceAt; }
+    public Long getLoadingApprovalDeadline() { return loadingApprovalDeadline; }
+    public boolean isLoadingAutoApproved() { return loadingAutoApproved; }
+    public boolean isDisputeOpen() { return disputeOpen; }
+    public boolean isTransporterConfirmedDelivery() { return transporterConfirmedDelivery; }
+    public boolean isBuyerConfirmedReceipt() { return buyerConfirmedReceipt; }
+    public String getSupplyOfferId() { return supplyOfferId; }
+    public String getWantedAdId() { return wantedAdId; }
+    public java.util.List<TransportEvent> getTransportEvents() { return transportEvents; }
+
+    /** Last transporter event of a type (e.g. LOADING_EVIDENCE_SUBMITTED) or null. */
+    public TransportEvent lastEvent(String type) {
+        if (transportEvents == null) return null;
+        for (int i = transportEvents.size() - 1; i >= 0; i--) {
+            if (type.equals(transportEvents.get(i).eventType)) return transportEvents.get(i);
+        }
+        return null;
+    }
+
+    /** When a status was reached (ISO timestamp) or null. */
+    public String reachedAt(String status) {
+        if (statusHistory == null) return null;
+        for (int i = statusHistory.size() - 1; i >= 0; i--) {
+            if (status.equals(statusHistory.get(i).status)) return statusHistory.get(i).timestamp;
+        }
+        return null;
+    }
+
+    public String getBuyerName() { return buyerName; }
+    public String getPickupDate() { return pickupDate; }
+    public String getActualDeliveryDate() { return actualDeliveryDate; }
+    public String getOrigin() { return origin; }
+    public boolean isFarmerConfirmed() { return farmerConfirmed; }
+    public boolean isBuyerConfirmed() { return buyerConfirmed; }
+    public Payment getPayment() { return payment; }
+    public String getVehicleType() { return vehicleType; }
+    public String getVehicleLabel() { return vehicleLabel; }
+    public Double getDistanceKm() { return distanceKm; }
+    public String getTransporterPhone() { return transporterPhone; }
+    public String getVehiclePlate() { return vehiclePlate; }
+    public String getPickupAddress() { return pickupAddress; }
+    public String getDropAddress() { return dropAddress; }
+    public java.util.List<String> getRatedBy() { return ratedBy; }
+    public java.util.List<StatusChange> getStatusHistory() { return statusHistory; }
+
+    /** Crop value = agreed quantity × agreed price. */
+    public double cropValue() {
+        return payment != null && payment.cropValue > 0 ? payment.cropValue : quantity * pricePerKg;
+    }
+
+    /** Short id for screens: last 6 characters, upper case. */
+    public String shortId() {
+        if (id == null) return "";
+        return (id.length() > 6 ? id.substring(id.length() - 6) : id).toUpperCase(java.util.Locale.US);
+    }
+
+    public static class Payment {
+        public double cropValue;
+        public double transportFee;
+        public double buyerFee;
+        public double advanceCropPortion;
+        public double advanceDue;
+        public double balanceDue;
+        public boolean advancePaid;
+        public boolean balancePaid;
+        public boolean farmerAdvanceReleased;
+        public boolean settled;
+        public double emptyTripFee;
+        public double transporterPayout;
+        public String settlementNote;
+    }
+
+    public static class TransportEvent {
+        public String eventType;
+        public String timestamp;
+        public String note;
+        public Double latitude;
+        public Double longitude;
+        public Integer photoCount;
+    }
+
+    public static class StatusChange {
+        public String status;
+        public String timestamp;
+        public String note;
+    }
 }

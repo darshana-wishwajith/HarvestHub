@@ -93,7 +93,11 @@ public class TransporterLoginActivity extends AppCompatActivity {
 
         btnSignIn.setOnClickListener(v -> handleSignIn());
 
-        findViewById(R.id.tvForgotPassword).setOnClickListener(v -> showForgotPasswordDialog());
+        findViewById(R.id.tvForgotPassword).setOnClickListener(v -> {
+            Intent forgot = new Intent(this, com.harvesthub.mobile.ui.farmer.ForgotPasswordActivity.class);
+            forgot.putExtra(com.harvesthub.mobile.ui.farmer.ForgotPasswordActivity.EXTRA_LOGIN_SCREEN, getClass().getName());
+            startActivity(forgot);
+        });
 
         findViewById(R.id.tvRegisterTransporter).setOnClickListener(v -> {
             Intent intent = new Intent(this, CreateAccountActivity.class);

@@ -50,6 +50,11 @@ public class FarmerController {
             map.put("updatedTime", l.getUpdatedTime());
             map.put("status", l.getStatus() != null ? l.getStatus().trim().toUpperCase() : "PENDING");
             map.put("grade", l.getGrade());
+            map.put("referenceCode", l.getReferenceCode());
+            map.put("reviewNotes", l.getReviewNotes());
+            map.put("activeOrderId", l.getActiveOrderId());
+            map.put("cropPending", Boolean.TRUE.equals(l.getCropPending()));
+            map.put("mediaUrls", l.getMediaUrls());
             return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(result);
@@ -67,10 +72,11 @@ public class FarmerController {
             map.put("listingId", l.getId());
             map.put("cropName", l.getCropName());
             map.put("status", l.getStatus());
-            map.put("date", l.getCreatedDate());
+            map.put("date", l.getUpdatedTime() != null ? l.getUpdatedTime() : l.getCreatedDate());
+            map.put("reviewNotes", l.getReviewNotes());
             map.put("buyerName", l.getBuyerName() != null ? l.getBuyerName() : "Unknown Buyer");
             map.put("quantityKg", l.getQuantityKg() != null ? l.getQuantityKg() : l.getQuantity());
-            map.put("totalValue", l.getTotalValue() != null ? l.getTotalValue() : "Rs. 0");
+            map.put("totalValue", l.getTotalValue());
             map.put("finalPricePerKg", l.getFinalPricePerKg() != null ? l.getFinalPricePerKg() : l.getPrice());
             return map;
         }).collect(Collectors.toList());

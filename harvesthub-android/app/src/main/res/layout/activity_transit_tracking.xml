@@ -7,15 +7,14 @@
     android:background="#E2E8F0">
 
     <!-- Map View Filling Background -->
-    <ImageView
-        android:id="@+id/ivTransitMap"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/mapTransit"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/cardBottomSheet"
         android:layout_marginBottom="4dp"
-        android:contentDescription="Live Transit GPS Map"
-        android:scaleType="centerCrop"
-        android:src="@drawable/img_transit_map" />
+        android:contentDescription="Live Transit GPS Map" />
 
     <!-- Top Floating Order Info Card -->
     <androidx.cardview.widget.CardView
@@ -91,6 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
+                    android:id="@+id/tvTransitStatus"
                     android:text="Status: In Transit"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"

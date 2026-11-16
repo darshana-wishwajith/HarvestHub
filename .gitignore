@@ -16,3 +16,13 @@ harvesthub-backend/uploads/
 # --- JVM crash dumps ---
 hs_err_pid*.log
 replay_pid*.log
+
+# Local Atlas backups (contain password hashes) - never commit
+backups/
+*.log
+CLAUDE.md
+DEVELOPMENT_STATUS.md
+docs/
+.claude/
+.idea/
+.vscode/

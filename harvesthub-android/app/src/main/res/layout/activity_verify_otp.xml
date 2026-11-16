@@ -1,169 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Forgot password, step 2: enter the 6-digit code.
+     Figma: "4.Forgot password - Code Verfication Screen" (660:111, empty),
+     "5. ... VC Code - Success Screen" (83:265, green boxes) and
+     "6. ... VC Code - Error Screen" (660:21, red boxes + banner). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_background"
-    android:padding="24dp">
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_back"
-        app:tint="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Enter Verification Code"
-        android:textColor="@color/text_primary"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" />
-
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        tools:text="We have sent a 4-digit verification code to your email." />
-
-    <LinearLayout
-        android:id="@+id/llOtpContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
-
-        <EditText
-            android:id="@+id/etOtp1"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/bg_otp_box_error"
-            android:gravity="center"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingHorizontal="0dp"
-            android:text="8"
-            android:textColor="@color/text_primary"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            tools:ignore="LabelFor" />
-
-        <EditText
-            android:id="@+id/etOtp2"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/bg_otp_box"
-            android:gravity="center"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingHorizontal="0dp"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:ignore="LabelFor" />
-
-        <EditText
-            android:id="@+id/etOtp3"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/bg_otp_box"
-            android:gravity="center"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingHorizontal="0dp"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:ignore="LabelFor" />
-
-        <EditText
-            android:id="@+id/etOtp4"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/bg_otp_box"
-            android:gravity="center"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingHorizontal="0dp"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:ignore="LabelFor" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/llErrorContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_error_container"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@id/llOtpContainer">
+    <LinearLayout style="@style/FpTopBar">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_warning"
-            app:tint="#F44336"
-            tools:ignore="ContentDescription" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Invalid verification code. Please try again."
-            android:textColor="#F44336"
-            android:textSize="14sp" />
+            android:id="@+id/btnBack"
+            style="@style/FpBackButton" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvResend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textColor="@color/text_primary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llErrorContainer"
-        tools:text="Need a new code? Resend in 00:58" />
-
-    <Button
-        android:id="@+id/btnVerify"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="@color/primary_dark_green"
-        android:text="Verify Code"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        app:cornerRadius="12dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                style="@style/FpTitle"
+                android:text="@string/fp_title_code" />
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                style="@style/FpBody"
+                android:layout_marginTop="16dp"
+                android:textSize="16sp" />
+
+            <!-- 6 digit boxes, spread across the width -->
+            <LinearLayout
+                android:id="@+id/llOtpContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:orientation="horizontal">
+
+                <EditText android:id="@+id/etOtp1" style="@style/FpOtpBox" />
+                <Space style="@style/FpOtpGap" />
+                <EditText android:id="@+id/etOtp2" style="@style/FpOtpBox" />
+                <Space style="@style/FpOtpGap" />
+                <EditText android:id="@+id/etOtp3" style="@style/FpOtpBox" />
+                <Space style="@style/FpOtpGap" />
+                <EditText android:id="@+id/etOtp4" style="@style/FpOtpBox" />
+                <Space style="@style/FpOtpGap" />
+                <EditText android:id="@+id/etOtp5" style="@style/FpOtpBox" />
+                <Space style="@style/FpOtpGap" />
+                <EditText android:id="@+id/etOtp6" style="@style/FpOtpBox" />
+            </LinearLayout>
+
+            <!-- Error banner (Figma 660:48) -->
+            <LinearLayout
+                android:id="@+id/llErrorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_fp_error_banner"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_fp_error" />
+
+                <TextView
+                    android:id="@+id/tvError"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:accessibilityLiveRegion="polite"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="@string/fp_err_code_invalid"
+                    android:textColor="@color/fp_error"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvResend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:padding="4dp"
+                android:textColor="@color/fp_body"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerify"
+                style="@style/FpPrimaryButton"
+                android:layout_marginTop="40dp"
+                android:text="@string/fp_verify_code"
+                app:icon="@drawable/ic_fp_check_circle_white"
+                app:iconSize="20dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

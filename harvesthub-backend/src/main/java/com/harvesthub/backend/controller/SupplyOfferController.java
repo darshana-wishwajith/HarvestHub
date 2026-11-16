@@ -30,6 +30,15 @@ public class SupplyOfferController {
     @Autowired
     private WantedAdRepository wantedAdRepository;
 
+    @Autowired
+    private com.harvesthub.backend.repository.ListingRepository listingRepository;
+    @Autowired
+    private com.harvesthub.backend.service.NotificationService notificationService;
+
+    /**
+     * Scenario B (workflow 2.1): a farmer answers a buyer's wanted ad with one of their verified
+     * (ACTIVE, graded) listings of the same crop — the "batch".
+     */
     @PostMapping({"/offers/create", "/api/offers/create"})
     public ResponseEntity<GenericResponse> createSupplyOffer(@RequestBody SupplyOfferRequest request) {
         currentUser.requireRole("FARMER");
@@ -37,21 +46,43 @@ public class SupplyOfferController {
         if (request.getQuantity() <= 0 || request.getPricePerKg() <= 0) {
             return ResponseEntity.badRequest().body(new GenericResponse(false, "Quantity and price must be positive"));
         }
+        WantedAd ad = request.getRequestId() == null ? null : wantedAdRepository.findById(request.getRequestId()).orElse(null);
+        if (ad == null) {
+            return ResponseEntity.badRequest().body(new GenericResponse(false, "This wanted ad no longer exists"));
+        }
+        if ("CLOSED".equals(ad.getStatus())) {
+            return ResponseEntity.badRequest().body(new GenericResponse(false, "This wanted ad is closed"));
+        }
+        var batch = request.getBatchId() == null ? null : listingRepository.findById(request.getBatchId()).orElse(null);
+        if (batch == null || !me.getId().equals(batch.getFarmerId()) || !"ACTIVE".equals(batch.getStatus())) {
+            return ResponseEntity.badRequest().body(new GenericResponse(false, "Attach one of your verified listings"));
+        }
+        if (ad.getCropName() != null && batch.getCropName() != null && !ad.getCropName().equalsIgnoreCase(batch.getCropName())) {
+            return ResponseEntity.badRequest().body(new GenericResponse(false, "The batch must be " + ad.getCropName()));
+        }
+        if (batch.quantityKgValue() > 0 && request.getQuantity() > batch.quantityKgValue() * 1.05) {
+            return ResponseEntity.badRequest().body(new GenericResponse(false,
+                    String.format("Batch has only about %,.0f kg", batch.quantityKgValue())));
+        }
         SupplyOffer offer = new SupplyOffer();
         offer.setFarmerId(me.getId());
-        offer.setId("offer_" + System.currentTimeMillis());
+        offer.setId("offer_" + System.currentTimeMillis() + "_" + java.util.UUID.randomUUID().toString().substring(0, 6));
         offer.setRequestId(request.getRequestId());
         offer.setBatchId(request.getBatchId());
         offer.setQuantity(request.getQuantity());
         offer.setPricePerKg(request.getPricePerKg());
         offer.setStatus("PENDING");
-        offer.setLocation(me.getFarmLocation() != null ? me.getFarmLocation().getAddress() : null);
+        offer.setCropName(batch.getCropName());
+        offer.setGrade(batch.getGrade());
+        offer.setLocation(me.getFarmLocation() != null ? me.getFarmLocation().getAddress() : batch.getLocation());
         offer.setFarmerName(me.getFullName());
-        offer.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")));
+        offer.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         supplyOfferRepository.save(offer);
-
-        GenericResponse response = new GenericResponse(true, "Supply offer submitted successfully for request: " + request.getRequestId());
-        return ResponseEntity.ok(response);
+        notificationService.notify(ad.getBuyerId(), "ORDERS", "SUPPLY_OFFER", "New supply offer",
+                String.format("%s offers %,.0f kg of Grade %s %s at LKR %,.0f/kg.", me.getFullName(),
+                        request.getQuantity(), batch.getGrade() == null ? "-" : batch.getGrade(), batch.getCropName(),
+                        request.getPricePerKg()));
+        return ResponseEntity.ok(new GenericResponse(true, "Supply offer sent to the buyer"));
     }
 
     @GetMapping({"/offers", "/api/offers"})

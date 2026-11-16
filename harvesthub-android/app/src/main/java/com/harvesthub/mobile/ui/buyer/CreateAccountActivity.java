@@ -134,53 +134,87 @@ public class CreateAccountActivity extends AppCompatActivity {
     }
 
     private void handleContinue() {
+        EditText etEmail = findViewById(R.id.etEmail);
         String fullName = etFullName.getText().toString().trim();
-        String mobile = etMobile.getText().toString().trim();
-        String nic = etNic.getText().toString().trim();
-        String password = etCreatePassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
+        String mobile = com.harvesthub.mobile.utils.AuthInputUtils.normaliseMobile(etMobile.getText().toString());
+        String email = etEmail.getText().toString().trim().toLowerCase(java.util.Locale.US);
+        String nic = etNic.getText().toString().trim().toUpperCase(java.util.Locale.US);
+        String password = etCreatePassword.getText().toString();
+        String confirmPassword = etConfirmPassword.getText().toString();
 
-        if (TextUtils.isEmpty(fullName)) {
-            etFullName.setError("Please enter your full name");
+        if (fullName.length() < 3 || !fullName.matches("^[A-Za-z][A-Za-z .']*$")) {
+            etFullName.setError("Use letters, spaces and dots only (min 3 characters)");
             etFullName.requestFocus();
             return;
         }
-
-        if (TextUtils.isEmpty(mobile)) {
-            etMobile.setError("Please enter your mobile number");
+        if (!mobile.matches("^07[0-9]{8}$")) {
+            etMobile.setError("Enter a 10-digit number starting with 07");
             etMobile.requestFocus();
             return;
         }
-
-        if (TextUtils.isEmpty(nic)) {
-            etNic.setError("Please enter your NIC number");
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Enter a valid email address");
+            etEmail.requestFocus();
+            return;
+        }
+        if (!nic.matches("^([0-9]{9}[VX]|[0-9]{12})$")) {
+            etNic.setError("Enter a valid NIC (123456789V or 200012345678)");
             etNic.requestFocus();
             return;
         }
-
-        if (TextUtils.isEmpty(password)) {
-            etCreatePassword.setError("Please create a password");
+        if (password.length() < 8 || !password.matches(".*[A-Za-z].*") || !password.matches(".*[0-9].*")) {
+            etCreatePassword.setError("At least 8 characters with letters and numbers");
             etCreatePassword.requestFocus();
             return;
         }
-
-        if (password.length() < 6) {
-            etCreatePassword.setError("Password must be at least 6 characters");
-            etCreatePassword.requestFocus();
-            return;
-        }
-
         if (!password.equals(confirmPassword)) {
             etConfirmPassword.setError("Passwords do not match");
             etConfirmPassword.requestFocus();
             return;
         }
 
-        Toast.makeText(this, "Account details validated! Proceeding to Location Setup...", Toast.LENGTH_SHORT).show();
+        com.harvesthub.mobile.model.RegisterRequest request =
+                new com.harvesthub.mobile.model.RegisterRequest(fullName, mobile, nic, email, password, targetRole());
+        java.util.Map<String, String> body = new java.util.HashMap<>();
+        body.put("email", email);
+        body.put("mobileNumber", mobile);
+        body.put("nic", nic);
+        btnContinueLocation.setEnabled(false);
+        com.harvesthub.mobile.network.ApiClient.getApiService().checkAvailability(body)
+                .enqueue(new retrofit2.Callback<java.util.Map<String, Boolean>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<java.util.Map<String, Boolean>> call,
+                                           retrofit2.Response<java.util.Map<String, Boolean>> response) {
+                        btnContinueLocation.setEnabled(true);
+                        java.util.Map<String, Boolean> r = response.body();
+                        if (!response.isSuccessful() || r == null) {
+                            Toast.makeText(CreateAccountActivity.this, "Could not verify your details. Please try again.",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        boolean ok = true;
+                        if (Boolean.FALSE.equals(r.get("mobileNumber"))) { etMobile.setError("This mobile number is already registered"); ok = false; }
+                        if (Boolean.FALSE.equals(r.get("email"))) { etEmail.setError("This email is already registered"); ok = false; }
+                        if (Boolean.FALSE.equals(r.get("nic"))) { etNic.setError("This NIC is already registered"); ok = false; }
+                        if (!ok) return;
+                        // Step 2: required delivery pin; the account is created there (decision 15 Nov)
+                        // transporters: vehicle profile first (Figma transporter "Vehicle Profile"), then the vehicle address
+                        Intent intent = new Intent(CreateAccountActivity.this, "TRANSPORTER".equals(targetRole())
+                                ? com.harvesthub.mobile.ui.transporter.TransporterVehicleProfileActivity.class : SetDeliveryAddressActivity.class);
+                        intent.putExtra(SetDeliveryAddressActivity.EXTRA_REGISTER, request);
+                        startActivity(intent);
+                    }
 
-        // Navigate to OTP Verification (Page 1.3.6)
-        Intent intent = new Intent(CreateAccountActivity.this, VerificationCodeActivity.class);
-        startActivity(intent);
+                    @Override
+                    public void onFailure(retrofit2.Call<java.util.Map<String, Boolean>> call, Throwable t) {
+                        btnContinueLocation.setEnabled(true);
+                        Toast.makeText(CreateAccountActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /** BUYER by default; the transporter login opens this screen with TARGET_ROLE=TRANSPORTER. */
+    private String targetRole() {
+        return "TRANSPORTER".equals(getIntent().getStringExtra("TARGET_ROLE")) ? "TRANSPORTER" : "BUYER";
     }
 }
-

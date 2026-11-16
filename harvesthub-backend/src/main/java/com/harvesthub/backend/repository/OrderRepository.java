@@ -8,4 +8,6 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     List<Order> findByBuyerId(String buyerId);
     List<Order> findByTransporterId(String transporterId);
     List<Order> findByTransporterIdAndStatusIn(String transporterId, List<String> statuses);
+    List<Order> findByStatus(String status);
+    List<Order> findByListingId(String listingId);
 }

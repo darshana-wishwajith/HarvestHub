@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        
+
         sessionManager = new SessionManager(requireContext());
         apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
         setupLineChart();
@@ -63,11 +63,14 @@ public class HomeFragment extends Fragment {
                         .addToBackStack(null)
                         .commit());
 
-        binding.btnMarketInsightsMenu.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), MarketInsightsActivity.class)));
-
-        binding.cardMarketTrends.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), MarketInsightsActivity.class)));
+        View.OnClickListener openMarket = v -> {
+            Intent i = new Intent(requireContext(), com.harvesthub.mobile.MainActivity.class);
+            i.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.MARKET.name());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(i);
+        };
+        binding.btnMarketInsightsMenu.setOnClickListener(openMarket);
+        binding.cardMarketTrends.setOnClickListener(openMarket);
 
         return binding.getRoot();
     }
@@ -77,11 +80,13 @@ public class HomeFragment extends Fragment {
         binding.swipeRefreshLayout.setOnRefreshListener(this::refreshData);
     }
 
+    /** Crop shown on the Home price chart. */
+    private static final String HOME_CROP = "Big Onions";
+
     private void refreshData() {
         if (binding != null) binding.swipeRefreshLayout.setRefreshing(true);
-        renderChart(defaultTrendValues(), 7);
-        
-        final int[] pending = {2};
+
+        final int[] pending = {3};
         Runnable checkDone = () -> {
             pending[0]--;
             if (pending[0] <= 0 && binding != null) {
@@ -90,15 +95,9 @@ public class HomeFragment extends Fragment {
         };
 
         String farmerId = sessionManager.getUserId();
-        String location = (sessionManager.getUser() != null && sessionManager.getUser().getLocation() != null)
-                ? sessionManager.getUser().getLocation() : "Dambulla, LK";
-
-        if (sessionManager.getUser() != null && sessionManager.getUser().getFullName() != null) {
-            binding.tvGreetingTitle.setText("Good morning, " + sessionManager.getUser().getFullName() + "!");
-        }
-
         fetchDashboardData(farmerId, checkDone);
-        fetchMarketTrend("Carrot", 7, checkDone);
+        fetchMarketTrend(HOME_CROP, 7, checkDone);
+        fetchWeather(checkDone);
     }
 
     @Override
@@ -130,17 +129,51 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void fetchWeather(Runnable onDone) {
+        apiService.getWeather(null).enqueue(new Callback<com.harvesthub.mobile.model.WeatherResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<com.harvesthub.mobile.model.WeatherResponse> call,
+                                   @NonNull Response<com.harvesthub.mobile.model.WeatherResponse> response) {
+                if (onDone != null) onDone.run();
+                if (binding == null) return;
+                com.harvesthub.mobile.model.WeatherResponse w = response.body();
+                if (response.isSuccessful() && w != null && w.getTemperature() != null) {
+                    String place = w.getLocation() == null ? "" : "  |  " + w.getLocation();
+                    binding.tvWeather.setText(w.getTemperature() + ", " + w.getCondition() + place);
+                    binding.tvWeather.setVisibility(View.VISIBLE);
+                } else {
+                    binding.tvWeather.setVisibility(View.GONE); // no data: hide instead of guessing
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.harvesthub.mobile.model.WeatherResponse> call, @NonNull Throwable t) {
+                if (onDone != null) onDone.run();
+                if (binding != null) binding.tvWeather.setVisibility(View.GONE);
+            }
+        });
+    }
+
     private void updateDashboardUI(DashboardResponse data) {
         if (binding == null) return;
+        if (data.getRevenueChange() != null) {
+            binding.tvRevenueChange.setText(data.getRevenueChange() + " vs LKR " + data.getPreviousRevenue() + " last month");
+            binding.tvRevenueChange.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvRevenueChange.setVisibility(View.GONE);
+        }
+        binding.tvTrustPercent.setText(data.getTrustPercent() + "%");
+        binding.tvRating.setText(data.getRatingAverage() == null ? "No ratings"
+                : String.format(Locale.US, "%.1f / 5.0", data.getRatingAverage()));
         if (data.getFarmerName() != null) {
-            String greeting = "Good morning, " + data.getFarmerName() + "!";
+            String greeting = data.getGreeting() != null ? data.getGreeting() : "Hello, " + data.getFarmerName() + "!";
             if (!binding.tvGreetingTitle.getText().toString().equals(greeting)) {
                 binding.tvGreetingTitle.setText(greeting);
                 binding.tvGreetingTitle.setAlpha(0f);
                 binding.tvGreetingTitle.animate().alpha(1f).setDuration(500).start();
             }
         }
-        
+
         animateValue(binding.tvTotalRevenue, data.getTotalRevenue(), "LKR ", "");
         animateValue(binding.tvActiveListings, data.getActiveListings(), "", "");
         animateValue(binding.tvCompletedOrders, data.getCompletedOrders(), "", "");
@@ -155,7 +188,7 @@ public class HomeFragment extends Fragment {
                 return;
             }
             int finalValue = Integer.parseInt(numericValue);
-            
+
             ValueAnimator animator = ValueAnimator.ofInt(0, finalValue);
             animator.setDuration(1000);
             animator.addUpdateListener(animation -> {
@@ -178,16 +211,36 @@ public class HomeFragment extends Fragment {
             public void onResponse(@NonNull Call<MarketTrendResponse> call, @NonNull Response<MarketTrendResponse> response) {
                 if (onDone != null) onDone.run();
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
-                    renderChart(response.body().getTrends(), days);
+                    showTrend(response.body());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<MarketTrendResponse> call, @NonNull Throwable t) {
                 if (onDone != null) onDone.run();
-                renderChart(defaultTrendValues(), days);
             }
         });
+    }
+
+    private void showTrend(MarketTrendResponse t) {
+        if (binding == null) return;
+        if (t.getCurrentAverage() == null || t.getTrends() == null || t.getTrends().isEmpty()) {
+            binding.tvMarketAvg.setText(HOME_CROP + ": no price data yet");
+            binding.tvMarketChange.setText("");
+            binding.layoutMarketTrendAlert.setVisibility(View.GONE);
+            binding.marketChart.clear();
+            return;
+        }
+        binding.tvMarketAvg.setText(String.format(Locale.US, "%s  LKR %,.2f /kg", HOME_CROP, t.getCurrentAverage()));
+        binding.tvMarketChange.setText(t.getChangePercent() == null ? "PAST 7 DAYS"
+                : String.format(Locale.US, "%+.1f%%  PAST 7 DAYS", t.getChangePercent()));
+        binding.tvMarketChange.setTextColor(t.getChangePercent() != null && t.getChangePercent() < 0
+                ? 0xFFDC2626 : 0xFF4CAF50);
+        if (t.getInsight() != null) {
+            binding.tvMarketTrendAlert.setText(t.getInsight());
+            binding.layoutMarketTrendAlert.setVisibility(View.VISIBLE);
+        }
+        renderChart(t.getTrends(), t.getLabels());
     }
 
     private void setupLineChart() {
@@ -209,14 +262,24 @@ public class HomeFragment extends Fragment {
         marketChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
     }
 
-    private void renderChart(List<Double> trends, int days) {
+    private void renderChart(List<Double> trends, List<String> dates) {
         if (binding == null || trends == null || trends.isEmpty()) return;
 
-        String[] labels = new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+        // x-axis: day names of the real dates returned by the backend
+        String[] labels = new String[trends.size()];
+        for (int i = 0; i < labels.length; i++) {
+            String d = dates != null && i < dates.size() ? dates.get(i) : null;
+            try {
+                labels[i] = d == null ? "" : new java.text.SimpleDateFormat("EEE", Locale.US)
+                        .format(new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(d)).toUpperCase(Locale.US);
+            } catch (java.text.ParseException e) {
+                labels[i] = "";
+            }
+        }
         binding.marketChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
 
         ArrayList<Entry> entries = new ArrayList<>();
-        int count = Math.min(trends.size(), labels.length);
+        int count = trends.size();
         for (int i = 0; i < count; i++) {
             entries.add(new Entry(i, trends.get(i).floatValue()));
         }
@@ -242,9 +305,4 @@ public class HomeFragment extends Fragment {
         binding.marketChart.animateY(1200);
     }
 
-    private List<Double> defaultTrendValues() {
-        return new ArrayList<>(Arrays.asList(
-                122.0, 124.0, 150.0, 128.0, 152.0, 142.0, 184.0
-        ));
-    }
 }

@@ -1,135 +1,71 @@
 package com.harvesthub.mobile.ui.buyer;
 
-import com.harvesthub.mobile.R;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.utils.RemoteImage;
+
+import java.util.Locale;
 
 /**
- * Page 6.1: Arrival Inspection
- * Allows buyer to physically inspect crop crates against pre-transit photo baseline,
- * release remaining 80% Escrow balance, or report transit damage.
+ * Figma buyer 6.1 "Post-Delivery Action" (ARRIVED_AT_DESTINATION). Compare the goods with the loading photo,
+ * then Accept & Pay Balance (80%, card or wallet → 4.2 checkout in balance mode) or Reject (Transit Damage):
+ * full refund, the transporter pays the crop advance (workflow 5.3).
  */
-public class ArrivalInspectionActivity extends AppCompatActivity {
-
-    private TextView tvOrderIdPill;
-    private TextView tvRemainingBalance;
-    private ImageView ivBaselineCargo;
-    private Button btnRejectDamage;
-    private Button btnAcceptPayBalance;
+public class ArrivalInspectionActivity extends BaseBuyerOrderActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_arrival_inspection);
+    protected int layout() {
+        return R.layout.activity_arrival_inspection;
+    }
 
-        // Light status bar with dark icons
-        if (getWindow() != null) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            );
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvOrderIdPill, ref(o));
+        Order.Payment p = o.getPayment();
+        if (p != null) {
+            setText(R.id.tvRemainingBalance, rs(p.balanceDue));
+            setText(R.id.tvSettlementNote, String.format(Locale.US,
+                    "%s (20%% crop + transport + fee) is already in escrow. Paying the balance lets the farmer and driver be paid "
+                            + "once you confirm the goods were received.", rs(p.advanceDue)));
         }
-
-        initializeViews();
-        setupClickListeners();
-    }
-
-    private void initializeViews() {
-        tvOrderIdPill = findViewById(R.id.tvOrderIdPill);
-        tvRemainingBalance = findViewById(R.id.tvRemainingBalance);
-        ivBaselineCargo = findViewById(R.id.ivBaselineCargo);
-        btnRejectDamage = findViewById(R.id.btnRejectDamage);
-        btnAcceptPayBalance = findViewById(R.id.btnAcceptPayBalance);
-    }
-
-    private void setupClickListeners() {
-        // Enlarge or inspect pre-transit photo baseline
-        if (ivBaselineCargo != null) {
-            ivBaselineCargo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showBaselineInspectionDialog();
-                }
+        ImageView iv = findViewById(R.id.ivBaselineCargo);
+        if (o.getLoadingEvidenceUrls() != null && !o.getLoadingEvidenceUrls().isEmpty()) {
+            RemoteImage.load(iv, mediaUrl(o.getLoadingEvidenceUrls().get(0)));
+            iv.setOnClickListener(v -> {
+                Intent i = new Intent(this, EvidenceViewerActivity.class);
+                i.putExtra(BuyerOrderRouter.EXTRA_ORDER_ID, o.getId());
+                startActivity(i);
             });
         }
+        setText(R.id.tvBaselineMeta, o.getLoadingEvidenceAt() == null ? "Pre-Transit Baseline"
+                : "Loaded " + time(o.getLoadingEvidenceAt()));
 
-        // Reject (Transit Damage) button
-        if (btnRejectDamage != null) {
-            btnRejectDamage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showTransitDamageDialog();
-                }
-            });
-        }
-
-        // Accept & Pay Balance button
-        if (btnAcceptPayBalance != null) {
-            btnAcceptPayBalance.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showAcceptAndPayDialog();
-                }
-            });
-        }
+        findViewById(R.id.btnAcceptPayBalance).setOnClickListener(v ->
+                startActivity(SecureCheckoutActivity.balanceIntent(this, o.getId())));
+        findViewById(R.id.btnRejectDamage).setOnClickListener(v -> askReject());
     }
 
-    private void showBaselineInspectionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        ImageView fullImageView = new ImageView(this);
-        fullImageView.setImageResource(R.drawable.img_cargo_evidence);
-        fullImageView.setAdjustViewBounds(true);
-        fullImageView.setPadding(24, 24, 24, 24);
-
-        builder.setView(fullImageView)
-                .setTitle("Pre-Transit Baseline Inspection")
-                .setMessage("GPS: Dambulla Farm | Departure Time: Today, 10:45 AM\nVerify that current tomato quality matches this baseline.")
-                .setPositiveButton("Close", null)
-                .show();
-    }
-
-    private void showTransitDamageDialog() {
+    private void askReject() {
+        EditText reason = new EditText(this);
+        reason.setHint("Describe the damage");
+        int pad = Math.round(16 * getResources().getDisplayMetrics().density);
+        reason.setPadding(pad, pad, pad, pad);
         new AlertDialog.Builder(this)
-                .setTitle("Report Transit Damage?")
-                .setMessage("Rejecting this shipment will freeze the remaining 80% balance (Rs. 9,476) in Smart Escrow and prompt you to submit proof photos of the damaged crates.")
-                .setNegativeButton("Keep Inspecting", null)
-                .setPositiveButton("Report Damage", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ArrivalInspectionActivity.this, "Transit Damage Claim Filed. Dispute Resolution Active.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ArrivalInspectionActivity.this, DisputeResolvedActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
+                .setTitle("Reject the delivery?")
+                .setMessage("Use this only if the goods were damaged in transit. You get a full refund; the transporter pays "
+                        + "for the crop and the goods go back to the farm. This cannot be undone.")
+                .setView(reason)
+                .setPositiveButton("Reject Delivery", (d, w) -> {
+                    String r = reason.getText().toString().trim();
+                    sendEvent("REJECT_DELIVERY", r.isEmpty() ? "Damaged in transit" : r, null, findViewById(R.id.btnRejectDamage));
                 })
-                .show();
-    }
-
-    private void showAcceptAndPayDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Release Final Settlement?")
-                .setMessage("Confirm arrival and crop condition? Releasing Rs. 9,476 from Smart Escrow completes Order #HH-842.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Confirm & Pay Balance", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ArrivalInspectionActivity.this, "Arrival Confirmed! Proceeding to Delivery Handshake.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ArrivalInspectionActivity.this, DeliveryHandshakeActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .show();
+                .setNegativeButton("Cancel", null).show();
     }
 }
-

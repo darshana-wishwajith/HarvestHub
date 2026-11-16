@@ -21,7 +21,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * Figma buyer 2.3 "Post Demand Request" (wanted ad). Crops come from the catalogue (GET /api/crops).
+ * With EXTRA_EDIT_AD (JSON of the ad) the same form edits an open ad (PUT /wanted-ads/{id}).
+ */
 public class PostDemandRequestActivity extends AppCompatActivity {
+
+    public static final String EXTRA_EDIT_AD = "edit_ad_json";
+    private com.harvesthub.mobile.model.WantedAd editing;
+    private String deadlineIso;
 
     private AutoCompleteTextView actvTargetCrop;
     private EditText etRequiredQuantity;
@@ -53,6 +61,22 @@ public class PostDemandRequestActivity extends AppCompatActivity {
         setupDatePicker();
         setupGradeSelectors();
         setupPublishAction();
+        String json = getIntent().getStringExtra(EXTRA_EDIT_AD);
+        if (json != null) fillForEdit(new com.google.gson.Gson().fromJson(json, com.harvesthub.mobile.model.WantedAd.class));
+    }
+
+    private void fillForEdit(com.harvesthub.mobile.model.WantedAd ad) {
+        editing = ad;
+        TextView title = findViewById(R.id.tvPostDemandTitle);
+        if (title != null) title.setText("Edit Demand Request");
+        actvTargetCrop.setText(ad.getCropName());
+        etRequiredQuantity.setText(String.format(Locale.US, "%.0f", ad.getRequiredQuantityKg()));
+        if (ad.getTargetPricePerKg() > 0) etTargetPrice.setText(String.format(Locale.US, "%.0f", ad.getTargetPricePerKg()));
+        deadlineIso = ad.getDeadline();
+        etDeadline.setText(ad.getDeadline());
+        if (ad.getNotes() != null) etAdditionalDetails.setText(ad.getNotes());
+        if (ad.getTargetGrade() != null) selectGrade(ad.getTargetGrade().startsWith("Grade") ? ad.getTargetGrade() : "Grade " + ad.getTargetGrade());
+        ((MaterialButton) findViewById(R.id.btnPublishDemand)).setText("Save Changes");
     }
 
     private void initViews() {
@@ -81,21 +105,23 @@ public class PostDemandRequestActivity extends AppCompatActivity {
     }
 
     private void setupCropDropdown() {
-        String[] crops = {
-                "Big Onions",
-                "Red Potatoes",
-                "Green Chillies",
-                "Carrots",
-                "Tomatoes",
-                "Cabbage",
-                "Pumpkin",
-                "Beans",
-                "Leeks",
-                "Beetroot"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, crops);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new java.util.ArrayList<>());
         actvTargetCrop.setAdapter(adapter);
+        com.harvesthub.mobile.network.ApiClient.getApiService().getCrops().enqueue(new retrofit2.Callback<java.util.List<com.harvesthub.mobile.model.CropInfo>>() {
+            @Override
+            public void onResponse(retrofit2.Call<java.util.List<com.harvesthub.mobile.model.CropInfo>> call,
+                                   retrofit2.Response<java.util.List<com.harvesthub.mobile.model.CropInfo>> r) {
+                if (!r.isSuccessful() || r.body() == null) return;
+                java.util.List<String> names = new java.util.ArrayList<>();
+                for (com.harvesthub.mobile.model.CropInfo c : r.body()) if (c.getName() != null) names.add(c.getName());
+                adapter.clear();
+                adapter.addAll(names);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<java.util.List<com.harvesthub.mobile.model.CropInfo>> call, Throwable t) { }
+        });
 
         LinearLayout layoutTargetCrop = findViewById(R.id.layoutTargetCrop);
         ImageView ivDropdownCrop = findViewById(R.id.ivDropdownCrop);
@@ -117,16 +143,16 @@ public class PostDemandRequestActivity extends AppCompatActivity {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            deadlineIso = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             etDeadline.setText(dateFormat.format(calendar.getTime()));
         };
 
-        View.OnClickListener showDatePicker = v -> new DatePickerDialog(
-                this,
-                datePickerListener,
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-        ).show();
+        View.OnClickListener showDatePicker = v -> {
+            DatePickerDialog d = new DatePickerDialog(this, datePickerListener,
+                    calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            d.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            d.show();
+        };
 
         LinearLayout layoutDeadline = findViewById(R.id.layoutDeadline);
         ImageView ivCalendar = findViewById(R.id.ivCalendar);
@@ -194,45 +220,47 @@ public class PostDemandRequestActivity extends AppCompatActivity {
                 return;
             }
 
-            btnPublishDemand.setEnabled(false);
-            String priceText = etTargetPrice.getText().toString().trim();
-            String deadlineText = etDeadline.getText().toString().trim();
-            double quantity = 0;
-            double price = 0;
-            try {
-                quantity = Double.parseDouble(qty.replaceAll("[^0-9.]", ""));
-            } catch (Exception ignored) { }
-            try {
-                price = Double.parseDouble(priceText.replaceAll("[^0-9.]", ""));
-            } catch (Exception ignored) { }
-
+            if (deadlineIso == null || deadlineIso.isEmpty()) {
+                Toast.makeText(this, "Choose the date you need it by", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            double quantity = 0, price = 0;
+            try { quantity = Double.parseDouble(qty.replaceAll("[^0-9.]", "")); } catch (Exception ignored) { }
+            try { price = Double.parseDouble(etTargetPrice.getText().toString().replaceAll("[^0-9.]", "")); } catch (Exception ignored) { }
+            if (quantity <= 0) {
+                etRequiredQuantity.setError("Enter the quantity in kg");
+                return;
+            }
             com.harvesthub.mobile.utils.SessionManager session = new com.harvesthub.mobile.utils.SessionManager(this);
-            String buyerId = session.getUserId();
+            com.harvesthub.mobile.model.WantedAd ad = new com.harvesthub.mobile.model.WantedAd();
+            ad.setCropName(crop);
+            if (session.getUser() != null && session.getUser().getFarmLocation() != null) {
+                ad.setLocation(session.getUser().getFarmLocation().getAddress());
+            }
+            ad.setRequiredQuantityKg(quantity);
+            ad.setTargetPricePerKg(price);
+            ad.setUrgent(isWithinDays(deadlineIso, 3));
+            ad.setTargetGrade(selectedGrade.replace("Grade ", ""));
+            ad.setDeadline(deadlineIso);
+            ad.setNotes(etAdditionalDetails.getText().toString().trim());
 
-            com.harvesthub.mobile.model.WantedAd newAd = new com.harvesthub.mobile.model.WantedAd();
-            newAd.setRequestId("REQ-" + System.currentTimeMillis());
-            newAd.setCropName(crop);
-            newAd.setLocation(session.getUser() != null && session.getUser().getFarmLocation() != null ? session.getUser().getFarmLocation().getAddress() : "Dambulla Economic Center");
-            newAd.setRequiredQuantityKg(quantity);
-            newAd.setTargetPricePerKg(price);
-            newAd.setUrgent(true);
-            newAd.setBuyerId(buyerId);
-            newAd.setTargetGrade(selectedGrade);
-            newAd.setDeadline(deadlineText.isEmpty() ? "Friday" : deadlineText);
-            newAd.setStatus("ACTIVE");
-            newAd.setCreatedDate(new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime()));
-
-            com.harvesthub.mobile.network.ApiService apiService = com.harvesthub.mobile.network.ApiClient.getClient(session).create(com.harvesthub.mobile.network.ApiService.class);
-            apiService.createWantedAd(newAd).enqueue(new retrofit2.Callback<com.harvesthub.mobile.model.WantedAd>() {
+            btnPublishDemand.setEnabled(false);
+            com.harvesthub.mobile.network.ApiService api = com.harvesthub.mobile.network.ApiClient.getApiService();
+            retrofit2.Call<com.harvesthub.mobile.model.WantedAd> call = editing == null ? api.createWantedAd(ad)
+                    : api.updateWantedAd(editing.getRequestId(), ad);
+            call.enqueue(new retrofit2.Callback<com.harvesthub.mobile.model.WantedAd>() {
                 @Override
-                public void onResponse(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> call, retrofit2.Response<com.harvesthub.mobile.model.WantedAd> response) {
+                public void onResponse(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> c,
+                                       retrofit2.Response<com.harvesthub.mobile.model.WantedAd> response) {
                     btnPublishDemand.setEnabled(true);
-                    Toast.makeText(
-                            PostDemandRequestActivity.this,
-                            "Demand for " + qty + " KG of " + crop + " (" + selectedGrade + ") published to database!",
-                            Toast.LENGTH_LONG
-                    ).show();
-
+                    if (!response.isSuccessful()) {
+                        Toast.makeText(PostDemandRequestActivity.this,
+                                com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(response, "Could not save the request."),
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText(PostDemandRequestActivity.this, editing == null
+                            ? "Published. Farmers can now send you offers." : "Request updated.", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(PostDemandRequestActivity.this, BuyerDashboardActivity.class);
                     intent.putExtra(BuyerDashboardActivity.EXTRA_INITIAL_TAB, BuyerDashboardActivity.Tab.DEMANDS.name());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -241,22 +269,21 @@ public class PostDemandRequestActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> call, Throwable t) {
+                public void onFailure(retrofit2.Call<com.harvesthub.mobile.model.WantedAd> c, Throwable t) {
                     btnPublishDemand.setEnabled(true);
-                    Toast.makeText(
-                            PostDemandRequestActivity.this,
-                            "Demand published locally for " + crop + " (" + selectedGrade + ")!",
-                            Toast.LENGTH_SHORT
-                    ).show();
-
-                    Intent intent = new Intent(PostDemandRequestActivity.this, BuyerDashboardActivity.class);
-                    intent.putExtra(BuyerDashboardActivity.EXTRA_INITIAL_TAB, BuyerDashboardActivity.Tab.DEMANDS.name());
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    startActivity(intent);
-                    finish();
+                    Toast.makeText(PostDemandRequestActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
                 }
             });
         });
     }
-}
 
+    /** Urgent when needed within a few days (shown first on the farmers' Wanted Ads feed). */
+    private static boolean isWithinDays(String iso, int days) {
+        try {
+            java.util.Date d = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(iso);
+            return d != null && d.getTime() - System.currentTimeMillis() < days * 86_400_000L;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
