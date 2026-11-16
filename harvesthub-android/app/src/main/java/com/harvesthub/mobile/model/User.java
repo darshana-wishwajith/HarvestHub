@@ -23,6 +23,19 @@ public class User {
 
     @SerializedName("farmLocation")
     private FarmLocation farmLocation;
+    // transporter only
+    private String vehicleType;
+    private String vehiclePlate;
+    private Double vehicleCapacityKg;
+    private String vehicleBodyType;
+    private Boolean online;
+    private boolean licenceUploaded;
+    public String getVehicleType() { return vehicleType; }
+    public String getVehiclePlate() { return vehiclePlate; }
+    public Double getVehicleCapacityKg() { return vehicleCapacityKg; }
+    public String getVehicleBodyType() { return vehicleBodyType; }
+    public Boolean getOnline() { return online; }
+    public boolean isLicenceUploaded() { return licenceUploaded; }
 
     public User() {}
 

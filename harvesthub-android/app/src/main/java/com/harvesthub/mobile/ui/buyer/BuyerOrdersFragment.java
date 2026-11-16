@@ -72,9 +72,15 @@ public class BuyerOrdersFragment extends Fragment {
                     return;
                 }
                 orderListContainer.removeAllViews();
+                java.util.List<Order> active = new java.util.ArrayList<>(), done = new java.util.ArrayList<>();
                 for (Order order : response.body()) {
-                    addOrderRow(order);
+                    if (FINAL.contains(order.getStatus())) done.add(order); else active.add(order);
                 }
+                addHeader("Active (" + active.size() + ")");
+                for (Order order : active) addOrderRow(order);
+                if (active.isEmpty()) addNote("No active orders. Send a purchase request from the marketplace.");
+                addHeader("History (" + done.size() + ")");
+                for (Order order : done) addOrderRow(order);
             }
 
             @Override
@@ -86,35 +92,69 @@ public class BuyerOrdersFragment extends Fragment {
         });
     }
 
+    static final java.util.Set<String> FINAL = new java.util.HashSet<>(java.util.Arrays.asList(
+            "COMPLETED", "PRELOAD_REJECTED", "RETURN_JOURNEY", "CANCELLED"));
+
+    /** What the buyer sees for each workflow status (Figma Order History 566:516). */
+    static String statusLabel(Order o) {
+        String s = o.getStatus() == null ? "" : o.getStatus();
+        switch (s) {
+            case "NEGOTIATING": return o.isBuyerConfirmed() && !o.isFarmerConfirmed() ? "Waiting for the farmer" : "Negotiating – action needed";
+            case "AWAITING_PAYMENT": return "Pay the advance – action needed";
+            case "DISPATCHING": case "TRANSPORTER_ASSIGNED": return "Assigning a vehicle";
+            case "PAUSED": return "Waiting for a free vehicle";
+            case "TRANSPORTER_ACCEPTED": return "Vehicle assigned";
+            case "HARVESTING": return "Farmer harvesting";
+            case "HARVEST_READY": return "Ready for pickup";
+            case "ARRIVED_AT_PICKUP": return "Vehicle at the farm";
+            case "AWAITING_BUYER_LOADING_APPROVAL": return "Approve loading photos – action needed";
+            case "LOADING_APPROVED": return "Loading";
+            case "IN_TRANSIT": return "In transit";
+            case "ARRIVED_AT_DESTINATION": return "Arrived – inspect & pay balance";
+            case "BALANCE_PAID": case "DELIVERED":
+                return o.isBuyerConfirmedReceipt() ? "Waiting for the driver" : "Confirm goods received – action needed";
+            case "COMPLETED": return "Completed";
+            case "PRELOAD_REJECTED": return "Rejected before loading – refunded";
+            case "RETURN_JOURNEY": return "Rejected on delivery – refunded";
+            case "CANCELLED": return "Cancelled";
+            default: return s;
+        }
+    }
+
+    private void addHeader(String text) {
+        TextView h = new TextView(requireContext());
+        h.setText(text);
+        h.setTextColor(Color.parseColor("#1B4332"));
+        h.setTextSize(16f);
+        h.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        h.setPadding(8, 24, 8, 12);
+        orderListContainer.addView(h);
+    }
+
+    private void addNote(String text) {
+        TextView n = new TextView(requireContext());
+        n.setText(text);
+        n.setTextColor(Color.parseColor("#757575"));
+        n.setPadding(8, 4, 8, 12);
+        orderListContainer.addView(n);
+    }
+
     private void addOrderRow(Order order) {
         if (!isAdded()) return;
         TextView row = new TextView(requireContext());
-        String cropTitle = order.getCropName() != null ? order.getCropName() : (order.getCropType() != null ? order.getCropType() : "Harvest Order");
-        String orderRef = order.getId() != null ? "Order #" + order.getId() : "Pending reference";
-        String status = order.getStatus() != null ? order.getStatus() : "PENDING";
-        double total = order.getTotalAmount() > 0 ? order.getTotalAmount() : (order.getCropTotal() > 0 ? order.getCropTotal() : 37000.0);
-
-        row.setText(String.format("%s • %s\nStatus: %s • Amount: Rs. %,.2f\n[Tap to View Details & Tracking]",
-                cropTitle, orderRef, status, total));
-        row.setTextColor(Color.parseColor("#1A1C1A"));
+        Order.Payment p = order.getPayment();
+        double total = p != null ? p.cropValue + p.transportFee + p.buyerFee : order.cropValue();
+        String label = statusLabel(order);
+        row.setText(String.format(java.util.Locale.US, "%s • %s\nOrder #%s • Farmer: %s\n%s\nTotal: %s",
+                order.getCropName(), BaseBuyerOrderActivity.kg(order.getQuantity()), order.shortId(),
+                order.getFarmerName() == null ? "-" : order.getFarmerName(), label, BaseBuyerOrderActivity.rs(total)));
+        row.setTextColor(Color.parseColor(label.contains("action needed") ? "#B45309" : "#1A1C1A"));
         row.setTextSize(14f);
-        row.setPadding(24, 24, 24, 24);
+        row.setLineSpacing(4f, 1f);
+        row.setPadding(28, 24, 28, 24);
         row.setBackgroundResource(R.drawable.bg_buyer_order_card);
-        row.setOnClickListener(v -> {
-            if ("DELIVERED_PENDING_HANDSHAKE".equalsIgnoreCase(status)) {
-                Intent intent = new Intent(requireActivity(), ArrivalInspectionActivity.class);
-                intent.putExtra("ORDER_ID", order.getId());
-                startActivity(intent);
-            } else if ("COMPLETED".equalsIgnoreCase(status)) {
-                Intent intent = new Intent(requireActivity(), DeliveryHandshakeActivity.class);
-                intent.putExtra("ORDER_ID", order.getId());
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(requireActivity(), TransitTrackingActivity.class);
-                intent.putExtra("ORDER_ID", order.getId());
-                startActivity(intent);
-            }
-        });
+        row.setOnClickListener(v -> startActivity(BuyerOrderRouter.intentFor(requireActivity(), order,
+                new SessionManager(requireContext()).getUserId())));
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

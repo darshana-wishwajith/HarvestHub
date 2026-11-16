@@ -1,84 +1,38 @@
 package com.harvesthub.mobile.ui.farmer;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.GenericResponse;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.BottomNavHelper;
-import com.harvesthub.mobile.utils.SessionManager;
+import com.harvesthub.mobile.model.Order;
 
-import java.util.HashMap;
-import java.util.Map;
+/**
+ * Figma 28: "Vehicle Assigned – Start Harvesting" (workflow 3.3). Only reachable once a transporter
+ * accepted; the backend refuses START_HARVESTING in any other state.
+ */
+public class StartHarvestingActivity extends BaseOrderActivity {
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class StartHarvestingActivity extends AppCompatActivity {
-
-    private ApiService apiService;
-    private SessionManager sessionManager;
-    private String orderId;
+    @Override
+    protected int layout() {
+        return R.layout.activity_start_harvesting;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start_harvesting);
-
-        orderId = getIntent().getStringExtra("ORDER_ID");
-        if (orderId == null) orderId = "demo-order";
-
-        sessionManager = new SessionManager(this);
-        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-
-        setupNavigation();
-
-        Button btnStartHarvesting = findViewById(R.id.btnStartHarvesting);
-
-        btnStartHarvesting.setOnClickListener(v -> {
-            Map<String, String> statusMap = new HashMap<>();
-            statusMap.put("status", "HARVEST_READY");
-            
-            apiService.updateOrderStatus(orderId, statusMap).enqueue(new Callback<GenericResponse>() {
-                @Override
-                public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(StartHarvestingActivity.this, "Harvesting started.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(StartHarvestingActivity.this, HarvestReadyActivity.class);
-                        intent.putExtra("ORDER_ID", orderId);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(StartHarvestingActivity.this, "Failed to update status", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GenericResponse> call, Throwable t) {
-                    Toast.makeText(StartHarvestingActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+        if (orderId == null) return;
+        findViewById(R.id.btnStartHarvesting).setOnClickListener(v -> sendEvent("START_HARVESTING", v));
     }
 
-    private void setupNavigation() {
-        // Setup Top Navigation
-        View topNav = findViewById(R.id.included_top_nav);
-        View btnNotification = topNav.findViewById(R.id.btnNotification);
-        btnNotification.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-        });
-
-        // Setup Bottom Navigation
-        View navBar = findViewById(R.id.included_nav);
-        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvOrderChip, orderLabel(o) + " | " + kg(o.getQuantity()) + " " + o.getCropName());
+        setText(R.id.tvVehicleInfo, (o.getTransporterName() != null ? o.getTransporterName() : "The transporter")
+                + " (" + vehicleLine(o) + ") accepted your job"
+                + (o.getPickupDate() != null ? ". Pickup on " + o.getPickupDate() + "." : "."));
+        Order.Payment p = o.getPayment();
+        setText(R.id.tvFieldStatus, p != null && p.advancePaid
+                ? lkr(p.advanceCropPortion) + " advance secured in escrow" : "Advance payment pending");
     }
 }

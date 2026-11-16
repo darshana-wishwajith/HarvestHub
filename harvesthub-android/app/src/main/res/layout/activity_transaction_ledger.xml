@@ -291,7 +291,8 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Payment Verified"
+                                        android:id="@+id/tvStep1Title"
+                                    android:text="Payment Verified"
                                         android:textColor="#111827"
                                         android:textSize="14sp"
                                         android:textStyle="bold"
@@ -302,7 +303,8 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Just now"
+                                        android:id="@+id/tvStep1Time"
+                                    android:text="Just now"
                                         android:textColor="#9CA3AF"
                                         android:textSize="11sp"
                                         app:layout_constraintBottom_toBottomOf="parent"
@@ -314,6 +316,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
+                                    android:id="@+id/tvStep1Subtitle"
                                     android:text="Escrow smart contract activated"
                                     android:textColor="#6B7280"
                                     android:textSize="12sp" />
@@ -363,6 +366,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:id="@+id/tvStep2Title"
                                     android:text="Filtering 1–Ton Lorries"
                                     android:textColor="#111827"
                                     android:textSize="14sp"
@@ -372,6 +376,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
+                                    android:id="@+id/tvStep2Subtitle"
                                     android:text="Dambulla Hub catchment area"
                                     android:textColor="#6B7280"
                                     android:textSize="12sp" />

@@ -17,6 +17,8 @@ public class ChatMessage {
     private String senderId;
     private String text;
     private String timestamp;
+    @com.fasterxml.jackson.annotation.JsonProperty("isSentByMe")
     private boolean isSentByMe;
+    @com.fasterxml.jackson.annotation.JsonProperty("isRead")
     private boolean isRead;
 }

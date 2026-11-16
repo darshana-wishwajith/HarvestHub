@@ -1,119 +1,149 @@
 package com.harvesthub.mobile.ui.buyer;
 
-import com.harvesthub.mobile.R;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.button.MaterialButton;
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.utils.AuthInputUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
- * Page 6.2: Delivery Handshake
- * Synchronized 2-way verification to finalize order, release Farmer Escrow
- * and Driver Fee from the automated settlement ledger.
+ * Figma buyer 6.2 "Delivery Handshake" (BALANCE_PAID, DELIVERED, COMPLETED). Funds are released when both the
+ * driver ("Delivery Completed") and the buyer ("Goods Received") confirm. "Report Issue with Handover" opens a
+ * dispute ticket for the officers; money stays as settled (decision 15 Nov).
  */
-public class DeliveryHandshakeActivity extends AppCompatActivity {
-
-    private TextView tvOrderIdPill;
-    private TextView tvDriverName;
-    private TextView tvDriverVehicle;
-    private TextView tvCropDetails;
-    private TextView tvFarmerEscrow;
-    private TextView tvDriverFee;
-    private TextView tvTotalRelease;
-    private Button btnConfirmGoodsReceived;
-    private TextView tvReportIssue;
+public class DeliveryHandshakeActivity extends BaseBuyerOrderActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_delivery_handshake);
+    protected int layout() {
+        return R.layout.activity_delivery_handshake;
+    }
 
-        // Light status bar with dark icons
-        if (getWindow() != null) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            );
+    @Override
+    protected void bind(@NonNull Order o) {
+        boolean completed = "COMPLETED".equals(o.getStatus());
+        boolean iConfirmed = o.isBuyerConfirmedReceipt() || completed;
+        boolean driverConfirmed = o.isTransporterConfirmedDelivery() || completed;
+
+        setText(R.id.tvOrderIdPill, ref(o));
+        setText(R.id.tvHandshakeStatus, completed ? "Status: Completed – funds released"
+                : iConfirmed ? "Status: Waiting for the driver" : "Status: Pending Buyer Confirmation");
+        setText(R.id.tvDriverName, "Driver: " + (o.getTransporterName() == null ? "-" : o.getTransporterName()));
+        setText(R.id.tvDriverVehicle, vehicleLine(o));
+        setText(R.id.tvCropDetails, kg(o.getQuantity()) + " " + o.getCropName());
+        setText(R.id.tvDriverVerified, driverConfirmed ? "Verified" : "Pending");
+        setText(R.id.tvDriverSignal, driverConfirmed ? "Transmitted: Delivery Completed" : "Waiting for: Delivery Completed");
+        setText(R.id.tvDriverSignalSub, driverConfirmed ? "The driver confirmed the offload"
+                : "The driver confirms the offload in their app");
+
+        Order.Payment p = o.getPayment();
+        if (p != null) {
+            setText(R.id.tvFarmerEscrow, rs(p.balanceDue));
+            setText(R.id.tvDriverFee, rs(p.transportFee));
+            setText(R.id.tvTotalRelease, rs(p.balanceDue + p.transportFee));
         }
+        setText(R.id.tvSettlementBadge, completed ? "Released" : "On 2-way confirm");
+        setText(R.id.tvHandshakeNote, completed
+                ? (p != null && p.settlementNote != null ? p.settlementNote : "All payments were released.")
+                : "Confirming releases the 80% crop balance to the farmer and the transport fee to the driver "
+                + "(5% platform commission deducted). This cannot be undone.");
 
-        initializeViews();
-        setupClickListeners();
-    }
-
-    private void initializeViews() {
-        tvOrderIdPill = findViewById(R.id.tvOrderIdPill);
-        tvDriverName = findViewById(R.id.tvDriverName);
-        tvDriverVehicle = findViewById(R.id.tvDriverVehicle);
-        tvCropDetails = findViewById(R.id.tvCropDetails);
-        tvFarmerEscrow = findViewById(R.id.tvFarmerEscrow);
-        tvDriverFee = findViewById(R.id.tvDriverFee);
-        tvTotalRelease = findViewById(R.id.tvTotalRelease);
-        btnConfirmGoodsReceived = findViewById(R.id.btnConfirmGoodsReceived);
-        tvReportIssue = findViewById(R.id.tvReportIssue);
-    }
-
-    private void setupClickListeners() {
-        // Confirm Goods Received button
-        if (btnConfirmGoodsReceived != null) {
-            btnConfirmGoodsReceived.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showConfirmHandoverDialog();
+        MaterialButton confirm = findViewById(R.id.btnConfirmGoodsReceived);
+        boolean rated = o.getRatedBy() != null && o.getRatedBy().contains(session.getUserId());
+        if (completed) {
+            confirm.setText(rated ? "Back to Orders" : "Rate Farmer & Driver");
+            confirm.setEnabled(true);
+            confirm.setOnClickListener(v -> {
+                if (rated) {
+                    Intent i = new Intent(this, BuyerDashboardActivity.class);
+                    i.putExtra(BuyerDashboardActivity.EXTRA_INITIAL_TAB, BuyerDashboardActivity.Tab.ORDERS.name());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(i);
+                    finish();
+                } else {
+                    Intent i = new Intent(this, BuyerRatingActivity.class);
+                    i.putExtra(BuyerOrderRouter.EXTRA_ORDER_ID, o.getId());
+                    startActivity(i);
                 }
             });
+        } else if (iConfirmed) {
+            confirm.setText("Goods received – waiting for the driver");
+            confirm.setEnabled(false);
+        } else {
+            confirm.setText("Confirm Goods Received");
+            confirm.setEnabled(true);
+            confirm.setOnClickListener(v -> new AlertDialog.Builder(this)
+                    .setTitle("Confirm goods received?")
+                    .setMessage("Only confirm after the goods are offloaded and checked.")
+                    .setPositiveButton("Confirm", (d, w) -> sendEvent("GOODS_RECEIVED", null, null, confirm))
+                    .setNegativeButton("Cancel", null).show());
         }
 
-        // Report Issue with Handover
-        if (tvReportIssue != null) {
-            tvReportIssue.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showReportDisputeDialog();
-                }
-            });
-        }
+        TextView report = findViewById(R.id.tvReportIssue);
+        report.setText(o.isDisputeOpen() ? "Issue reported – an officer is reviewing it" : "Report Issue with Handover");
+        report.setEnabled(!o.isDisputeOpen());
+        report.setOnClickListener(v -> askDispute());
     }
 
-    private void showConfirmHandoverDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Confirm Order Handover?")
-                .setMessage("Disbursement Ledger will execute automatically:\n\n" +
-                        "â€¢ Farmer Escrow: Rs. 8,200\n" +
-                        "â€¢ Driver Fee: Rs. 1,276\n\n" +
-                        "Total Release: Rs. 9,476\n\n" +
-                        "This will finalize Order #HH-842 and cannot be undone.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Confirm & Disburse", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(DeliveryHandshakeActivity.this, "Order #HH-842 Completed! Funds Disbursed to Farmer & Transporter.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(DeliveryHandshakeActivity.this, BuyerOrdersActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .show();
+    @Override
+    protected boolean handOver(Order o) {
+        // stay here after confirming: COMPLETED is shown on this screen until the buyer leaves
+        if ("COMPLETED".equals(o.getStatus()) || "BALANCE_PAID".equals(o.getStatus()) || "DELIVERED".equals(o.getStatus())) return false;
+        return super.handOver(o);
     }
 
-    private void showReportDisputeDialog() {
+    private void askDispute() {
+        String[] reasons = {"Short weight", "Quality not as agreed", "Damaged on offload", "Wrong crop or grade", "Other"};
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = Math.round(16 * getResources().getDisplayMetrics().density);
+        box.setPadding(pad, pad / 2, pad, 0);
+        Spinner reason = new Spinner(this);
+        reason.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, reasons));
+        EditText details = new EditText(this);
+        details.setHint("Details (optional)");
+        details.setMinLines(2);
+        box.addView(reason);
+        box.addView(details);
         new AlertDialog.Builder(this)
-                .setTitle("Report Handover Issue")
-                .setMessage("Describe any cargo discrepancy (crate count mismatch, offload damage, or delivery dispute). Escrow disbursement will be paused immediately.")
-                .setNegativeButton("Back", null)
-                .setPositiveButton("Open Dispute", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(DeliveryHandshakeActivity.this, "Dispute Filed. Escrow payout held for mediation.", Toast.LENGTH_LONG).show();
-                    }
+                .setTitle("Report an issue")
+                .setMessage("An agricultural officer reviews the ticket. Payments are not reversed automatically.")
+                .setView(box)
+                .setPositiveButton("Send", (d, w) -> {
+                    Map<String, String> body = new HashMap<>();
+                    body.put("reason", (String) reason.getSelectedItem());
+                    body.put("details", details.getText().toString().trim());
+                    api.openDispute(orderId, body).enqueue(new Callback<Map<String, Object>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> r) {
+                            Toast.makeText(DeliveryHandshakeActivity.this, r.isSuccessful()
+                                    ? "Issue reported. An officer will review it."
+                                    : AuthInputUtils.errorMessage(r, "Could not report the issue."), Toast.LENGTH_LONG).show();
+                            load();
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                            Toast.makeText(DeliveryHandshakeActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
-                .show();
+                .setNegativeButton("Cancel", null).show();
     }
 }
-

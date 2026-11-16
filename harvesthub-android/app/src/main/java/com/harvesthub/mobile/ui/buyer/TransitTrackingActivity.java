@@ -1,180 +1,158 @@
 package com.harvesthub.mobile.ui.buyer;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.SessionManager;
+import com.harvesthub.mobile.model.Tracking;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import java.util.Locale;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Page 5.2: Live Transit Tracking
- * Shows real-time GPS transit map with driver Sunil Perera,
- * delivery ETA, route progress, and direct access to Page 5.1 Loading Evidence.
+ * Figma buyer 5.2 "Live Delivery Tracking". Real GPS (decision 15 Nov): the driver's app sends its position,
+ * GET /orders/{id}/tracking returns the last point, remaining distance and ETA. Refreshes every 10 s and
+ * opens 6.1 when the vehicle arrives.
  */
-public class TransitTrackingActivity extends AppCompatActivity {
+public class TransitTrackingActivity extends BaseBuyerOrderActivity {
 
-    private TextView tvOrderNumber;
-    private TextView tvOrderDetails;
-    private TextView tvArrivingTime;
-    private TextView tvDistanceRemaining;
-    private ProgressBar progressBarTransit;
-    private TextView tvProgressPercent;
-    private TextView tvOrigin;
-    private TextView tvDestination;
-    private TextView tvDriverName;
-    private TextView tvDriverVehicle;
-    private ImageButton btnCallDriver;
-    private Button btnViewLoadingEvidence;
-    private ImageView ivTransitMap;
-    private String orderId;
+    private GoogleMap map;
+    private Tracking last;
+    private boolean framed;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected int layout() {
+        return R.layout.activity_transit_tracking;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transit_tracking);
-
-        // Light status bar with dark icons
-        if (getWindow() != null) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            );
-        }
-
-        initializeViews();
-        orderId = getIntent().getStringExtra("ORDER_ID");
-        if (orderId == null || orderId.isEmpty()) {
-            orderId = getIntent().getStringExtra("order_id");
-        }
-        if (orderId == null || orderId.isEmpty()) {
-            orderId = "ORD-892";
-        }
-        loadOrder();
-        setupListeners();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadOrder();
-    }
-
-    private void loadOrder() {
-        if (orderId == null || orderId.isEmpty()) return;
-        ApiService apiService = ApiClient.getClient(new SessionManager(this)).create(ApiService.class);
-        apiService.getOrder(orderId).enqueue(new Callback<Order>() {
-            @Override
-            public void onResponse(Call<Order> call, Response<Order> response) {
-                if (!response.isSuccessful() || response.body() == null) return;
-                Order order = response.body();
-                tvOrderNumber.setText("Order #" + order.getId());
-                String crop = order.getCropName() != null ? order.getCropName() : (order.getCropType() != null ? order.getCropType() : "Fresh Tomatoes");
-                tvOrderDetails.setText(crop + " (" + (int)order.getQuantity() + " KG)");
-                if (order.getTransporterName() != null && !order.getTransporterName().isEmpty()) {
-                    tvDriverName.setText(order.getTransporterName());
-                }
-                if (order.getVehicleTier() != null && !order.getVehicleTier().isEmpty()) {
-                    tvDriverVehicle.setText(order.getVehicleTier());
-                }
-                if ("DELIVERED".equalsIgnoreCase(order.getStatus()) || "DELIVERED_PENDING_HANDSHAKE".equalsIgnoreCase(order.getStatus())) {
-                    Intent intent = new Intent(TransitTrackingActivity.this, ArrivalInspectionActivity.class);
-                    intent.putExtra("ORDER_ID", orderId);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Order> call, Throwable throwable) { }
+        if (api == null) return;
+        SupportMapFragment f = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapTransit);
+        if (f != null) f.getMapAsync(m -> {
+            map = m;
+            map.getUiSettings().setZoomControlsEnabled(true);
+            drawMap();
         });
     }
 
-    private void initializeViews() {
-        tvOrderNumber = findViewById(R.id.tvOrderNumber);
-        tvOrderDetails = findViewById(R.id.tvOrderDetails);
-        tvArrivingTime = findViewById(R.id.tvArrivingTime);
-        tvDistanceRemaining = findViewById(R.id.tvDistanceRemaining);
-        progressBarTransit = findViewById(R.id.progressBarTransit);
-        tvProgressPercent = findViewById(R.id.tvProgressPercent);
-        tvOrigin = findViewById(R.id.tvOrigin);
-        tvDestination = findViewById(R.id.tvDestination);
-        tvDriverName = findViewById(R.id.tvDriverName);
-        tvDriverVehicle = findViewById(R.id.tvDriverVehicle);
-        btnCallDriver = findViewById(R.id.btnCallDriver);
-        btnViewLoadingEvidence = findViewById(R.id.btnViewLoadingEvidence);
-        ivTransitMap = findViewById(R.id.ivTransitMap);
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvOrderNumber, "Order " + ref(o));
+        setText(R.id.tvOrderDetails, kg(o.getQuantity()) + " " + o.getCropName());
+        setText(R.id.tvOrigin, "Origin: " + (o.getPickupAddress() == null ? "Farm" : o.getPickupAddress()));
+        setText(R.id.tvDestination, "Destination: " + (o.getDropAddress() == null ? "Your delivery point" : o.getDropAddress()));
+        setText(R.id.tvDriverName, o.getTransporterName() == null ? "Driver" : o.getTransporterName());
+        setText(R.id.tvDriverVehicle, vehicleLine(o));
+        findViewById(R.id.btnCallDriver).setOnClickListener(v -> dial(o.getTransporterPhone()));
+        findViewById(R.id.btnViewLoadingEvidence).setOnClickListener(v -> showEvidence(o));
+        loadTracking();
     }
 
-    private void setupListeners() {
-        // Driver phone call action
-        if (btnCallDriver != null) {
-            btnCallDriver.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showCallDriverDialog();
-                }
-            });
-        }
+    private void loadTracking() {
+        api.getTracking(orderId).enqueue(new Callback<Tracking>() {
+            @Override
+            public void onResponse(@NonNull Call<Tracking> call, @NonNull Response<Tracking> r) {
+                if (isFinishing() || !r.isSuccessful() || r.body() == null) return;
+                last = r.body();
+                bindTracking(last);
+                drawMap();
+            }
 
-        // View Loading Evidence button -> Opens Page 5.1 (VerifyCargoActivity)
-        if (btnViewLoadingEvidence != null) {
-            btnViewLoadingEvidence.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(TransitTrackingActivity.this, VerifyCargoActivity.class);
-                    intent.putExtra("ORDER_ID", orderId);
-                    startActivity(intent);
-                }
-            });
-        }
+            @Override
+            public void onFailure(@NonNull Call<Tracking> call, @NonNull Throwable t) { }
+        });
+    }
 
-        // Tap on map to show live telemetry
-        if (ivTransitMap != null) {
-            ivTransitMap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(TransitTrackingActivity.this, "Live GPS Signal Active â€¢ Speed: 42 km/h â€¢ On Route", Toast.LENGTH_SHORT).show();
-                }
-            });
+    private void bindTracking(Tracking t) {
+        boolean live = t.currentLatitude != null;
+        setText(R.id.tvTransitStatus, live ? "Status: In Transit" : "Status: In Transit • waiting for GPS");
+        if (t.etaMinutes != null) {
+            int m = t.etaMinutes;
+            setText(R.id.tvArrivingTime, m >= 60 ? String.format(Locale.US, "%dh %02dm", m / 60, m % 60) : m + " mins");
+        }
+        if (t.remainingKm != null) setText(R.id.tvDistanceRemaining, String.format(Locale.US, "remaining: %.1f km", t.remainingKm));
+        ProgressBar bar = findViewById(R.id.progressBarTransit);
+        if (bar != null) bar.setProgress(t.progressPercent);
+        String speed = t.speedKmh != null ? String.format(Locale.US, " • %.0f km/h", t.speedKmh) : "";
+        String updated = t.lastUpdate != null ? " • updated " + time(t.lastUpdate) : "";
+        setText(R.id.tvProgressPercent, t.progressPercent + " % Completed" + speed + updated);
+    }
+
+    private void drawMap() {
+        if (map == null || last == null) return;
+        map.clear();
+        LatLngBounds.Builder b = new LatLngBounds.Builder();
+        int points = 0;
+        LatLng from = null, to = null, now = null;
+        if (last.pickupLatitude != null && last.pickupLongitude != null) {
+            from = new LatLng(last.pickupLatitude, last.pickupLongitude);
+            map.addMarker(new MarkerOptions().position(from).title("Farm (origin)")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            b.include(from);
+            points++;
+        }
+        if (last.dropLatitude != null && last.dropLongitude != null) {
+            to = new LatLng(last.dropLatitude, last.dropLongitude);
+            map.addMarker(new MarkerOptions().position(to).title("Delivery point")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            b.include(to);
+            points++;
+        }
+        if (last.currentLatitude != null && last.currentLongitude != null) {
+            now = new LatLng(last.currentLatitude, last.currentLongitude);
+            map.addMarker(new MarkerOptions().position(now).title(last.transporterName == null ? "Vehicle" : last.transporterName)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            b.include(now);
+            points++;
+        }
+        if (from != null && to != null) {
+            PolylineOptions line = new PolylineOptions().color(0xFF1B4332).width(8f).add(from);
+            if (now != null) line.add(now);
+            line.add(to);
+            map.addPolyline(line);
+        }
+        if (points > 0 && !framed) {
+            framed = true;
+            try {
+                map.moveCamera(points == 1 ? CameraUpdateFactory.newLatLngZoom(from != null ? from : to != null ? to : now, 12)
+                        : CameraUpdateFactory.newLatLngBounds(b.build(), 120));
+            } catch (IllegalStateException e) { // map not laid out yet
+                framed = false;
+            }
         }
     }
 
-    private void showCallDriverDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Call Driver")
-                .setMessage("Connect directly with driver Sunil Perera?\n\nVehicle: 1â€“Ton Lorry (WP-LO492)\nPhone: +94 77 458 9201")
-                .setPositiveButton("Call Now", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                            callIntent.setData(Uri.parse("tel:+94774589201"));
-                            startActivity(callIntent);
-                        } catch (Exception e) {
-                            Toast.makeText(TransitTrackingActivity.this, "Calling Sunil Perera (+94 77 458 9201)", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+    private void showEvidence(Order o) {
+        if (o.getLoadingEvidenceUrls() == null || o.getLoadingEvidenceUrls().isEmpty()) {
+            new androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Loading evidence")
+                    .setMessage("The driver submitted " + photoCount(o) + " photo(s) in their app; no uploaded copies are available.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
+        Intent i = new Intent(this, EvidenceViewerActivity.class);
+        i.putExtra(BuyerOrderRouter.EXTRA_ORDER_ID, o.getId());
+        startActivity(i);
+    }
+
+    private static int photoCount(Order o) {
+        Order.TransportEvent e = o.lastEvent("LOADING_EVIDENCE_SUBMITTED");
+        return e == null || e.photoCount == null ? 0 : e.photoCount;
     }
 }
-

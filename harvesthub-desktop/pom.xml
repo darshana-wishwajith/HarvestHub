@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
-      <artifactId>javafx-fxml</artifactId>
+      <artifactId>javafx-media</artifactId>
       <version>${javafx.version}</version>
     </dependency>
 
@@ -71,11 +71,21 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- unit tests need no JavaFX toolkit; the classpath avoids JavaFX's platform-jar module lookup -->
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.harvesthub.desktop/com.harvesthub.desktop.HelloApplication</mainClass>
+          <mainClass>com.harvesthub.desktop/com.harvesthub.desktop.PortalApp</mainClass>
           <launcher>HarvestHub</launcher>
           <jlinkImageName>harvesthub-app</jlinkImageName>
           <jlinkZipName>harvesthub-dist</jlinkZipName>

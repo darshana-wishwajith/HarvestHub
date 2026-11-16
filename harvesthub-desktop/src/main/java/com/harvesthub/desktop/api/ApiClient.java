@@ -1,222 +1,175 @@
 package com.harvesthub.desktop.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Thin wrapper around java.net.http.HttpClient for calling the HarvestHub backend.
- * Attaches the JWT from {@link Session} to every call once the officer has logged in.
+ * HTTP client for the HarvestHub backend. Attaches the officer's JWT from {@link Session} to every call.
+ * Base URL: env HARVESTHUB_BACKEND_URL, else -Dharvesthub.backend.url, else production.
+ * Responses are returned as Jackson trees so screens show exactly what the server sent.
  */
 public final class ApiClient {
 
-    /** Default AWS cloud backend URL. Can be overridden via env var HARVESTHUB_BACKEND_URL or system property -Dharvesthub.backend.url */
     public static final String DEFAULT_BASE_URL = "https://harvesthubapp.tech";
     private static volatile String baseUrl = resolveBaseUrl();
+
+    private static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(8))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /** Called when the server says the session is no longer valid (401, or 403 for a suspended account). */
+    private static volatile Runnable onSessionExpired = () -> { };
+
+    private ApiClient() {
+    }
 
     public static String getBaseUrl() {
         return baseUrl;
     }
 
-    public static void setBaseUrl(String url) {
-        if (url != null && !url.isBlank()) {
-            baseUrl = cleanUrl(url);
-        }
+    public static void setOnSessionExpired(Runnable r) {
+        onSessionExpired = r == null ? () -> { } : r;
     }
 
-    private static String resolveBaseUrl() {
+    static String resolveBaseUrl() {
         String env = System.getenv("HARVESTHUB_BACKEND_URL");
-        if (env != null && !env.isBlank()) {
-            return cleanUrl(env);
-        }
+        if (env != null && !env.isBlank()) return cleanUrl(env);
         String prop = System.getProperty("harvesthub.backend.url");
-        if (prop != null && !prop.isBlank()) {
-            return cleanUrl(prop);
-        }
+        if (prop != null && !prop.isBlank()) return cleanUrl(prop);
         return DEFAULT_BASE_URL;
     }
 
-    private static String cleanUrl(String url) {
-        String trimmed = url.trim();
-        while (trimmed.endsWith("/")) {
-            trimmed = trimmed.substring(0, trimmed.length() - 1);
-        }
-        return trimmed;
+    static String cleanUrl(String url) {
+        String t = url.trim();
+        while (t.endsWith("/")) t = t.substring(0, t.length() - 1);
+        return t;
     }
 
-    private static final HttpClient HTTP = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private ApiClient() {
+    /** Absolute URL for a server path such as "/uploads/abc.jpg"; null stays null. */
+    public static String absolute(String path) {
+        if (path == null || path.isBlank()) return null;
+        if (path.startsWith("http://") || path.startsWith("https://")) return path;
+        return baseUrl + (path.startsWith("/") ? path : "/" + path);
     }
 
-    // ---- Auth ---------------------------------------------------------
+    // ---- auth (public endpoints) ------------------------------------------------------------
 
     public static LoginResponseDto login(String username, String password) {
-        Map<String, Object> body = Map.of("username", username, "password", password);
-        return post("/api/auth/login", body, LoginResponseDto.class, false);
+        JsonNode body = send("POST", "/api/auth/login", Map.of("username", username, "password", password), false);
+        return MAPPER.convertValue(body, LoginResponseDto.class);
     }
 
-    public static OfficerDto currentOfficer() {
-        return get("/api/officers/me", OfficerDto.class);
+    public static void forgotPassword(String email) {
+        send("POST", "/api/auth/forgot-password", Map.of("email", email), false);
     }
 
-    // ---- Dashboard ------------------------------------------------------
-
-    public static List<ActivityLogDto> getRecentActivity() {
-        return getList("/api/dashboard/activity", ActivityLogDto.class);
+    public static void verifyResetCode(String email, String code) {
+        send("POST", "/api/auth/verify-reset-code", Map.of("email", email, "code", code), false);
     }
 
-    public static OfficerStatsDto getDashboardStats() {
-        return get("/api/dashboard/stats", OfficerStatsDto.class);
+    public static void resetPassword(String email, String code, String newPassword) {
+        send("POST", "/api/auth/reset-password", Map.of("email", email, "token", code, "newPassword", newPassword), false);
     }
 
-    // ---- Verification Queue ---------------------------------------------
+    // ---- generic authenticated calls ------------------------------------------------------------
 
-    public static List<QueueListingDto> getQueue(String tab, String search) {
-        StringBuilder path = new StringBuilder("/api/queue?tab=").append(urlEncode(tab));
-        if (search != null && !search.isBlank()) {
-            path.append("&search=").append(urlEncode(search));
+    public static JsonNode get(String path) {
+        return send("GET", path, null, true);
+    }
+
+    public static JsonNode post(String path, Object body) {
+        return send("POST", path, body == null ? Map.of() : body, true);
+    }
+
+    /** Builds "path?k=v&..." skipping null/blank values. */
+    public static String query(String path, Object... keyValues) {
+        Map<String, String> params = new LinkedHashMap<>();
+        for (int i = 0; i + 1 < keyValues.length; i += 2) {
+            Object v = keyValues[i + 1];
+            if (v != null && !v.toString().isBlank()) params.put(keyValues[i].toString(), v.toString());
         }
-        return getList(path.toString(), QueueListingDto.class);
+        if (params.isEmpty()) return path;
+        StringBuilder sb = new StringBuilder(path).append('?');
+        params.forEach((k, v) -> sb.append(enc(k)).append('=').append(enc(v)).append('&'));
+        sb.setLength(sb.length() - 1);
+        return sb.toString();
     }
 
-    public static ListingDetailDto claimListing(String listingId) {
-        return post("/api/queue/" + listingId + "/claim", Map.of(), ListingDetailDto.class, true);
+    public static String enc(String v) {
+        return URLEncoder.encode(v, StandardCharsets.UTF_8);
     }
 
-    public static ListingDetailDto claimListing(long listingId) {
-        return claimListing(String.valueOf(listingId));
-    }
+    // ---- core -------------------------------------------------------------------------------------
 
-    public static ListingDetailDto getListing(String listingId) {
-        return get("/api/listings/" + listingId, ListingDetailDto.class);
-    }
-
-    public static ListingDetailDto getListing(long listingId) {
-        return getListing(String.valueOf(listingId));
-    }
-
-    // ---- Review -----------------------------------------------------------
-
-    public static void submitReview(String listingId, ReviewDecisionRequestDto request) {
-        post("/api/listings/" + listingId + "/review", request, Void.class, true);
-    }
-
-    public static void submitReview(long listingId, ReviewDecisionRequestDto request) {
-        submitReview(String.valueOf(listingId), request);
-    }
-
-    public static List<ReviewHistoryRecordDto> getReviewHistory(String search) {
-        String path = "/api/review-history" + (search != null && !search.isBlank()
-                ? "?search=" + urlEncode(search) : "");
-        return getList(path, ReviewHistoryRecordDto.class);
-    }
-
-    // ---- Core HTTP helpers ------------------------------------------------
-
-    private static <T> T get(String path, Class<T> type) {
-        HttpRequest request = requestBuilder(path)
-                .GET()
-                .build();
-        return send(request, type);
-    }
-
-    private static <T> List<T> getList(String path, Class<T> elementType) {
-        HttpRequest request = requestBuilder(path)
-                .GET()
-                .build();
-        return sendList(request, elementType);
-    }
-
-    private static <T> T post(String path, Object body, Class<T> type, boolean authorized) {
+    private static JsonNode send(String method, String path, Object body, boolean authorized) {
         try {
-            String json = MAPPER.writeValueAsString(body);
-            HttpRequest.Builder builder = requestBuilder(path)
-                    .POST(HttpRequest.BodyPublishers.ofString(json));
-            HttpRequest request = builder.build();
-            return send(request, type);
+            HttpRequest.Builder b = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + (path.startsWith("/") ? path : "/" + path)))
+                    .timeout(Duration.ofSeconds(20))
+                    .header("Accept", "application/json");
+            if (authorized && Session.isLoggedIn()) b.header("Authorization", "Bearer " + Session.getToken());
+            if ("GET".equals(method)) {
+                b.GET();
+            } else {
+                b.header("Content-Type", "application/json");
+                b.method(method, HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(body)));
+            }
+            HttpResponse<String> response = HTTP.send(b.build(), HttpResponse.BodyHandlers.ofString());
+            int status = response.statusCode();
+            if (status >= 200 && status < 300) {
+                String text = response.body();
+                return text == null || text.isBlank() ? MAPPER.nullNode() : MAPPER.readTree(text);
+            }
+            String message = errorMessage(status, response.body());
+            if (authorized && (status == 401 || (status == 403 && Session.isLoggedIn() && isSessionDead(path)))) {
+                onSessionExpired.run();
+            }
+            throw new ApiException(message, status);
         } catch (IOException e) {
-            throw new ApiException("Could not reach HarvestHub server: " + e.getMessage());
+            throw new ApiException("Cannot reach the HarvestHub server (" + baseUrl + "). Check your internet connection.");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ApiException("The request was interrupted.");
         }
     }
 
-    private static HttpRequest.Builder requestBuilder(String path) {
-        String targetPath = (path != null && path.startsWith("/")) ? path : ("/" + (path == null ? "" : path));
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + targetPath))
-                .timeout(Duration.ofSeconds(10))
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json");
-        if (Session.isLoggedIn()) {
-            builder.header("Authorization", "Bearer " + Session.getToken());
-        }
-        return builder;
+    /** A 403 on the officer's own profile means the token is no longer accepted (e.g. account suspended). */
+    private static boolean isSessionDead(String path) {
+        return path.startsWith("/api/officers/me");
     }
 
-    private static <T> T send(HttpRequest request, Class<T> type) {
+    static String errorMessage(int status, String body) {
+        String server = null;
         try {
-            HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
-            checkStatus(response);
-            if (type == Void.class || response.body() == null || response.body().isBlank()) {
-                return null;
-            }
-            return MAPPER.readValue(response.body(), type);
-        } catch (IOException | InterruptedException e) {
-            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            throw new ApiException("Could not reach HarvestHub server: " + e.getMessage());
-        }
-    }
-
-    private static <T> List<T> sendList(HttpRequest request, Class<T> elementType) {
-        try {
-            HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
-            checkStatus(response);
-            var type = MAPPER.getTypeFactory().constructCollectionType(List.class, elementType);
-            return MAPPER.readValue(response.body(), type);
-        } catch (IOException | InterruptedException e) {
-            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            throw new ApiException("Could not reach HarvestHub server: " + e.getMessage());
-        }
-    }
-
-    private static void checkStatus(HttpResponse<String> response) throws IOException {
-        int status = response.statusCode();
-        if (status >= 200 && status < 300) {
-            return;
-        }
-        String message = "Request failed (HTTP " + status + ")";
-        try {
-            Map<?, ?> error = MAPPER.readValue(response.body(), Map.class);
-            if (error.get("error") != null) {
-                message = error.get("error").toString();
-            } else if (error.get("message") != null) {
-                message = error.get("message").toString();
-            }
+            JsonNode n = MAPPER.readTree(body);
+            if (n != null && n.hasNonNull("error")) server = n.get("error").asText();
+            else if (n != null && n.hasNonNull("message")) server = n.get("message").asText();
         } catch (Exception ignored) {
-            // Body wasn't JSON — fall back to the generic message above.
+            // not JSON
         }
-        if (status == 401) {
-            message = "Your session has expired. Please sign in again.";
-        } else if (status == 403) {
-            message = "You do not have permission to perform this action.";
-        } else if (status == 409) {
-            message = "This listing is already being reviewed by another officer, or its status has changed.";
-        }
-        throw new ApiException(message, status);
-    }
-
-    private static String urlEncode(String value) {
-        return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8);
+        if (server != null && !server.isBlank() && !server.startsWith("Request failed")) return server;
+        return switch (status) {
+            case 400 -> "The server did not accept this request.";
+            case 401 -> "Your session has ended. Please sign in again.";
+            case 403 -> "Your account is not allowed to do this.";
+            case 404 -> "Not found. It may have been removed.";
+            case 409 -> "Someone else changed this item. Refresh and try again.";
+            case 429 -> "Too many attempts. Please wait and try again.";
+            default -> status >= 500 ? "The server had a problem (HTTP " + status + "). Try again in a moment."
+                    : "Request failed (HTTP " + status + ").";
+        };
     }
 }

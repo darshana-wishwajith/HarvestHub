@@ -31,4 +31,15 @@ public class Transaction {
     public String getTimestamp() { return timestamp; }
     public String getAmount() { return amount; }
     public boolean isCredit() { return isCredit; }
+
+    // ledger fields (backend LedgerService)
+    private double amountValue;
+    private Double balanceAfter;
+    private String orderId;
+    private String type;
+
+    public double getAmountValue() { return amountValue; }
+    public Double getBalanceAfter() { return balanceAfter; }
+    public String getOrderId() { return orderId; }
+    public String getType() { return type; }
 }

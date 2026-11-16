@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- background GPS during trips (transporter, decision 15 Nov) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
@@ -55,6 +59,7 @@
         <activity android:name=".ui.farmer.ListingsHistoryActivity" />
         <activity android:name=".ui.farmer.EditProfileActivity" />
         <activity android:name=".ui.farmer.CameraCaptureActivity" />
+        <activity android:name=".ui.farmer.LocationVerificationActivity" />
         <activity android:name=".ui.farmer.ChatActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.farmer.WaitForBuyerApprovalActivity" />
@@ -87,6 +92,13 @@
         <activity android:name=".ui.buyer.TransitTrackingActivity" />
         <activity android:name=".ui.buyer.VerifyCargoActivity" />
         <activity android:name=".ui.buyer.DisputeResolvedActivity" />
+        <activity android:name=".ui.buyer.ArrivalInspectionActivity" />
+        <activity android:name=".ui.buyer.DeliveryHandshakeActivity" />
+        <activity android:name=".ui.buyer.HarvestTrackerActivity" />
+        <activity android:name=".ui.buyer.EvidenceViewerActivity" />
+        <activity android:name=".ui.buyer.BuyerRatingActivity" />
+        <activity android:name=".ui.buyer.BuyerWalletActivity" />
+        <activity android:name=".ui.buyer.BuyerProfileActivity" />
 
         <!-- Transporter Activities -->
         <activity android:name=".ui.transporter.TransporterLoginActivity" />
@@ -102,6 +114,18 @@
         <activity android:name=".ui.transporter.RateExperienceActivity" />
         <activity android:name=".ui.transporter.AccountSuspendedActivity" />
         <activity android:name=".ui.transporter.TransporterSettingsActivity" />
+        <activity android:name=".ui.transporter.TransporterJobsActivity" />
+        <activity android:name=".ui.transporter.JobOfferActivity" />
+        <activity android:name=".ui.transporter.LoadingApprovalActivity" />
+        <activity android:name=".ui.transporter.EvidenceCameraActivity" android:screenOrientation="portrait" />
+        <activity android:name=".ui.transporter.AppealDisputeActivity" />
+        <activity android:name=".ui.transporter.DisputeCaseActivity" />
+        <activity android:name=".ui.transporter.TransporterWalletActivity" />
+        <activity android:name=".ui.transporter.TransporterVehicleProfileActivity" />
+        <service
+            android:name=".ui.transporter.TransporterTrackingService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

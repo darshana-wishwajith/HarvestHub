@@ -74,11 +74,68 @@ public class WalletFragment extends Fragment {
         adapter = new TransactionAdapter(transactionList);
         rvTransactions.setAdapter(adapter);
 
-        v.findViewById(R.id.btnWithdraw).setOnClickListener(view ->
-                Toast.makeText(requireContext(), "Withdraw Funds Clicked", Toast.LENGTH_SHORT).show());
+        v.findViewById(R.id.btnWithdraw).setOnClickListener(view -> showWithdrawDialog());
 
-        tvViewAll.setOnClickListener(view ->
-                Toast.makeText(requireContext(), "View All Transactions Clicked", Toast.LENGTH_SHORT).show());
+        tvViewAll.setOnClickListener(view -> {
+            showAll = !showAll;
+            tvViewAll.setText(showAll ? "Show recent only" : "View all transactions");
+            fetchRecentTransactions();
+        });
+    }
+
+    private boolean showAll = false;
+    private double balance = 0;
+    private boolean suspended = false;
+
+    /** Mock withdrawal (user decision 14 Nov): records a debit; no real bank transfer (proposal §4.2). */
+    private void showWithdrawDialog() {
+        if (suspended) {
+            Toast.makeText(requireContext(), "Your balance is negative. Withdrawals are blocked until it is paid back.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setHint(String.format(java.util.Locale.US, "Up to LKR %,.0f", balance));
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Withdraw Funds")
+                .setMessage("Demo wallet: the amount is deducted here; no real bank transfer is made.")
+                .setView(input)
+                .setPositiveButton("Withdraw", (d, w) -> {
+                    double amount;
+                    try {
+                        amount = Double.parseDouble(input.getText().toString().trim());
+                    } catch (NumberFormatException e) {
+                        amount = 0;
+                    }
+                    withdraw(amount);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void withdraw(double amount) {
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("amount", amount);
+        apiService.withdraw(farmerId, body).enqueue(new Callback<Transaction>() {
+            @Override
+            public void onResponse(@NonNull Call<Transaction> call, @NonNull Response<Transaction> response) {
+                if (!isAdded()) return;
+                if (response.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Withdrawal recorded.", Toast.LENGTH_SHORT).show();
+                    fetchWalletSummary();
+                    fetchRecentTransactions();
+                } else {
+                    Toast.makeText(requireContext(), com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(response,
+                            "Withdrawal not possible."), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Transaction> call, @NonNull Throwable t) {
+                if (isAdded()) Toast.makeText(requireContext(), R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void fetchWalletSummary() {
@@ -87,9 +144,16 @@ public class WalletFragment extends Fragment {
             public void onResponse(@NonNull Call<WalletSummaryResponse> call, @NonNull Response<WalletSummaryResponse> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
                     WalletSummaryResponse data = response.body();
+                    balance = data.getBalance();
+                    suspended = data.isSuspended();
                     tvBalance.setText("LKR " + data.getAvailableBalance());
-                    tvTrustScore.setText(data.getTrustScore());
-                    tvPenalties.setText("Empty Trip Penalties: LKR " + data.getEmptyTripPenalties());
+                    tvBalance.setTextColor(suspended ? 0xFFDC2626 : tvPenalties.getCurrentTextColor());
+                    // trust % and star rating (user decision 14 Nov)
+                    String rating = data.getRatingAverage() == null ? "no ratings yet"
+                            : String.format(java.util.Locale.US, "%.1f / 5.0 (%d)", data.getRatingAverage(), data.getRatingCount());
+                    tvTrustScore.setText(data.getTrustPercent() + "%  ·  " + rating);
+                    tvPenalties.setText("Empty Trip Penalties: LKR " + data.getEmptyTripPenalties()
+                            + (suspended ? "  ·  Account suspended (negative balance)" : ""));
                 }
             }
             @Override public void onFailure(@NonNull Call<WalletSummaryResponse> call, @NonNull Throwable t) {}
@@ -97,34 +161,23 @@ public class WalletFragment extends Fragment {
     }
 
     private void fetchRecentTransactions() {
-        apiService.getRecentTransactions(farmerId, 2).enqueue(new Callback<List<Transaction>>() {
+        apiService.getRecentTransactions(farmerId, showAll ? 50 : 3).enqueue(new Callback<List<Transaction>>() {
             @Override
             public void onResponse(@NonNull Call<List<Transaction>> call, @NonNull Response<List<Transaction>> response) {
                 if (!isAdded()) return;
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    transactionList.clear();
-                    transactionList.addAll(response.body());
-                    adapter.notifyDataSetChanged();
-                    tvEmptyState.setVisibility(View.GONE);
-                } else {
-                    addMockData();
-                }
+                transactionList.clear();
+                if (response.isSuccessful() && response.body() != null) transactionList.addAll(response.body());
+                adapter.notifyDataSetChanged();
+                tvEmptyState.setText("No transactions yet");
+                tvEmptyState.setVisibility(transactionList.isEmpty() ? View.VISIBLE : View.GONE);
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Transaction>> call, @NonNull Throwable t) {
-                if (isAdded()) addMockData();
+                if (!isAdded()) return;
+                tvEmptyState.setText("Can't reach the server.");
+                tvEmptyState.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-    private void addMockData() {
-        transactionList.clear();
-        transactionList.add(new Transaction("1", "Order #402 Settled", "Yesterday, 4:30 PM", "45,000", true));
-        transactionList.add(new Transaction("2", "Order #398 Settled", "2 days ago", "22,000", true));
-        if (adapter != null) adapter.notifyDataSetChanged();
-        if (tvEmptyState != null) {
-            tvEmptyState.setVisibility(transactionList.isEmpty() ? View.VISIBLE : View.GONE);
-        }
     }
 }

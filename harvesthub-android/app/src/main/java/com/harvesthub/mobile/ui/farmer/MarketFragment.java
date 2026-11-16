@@ -38,12 +38,101 @@ public class MarketFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentMarketBinding.inflate(inflater, container, false);
-        
+
         setupLineChart();
-        setupRecyclerView();
+        binding.rvCenterHighlights.setLayoutManager(new LinearLayoutManager(requireContext()));
         setupTabListeners();
-        
+        binding.tvCropName.setText(crop + "  ▾");
+        binding.tvCropName.setOnClickListener(v -> chooseCrop());
+        loadData();
         return binding.getRoot();
+    }
+
+    // ---- real data (market_prices + completed orders), workflow 1.1 ----
+    private static final String[] CROPS = {"Big Onions", "Red Onions", "Tomatoes", "Potatoes", "Carrots", "Leeks",
+            "Cabbage", "Beans", "Keeri Samba"};
+    private String crop = "Big Onions";
+    private int days = 7;
+
+    private void chooseCrop() {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Choose crop")
+                .setItems(CROPS, (d, which) -> {
+                    crop = CROPS[which];
+                    binding.tvCropName.setText(crop + "  ▾");
+                    loadData();
+                })
+                .show();
+    }
+
+    private void loadData() {
+        com.harvesthub.mobile.network.ApiService api = com.harvesthub.mobile.network.ApiClient.getApiService();
+        api.getMarketTrend(crop, days).enqueue(new retrofit2.Callback<com.harvesthub.mobile.model.MarketTrendResponse>() {
+            @Override
+            public void onResponse(@NonNull retrofit2.Call<com.harvesthub.mobile.model.MarketTrendResponse> call,
+                                   @NonNull retrofit2.Response<com.harvesthub.mobile.model.MarketTrendResponse> response) {
+                if (binding == null || response.body() == null) return;
+                showTrend(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull retrofit2.Call<com.harvesthub.mobile.model.MarketTrendResponse> call, @NonNull Throwable t) {
+                if (binding != null) binding.tvInsight.setText("Can't reach the server.");
+            }
+        });
+        api.getMarketCenterInfo(crop).enqueue(new retrofit2.Callback<List<com.harvesthub.mobile.model.MarketCenterInfo>>() {
+            @Override
+            public void onResponse(@NonNull retrofit2.Call<List<com.harvesthub.mobile.model.MarketCenterInfo>> call,
+                                   @NonNull retrofit2.Response<List<com.harvesthub.mobile.model.MarketCenterInfo>> response) {
+                if (binding == null) return;
+                List<MarketCenter> list = new ArrayList<>();
+                if (response.body() != null) {
+                    for (com.harvesthub.mobile.model.MarketCenterInfo c : response.body()) {
+                        list.add(new MarketCenter(c.getName(), c.getProvince(), c.getRecommendation(), c.getSupply(),
+                                c.getSupplyPercent(), c.getDemand(), c.getDemandPercent(), c.getUpdateTime(), c.isHighlighted()));
+                    }
+                }
+                binding.rvCenterHighlights.setAdapter(new MarketAdapter(list));
+            }
+
+            @Override
+            public void onFailure(@NonNull retrofit2.Call<List<com.harvesthub.mobile.model.MarketCenterInfo>> call, @NonNull Throwable t) { }
+        });
+    }
+
+    private void showTrend(com.harvesthub.mobile.model.MarketTrendResponse t) {
+        binding.tvPeriod.setText(days <= 2 ? "PAST 24 HOURS" : "PAST " + days + " DAYS");
+        binding.tvInsight.setText(t.getInsight() != null ? t.getInsight() : "");
+        if (t.getCurrentAverage() == null || t.getTrends() == null || t.getTrends().isEmpty()) {
+            binding.tvAvgPrice.setText("No data");
+            binding.tvChange.setText("");
+            binding.lineChart.clear();
+            return;
+        }
+        binding.tvAvgPrice.setText(String.format(java.util.Locale.US, "LKR %,.2f /kg", t.getCurrentAverage()));
+        binding.tvChange.setText(t.getChangePercent() == null ? "" : String.format(java.util.Locale.US, "%+.1f%%", t.getChangePercent()));
+        ArrayList<Entry> entries = new ArrayList<>();
+        String[] labels = new String[t.getTrends().size()];
+        for (int i = 0; i < t.getTrends().size(); i++) {
+            entries.add(new Entry(i, t.getTrends().get(i).floatValue()));
+            String d = t.getLabels() != null && i < t.getLabels().size() ? t.getLabels().get(i) : "";
+            labels[i] = d.length() >= 10 ? d.substring(8, 10) + "/" + d.substring(5, 7) : d;
+        }
+        binding.lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        LineDataSet dataSet = new LineDataSet(entries, "Market Price");
+        int accentGreen = ContextCompat.getColor(requireContext(), R.color.accent_green);
+        dataSet.setColor(accentGreen);
+        dataSet.setLineWidth(2.5f);
+        dataSet.setDrawCircles(entries.size() <= 10);
+        dataSet.setCircleColor(accentGreen);
+        dataSet.setDrawValues(false);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setDrawFilled(true);
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_gradient);
+        if (drawable != null) dataSet.setFillDrawable(drawable);
+        binding.lineChart.setData(new LineData(dataSet));
+        binding.lineChart.invalidate();
+        binding.lineChart.animateY(600);
     }
 
     private void setupTabListeners() {
@@ -65,7 +154,8 @@ public class MarketFragment extends Fragment {
             setActiveTabUI(binding.cvTab30d, binding.tvTab30d);
         }
 
-        binding.lineChart.animateY(800);
+        days = hours == 24 ? 2 : hours;
+        loadData();
     }
 
     private void resetTabUI(MaterialCardView card, TextView text) {
@@ -95,47 +185,9 @@ public class MarketFragment extends Fragment {
         lineChart.getXAxis().setTextColor(ContextCompat.getColor(requireContext(), R.color.market_chart_axis));
         lineChart.getXAxis().setTextSize(10f);
 
-        final String[] labels = new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
-        lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
-
-        ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0, 160));
-        entries.add(new Entry(1, 165));
-        entries.add(new Entry(2, 185));
-        entries.add(new Entry(3, 172));
-        entries.add(new Entry(4, 188));
-        entries.add(new Entry(5, 180));
-        entries.add(new Entry(6, 195));
-
-        LineDataSet dataSet = new LineDataSet(entries, "Market Price");
-        int accentGreen = ContextCompat.getColor(requireContext(), R.color.accent_green);
-        dataSet.setColor(accentGreen);
-        dataSet.setLineWidth(2.5f);
-        dataSet.setDrawCircles(true);
-        dataSet.setCircleColor(accentGreen);
-        dataSet.setCircleRadius(4f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(ContextCompat.getColor(requireContext(), R.color.market_chart_card_bg));
-        dataSet.setDrawValues(false);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setDrawFilled(true);
-
-        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_gradient);
-        if (drawable != null) dataSet.setFillDrawable(drawable);
-
-        lineChart.setData(new LineData(dataSet));
-        lineChart.invalidate();
-        lineChart.animateY(1000);
+        lineChart.setNoDataText("Loading prices…");
     }
 
-    private void setupRecyclerView() {
-        binding.rvCenterHighlights.setLayoutManager(new LinearLayoutManager(requireContext()));
-        List<MarketCenter> list = new ArrayList<>();
-        list.add(new MarketCenter("Dambulla Market", "Central Province", "HARVEST NOW", "Low", 30, "High", 85, "15 mins ago", true));
-        list.add(new MarketCenter("Keppetipola Center", "Uva Province", "DELAY HARVEST", "High", 80, "Low", 25, "1 hour ago", false));
-
-        binding.rvCenterHighlights.setAdapter(new MarketAdapter(list));
-    }
 
     @Override
     public void onDestroyView() {
@@ -177,7 +229,7 @@ public class MarketFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             MarketCenter item = items.get(position);
             ItemCenterHighlightBinding b = holder.binding;
-            
+
             b.tvCenterName.setText(item.name);
             b.tvLocation.setText(item.province);
             b.tvBadgeText.setText(item.badge);

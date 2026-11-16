@@ -76,4 +76,31 @@ public class Listing {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    // Location-locked, geotagged capture (workflow 1.2-1.3); sent on create / retake
+    private Double gpsLatitude;
+    private Double gpsLongitude;
+    private java.util.List<String> mediaUrls;
+    private String deviceModel;
+    private String capturedAt;
+    private String variety;
+    private String grade;
+    private String referenceCode;
+    private String reviewNotes;
+
+    public Double getGpsLatitude() { return gpsLatitude; }
+    public void setGpsLatitude(Double v) { gpsLatitude = v; }
+    public Double getGpsLongitude() { return gpsLongitude; }
+    public void setGpsLongitude(Double v) { gpsLongitude = v; }
+    public java.util.List<String> getMediaUrls() { return mediaUrls; }
+    public void setMediaUrls(java.util.List<String> v) { mediaUrls = v; }
+    public String getDeviceModel() { return deviceModel; }
+    public void setDeviceModel(String v) { deviceModel = v; }
+    public String getCapturedAt() { return capturedAt; }
+    public void setCapturedAt(String v) { capturedAt = v; }
+    public String getVariety() { return variety; }
+    public void setVariety(String v) { variety = v; }
+    public String getGrade() { return grade; }
+    public String getReferenceCode() { return referenceCode; }
+    public String getReviewNotes() { return reviewNotes; }
 }

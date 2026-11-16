@@ -17,6 +17,7 @@ public class CropBatch {
     private String farmerId;
     private String cropType;
     private double availableQuantity;
+    @com.fasterxml.jackson.annotation.JsonProperty("isVerified")
     private boolean isVerified;
     private String createdDate;
 }

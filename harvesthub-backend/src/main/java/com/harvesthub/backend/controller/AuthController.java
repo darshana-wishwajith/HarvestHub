@@ -7,6 +7,7 @@ import com.harvesthub.backend.dto.OfficerDto;
 import com.harvesthub.backend.dto.RegisterRequest;
 import com.harvesthub.backend.dto.ResetPasswordRequest;
 import com.harvesthub.backend.dto.UserDto;
+import com.harvesthub.backend.dto.VerifyResetCodeRequest;
 import com.harvesthub.backend.model.User;
 import com.harvesthub.backend.security.Roles;
 import com.harvesthub.backend.service.UserService;
@@ -76,6 +77,11 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
         }
         User user = userOpt.get();
+        if (user.isAccountSuspended()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error",
+                    "Your account is suspended by an Agricultural Officer. Reason: "
+                            + (user.getSuspensionReason() == null ? "not given" : user.getSuspensionReason())));
+        }
         String jwt = jwtUtil.generateToken(user);
         OfficerDto officerDto = null;
         if (Roles.OFFICER.equals(user.getRole()) || Roles.ADMIN.equals(user.getRole())) {
@@ -89,6 +95,17 @@ public class AuthController {
         userService.createPasswordResetTokenForUser(request.getEmail());
         return ResponseEntity.ok(Map.of("message",
                 "If an account with that email exists, a verification code has been sent."));
+    }
+
+    /** Checks a reset code without using it up. 200 = code is right; 400 = wrong, expired or too many tries. */
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<?> verifyResetCode(@Valid @RequestBody VerifyResetCodeRequest request) {
+        try {
+            userService.verifyResetCode(request.getEmail(), request.getCode());
+            return ResponseEntity.ok(Map.of("message", "Verification code accepted."));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/reset-password")

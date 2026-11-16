@@ -1,203 +1,172 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import com.harvesthub.mobile.R;
-
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.widget.ScrollView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.model.TransporterDashboard;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.utils.SessionManager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * Figma transporter "History": weekly earnings header (dashboard) and every job of this driver with its money
+ * outcome – completed (95% payout), empty trip (Empty Trip Fee), rejected (damage charge / appeal).
+ */
 public class JobHistoryActivity extends AppCompatActivity {
 
-    private TextView chipAllTrips;
-    private TextView chipCompleted;
-    private TextView chipDisputed;
-    private TextView chipThisMonth;
+    private static final String[] FILTERS = {"All trips", "Completed", "Empty trips", "Disputes", "Active"};
 
-    private CardView cardJob1;
-    private CardView cardJob2;
-    private CardView cardJob3;
+    private LinearLayout content;
+    private LinearLayout list;
+    private TransporterDashboard dash;
+    private List<Order> orders = new ArrayList<>();
+    private List<TextView> chips;
+    private EditText search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.transporter_activity_job_history);
+        content = TUi.scaffold(this, "History", TUi.Tab.HISTORY);
+        SwipeRefreshLayout refresh = findViewById(R.id.tpRefresh);
+        refresh.setOnRefreshListener(() -> {
+            refresh.setRefreshing(false);
+            load();
+        });
+    }
 
-        // Configure light status bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Window window = getWindow();
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            window.setStatusBarColor(Color.parseColor("#F8FAFC"));
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        load();
+    }
 
-        initViews();
-        setupFilterChips();
-        setupCardClicks();
-        setupBottomNav();
+    private void load() {
+        String me = new SessionManager(this).getUserId();
+        ApiClient.getApiService().getTransporterDashboard(me).enqueue(new Callback<TransporterDashboard>() {
+            @Override
+            public void onResponse(@NonNull Call<TransporterDashboard> call, @NonNull Response<TransporterDashboard> r) {
+                if (r.isSuccessful()) dash = r.body();
+                ApiClient.getApiService().getTransporterOrders(me, null).enqueue(new Callback<List<Order>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<Order>> call, @NonNull Response<List<Order>> r2) {
+                        orders = r2.isSuccessful() && r2.body() != null ? r2.body() : new ArrayList<>();
+                        Collections.sort(orders, (a, b) -> String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt())));
+                        build();
+                    }
 
-        ScrollView scrollView = findViewById(R.id.scrollView);
-        if (scrollView != null) {
-            scrollView.setFocusableInTouchMode(true);
-            scrollView.requestFocus();
-            String filter = getIntent().getStringExtra("filter");
-            if ("disputed".equalsIgnoreCase(filter)) {
-                selectFilter(2);
-            } else if ("completed".equalsIgnoreCase(filter)) {
-                selectFilter(1);
-            } else if (getIntent().getBooleanExtra("scroll_to_bottom", false)) {
-                scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
-            } else {
-                scrollView.post(() -> scrollView.scrollTo(0, 0));
+                    @Override
+                    public void onFailure(@NonNull Call<List<Order>> call, @NonNull Throwable t) {
+                        build();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TransporterDashboard> call, @NonNull Throwable t) {
+                content.removeAllViews();
+                TUi.body(content, "Can't reach the server. Pull down to try again.");
+            }
+        });
+    }
+
+    private void build() {
+        content.removeAllViews();
+        if (dash != null) {
+            LinearLayout h = TUi.card(content);
+            TUi.caption(h, "Weekly net earnings");
+            TUi.big(h, TUi.rs(dash.earningsWeek), TUi.DARK);
+            TUi.row(h, "Trips this week", String.valueOf(dash.tripsThisWeek));
+            TUi.row(h, "Completed trips (all time)", String.valueOf(dash.tripsCompleted));
+            TUi.row(h, "Empty Trip Fees", "+" + TUi.rs(dash.emptyTripTotal), TUi.ACCENT, false);
+            if (dash.ratingAverage != null) {
+                TUi.row(h, "Your rating", String.format(Locale.US, "★ %.1f (%d)", dash.ratingAverage, dash.ratingCount == null ? 0 : dash.ratingCount));
             }
         }
+        TUi.title(content, "Trip History").setPadding(0, TUi.dp(this, 16), 0, 0);
+        search = TUi.input(content, "Search orders, crops, farms or buyers…", false);
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) { }
+            public void onTextChanged(CharSequence s, int a, int b, int c) { fill(); }
+            public void afterTextChanged(android.text.Editable s) { }
+        });
+        chips = TUi.chips(content, FILTERS, false, this::fill);
+        TUi.setChip(chips.get(0), true);
+        list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        content.addView(list);
+        fill();
     }
 
-    private void initViews() {
-        chipAllTrips = findViewById(R.id.chipAllTrips);
-        chipCompleted = findViewById(R.id.chipCompleted);
-        chipDisputed = findViewById(R.id.chipDisputed);
-        chipThisMonth = findViewById(R.id.chipThisMonth);
-
-        cardJob1 = findViewById(R.id.cardJob1);
-        cardJob2 = findViewById(R.id.cardJob2);
-        cardJob3 = findViewById(R.id.cardJob3);
-
-        View btnHeaderReceipt = findViewById(R.id.btnHeaderReceipt);
-        if (btnHeaderReceipt != null) {
-            btnHeaderReceipt.setOnClickListener(v -> 
-                Toast.makeText(JobHistoryActivity.this, "Opening Verified Dispatch Ledger", Toast.LENGTH_SHORT).show()
-            );
+    private void fill() {
+        list.removeAllViews();
+        int filter = 0;
+        for (int i = 0; i < chips.size(); i++) if (TUi.isOn(chips.get(i))) filter = i;
+        String q = search.getText().toString().trim().toLowerCase(Locale.US);
+        int shown = 0;
+        for (Order o : orders) {
+            String s = o.getStatus() == null ? "" : o.getStatus();
+            boolean ok;
+            switch (filter) {
+                case 1: ok = "COMPLETED".equals(s); break;
+                case 2: ok = "PRELOAD_REJECTED".equals(s); break;
+                case 3: ok = "RETURN_JOURNEY".equals(s) || "RETURNED".equals(s) || o.isDisputeOpen(); break;
+                case 4: ok = !"COMPLETED".equals(s) && !"PRELOAD_REJECTED".equals(s) && !"RETURN_JOURNEY".equals(s)
+                        && !"RETURNED".equals(s) && !"CANCELLED".equals(s); break;
+                default: ok = true;
+            }
+            if (!q.isEmpty()) {
+                String hay = (o.getId() + " " + o.getCropName() + " " + o.getFarmerName() + " " + o.getBuyerName() + " "
+                        + o.getPickupAddress() + " " + o.getDropAddress()).toLowerCase(Locale.US);
+                ok = ok && hay.contains(q);
+            }
+            if (!ok) continue;
+            shown++;
+            card(o, s);
         }
-
-        View btnHeaderProfile = findViewById(R.id.btnHeaderProfile);
-        if (btnHeaderProfile != null) {
-            btnHeaderProfile.setOnClickListener(v -> {
-                Intent intent = new Intent(JobHistoryActivity.this, TransporterSettingsActivity.class);
-                startActivity(intent);
-            });
-        }
+        if (shown == 0) TUi.body(list, orders.isEmpty() ? "No trips yet." : "No trips match.");
     }
 
-    private void setupFilterChips() {
-        chipAllTrips.setOnClickListener(v -> selectFilter(0));
-        chipCompleted.setOnClickListener(v -> selectFilter(1));
-        chipDisputed.setOnClickListener(v -> selectFilter(2));
-        chipThisMonth.setOnClickListener(v -> selectFilter(3));
-    }
-
-    private void selectFilter(int index) {
-        // Reset all chips
-        resetChipStyle(chipAllTrips);
-        resetChipStyle(chipCompleted);
-        resetChipStyle(chipDisputed);
-        resetChipStyle(chipThisMonth);
-
-        switch (index) {
-            case 0: // All Trips
-                highlightChipStyle(chipAllTrips);
-                cardJob1.setVisibility(View.VISIBLE);
-                cardJob2.setVisibility(View.VISIBLE);
-                cardJob3.setVisibility(View.VISIBLE);
-                break;
-            case 1: // Completed
-                highlightChipStyle(chipCompleted);
-                cardJob1.setVisibility(View.VISIBLE);
-                cardJob2.setVisibility(View.GONE);
-                cardJob3.setVisibility(View.VISIBLE);
-                break;
-            case 2: // Disputed
-                highlightChipStyle(chipDisputed);
-                cardJob1.setVisibility(View.GONE);
-                cardJob2.setVisibility(View.VISIBLE);
-                cardJob3.setVisibility(View.GONE);
-                break;
-            case 3: // This Month
-                highlightChipStyle(chipThisMonth);
-                cardJob1.setVisibility(View.VISIBLE);
-                cardJob2.setVisibility(View.VISIBLE);
-                cardJob3.setVisibility(View.VISIBLE);
-                break;
+    private void card(Order o, String s) {
+        LinearLayout c = TUi.card(list);
+        boolean done = "COMPLETED".equals(s), empty = "PRELOAD_REJECTED".equals(s), rejected = "RETURN_JOURNEY".equals(s) || "RETURNED".equals(s);
+        TUi.pill(c, "#" + o.shortId() + " • " + JobStatus.label(s),
+                done ? TUi.SURFACE : empty ? TUi.AMBER_BG : rejected ? TUi.RED_BG : TUi.GREY_BG,
+                done ? TUi.DARK : empty ? TUi.AMBER : rejected ? TUi.RED : TUi.INK);
+        TUi.route(c, o.getFarmerName() == null ? "Farm" : o.getFarmerName(), o.getPickupAddress(),
+                o.getBuyerName() == null ? "Buyer" : o.getBuyerName(), o.getDropAddress());
+        TUi.body(c, String.format(Locale.US, "%s • %,.0f kg%s", o.getCropName(), o.getQuantity(),
+                o.getActualDeliveryDate() == null ? "" : " • " + com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(o.getActualDeliveryDate())));
+        double fee = o.getPayment() == null ? 0 : o.getPayment().transportFee;
+        if (done) {
+            TUi.row(c, "Gross freight fee", TUi.rs(fee));
+            TUi.row(c, "5% platform commission", "-" + TUi.rs(fee - o.driverPayout()), TUi.RED, false);
+            TUi.row(c, "Net transporter payout", TUi.rs(o.driverPayout()), TUi.ACCENT, true);
+        } else if (empty) {
+            TUi.row(c, "Empty Trip Fee credited", "+" + TUi.rs(o.getPayment() == null ? 0 : o.getPayment().emptyTripFee), TUi.ACCENT, true);
+        } else if (rejected) {
+            TUi.row(c, "Damage charge", "-" + TUi.rs(o.getPayment() == null ? 0 : o.getPayment().advanceCropPortion), TUi.RED, true);
+        } else {
+            TUi.row(c, "Payout on delivery", TUi.rs(o.driverPayout()), TUi.DARK, true);
         }
-    }
-
-    private void resetChipStyle(TextView chip) {
-        chip.setBackgroundResource(R.drawable.transporter_bg_chip_history_unselected);
-        chip.setTextColor(Color.parseColor("#475569"));
-    }
-
-    private void highlightChipStyle(TextView chip) {
-        chip.setBackgroundResource(R.drawable.transporter_bg_chip_history_selected);
-        chip.setTextColor(Color.parseColor("#FFFFFF"));
-    }
-
-    private void setupCardClicks() {
-        // Card 1
-        View btnReceiptCard1 = findViewById(R.id.btnReceiptCard1);
-        if (btnReceiptCard1 != null) {
-            btnReceiptCard1.setOnClickListener(v ->
-                Toast.makeText(JobHistoryActivity.this, "Order #842 Consignment Receipt & Ratings", Toast.LENGTH_SHORT).show()
-            );
-        }
-        cardJob1.setOnClickListener(v ->
-            Toast.makeText(JobHistoryActivity.this, "Dambulla to Colombo - Order #842 (Delivered)", Toast.LENGTH_SHORT).show()
-        );
-
-        // Card 2
-        View btnIncidentReport = findViewById(R.id.btnIncidentReport);
-        if (btnIncidentReport != null) {
-            btnIncidentReport.setOnClickListener(v ->
-                Toast.makeText(JobHistoryActivity.this, "Incident Report #810: Bay #14 Inspection Evidence", Toast.LENGTH_LONG).show()
-            );
-        }
-        cardJob2.setOnClickListener(v ->
-            Toast.makeText(JobHistoryActivity.this, "Nuwara Eliya to Colombo - Order #810 (Disputed)", Toast.LENGTH_SHORT).show()
-        );
-
-        // Card 3
-        View btnReceiptCard3 = findViewById(R.id.btnReceiptCard3);
-        if (btnReceiptCard3 != null) {
-            btnReceiptCard3.setOnClickListener(v ->
-                Toast.makeText(JobHistoryActivity.this, "Order #798 Consignment Receipt & Ratings", Toast.LENGTH_SHORT).show()
-            );
-        }
-        cardJob3.setOnClickListener(v ->
-            Toast.makeText(JobHistoryActivity.this, "Kandy Hub to Colombo - Order #798 (Delivered)", Toast.LENGTH_SHORT).show()
-        );
-    }
-
-    private void setupBottomNav() {
-        View navHome = findViewById(R.id.navHome);
-        if (navHome != null) {
-            navHome.setOnClickListener(v -> {
-                Intent intent = new Intent(JobHistoryActivity.this, DeliveryDashboardActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-            });
-        }
-
-        View navHistory = findViewById(R.id.navHistory);
-        if (navHistory != null) {
-            navHistory.setOnClickListener(v -> {
-                // Already on History tab
-                Toast.makeText(JobHistoryActivity.this, "Trip History (All 24 Records)", Toast.LENGTH_SHORT).show();
-            });
-        }
-
-        View navSettings = findViewById(R.id.navSettings);
-        if (navSettings != null) {
-            navSettings.setOnClickListener(v -> {
-                Intent intent = new Intent(JobHistoryActivity.this, TransporterSettingsActivity.class);
-                startActivity(intent);
-            });
-        }
+        c.setOnClickListener(v -> TransporterOrderRouter.open(this, o.getId()));
+        if (rejected) TUi.danger(c, "View resolution case", v -> startActivity(new android.content.Intent(this, DisputeCaseActivity.class)
+                .putExtra(TransporterOrderRouter.EXTRA_ORDER_ID, o.getId())));
+        else TUi.secondary(c, "Open", v -> TransporterOrderRouter.open(this, o.getId()));
     }
 }
-

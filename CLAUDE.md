@@ -22,13 +22,14 @@ Android packages: `ui/{farmer,buyer,transporter,common}`, `network/ApiService.ja
 Desktop: controllers in `com.harvesthub.desktop`, HTTP in `api/ApiClient.java`, session in `api/Session.java`.
 
 ## Run commands (when the user says "run backend / run desktop / run mobile app")
-Run from the repo root in PowerShell; backend first, each in its own terminal:
+**Working mode (user decision, 2026-11-14): everything runs against the remote stack — backend https://harvesthubapp.tech + MongoDB Atlas. No local MongoDB/backend for the apps, no Android Studio.** The user runs these in their own terminal from the repo root:
 | Say | Command | Does |
 |---|---|---|
-| run backend | `powershell -File scripts\run-backend.ps1` | Spring Boot on :8080 using `application-local.properties` (Atlas) |
-| run desktop | `powershell -File scripts\run-desktop.ps1` | JavaFX portal → `http://localhost:8080` (`-Production` → harvesthubapp.tech) |
-| run mobile app | `powershell -File scripts\run-mobile.ps1` | Builds debug APK pointed at `http://<laptop Wi-Fi IP>:8080/`, installs over USB with adb (`D:\Android\platform-tools`), launches it (`-Production` → harvesthubapp.tech) |
-Android debug builds take the API URL from `-PapiUrl` (`app/build.gradle` → `BuildConfig.API_BASE_URL`) and allow cleartext HTTP (`src/debug/AndroidManifest.xml`); release builds are HTTPS-only to production.
+| run mobile app | `powershell -File scripts\run-mobile.ps1 -Production` | Builds debug APK → harvesthubapp.tech, installs over USB with adb (`D:\Android\platform-tools`), launches it |
+| run desktop | `powershell -File scripts\run-desktop.ps1 -Production` | JavaFX portal → harvesthubapp.tech |
+| run backend | `powershell -File scripts\run-backend.ps1` | Local Spring Boot on :8080 against Atlas (`application-local.properties`). Note: the script has no `-Production` switch, and `-Production` apps do not use this local backend |
+- **Backend changes reach the apps only after they are deployed to harvesthubapp.tech** (deploy log in `DEVELOPMENT_STATUS.md` §6). Say so after backend work; deploy only when the user asks in that chat.
+- Without `-Production`, `run-mobile.ps1` targets `http://<laptop Wi-Fi IP>:8080/`. Debug builds take the URL from `-PapiUrl`, else `API_URL` in untracked `harvesthub-android/local.properties`, else production. Debug allows cleartext HTTP (`src/debug/AndroidManifest.xml`); release builds are HTTPS-only to production.
 
 ## Commands (Windows; JDK 25/26 installed, no JDK 21 — builds still work)
 ```bash
@@ -43,7 +44,7 @@ cd harvesthub-android && ./gradlew.bat assembleDebug lintDebug testDebugUnitTest
 - `harvesthub-android/local.properties` (sdk.dir) is untracked and machine-specific.
 
 ## Security model (backend)
-- `SecurityConfig`: everything requires a JWT except `POST /api/auth/{login,register,forgot-password,reset-password}`, `/auth/*-otp`, `GET /uploads/*`. Officer area (`/api/queue`, `/api/listings/**`, `/api/review-history`, `/api/dashboard/{stats,activity}`, `/api/officers/**`) needs OFFICER/ADMIN; `/api/users` needs ADMIN.
+- `SecurityConfig`: everything requires a JWT except `POST /api/auth/{login,register,check-availability,forgot-password,verify-reset-code,reset-password}`, `/auth/*-otp`, `GET /uploads/*`. Officer area (`/api/queue`, `/api/listings/**`, `/api/review-history`, `/api/dashboard/{stats,activity}`, `/api/officers/**`) needs OFFICER/ADMIN; `/api/users` needs ADMIN.
 - JWT subject = user id; the filter reloads the user from Mongo each request.
 - In controllers use `security/CurrentUser`: `id()`, `requireSelfOrStaff(userId)`, `requireParticipantOrStaff(...)`, `requireRole(...)`.
 - Uploads only via `service/MediaStorageService` (magic-byte type check, size limits, generated names).

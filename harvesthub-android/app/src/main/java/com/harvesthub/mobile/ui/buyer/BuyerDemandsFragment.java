@@ -83,23 +83,30 @@ public class BuyerDemandsFragment extends Fragment {
         rvDemandRequests.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new DemandRequestAdapter(new ArrayList<>(), (item, action) -> {
+            WantedAd ad = ads.get(item.getId());
+            if (ad == null) return;
             switch (action) {
                 case "view_offers":
                     if (getActivity() instanceof BuyerDashboardActivity) {
-                        ((BuyerDashboardActivity) getActivity()).selectTab(BuyerDashboardActivity.Tab.OFFERS,
-                                "Responding to your ad: " + item.getTitle());
-                    } else {
-                        Intent intentOffers = new Intent(requireActivity(), SupplyOffersActivity.class);
-                        intentOffers.putExtra("ad_title", "Responding to your ad: " + item.getTitle());
-                        startActivity(intentOffers);
+                        ((BuyerDashboardActivity) getActivity()).showOffersFor(
+                                ad.getCropName() + " (" + (int) ad.getRequiredQuantityKg() + " kg)", ad.getRequestId());
                     }
                     break;
                 case "edit_ad":
-                    Intent intentEdit = new Intent(requireActivity(), PostDemandRequestActivity.class);
-                    startActivity(intentEdit);
+                    new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            .setTitle(item.getTitle())
+                            .setItems(new String[]{"Edit request", "Close request"}, (d, which) -> {
+                                if (which == 0) {
+                                    Intent intentEdit = new Intent(requireActivity(), PostDemandRequestActivity.class);
+                                    intentEdit.putExtra(PostDemandRequestActivity.EXTRA_EDIT_AD, new com.google.gson.Gson().toJson(ad));
+                                    startActivity(intentEdit);
+                                } else {
+                                    closeAd(ad);
+                                }
+                            }).show();
                     break;
                 case "republish":
-                    Toast.makeText(requireContext(), "Republishing demand request for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                    republish(ad);
                     break;
             }
         });
@@ -150,35 +157,31 @@ public class BuyerDemandsFragment extends Fragment {
                 if (progressBar != null) progressBar.setVisibility(View.GONE);
 
                 allDemandList.clear();
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                ads.clear();
+                if (response.isSuccessful() && response.body() != null) {
                     for (WantedAd ad : response.body()) {
-                        DemandStatus status = "CLOSED".equalsIgnoreCase(ad.getStatus()) ? DemandStatus.CLOSED : DemandStatus.ACTIVE;
-                        String timeAgo = (ad.getCreatedDate() != null && !ad.getCreatedDate().isEmpty())
-                                ? "Posted " + ad.getCreatedDate() : "Active Ad";
-                        String title = "Need " + ((int) ad.getRequiredQuantityKg()) + "kg of " + (ad.getCropName() != null ? ad.getCropName() : "Produce");
-                        String deadline = (ad.getDeadline() != null && !ad.getDeadline().isEmpty())
-                                ? "Deadline: " + ad.getDeadline() : "Target: Rs. " + ((int) ad.getTargetPricePerKg()) + "/KG";
-                        String targetGrade = (ad.getTargetGrade() != null && !ad.getTargetGrade().isEmpty())
-                                ? "Target: " + ad.getTargetGrade() : "Target: Grade A";
-
-                        allDemandList.add(new DemandRequestItem(
-                                ad.getRequestId(),
-                                status,
-                                timeAgo,
-                                title,
-                                deadline,
-                                targetGrade
-                        ));
+                        ads.put(ad.getRequestId(), ad);
+                        DemandStatus status = ad.isOpen() ? DemandStatus.ACTIVE : DemandStatus.CLOSED;
+                        String when = ad.isOpen()
+                                ? "Posted " + BaseBuyerOrderActivity.time(ad.getCreatedDate())
+                                : closedLabel(ad);
+                        if (ad.getOfferCount() > 0) {
+                            when += " • " + ad.getOfferCount() + (ad.getOfferCount() == 1 ? " offer" : " offers")
+                                    + (ad.getPendingOfferCount() > 0 ? " (" + ad.getPendingOfferCount() + " new)" : "");
+                        }
+                        String title = String.format(java.util.Locale.US, "Need %,.0f kg of %s", ad.getRequiredQuantityKg(),
+                                ad.getCropName() == null ? "produce" : ad.getCropName());
+                        String deadline = ad.getDeadline() == null || ad.getDeadline().isEmpty() ? null : "Deadline: " + ad.getDeadline();
+                        String grade = "Target: " + (ad.getTargetGrade() == null || ad.getTargetGrade().isEmpty() ? "Any grade"
+                                : "Grade " + ad.getTargetGrade().replace("Grade ", ""))
+                                + (ad.getTargetPricePerKg() > 0 ? String.format(java.util.Locale.US, " • Rs. %,.0f/kg", ad.getTargetPricePerKg()) : "");
+                        allDemandList.add(new DemandRequestItem(ad.getRequestId(), status, when, title, deadline, grade));
                     }
                 }
-
-                if (allDemandList.isEmpty()) {
-                    // Fallback to sample items if database is freshly cleared
-                    allDemandList.add(new DemandRequestItem("1", DemandStatus.ACTIVE, "Posted 1d ago", "Need 200kg of Tomatoes", "Deadline: Friday", "Target: Grade A"));
-                    allDemandList.add(new DemandRequestItem("2", DemandStatus.ACTIVE, "Posted 30 minutes ago", "Need 200kg of Tomatoes", "Deadline: Friday", "Target: Grade B"));
-                    allDemandList.add(new DemandRequestItem("3", DemandStatus.CLOSED, "Fulfilled 4d ago", "500kg Big Onions", null, "Target: Grade B"));
-                }
-
+                long open = 0;
+                for (DemandRequestItem i : allDemandList) if (i.getStatus() == DemandStatus.ACTIVE) open++;
+                tabActiveAds.setText("Active Ads (" + open + ")");
+                if (tvEmptyDemands != null && !response.isSuccessful()) tvEmptyDemands.setText("Could not load your wanted ads.");
                 filterList();
             }
 
@@ -187,14 +190,63 @@ public class BuyerDemandsFragment extends Fragment {
                 if (!isAdded()) return;
                 if (progressBar != null) progressBar.setVisibility(View.GONE);
 
-                if (allDemandList.isEmpty()) {
-                    allDemandList.add(new DemandRequestItem("1", DemandStatus.ACTIVE, "Posted 1d ago", "Need 200kg of Tomatoes", "Deadline: Friday", "Target: Grade A"));
-                    allDemandList.add(new DemandRequestItem("2", DemandStatus.ACTIVE, "Posted 30 minutes ago", "Need 200kg of Tomatoes", "Deadline: Friday", "Target: Grade B"));
-                    allDemandList.add(new DemandRequestItem("3", DemandStatus.CLOSED, "Fulfilled 4d ago", "500kg Big Onions", null, "Target: Grade B"));
-                }
+                if (tvEmptyDemands != null) tvEmptyDemands.setText("Can't reach the server.");
                 filterList();
             }
         });
+    }
+
+    private final java.util.Map<String, WantedAd> ads = new java.util.HashMap<>();
+
+    private static String closedLabel(WantedAd ad) {
+        String why = "OFFER_ACCEPTED".equals(ad.getClosedReason()) ? "Offer accepted"
+                : "DEADLINE".equals(ad.getClosedReason()) ? "Deadline passed" : "Closed";
+        return why + (ad.getClosedDate() == null ? "" : " " + BaseBuyerOrderActivity.time(ad.getClosedDate()));
+    }
+
+    private void closeAd(WantedAd ad) {
+        ApiClient.getApiService().closeWantedAd(ad.getRequestId()).enqueue(new Callback<WantedAd>() {
+            @Override
+            public void onResponse(Call<WantedAd> call, Response<WantedAd> r) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), r.isSuccessful() ? "Request closed."
+                        : com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(r, "Could not close it."), Toast.LENGTH_SHORT).show();
+                loadDemandsFromDatabase();
+            }
+
+            @Override
+            public void onFailure(Call<WantedAd> call, Throwable t) {
+                if (isAdded()) Toast.makeText(requireContext(), R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /** Republish = new open copy with a new deadline (decision 15 Nov). */
+    private void republish(WantedAd ad) {
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        c.add(java.util.Calendar.DAY_OF_MONTH, 7);
+        android.app.DatePickerDialog dp = new android.app.DatePickerDialog(requireContext(), (view, y, m, d) -> {
+            java.util.Map<String, String> body = new java.util.HashMap<>();
+            body.put("deadline", String.format(java.util.Locale.US, "%04d-%02d-%02d", y, m + 1, d));
+            ApiClient.getApiService().republishWantedAd(ad.getRequestId(), body).enqueue(new Callback<WantedAd>() {
+                @Override
+                public void onResponse(Call<WantedAd> call, Response<WantedAd> r) {
+                    if (!isAdded()) return;
+                    Toast.makeText(requireContext(), r.isSuccessful() ? "Request published again."
+                            : com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(r, "Could not republish."), Toast.LENGTH_SHORT).show();
+                    if (r.isSuccessful()) selectTab(true);
+                    loadDemandsFromDatabase();
+                }
+
+                @Override
+                public void onFailure(Call<WantedAd> call, Throwable t) {
+                    if (isAdded()) Toast.makeText(requireContext(), R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH));
+        dp.setTitle("New deadline");
+        dp.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        dp.show();
     }
 
     private void filterList() {

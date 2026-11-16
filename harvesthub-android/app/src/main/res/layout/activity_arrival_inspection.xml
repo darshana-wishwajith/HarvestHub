@@ -134,6 +134,7 @@
                         android:paddingTop="5dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="5dp"
+                        android:id="@+id/tvBaselineMeta"
                         android:text="Pre–Transit Baseline"
                         android:textColor="#047857"
                         android:textSize="11sp"
@@ -154,7 +155,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Pre-Transit Cargo Loading Photo"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/img_cargo_evidence" />
+                        android:background="#E2E8F0" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Description -->
@@ -257,6 +258,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:lineSpacingExtra="3dp"
+                    android:id="@+id/tvSettlementNote"
                     android:text="20% advance secured in Escrow. Releasing balance completes transaction."
                     android:textColor="#64748B"
                     android:textSize="12.5sp" />

@@ -39,6 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             jwtUtil.parseValid(header.substring(7))
                     .flatMap(claims -> userRepository.findById(claims.getSubject()))
+                    .filter(user -> !user.isAccountSuspended()) // officer suspension ends every session at once
                     .ifPresent(user -> {
                         String role = user.getRole() == null ? "FARMER" : user.getRole().toUpperCase();
                         AuthUser principal = new AuthUser(user.getId(), user.getEmail(), role, user.getFullName());

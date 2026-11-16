@@ -1,175 +1,118 @@
 package com.harvesthub.mobile.ui.buyer;
 
-import com.harvesthub.mobile.R;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.utils.RemoteImage;
+
+import java.util.List;
 import java.util.Locale;
 
 /**
- * Page 5.1: Verify Cargo Evidence
- * Allows buyers to inspect live transporter photos and GPS telemetry
- * before releasing transit escrow or rejecting the load.
+ * Figma buyer 5.1 "Pre-Loading Evidence Review". Shows the driver's real loading photos and GPS, with the
+ * server's 15-minute deadline (decision 15 Nov: auto-approve when it runs out).
+ * Approve → LOADING_APPROVED. Reject → PRELOAD_REJECTED: 100% refund, Empty Trip Fee charged to the farmer.
  */
-public class VerifyCargoActivity extends AppCompatActivity {
+public class VerifyCargoActivity extends BaseBuyerOrderActivity {
 
-    private TextView tvExpiringTimer;
-    private TextView tvTelemetryLat;
-    private TextView tvTelemetryLong;
-    private TextView tvTelemetryAlt;
-    private TextView tvEscrowProtectedText;
-    private ImageView ivCargoEvidence;
-    private Button btnRejectCargo;
-    private Button btnApproveLoad;
-
-    private CountDownTimer countDownTimer;
-    // 14 minutes and 22 seconds in milliseconds (862,000 ms)
-    private static final long INITIAL_TIME_MS = (14 * 60 + 22) * 1000L;
+    private final Runnable tick = this::updateTimer;
+    private int photoIndex;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_verify_cargo);
-
-        // Make status bar icons dark for light background
-        if (getWindow() != null) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            );
-        }
-
-        initializeViews();
-        setupCountdownTimer();
-        setupClickListeners();
-    }
-
-    private void initializeViews() {
-        tvExpiringTimer = findViewById(R.id.tvExpiringTimer);
-        tvTelemetryLat = findViewById(R.id.tvTelemetryLat);
-        tvTelemetryLong = findViewById(R.id.tvTelemetryLong);
-        tvTelemetryAlt = findViewById(R.id.tvTelemetryAlt);
-        tvEscrowProtectedText = findViewById(R.id.tvEscrowProtectedText);
-        ivCargoEvidence = findViewById(R.id.ivCargoEvidence);
-        btnRejectCargo = findViewById(R.id.btnRejectCargo);
-        btnApproveLoad = findViewById(R.id.btnApproveLoad);
-    }
-
-    private void setupCountdownTimer() {
-        countDownTimer = new CountDownTimer(INITIAL_TIME_MS, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                long minutes = (millisUntilFinished / 1000) / 60;
-                long seconds = (millisUntilFinished / 1000) % 60;
-                String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d mins", minutes, seconds);
-                if (tvExpiringTimer != null) {
-                    tvExpiringTimer.setText(timeFormatted);
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                if (tvExpiringTimer != null) {
-                    tvExpiringTimer.setText("Expired");
-                }
-            }
-        }.start();
-    }
-
-    private void setupClickListeners() {
-        // Enlarge or preview image on tap
-        if (ivCargoEvidence != null) {
-            ivCargoEvidence.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showImagePreviewDialog();
-                }
-            });
-        }
-
-        // Reject Cargo button
-        if (btnRejectCargo != null) {
-            btnRejectCargo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showRejectConfirmationDialog();
-                }
-            });
-        }
-
-        // Approve & Load button
-        if (btnApproveLoad != null) {
-            btnApproveLoad.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showApprovalSuccessDialog();
-                }
-            });
-        }
-    }
-
-    private void showImagePreviewDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        ImageView fullImageView = new ImageView(this);
-        fullImageView.setImageResource(R.drawable.img_cargo_evidence);
-        fullImageView.setAdjustViewBounds(true);
-        fullImageView.setPadding(24, 24, 24, 24);
-
-        builder.setView(fullImageView)
-                .setTitle("Cargo Loading Evidence Inspection")
-                .setMessage("GPS: Dambulla Farm | LAT: 7.8731Â° N, LONG: 80.6517Â° E | ALT: 168m\nTimestamp: Today, 10:45 AM")
-                .setPositiveButton("Close", null)
-                .show();
-    }
-
-    private void showRejectConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Reject Cargo Load?")
-                .setMessage("Rejecting will cancel transporter assignment and trigger an immediate 100% refund of Rs. 11,845 to your escrow balance.")
-                .setNegativeButton("Keep Reviewing", null)
-                .setPositiveButton("Confirm Rejection", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(VerifyCargoActivity.this, "Cargo Rejected. 100% Escrow Refund Processed.", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                })
-                .show();
-    }
-
-    private void showApprovalSuccessDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Cargo Approved!")
-                .setMessage("Physical cargo verified successfully. Transporter has been authorized to depart. Real-time GPS tracking is now active.")
-                .setPositiveButton("Proceed to Live Tracking", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(VerifyCargoActivity.this, "Transit Authorized!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(VerifyCargoActivity.this, TransitTrackingActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .show();
+    protected int layout() {
+        return R.layout.activity_verify_cargo;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(tick);
+    }
+
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvCargoVehicle, o.getVehicleLabel() == null ? "Vehicle" : o.getVehicleLabel());
+        setText(R.id.tvCargoCarrier, (o.getTransporterName() == null ? "" : o.getTransporterName())
+                + (o.getVehiclePlate() == null ? "" : " • " + o.getVehiclePlate()));
+
+        Order.TransportEvent ev = o.lastEvent("LOADING_EVIDENCE_SUBMITTED");
+        if (ev != null && ev.latitude != null && ev.longitude != null) {
+            setText(R.id.tvTelemetryLat, String.format(Locale.US, "%.4f° %s", Math.abs(ev.latitude), ev.latitude >= 0 ? "N" : "S"));
+            setText(R.id.tvTelemetryLong, String.format(Locale.US, "%.4f° %s", Math.abs(ev.longitude), ev.longitude >= 0 ? "E" : "W"));
+        } else {
+            setText(R.id.tvTelemetryLat, "—");
+            setText(R.id.tvTelemetryLong, "—");
         }
+        setText(R.id.tvTelemetryAltLabel, "TIME");
+        setText(R.id.tvTelemetryAlt, o.getLoadingEvidenceAt() == null ? "—" : time(o.getLoadingEvidenceAt()));
+
+        Order.Payment p = o.getPayment();
+        if (p != null) setText(R.id.tvEscrowProtectedText, "Smart Escrow Lock: " + rs(p.advanceDue) + " Protected");
+
+        showPhoto(o);
+        ImageView iv = findViewById(R.id.ivCargoEvidence);
+        iv.setOnClickListener(v -> {
+            photoIndex++;
+            showPhoto(o);
+        });
+
+        findViewById(R.id.btnApproveLoad).setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Approve loading?")
+                .setMessage("You confirm the crops in the photos match your order. The driver will load and start the journey, "
+                        + "and the farmer receives the 20% advance.")
+                .setPositiveButton("Approve & Load", (d, w) -> sendEvent("APPROVE_LOADING", null, null, v))
+                .setNegativeButton("Cancel", null).show());
+        findViewById(R.id.btnRejectCargo).setOnClickListener(v -> askReject());
+        updateTimer();
+    }
+
+    private void showPhoto(Order o) {
+        List<String> urls = o.getLoadingEvidenceUrls();
+        ImageView iv = findViewById(R.id.ivCargoEvidence);
+        if (urls == null || urls.isEmpty()) {
+            setText(R.id.tvEvidencePager, "Photos were taken in the driver's app (not uploaded)");
+            return;
+        }
+        int i = Math.floorMod(photoIndex, urls.size());
+        RemoteImage.load(iv, mediaUrl(urls.get(i)));
+        setText(R.id.tvEvidencePager, String.format(Locale.US, "Photo %d of %d%s", i + 1, urls.size(), urls.size() > 1 ? " • tap for next" : ""));
+    }
+
+    private void askReject() {
+        EditText reason = new EditText(this);
+        reason.setHint("What is wrong? (e.g. wrong grade, rotten)");
+        int pad = Math.round(16 * getResources().getDisplayMetrics().density);
+        reason.setPadding(pad, pad, pad, pad);
+        new AlertDialog.Builder(this)
+                .setTitle("Reject the cargo?")
+                .setMessage("You get a 100% refund including the 3% fee. The farmer pays the Empty Trip Fee to the transporter. "
+                        + "This cannot be undone.")
+                .setView(reason)
+                .setPositiveButton("Reject Cargo", (d, w) -> {
+                    String r = reason.getText().toString().trim();
+                    sendEvent("REJECT_LOADING", r.isEmpty() ? "Crop does not match the order" : r, null, findViewById(R.id.btnRejectCargo));
+                })
+                .setNegativeButton("Cancel", null).show();
+    }
+
+    private void updateTimer() {
+        handler.removeCallbacks(tick);
+        if (order == null || order.getLoadingApprovalDeadline() == null) {
+            setText(R.id.tvExpiringTimer, "—");
+            return;
+        }
+        long left = order.getLoadingApprovalDeadline() - System.currentTimeMillis();
+        if (left <= 0) {
+            setText(R.id.tvExpiringTimer, "auto-approving…");
+            return; // the next poll picks up LOADING_APPROVED and moves on
+        }
+        long s = left / 1000;
+        setText(R.id.tvExpiringTimer, String.format(Locale.US, "%02d:%02d mins", s / 60, s % 60));
+        handler.postDelayed(tick, 1000);
     }
 }
-

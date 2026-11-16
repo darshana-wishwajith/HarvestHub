@@ -41,7 +41,7 @@ public class HarvestItem {
         String grade = listing.getGrade();
         if (grade == null || grade.trim().isEmpty()) {
                 return new HarvestItem("Verified Harvest", R.drawable.bg_badge_grade_a,
-                    R.drawable.ic_check, listing.getCreatedDate(), listing.getCropName(),
+                    R.drawable.ic_check, "Listed " + BaseBuyerOrderActivity.time(listing.getUpdatedTime() != null ? listing.getUpdatedTime() : listing.getCreatedDate()), listing.getCropName(),
                     listing.getQuantity(), listing.getLocation(), listing.getPrice(),
                     listing.getId(), listing.getFarmerId(), listing.getFarmerName());
         }
@@ -53,7 +53,7 @@ public class HarvestItem {
         }
         String gradeLabel = "Grade " + grade + " Verified";
         return new HarvestItem(gradeLabel, badgeBackground, R.drawable.ic_check,
-                listing.getCreatedDate(), listing.getCropName(), listing.getQuantity(),
+                "Listed " + BaseBuyerOrderActivity.time(listing.getUpdatedTime() != null ? listing.getUpdatedTime() : listing.getCreatedDate()), listing.getCropName(), listing.getQuantity(),
             listing.getLocation(), listing.getPrice(), listing.getId(),
             listing.getFarmerId(), listing.getFarmerName());
     }

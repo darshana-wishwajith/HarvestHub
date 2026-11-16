@@ -57,7 +57,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="@string/order_id_waiting"
+                            android:id="@+id/tvOrderId"
+            android:text="@string/order_id_waiting"
                             android:textColor="@color/text_black_bold"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -103,7 +104,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="24dp"
                         android:lineSpacingExtra="4dp"
-                        android:text="@string/waiting_desc"
+                        android:id="@+id/tvWaitingDesc"
+            android:text="@string/waiting_desc"
                         android:textColor="@color/text_gray_medium"
                         android:textSize="14sp" />
 
@@ -126,7 +128,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/escrow_amount_label"
+                                android:id="@+id/tvEscrowLabel"
+            android:text="@string/escrow_amount_label"
                                 android:textColor="@color/text_gray_medium"
                                 android:textSize="11sp"
                                 android:textStyle="bold" />
@@ -135,7 +138,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="@string/escrow_amount_value"
+                                android:id="@+id/tvEscrowAmount"
+            android:text="@string/escrow_amount_value"
                                 android:textColor="@color/primary_dark_green"
                                 android:textSize="26sp"
                                 android:textStyle="bold" />
@@ -173,7 +177,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="@string/quantity_value_bold"
+                                android:id="@+id/tvQuantity"
+            android:text="@string/quantity_value_bold"
                                 android:textColor="@color/text_black_bold"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -197,7 +202,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="@string/unit_rate_value"
+                                android:id="@+id/tvUnitRate"
+            android:text="@string/unit_rate_value"
                                 android:textColor="@color/text_black_bold"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />

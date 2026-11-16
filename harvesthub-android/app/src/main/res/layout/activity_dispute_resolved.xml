@@ -63,6 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:id="@+id/tvDisputeStatus"
                 android:text="System Status: Return Journey / Disputed"
                 android:textColor="#B91C1C"
                 android:textSize="13sp"
@@ -109,6 +110,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/tvRefundTitle"
                         android:text="100% Escrow Refunded"
                         android:textColor="#16A34A"
                         android:textSize="16sp"
@@ -168,6 +170,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:lineSpacingExtra="3dp"
+                    android:id="@+id/tvRefundPolicy"
                     android:text="Zero–Fee Refund Policy: The platform has fully waived its fees to maintain perfect buyer trust."
                     android:textColor="#64748B"
                     android:textSize="13sp" />
@@ -209,6 +212,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/tvLiabilityTitle"
                         android:text="Transporter Liability Protocol"
                         android:textColor="#111827"
                         android:textSize="17sp"
@@ -221,6 +225,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="3dp"
+                    android:id="@+id/tvLiabilityBody"
                     android:text="The Transporter forfeits their Delivery Fee due to transit damage. They are now forced to return the ruined goods to the Farmer to claim a minimal Fuel Recovery Fee."
                     android:textColor="#64748B"
                     android:textSize="13sp" />
@@ -251,6 +256,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvReturnRoute"
                             android:text="Route: Colombo Depot ➔ Dambulla Farm"
                             android:textColor="#1E293B"
                             android:textSize="13sp"
@@ -260,6 +266,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:id="@+id/tvReturnState"
                             android:text="(Return In–Progress)"
                             android:textColor="#C2410C"
                             android:textSize="12sp"
@@ -288,6 +295,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:lineSpacingExtra="2dp"
+                        android:id="@+id/tvFarmerOutcome"
                         android:text="Farmer retains the original Advance Payment to cover their ruined crops."
                         android:textColor="#065F46"
                         android:textSize="12.5sp" />
