@@ -61,19 +61,17 @@ public class SettingsFragment extends Fragment {
         tvProfileNic = v.findViewById(R.id.tvProfileNic);
         tvCurrentLanguage = v.findViewById(R.id.tvCurrentLanguage);
 
-        v.findViewById(R.id.btnEditPhoto).setOnClickListener(view -> 
+        v.findViewById(R.id.btnEditPhoto).setOnClickListener(view ->
             startActivity(new Intent(requireContext(), EditProfileActivity.class)));
 
-        v.findViewById(R.id.rowChangePassword).setOnClickListener(view -> 
-            startActivity(new Intent(requireContext(), ResetPasswordActivity.class)));
+        v.findViewById(R.id.rowChangePassword).setOnClickListener(view -> AccountDialogs.changePassword(requireContext()));
 
-        v.findViewById(R.id.rowNotifications).setOnClickListener(view -> 
-            Toast.makeText(requireContext(), "Notification Preferences clicked", Toast.LENGTH_SHORT).show());
+        v.findViewById(R.id.rowNotifications).setOnClickListener(view -> AccountDialogs.notificationPreferences(requireContext()));
 
+        tvCurrentLanguage.setText("English");
         v.findViewById(R.id.rowLanguage).setOnClickListener(view -> showLanguageDialog());
 
-        v.findViewById(R.id.rowHelp).setOnClickListener(view -> 
-            Toast.makeText(requireContext(), "Help & Support clicked", Toast.LENGTH_SHORT).show());
+        v.findViewById(R.id.rowHelp).setOnClickListener(view -> AccountDialogs.help(requireContext()));
 
         v.findViewById(R.id.btnLogout).setOnClickListener(view -> showLogoutConfirmation());
     }
@@ -84,15 +82,18 @@ public class SettingsFragment extends Fragment {
             public void onResponse(@NonNull Call<FarmerProfileResponse> call, @NonNull Response<FarmerProfileResponse> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
                     updateUI(response.body());
-                } else if (isAdded()) {
-                    updateUI(new FarmerProfileResponse("Kamal Perera", "kamal@example.com", "077 123 4567", "852145659V", null, null));
+                } else if (isAdded() && sessionManager.getUser() != null) {
+                    // show what this device knows about the signed-in user, never a placeholder person
+                    updateUI(new FarmerProfileResponse(sessionManager.getUser().getFullName(), sessionManager.getUser().getEmail(),
+                            sessionManager.getUser().getMobileNumber(), "—", null, null));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<FarmerProfileResponse> call, @NonNull Throwable t) {
-                if (isAdded()) {
-                    updateUI(new FarmerProfileResponse("Kamal Perera", "kamal@example.com", "077 123 4567", "852145659V", null, null));
+                if (isAdded() && sessionManager.getUser() != null) {
+                    updateUI(new FarmerProfileResponse(sessionManager.getUser().getFullName(), sessionManager.getUser().getEmail(),
+                            sessionManager.getUser().getMobileNumber(), "—", null, null));
                 }
             }
         });
@@ -116,13 +117,11 @@ public class SettingsFragment extends Fragment {
     }
 
     private void showLanguageDialog() {
-        String[] languages = {"English", "Sinhala", "Tamil"};
+        // English only for now (user decision 14 Nov)
         new AlertDialog.Builder(requireContext())
-                .setTitle("Select App Language")
-                .setItems(languages, (dialog, which) -> {
-                    tvCurrentLanguage.setText(languages[which]);
-                    Toast.makeText(requireContext(), "Language set to " + languages[which], Toast.LENGTH_SHORT).show();
-                })
+                .setTitle("App Language")
+                .setMessage("HarvestHub is available in English. Sinhala and Tamil are planned.")
+                .setPositiveButton("OK", null)
                 .show();
     }
 
@@ -131,8 +130,6 @@ public class SettingsFragment extends Fragment {
                 .setTitle("Log Out")
                 .setMessage("Are you sure you want to log out?")
                 .setPositiveButton("Log Out", (dialog, which) -> {
-                    // TODO: Final logout logic in a later step
-                    android.util.Log.d("SettingsFragment", "Logout requested");
                     sessionManager.logoutUser();
                     Intent intent = new Intent(requireContext(), com.harvesthub.mobile.ui.common.RoleSelectionActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

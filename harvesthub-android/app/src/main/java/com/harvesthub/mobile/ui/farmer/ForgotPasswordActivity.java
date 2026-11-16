@@ -29,6 +29,13 @@ import retrofit2.Response;
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     public static final String EXTRA_IDENTIFIER = "identifier";
+    /** Sign-in screen to return to after the reset (buyer / transporter reuse this flow). Farmer by default. */
+    public static final String EXTRA_LOGIN_SCREEN = "login_screen";
+    static Class<?> loginScreen = FarmerLoginActivity.class;
+
+    static Class<?> loginScreen() {
+        return loginScreen == null ? FarmerLoginActivity.class : loginScreen;
+    }
 
     private EditText etIdentifier;
     private TextView tvIdentifierError;
@@ -38,6 +45,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
+        loginScreen = FarmerLoginActivity.class;
+        String target = getIntent().getStringExtra(EXTRA_LOGIN_SCREEN);
+        if (target != null) {
+            try {
+                loginScreen = Class.forName(target);
+            } catch (ClassNotFoundException ignored) { }
+        }
 
         etIdentifier = findViewById(R.id.etIdentifier);
         tvIdentifierError = findViewById(R.id.tvIdentifierError);

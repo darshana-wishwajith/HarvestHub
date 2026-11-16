@@ -2,15 +2,27 @@ package com.harvesthub.backend.service;
 
 import com.harvesthub.backend.model.NotificationItem;
 import com.harvesthub.backend.repository.NotificationRepository;
+import com.harvesthub.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
+/**
+ * In-app notifications. {@code farmerId} on a notification is the receiving user's id (any role).
+ * A user can switch a notification category off in Settings → Notification Preferences.
+ */
 @Service
 public class NotificationService {
+
+    /** Categories shown as toggles in Settings. */
+    public static final List<String> CATEGORIES = List.of("ORDERS", "PAYMENTS", "LISTINGS", "MARKET");
+
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<NotificationItem> getNotifications(String farmerId) {
         return notificationRepository.findByFarmerIdOrderByTimestampDesc(farmerId);
@@ -39,5 +51,15 @@ public class NotificationService {
         notification.setTimestamp(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         notification.setRead(false);
         return notificationRepository.save(notification);
+    }
+
+    /** Sends unless the user switched this category off. */
+    public void notify(String userId, String category, String type, String title, String body) {
+        if (userId == null) return;
+        boolean enabled = userRepository.findById(userId)
+                .map(u -> u.getNotificationPreferences())
+                .map((Map<String, Boolean> prefs) -> !Boolean.FALSE.equals(prefs.get(category)))
+                .orElse(true);
+        if (enabled) createNotification(userId, type, title, body);
     }
 }

@@ -18,5 +18,6 @@ public class NotificationItem {
     private String title;
     private String body;
     private String timestamp;
+    @com.fasterxml.jackson.annotation.JsonProperty("isRead")
     private boolean isRead;
 }

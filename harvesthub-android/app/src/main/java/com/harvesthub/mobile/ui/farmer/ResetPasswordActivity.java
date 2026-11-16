@@ -69,7 +69,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(ResetPasswordActivity.this, "Password reset successfully", Toast.LENGTH_LONG).show();
                     // Navigate back to Login
-                    Intent intent = new Intent(ResetPasswordActivity.this, FarmerLoginActivity.class);
+                    Intent intent = new Intent(ResetPasswordActivity.this, ForgotPasswordActivity.loginScreen());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();

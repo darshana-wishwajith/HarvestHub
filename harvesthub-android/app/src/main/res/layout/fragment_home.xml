@@ -34,10 +34,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="Welcome back, Kamal!"
+                    android:text=""
                     android:textColor="#111827"
                     android:textSize="24sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvGreetingSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="Here's what's happening at your farm today."
+                    android:textColor="#64748B"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvWeather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:drawablePadding="6dp"
+                    android:fontFamily="@font/plus_jakarta_sans_medium"
+                    android:textColor="#1B4332"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
                 <!-- Total Earnings Card -->
                 <com.google.android.material.card.MaterialCardView
@@ -74,7 +95,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:fontFamily="@font/plus_jakarta_sans"
-                                android:text="Total Earnings"
+                                android:text="TOTAL REVENUE (THIS MONTH)"
                                 android:textColor="#4A7C59"
                                 android:textSize="14sp" />
                         </LinearLayout>
@@ -85,10 +106,20 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:text="LKR 125,000"
+                            android:text="LKR 0"
                             android:textColor="#1E3F20"
                             android:textSize="26sp"
                             android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvRevenueChange"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textColor="#4A7C59"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -135,7 +166,7 @@
                                 android:layout_alignParentTop="true"
                                 android:layout_alignParentEnd="true"
                                 android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:text="2"
+                                android:text="00"
                                 android:textColor="#111827"
                                 android:textSize="24sp"
                                 android:textStyle="bold" />
@@ -188,7 +219,7 @@
                                 android:layout_alignParentTop="true"
                                 android:layout_alignParentEnd="true"
                                 android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:text="18"
+                                android:text="00"
                                 android:textColor="#111827"
                                 android:textSize="24sp"
                                 android:textStyle="bold" />
@@ -206,6 +237,78 @@
                         </RelativeLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
+
+                <!-- Trust Score Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTrust"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="TRUST SCORE"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvTrustPercent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="--"
+                                android:textColor="#1B4332"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="RATING"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="--"
+                                android:textColor="#1B4332"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Market Trends Card -->
                 <com.google.android.material.card.MaterialCardView
@@ -254,6 +357,23 @@
                                 app:tint="#6B7280" />
                         </RelativeLayout>
 
+                        <TextView
+                            android:id="@+id/tvMarketAvg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:textColor="#111827"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMarketChange"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textColor="#4CAF50"
+                            android:textSize="12sp" />
+
                         <!-- Chart -->
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/marketChart"
@@ -287,7 +407,7 @@
                                 android:layout_marginStart="10dp"
                                 android:layout_weight="1"
                                 android:fontFamily="@font/plus_jakarta_sans_medium"
-                                android:text="High demand for Big Onions in Dambulla"
+                                android:text=""
                                 android:textColor="#111827"
                                 android:textSize="13sp" />
                         </LinearLayout>

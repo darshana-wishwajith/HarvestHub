@@ -37,6 +37,13 @@ public class MarketInsightsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // The Market tab shows the same screen with live data; this older copy only redirects there.
+        android.content.Intent i = new android.content.Intent(this, com.harvesthub.mobile.MainActivity.class);
+        i.putExtra(com.harvesthub.mobile.MainActivity.EXTRA_INITIAL_TAB, com.harvesthub.mobile.MainActivity.Tab.MARKET.name());
+        i.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(i);
+        finish();
+        if (true) return;
         setContentView(R.layout.activity_market_insights);
 
         initViews();

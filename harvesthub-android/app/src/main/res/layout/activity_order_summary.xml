@@ -142,6 +142,7 @@
                             android:background="@drawable/bg_badge_verified_green"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
+                            android:id="@+id/tvVerifiedBadge"
                             android:text="✓ Verified"
                             android:textColor="#16A34A"
                             android:textSize="11sp"
@@ -450,7 +451,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Partial Crop Cost"
+                            android:id="@+id/tvPartialCropLabel"
+                            android:text="Crop Advance (20%)"
                             android:textColor="#6B7280"
                             android:textSize="14sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -597,6 +599,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
+                    android:id="@+id/tvEscrowNote"
                     android:text="Instant escrow locking upon confirmation"
                     android:textColor="#6B7280"
                     android:textSize="12sp" />

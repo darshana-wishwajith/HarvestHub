@@ -58,7 +58,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="Big Onions"
+                            android:id="@+id/tvCropName"
+                android:text="Big Onions"
                             android:textColor="@color/stat_text_value"
                             android:textSize="15sp" />
 
@@ -203,7 +204,8 @@
                             android:layout_below="@id/tvPriceLabel"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:text="LKR 185.00 /kg"
+                            android:id="@+id/tvAvgPrice"
+                android:text="LKR —"
                             android:textColor="@color/home_greeting_title"
                             android:textSize="18sp" />
 
@@ -231,7 +233,8 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="4dp"
                                     android:fontFamily="@font/plus_jakarta_sans_bold"
-                                    android:text="+12.5%"
+                                    android:id="@+id/tvChange"
+                android:text=""
                                     android:textColor="@color/accent_green"
                                     android:textSize="13sp" />
                             </LinearLayout>
@@ -240,7 +243,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/plus_jakarta_sans_bold"
-                                android:text="PAST 7 DAYS"
+                                android:id="@+id/tvPeriod"
+                android:text="PAST 7 DAYS"
                                 android:textColor="@color/market_chart_axis"
                                 android:textSize="10sp"
                                 android:letterSpacing="0.05" />
@@ -325,7 +329,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="Onion supply expected to rise by 15% next week in Dambulla. Consider locking in current market prices today."
+                            android:id="@+id/tvInsight"
+                android:text=""
                             android:textColor="@color/market_tip_text_secondary"
                             android:textSize="12.5sp"
                             android:lineSpacingExtra="3dp" />

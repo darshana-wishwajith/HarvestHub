@@ -17,7 +17,11 @@ public class BuyerListingController {
     @GetMapping({"/buyer/listings", "/api/buyer/listings"})
     public ResponseEntity<List<Listing>> getBuyerListings(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String grade) {
-        return ResponseEntity.ok(listingService.getMarketplaceListings(search, grade));
+            @RequestParam(required = false) String grade,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String district,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Double minQty) {
+        return ResponseEntity.ok(listingService.getMarketplaceListings(search, grade, category, district, maxPrice, minQty));
     }
 }

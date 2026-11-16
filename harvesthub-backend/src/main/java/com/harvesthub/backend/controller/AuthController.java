@@ -77,6 +77,11 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
         }
         User user = userOpt.get();
+        if (user.isAccountSuspended()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error",
+                    "Your account is suspended by an Agricultural Officer. Reason: "
+                            + (user.getSuspensionReason() == null ? "not given" : user.getSuspensionReason())));
+        }
         String jwt = jwtUtil.generateToken(user);
         OfficerDto officerDto = null;
         if (Roles.OFFICER.equals(user.getRole()) || Roles.ADMIN.equals(user.getRole())) {

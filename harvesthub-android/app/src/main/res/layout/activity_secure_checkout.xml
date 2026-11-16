@@ -191,6 +191,82 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Payment method (decision 15 Nov: buyer chooses simulated card or wallet balance) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPaymentMethod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pay with"
+                        android:textColor="#1B4332"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/rgPaymentMethod"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/rbMethodCard"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="#1B4332"
+                            android:checked="true"
+                            android:text="Credit / Debit Card (simulated)"
+                            android:textColor="#111827"
+                            android:textSize="14sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbMethodWallet"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="#1B4332"
+                            android:text="HarvestHub Wallet"
+                            android:textColor="#111827"
+                            android:textSize="14sp" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:id="@+id/tvWalletHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="#64748B"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/btnTopUpWallet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:paddingVertical="4dp"
+                        android:text="+ Top up wallet"
+                        android:textColor="#2E7D32"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Card 2: Credit / Debit Card Form -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPaymentForm"
@@ -281,7 +357,7 @@
                             android:layout_weight="1"
                             android:background="@null"
                             android:inputType="number"
-                            android:text="4532 8920 1142 8842"
+                            android:hint="1234 5678 9012 3456"
                             android:textColor="#111827"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -329,7 +405,7 @@
                                     android:layout_height="match_parent"
                                     android:background="@null"
                                     android:inputType="datetime"
-                                    android:text="08/27"
+                                    android:hint="MM/YY"
                                     android:textColor="#111827"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
@@ -368,7 +444,7 @@
                                     android:background="@null"
                                     android:inputType="numberPassword"
                                     android:maxLength="4"
-                                    android:text="724"
+                                    android:hint="123"
                                     android:textColor="#111827"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
@@ -407,7 +483,7 @@
                             android:layout_height="match_parent"
                             android:background="@null"
                             android:inputType="textCapCharacters"
-                            android:text="DEEPAK AGRO ENTERPRISES"
+                            android:hint="Name on card"
                             android:textColor="#111827"
                             android:textSize="14sp"
                             android:textStyle="bold" />

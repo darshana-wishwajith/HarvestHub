@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Loading evidence photos ("View Loading Evidence" on buyer 5.2 / baseline on 6.1). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAF9"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#1B4332" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Proof of Loading"
+                android:textColor="#1B4332"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEvidenceMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#475569"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layoutEvidencePhotos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="24dp" />
+    </ScrollView>
+</LinearLayout>

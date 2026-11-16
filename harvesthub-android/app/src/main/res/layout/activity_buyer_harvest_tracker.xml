@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma buyer "Harvesting & Pickup Tracker" (563:228). Steps are filled in by HarvestTrackerActivity. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAF9"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="#1B4332" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Order Prep Tracker"
+                android:textColor="#1B4332"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrackerLot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#475569"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvTrackerPaid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_badge_light_green"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="#1B4332"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutTrackerSteps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvTrackerEscrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_badge_light_green"
+                android:padding="14dp"
+                android:textColor="#1B4332"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTrackerChat"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Chat with Farmer"
+            android:textAllCaps="false"
+            android:textColor="#1B4332"
+            app:cornerRadius="14dp"
+            app:strokeColor="#1B4332" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTrackerCallDriver"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:backgroundTint="#1B4332"
+            android:text="Call Driver"
+            android:textAllCaps="false"
+            app:cornerRadius="14dp" />
+    </LinearLayout>
+</LinearLayout>

@@ -9,4 +9,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByMobileNumber(String mobileNumber);
     Optional<User> findByNic(String nic);
     Optional<User> findByResetPasswordToken(String token);
+    java.util.List<User> findByRole(String role);
 }

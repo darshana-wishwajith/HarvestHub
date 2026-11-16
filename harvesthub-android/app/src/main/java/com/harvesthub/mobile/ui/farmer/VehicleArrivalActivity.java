@@ -1,130 +1,59 @@
 package com.harvesthub.mobile.ui.farmer;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.BottomNavHelper;
-import com.harvesthub.mobile.utils.SessionManager;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.Locale;
 
-public class VehicleArrivalActivity extends AppCompatActivity {
+/**
+ * Figma 30: harvest is ready; the vehicle is coming / at the farm / loading checks (workflow 4.1–4.2).
+ * Moves on by itself to "In Transit" once the driver starts the journey.
+ */
+public class VehicleArrivalActivity extends BaseOrderActivity {
 
-    private GestureDetector gestureDetector;
-    private ApiService apiService;
-    private SessionManager sessionManager;
-    private String orderId;
-    private Handler statusHandler;
+    @Override
+    protected int layout() {
+        return R.layout.activity_vehicle_arrival;
+    }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vehicle_arrival);
-
-        orderId = getIntent().getStringExtra("ORDER_ID");
-        if (orderId == null) orderId = "demo-order";
-
-        sessionManager = new SessionManager(this);
-        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-
-        setupNavigation();
-        setupGestureDetector();
-        startPolling();
-
-        getWindow().getDecorView().setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });
-
-        Button btnCallDriver = findViewById(R.id.btnCallDriver);
-
-        btnCallDriver.setOnClickListener(v -> {
-            String phoneNumber = "0112345678";
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        });
-    }
-
-    private void startPolling() {
-        statusHandler = new Handler(Looper.getMainLooper());
-        Runnable pollRunnable = new Runnable() {
-            @Override
-            public void run() {
-                apiService.getOrder(orderId).enqueue(new Callback<Order>() {
-                    @Override
-                    public void onResponse(Call<Order> call, Response<Order> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            if ("IN_TRANSIT".equals(response.body().getStatus())) {
-                                navigateNext();
-                            }
-                        }
-                    }
-                    @Override
-                    public void onFailure(Call<Order> call, Throwable t) { }
-                });
-                statusHandler.postDelayed(this, 10000);
-            }
-        };
-        statusHandler.post(pollRunnable);
-    }
-
-    private void navigateNext() {
-        Intent intent = new Intent(VehicleArrivalActivity.this, OrderInTransitActivity.class);
-        intent.putExtra("ORDER_ID", orderId);
-        startActivity(intent);
-        finish();
+        if (orderId == null) return;
+        findViewById(R.id.btnCallDriver).setOnClickListener(v -> dial(order == null ? null : order.getTransporterPhone()));
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (statusHandler != null) statusHandler.removeCallbacksAndMessages(null);
-    }
-
-    private void setupNavigation() {
-        // Setup Top Navigation
-        View topNav = findViewById(R.id.included_top_nav);
-        View btnNotification = topNav.findViewById(R.id.btnNotification);
-        btnNotification.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-        });
-
-        // Setup Bottom Navigation
-        View navBar = findViewById(R.id.included_nav);
-        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
-    }
-
-    private void setupGestureDetector() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(@NonNull MotionEvent e) {
-                navigateNext();
-                return true;
-            }
-
-            @Override
-            public boolean onDown(@NonNull MotionEvent e) {
-                return true;
-            }
-        });
+    protected void bind(@NonNull Order o) {
+        String status;
+        String eta;
+        switch (o.getStatus()) {
+            case "ARRIVED_AT_PICKUP":
+                status = "Status: Vehicle at your farm";
+                eta = "Arrived";
+                break;
+            case "AWAITING_BUYER_LOADING_APPROVAL":
+                status = "Status: Buyer checking the crop photos";
+                eta = "Loading check";
+                break;
+            case "LOADING_APPROVED":
+                status = "Status: Approved – loading";
+                eta = "Loading";
+                break;
+            default:
+                status = "Status: Vehicle on the way";
+                eta = o.getDistanceKm() != null ? String.format(Locale.US, "%.0f km trip", o.getDistanceKm()) : "On the way";
+        }
+        setText(R.id.tvVehicleStatus, status);
+        setText(R.id.tvOrderNumber, orderLabel(o));
+        setText(R.id.tvEtaLabel, "CURRENT STEP");
+        setText(R.id.tvEta, eta);
+        setText(R.id.tvDriverName, o.getTransporterName() != null ? o.getTransporterName() : "—");
+        setText(R.id.tvVehicleValue, o.getVehiclePlate() != null ? o.getVehiclePlate() : "—");
+        setText(R.id.tvCapacity, o.getVehicleLabel() != null ? o.getVehicleLabel() : "—");
     }
 }

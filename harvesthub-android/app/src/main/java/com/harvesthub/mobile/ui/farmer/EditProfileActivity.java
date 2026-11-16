@@ -69,7 +69,7 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         binding.btnUpdatePassword.setOnClickListener(v -> 
-                startActivity(new Intent(this, ResetPasswordActivity.class)));
+                AccountDialogs.changePassword(this));
 
         binding.btnSaveChanges.setOnClickListener(v -> validateAndSave());
     }

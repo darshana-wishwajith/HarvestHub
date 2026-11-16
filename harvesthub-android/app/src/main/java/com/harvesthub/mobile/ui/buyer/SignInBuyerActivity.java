@@ -168,17 +168,10 @@ public class SignInBuyerActivity extends AppCompatActivity {
         return "BUYER";
     }
 
+    /** Real reset flow (6-digit code by email), shared with the farmer app; returns to this sign-in screen. */
     private void showForgotPasswordDialog() {
-        String identifier = etIdentifier.getText().toString().trim();
-        String message = TextUtils.isEmpty(identifier) 
-                ? "Enter your mobile number or email above, and a secure password recovery code will be dispatched."
-                : "A secure reset link has been dispatched to: " + identifier;
-
-        new AlertDialog.Builder(this)
-                .setTitle("Reset Password")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .show();
+        Intent forgot = new Intent(this, com.harvesthub.mobile.ui.farmer.ForgotPasswordActivity.class);
+        forgot.putExtra(com.harvesthub.mobile.ui.farmer.ForgotPasswordActivity.EXTRA_LOGIN_SCREEN, getClass().getName());
+        startActivity(forgot);
     }
 }
-

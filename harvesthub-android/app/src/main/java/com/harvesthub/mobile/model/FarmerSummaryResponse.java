@@ -16,4 +16,10 @@ public class FarmerSummaryResponse {
 
     public String getMonthlyRevenue() { return monthlyRevenue; }
     public String getTrustScore() { return trustScore; }
+
+    private int trustPercent;
+    private Double ratingAverage;
+
+    public int getTrustPercent() { return trustPercent; }
+    public Double getRatingAverage() { return ratingAverage; }
 }

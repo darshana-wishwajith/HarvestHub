@@ -192,6 +192,12 @@ public interface ApiService {
     @GET("buyer/listings")
     Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grade);
 
+    /** Buyer marketplace with the Figma 2.2 filters; null parameters are left out. */
+    @GET("buyer/listings")
+    Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grades,
+                                             @Query("category") String category, @Query("district") String district,
+                                             @Query("maxPrice") Double maxPrice, @Query("minQty") Double minQty);
+
     @GET("wanted-ads/buyer/{buyerId}")
     Call<List<WantedAd>> getBuyerWantedAds(@Path("buyerId") String buyerId);
 
@@ -203,4 +209,93 @@ public interface ApiService {
 
     @GET("offers")
     Call<List<com.harvesthub.mobile.model.SupplyOffer>> getAllOffers();
+
+    // ---- Farmer workflow (backend OrderService / ListingService, 14 Nov) ----
+
+    @GET("market/centers")
+    Call<List<com.harvesthub.mobile.model.MarketCenterInfo>> getMarketCenterInfo(@Query("crop") String crop);
+
+    @GET("api/crops")
+    Call<List<com.harvesthub.mobile.model.CropInfo>> getCrops();
+
+    @GET("listings/location-check")
+    Call<java.util.Map<String, Object>> checkFarmLocation(@Query("lat") double lat, @Query("lng") double lng);
+
+    @Multipart
+    @POST("media/upload")
+    Call<java.util.Map<String, String>> uploadMedia(@Part okhttp3.MultipartBody.Part file);
+
+    @PUT("listings/{id}/retake")
+    Call<Listing> retakeListing(@Path("id") String id, @Body Listing capture);
+
+    /** event: START_HARVESTING | HARVEST_READY (farmer) */
+    @POST("orders/{orderId}/events")
+    Call<Order> sendOrderEvent(@Path("orderId") String orderId, @Body Map<String, String> body);
+
+    @POST("orders/{orderId}/cancel")
+    Call<Order> cancelOrder(@Path("orderId") String orderId);
+
+    @POST("wallet/{userId}/withdraw")
+    Call<Transaction> withdraw(@Path("userId") String userId, @Body Map<String, Object> body);
+
+    @POST("api/me/change-password")
+    Call<GenericResponse> changePassword(@Body Map<String, String> body);
+
+    @GET("api/me/preferences")
+    Call<Map<String, Object>> getPreferences();
+
+    @PUT("api/me/preferences")
+    Call<Map<String, Object>> updatePreferences(@Body Map<String, Object> body);
+
+    // ---- Buyer workflow (backend, 15 Nov) ----
+
+    @GET("dashboard/buyer/{id}")
+    Call<com.harvesthub.mobile.model.BuyerDashboard> getBuyerDashboard(@Path("id") String buyerId);
+
+    @PUT("api/me/delivery-location")
+    Call<Map<String, Object>> setDeliveryLocation(@Body Map<String, Object> body);
+
+    @POST("wallet/{userId}/deposit")
+    Call<Transaction> deposit(@Path("userId") String userId, @Body Map<String, Object> body);
+
+    @POST("offers/{offerId}/accept")
+    Call<Order> acceptSupplyOffer(@Path("offerId") String offerId);
+
+    @GET("offers/request/{requestId}")
+    Call<List<com.harvesthub.mobile.model.SupplyOffer>> getOffersForRequest(@Path("requestId") String requestId);
+
+    @PUT("wanted-ads/{id}")
+    Call<WantedAd> updateWantedAd(@Path("id") String id, @Body WantedAd ad);
+
+    @POST("wanted-ads/{id}/close")
+    Call<WantedAd> closeWantedAd(@Path("id") String id);
+
+    @POST("wanted-ads/{id}/republish")
+    Call<WantedAd> republishWantedAd(@Path("id") String id, @Body Map<String, String> body);
+
+    @GET("orders/{orderId}/tracking")
+    Call<com.harvesthub.mobile.model.Tracking> getTracking(@Path("orderId") String orderId);
+
+    @POST("orders/{orderId}/disputes")
+    Call<Map<String, Object>> openDispute(@Path("orderId") String orderId, @Body Map<String, String> body);
+
+    // ---- transporter view (15 Nov) ----
+    @GET("api/vehicle-types")
+    Call<List<Map<String, Object>>> getVehicleTypes();
+
+    @GET("dashboard/transporter/{id}")
+    Call<com.harvesthub.mobile.model.TransporterDashboard> getTransporterDashboard(@Path("id") String transporterId);
+
+    @PUT("api/me/availability")
+    Call<com.harvesthub.mobile.model.TransporterDashboard> setAvailability(@Body Map<String, Object> body);
+
+    @PUT("api/me/vehicle")
+    Call<User> updateVehicle(@Body Map<String, Object> body);
+
+    /** Appeal / issue with photos: {"reason", "details", "photoUrls": [...]} */
+    @POST("orders/{orderId}/disputes")
+    Call<Map<String, Object>> openDisputeWithPhotos(@Path("orderId") String orderId, @Body Map<String, Object> body);
+
+    @GET("orders/{orderId}/disputes")
+    Call<List<Map<String, Object>>> getDisputes(@Path("orderId") String orderId);
 }

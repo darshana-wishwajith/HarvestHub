@@ -20,26 +20,28 @@ public class ListingController {
     @Autowired
     private ListingService listingService;
 
+    /**
+     * Workflow 1.2–1.4: location-locked, geotagged submission. Body must carry gpsLatitude/gpsLongitude
+     * (device position at capture) and mediaUrls [wide photo, close-up photo, 10 s video] from /media/upload.
+     */
     @PostMapping("/create")
     public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
         currentUser.requireRole("FARMER");
-        // Server-owned fields: owner, verification state and timestamps never come from the client.
-        var me = currentUser.get();
-        listing.setId(null);
-        listing.setFarmerId(me.id());
-        listing.setFarmerName(me.fullName());
-        listing.setStatus("PENDING");
-        listing.setGrade(null);
-        listing.setReviewNotes(null);
-        listing.setClaimedByOfficerId(null);
-        listing.setClaimedByOfficerName(null);
-        listing.setReviewedByOfficerId(null);
-        listing.setReviewedByOfficerName(null);
-        listing.setReviewedAt(null);
-        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        listing.setCreatedDate(now);
-        listing.setUpdatedTime(now);
-        return ResponseEntity.ok(listingService.createListing(listing));
+        return ResponseEntity.ok(listingService.submitListing(listing, currentUser.id(), null));
+    }
+
+    /** Officer asked for a retake (RETAKE_REQUESTED): farmer re-captures media at the farm → PENDING again. */
+    @PutMapping("/{id}/retake")
+    public ResponseEntity<Listing> retake(@PathVariable String id, @RequestBody Listing capture) {
+        currentUser.requireRole("FARMER");
+        return ResponseEntity.ok(listingService.submitListing(capture, currentUser.id(), id));
+    }
+
+    /** Location-Lock screen (Figma 12): is the device at the registered farm? */
+    @GetMapping("/location-check")
+    public ResponseEntity<Map<String, Object>> locationCheck(@RequestParam double lat, @RequestParam double lng) {
+        currentUser.requireRole("FARMER");
+        return ResponseEntity.ok(listingService.locationCheck(currentUser.id(), lat, lng));
     }
 
     @PutMapping("/{id}")
@@ -67,8 +69,6 @@ public class ListingController {
         boolean validTransition = false;
         
         if ("DRAFT".equals(currentStatus) && "PENDING".equals(newStatus)) validTransition = true; // submit for verification
-        else if ("ACTIVE".equals(currentStatus) && "DEACTIVATED".equals(newStatus)) validTransition = true;
-        else if ("DEACTIVATED".equals(currentStatus) && "ACTIVE".equals(newStatus)) validTransition = true;
 
         if (!validTransition) {
             return ResponseEntity.badRequest().body("Invalid status transition from " + currentStatus + " to " + newStatus);

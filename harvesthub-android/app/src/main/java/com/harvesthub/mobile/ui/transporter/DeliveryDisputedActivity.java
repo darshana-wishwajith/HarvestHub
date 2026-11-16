@@ -1,140 +1,89 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import com.harvesthub.mobile.R;
-
-import android.app.AlertDialog;
-import android.graphics.Color;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
+import android.content.Intent;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.model.Tracking;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
- * Delivery Disputed Activity - Transporter Transit Incident Screen
+ * Figma "Transit Damage Dispute" – post-delivery rejection (workflow 5.3, transporter at fault). Decisions 15 Nov:
+ * the crop-advance charge applies at once; the driver drives the goods back to the farm and taps Goods Returned;
+ * an appeal opens a ticket for the officers but does not change the money.
  */
-public class DeliveryDisputedActivity extends AppCompatActivity {
+public class DeliveryDisputedActivity extends BaseTransporterOrderActivity {
 
-    private LinearLayout btnReverseLogistics;
-    private LinearLayout btnFileAppeal;
-    private TextView btnTapToEnlarge;
-    private CardView cardPhoto1;
-    private CardView cardPhoto2;
-    private CardView cardPhoto3;
+    private Tracking tracking;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.transporter_activity_delivery_disputed);
-
-        // Turn screen on and keep awake for testing on phone
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(true);
-            setTurnScreenOn(true);
-        }
-        getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // Light status bar with slate background
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            getWindow().setStatusBarColor(Color.parseColor("#F8FAFC"));
-        }
-
-        initViews();
-        setupListeners();
-
-        final ScrollView scrollView = findViewById(R.id.scrollView);
-        if (scrollView != null) {
-            scrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (getIntent().getBooleanExtra("scroll_to_bottom", false)) {
-                        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                    } else {
-                        scrollView.scrollTo(0, 0);
-                    }
-                }
-            });
-        }
+    protected String title() {
+        return "Delivery Rejected";
     }
 
-    private void initViews() {
-        btnReverseLogistics = findViewById(R.id.btnReverseLogistics);
-        btnFileAppeal = findViewById(R.id.btnFileAppeal);
-        btnTapToEnlarge = findViewById(R.id.btnTapToEnlarge);
-        cardPhoto1 = findViewById(R.id.cardPhoto1);
-        cardPhoto2 = findViewById(R.id.cardPhoto2);
-        cardPhoto3 = findViewById(R.id.cardPhoto3);
-    }
-
-    private void setupListeners() {
-        // Reverse Logistics Routing Button
-        if (btnReverseLogistics != null) {
-            btnReverseLogistics.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new AlertDialog.Builder(DeliveryDisputedActivity.this)
-                            .setTitle("Initiate Reverse Logistics")
-                            .setMessage("Assigning transit routing to nearest salvage liquidation center:\n\nâ€¢ Destination: Bio-Compost Hub, Peliyagoda\nâ€¢ Rejected Load: 12 Crates (600 kg)\n\nProceed with dispatch navigation?")
-                            .setPositiveButton("Accept Route", (dialog, which) -> {
-                                Toast.makeText(DeliveryDisputedActivity.this, "Reverse Logistics Route Assigned", Toast.LENGTH_LONG).show();
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show();
-                }
-            });
-        }
-
-        // File Appeal Button
-        if (btnFileAppeal != null) {
-            btnFileAppeal.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new AlertDialog.Builder(DeliveryDisputedActivity.this)
-                            .setTitle("File Dispute Appeal")
-                            .setMessage("You have 23h 48m remaining to submit evidence against Cargo Damage Claim #842.\n\nRequired:\n1. Pre-transit inspection signoff\n2. Reefer temperature logs\n3. Counter-photos")
-                            .setPositiveButton("Open Appeal Form", (dialog, which) -> {
-                                Toast.makeText(DeliveryDisputedActivity.this, "Opening Dispute Appeal Portal...", Toast.LENGTH_SHORT).show();
-                            })
-                            .setNegativeButton("Later", null)
-                            .show();
-                }
-            });
-        }
-
-        // Photo Clicks & Enlarge
-        View.OnClickListener photoClickListener = new View.OnClickListener() {
+    @Override
+    protected void load() {
+        super.load();
+        api.getTracking(orderId).enqueue(new Callback<Tracking>() {
             @Override
-            public void onClick(View v) {
-                String photoLabel = "Terminal Evidence Photo";
-                if (v.getId() == R.id.cardPhoto1) {
-                    photoLabel = "Evidence Crate #04: Lower tier crush damage";
-                } else if (v.getId() == R.id.cardPhoto2) {
-                    photoLabel = "Evidence Crate #09: Side impact collapse";
-                } else if (v.getId() == R.id.cardPhoto3) {
-                    photoLabel = "Evidence Barcode QA: Rejected consignment sheet";
-                }
-                Toast.makeText(DeliveryDisputedActivity.this, photoLabel, Toast.LENGTH_SHORT).show();
+            public void onResponse(@NonNull Call<Tracking> call, @NonNull Response<Tracking> r) {
+                if (r.isSuccessful()) tracking = r.body();
             }
-        };
 
-        if (cardPhoto1 != null) cardPhoto1.setOnClickListener(photoClickListener);
-        if (cardPhoto2 != null) cardPhoto2.setOnClickListener(photoClickListener);
-        if (cardPhoto3 != null) cardPhoto3.setOnClickListener(photoClickListener);
+            @Override
+            public void onFailure(@NonNull Call<Tracking> call, @NonNull Throwable t) { }
+        });
+    }
 
-        if (btnTapToEnlarge != null) {
-            btnTapToEnlarge.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(DeliveryDisputedActivity.this, "Opening full-resolution damage gallery (3 photos)", Toast.LENGTH_SHORT).show();
-                }
-            });
+    @Override
+    protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
+        boolean returned = "RETURNED".equals(o.getStatus());
+        TUi.banner(c, TUi.RED_BG, TUi.RED, "Transit damage – delivery rejected by the buyer",
+                CargoRejectedActivity.reason(o) + "\nOrder " + ref() + " • " + cargo(o));
+
+        double fee = o.getPayment() == null ? 0 : o.getPayment().transportFee;
+        double charge = o.getPayment() == null ? 0 : o.getPayment().advanceCropPortion;
+        LinearLayout m = TUi.card(c);
+        TUi.title(m, "Financial impact");
+        TUi.row(m, "Trip agreed fee", rs(fee));
+        TUi.row(m, "Trip payout", rs(0) + " (forfeited)", TUi.RED, false);
+        TUi.row(m, "Ruined cargo charge (crop advance)", "-" + rs(charge), TUi.RED, false);
+        TUi.row(m, "Total wallet adjustment", "-" + rs(charge), TUi.RED, true);
+        TUi.body(m, "The buyer got a full refund; the farmer keeps the advance (workflow 5.3). If your balance is below zero you get no new jobs until it is paid back.");
+
+        LinearLayout ev = TUi.card(c);
+        TUi.title(ev, "Evidence");
+        TUi.caption(ev, "Your pre-loading photos (approved by the buyer)");
+        TUi.photos(ev, o.getLoadingEvidenceUrls());
+
+        LinearLayout r = TUi.card(c);
+        TUi.title(r, "Return route");
+        if (returned) {
+            TUi.step(r, "Goods returned to the farm " + time(o.getGoodsReturnedAt()), 2, "Done");
+        } else {
+            TUi.pill(r, "Mandatory", TUi.RED_BG, TUi.RED);
+            TUi.body(r, "Take the rejected goods back to " + (o.getFarmerName() == null ? "the farm" : o.getFarmerName())
+                    + (o.getPickupAddress() == null ? "" : " – " + o.getPickupAddress()) + ", then tap Goods Returned.");
+            TUi.secondary(r, "Navigate to the farm", v -> RouteMap.navigate(this,
+                    tracking == null ? null : tracking.pickupLatitude, tracking == null ? null : tracking.pickupLongitude));
         }
+
+        if (!returned) {
+            TUi.primary(actions, "Goods Returned to Farm", v -> new AlertDialog.Builder(this)
+                    .setTitle("Goods returned?")
+                    .setMessage("Confirm that the rejected goods are back at the farm.")
+                    .setPositiveButton("Confirm", (d, w) -> sendEvent("GOODS_RETURNED", "Returned to the farm", null, null))
+                    .setNegativeButton("Cancel", null).show());
+        }
+        TUi.secondary(actions, "Appeal with transporter log", v -> startActivity(
+                new Intent(this, AppealDisputeActivity.class).putExtra(TransporterOrderRouter.EXTRA_ORDER_ID, orderId)));
+        TUi.secondary(actions, "View dispute case", v -> startActivity(
+                new Intent(this, DisputeCaseActivity.class).putExtra(TransporterOrderRouter.EXTRA_ORDER_ID, orderId)));
     }
 }
-

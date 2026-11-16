@@ -154,7 +154,7 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
 
         BatchBottomSheetFragment bottomSheet = new BatchBottomSheetFragment(verifiedBatches, batch -> {
             selectedBatch = batch;
-            tvSelectedBatch.setText(String.format("Attach Batch: #%s (Verified - %s KG available)",
+            tvSelectedBatch.setText(String.format("Attach Batch: %s (Verified - %s KG available)",
                     batch.getBatchNumber(), (int)batch.getAvailableQuantity()));
             ivSelectedBatchVerified.setVisibility(View.VISIBLE);
         });

@@ -1,127 +1,178 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import com.harvesthub.mobile.R;
 import android.content.Intent;
-import com.harvesthub.mobile.model.Order;
-import com.harvesthub.mobile.model.TransporterEventRequest;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.SessionManager;
-
-import android.os.Build;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+
+import com.google.android.material.button.MaterialButton;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.utils.AuthInputUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LiabilityCheckpointActivity extends AppCompatActivity {
+/**
+ * Figma "Arrived at Farm" – pre-loading sequence (workflow 4.2, decision 15 Nov: 2–4 photos). Photos are taken
+ * with the in-app evidence camera (GPS + time stamped), uploaded, and submitted for the buyer's approval.
+ */
+public class LiabilityCheckpointActivity extends BaseTransporterOrderActivity {
 
-    private FrameLayout btnBack;
-    private ImageView ivBuyerSpinner;
-    private TextView btnAddSecondary;
-    private LinearLayout btnStartJourney;
+    static final int MIN_PHOTOS = 2;
+    static final int MAX_PHOTOS = 4;
+
+    private final ArrayList<String> photoFiles = new ArrayList<>();
+    private ActivityResultLauncher<Intent> camera;
+    private boolean uploading;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected String title() {
+        return "Arrived at Farm";
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        camera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {
+            if (r.getResultCode() == RESULT_OK && r.getData() != null) {
+                String path = r.getData().getStringExtra(EvidenceCameraActivity.EXTRA_PHOTO_PATH);
+                if (path != null && photoFiles.size() < MAX_PHOTOS) photoFiles.add(path);
+                if (order != null) render();
+            }
+        });
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.transporter_activity_liability_checkpoint);
-
-        // Dark status bar icons on white background
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            getWindow().setStatusBarColor(0xFFFFFFFF);
-        }
-
-        initViews();
-        setupSpinnerAnimation();
-        setupListeners();
-    }
-
-    private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
-        ivBuyerSpinner = findViewById(R.id.ivBuyerSpinner);
-        btnAddSecondary = findViewById(R.id.btnAddSecondary);
-        btnStartJourney = findViewById(R.id.btnStartJourney);
-    }
-
-    private void setupSpinnerAnimation() {
-        if (ivBuyerSpinner != null) {
-            RotateAnimation rotate = new RotateAnimation(
-                    0f, 360f,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF, 0.5f
-            );
-            rotate.setDuration(1200);
-            rotate.setRepeatCount(Animation.INFINITE);
-            rotate.setInterpolator(new LinearInterpolator());
-            ivBuyerSpinner.startAnimation(rotate);
+        if (savedInstanceState != null) {
+            ArrayList<String> saved = savedInstanceState.getStringArrayList("photos");
+            if (saved != null) photoFiles.addAll(saved);
         }
     }
 
-    private void setupListeners() {
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
-
-        if (btnAddSecondary != null) {
-            btnAddSecondary.setOnClickListener(v -> submitEvidence());
-        }
-
-        if (btnStartJourney != null) {
-            btnStartJourney.setOnClickListener(v -> startJourney());
-        }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle out) {
+        super.onSaveInstanceState(out);
+        out.putStringArrayList("photos", photoFiles);
     }
 
-    private void submitEvidence() {
-        SessionManager session = new SessionManager(this);
-        TransporterEventRequest event = new TransporterEventRequest(session.getUser().getId(),
-                "LOADING_EVIDENCE_SUBMITTED", "Pre-loading cargo evidence submitted");
-        event.setPhotoCount(1);
-        event.setBuyerVerified(true);
-        applyEvent(event, false);
+    @Override
+    protected boolean pollWhileOpen() {
+        return false; // nothing changes on the server until the driver submits
     }
 
-    private void startJourney() {
-        SessionManager session = new SessionManager(this);
-        TransporterEventRequest event = new TransporterEventRequest(session.getUser().getId(),
-                "START_JOURNEY", "Buyer loading clearance received; journey started");
-        applyEvent(event, true);
-    }
+    @Override
+    protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
+        LinearLayout at = TUi.card(c);
+        TUi.pill(at, "✓ Arrival recorded • At farm", TUi.SURFACE, TUi.DARK);
+        TUi.text(at, o.getFarmerName() == null ? "Farm" : o.getFarmerName(), 20, TUi.INK, true);
+        TUi.body(at, o.getPickupAddress() == null ? "" : o.getPickupAddress());
 
-    private void applyEvent(TransporterEventRequest event, boolean navigate) {
-        String orderId = getIntent().getStringExtra("ORDER_ID");
-        SessionManager session = new SessionManager(this);
-        ApiClient.getClient(session).create(ApiService.class).applyTransporterEvent(orderId, event)
-                .enqueue(new Callback<Order>() {
-                    @Override public void onResponse(Call<Order> call, Response<Order> response) {
-                        if (!response.isSuccessful()) {
-                            Toast.makeText(LiabilityCheckpointActivity.this, "Transport event was rejected.", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        if (navigate) {
-                            Intent intent = new Intent(LiabilityCheckpointActivity.this, NavigationTrackingActivity.class);
-                            intent.putExtra("ORDER_ID", orderId);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(LiabilityCheckpointActivity.this, "Loading evidence recorded.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    @Override public void onFailure(Call<Order> call, Throwable throwable) {
-                        Toast.makeText(LiabilityCheckpointActivity.this, "Network error recording evidence.", Toast.LENGTH_LONG).show();
-                    }
+        LinearLayout man = TUi.card(c);
+        TUi.title(man, "Manifest " + ref());
+        TUi.text(man, o.getCropName() == null ? "Produce" : o.getCropName(), 16, TUi.INK, true);
+        TUi.row(man, "Net weight", String.format(java.util.Locale.US, "%,.0f kg", o.getQuantity()));
+        if (o.getVehicleLabel() != null) TUi.row(man, "Vehicle class", o.getVehicleLabel());
+        TUi.row(man, "Buyer", o.getBuyerName() == null ? "—" : o.getBuyerName());
+
+        LinearLayout seq = TUi.card(c);
+        TUi.title(seq, "Pre-Loading Sequence");
+        TUi.step(seq, "1. Farm arrival recorded", 2, "Done");
+        TUi.step(seq, "2. Harvest marked ready by the farmer", 2, "Done");
+        int n = photoFiles.size();
+        TUi.step(seq, "3. Pre-loading photos (" + n + " / min " + MIN_PHOTOS + ")", n >= MIN_PHOTOS ? 2 : 1, n >= MIN_PHOTOS ? "Ready" : "Required");
+        TUi.step(seq, "4. Buyer approval", 0, null);
+        TUi.body(seq, "Photograph the crates and the produce up close before loading. Each photo is stamped with time and GPS.");
+        if (n > 0) {
+            HorizontalScrollView hs = new HorizontalScrollView(this);
+            LinearLayout strip = new LinearLayout(this);
+            hs.addView(strip);
+            for (String p : photoFiles) {
+                ImageView iv = new ImageView(this);
+                iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                BitmapFactory.Options opt = new BitmapFactory.Options();
+                opt.inSampleSize = 8;
+                iv.setImageBitmap(BitmapFactory.decodeFile(p, opt));
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(TUi.dp(this, 110), TUi.dp(this, 90));
+                lp.rightMargin = TUi.dp(this, 8);
+                iv.setOnLongClickListener(v -> {
+                    photoFiles.remove(p);
+                    render();
+                    return true;
                 });
+                strip.addView(iv, lp);
+            }
+            seq.addView(hs);
+            TUi.body(seq, "Long-press a photo to remove it.");
+        }
+
+        if (n < MAX_PHOTOS) {
+            TUi.secondary(actions, "📷  Launch Evidence Camera", v -> camera.launch(new Intent(this, EvidenceCameraActivity.class)
+                    .putExtra(EvidenceCameraActivity.EXTRA_LABEL, "Order " + ref() + " • photo " + (n + 1))));
+        }
+        MaterialButton submit = TUi.primary(actions, uploading ? "Uploading…" : "Submit for Buyer Approval", v -> submit((MaterialButton) v));
+        submit.setEnabled(n >= MIN_PHOTOS && !uploading);
+    }
+
+    private void submit(MaterialButton button) {
+        uploading = true;
+        button.setEnabled(false);
+        button.setText("Uploading 1 / " + photoFiles.size() + "…");
+        uploadNext(0, new ArrayList<>(), button);
+    }
+
+    private void uploadNext(int i, List<String> urls, MaterialButton button) {
+        if (i >= photoFiles.size()) {
+            uploading = false;
+            sendEvent("LOADING_EVIDENCE_SUBMITTED", "Pre-loading photos", urls, button);
+            return;
+        }
+        File f = new File(photoFiles.get(i));
+        MultipartBody.Part part = MultipartBody.Part.createFormData("file", f.getName(),
+                RequestBody.create(MediaType.parse("image/jpeg"), f));
+        ApiClient.getApiService().uploadMedia(part).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> r) {
+                if (!r.isSuccessful() || r.body() == null || r.body().get("url") == null) {
+                    fail(AuthInputUtils.errorMessage(r, "Photo upload failed."));
+                    return;
+                }
+                urls.add(r.body().get("url"));
+                button.setText("Uploading " + Math.min(i + 2, photoFiles.size()) + " / " + photoFiles.size() + "…");
+                uploadNext(i + 1, urls, button);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, String>> call, @NonNull Throwable t) {
+                fail("Upload failed – check your connection and try again.");
+            }
+        });
+    }
+
+    private void fail(String msg) {
+        uploading = false;
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        render();
+    }
+
+    @Override
+    protected void onEventDone(String event, Order updated) {
+        for (String p : photoFiles) //noinspection ResultOfMethodCallIgnored
+            new File(p).delete();
+        photoFiles.clear();
+        super.onEventDone(event, updated);
     }
 }
-
