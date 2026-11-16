@@ -37,4 +37,12 @@ public class RegisterRequest {
     /** Required for farmers (registered farm GPS location). */
     @Valid
     private FarmLocation farmLocation;
+
+    /** Transporters (Figma "Vehicle Profile"): THREE_WHEELER | MINI_LORRY | LORRY | TRUCK. farmLocation = vehicle base. */
+    private String vehicleType;
+    @Size(max = 20)
+    private String vehiclePlate;
+    private Double vehicleCapacityKg;
+    /** REEFER | FLATBED | BOX */
+    private String vehicleBodyType;
 }

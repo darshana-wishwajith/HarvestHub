@@ -80,4 +80,24 @@ public class WantedAd {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    // buyer view (15 Nov)
+    private String buyerName;
+    private String notes;
+    private String closedDate;
+    private String closedReason;
+    private int offerCount;
+    private int pendingOfferCount;
+
+    public String getBuyerName() { return buyerName; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public String getClosedDate() { return closedDate; }
+    public String getClosedReason() { return closedReason; }
+    public int getOfferCount() { return offerCount; }
+    public int getPendingOfferCount() { return pendingOfferCount; }
+
+    public boolean isOpen() {
+        return status == null || "OPEN".equals(status) || "ACTIVE".equals(status);
+    }
 }

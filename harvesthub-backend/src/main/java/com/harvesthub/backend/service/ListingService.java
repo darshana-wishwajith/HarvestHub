@@ -15,10 +15,136 @@ import java.util.stream.Collectors;
 public class ListingService {
     @Autowired
     private ListingRepository listingRepository;
+    @Autowired
+    private com.harvesthub.backend.repository.UserRepository userRepository;
+    @Autowired
+    private com.harvesthub.backend.repository.CropRepository cropRepository;
+    @Autowired
+    private LedgerService ledger;
+    @Autowired
+    private MediaStorageService mediaStorage;
+    @Autowired
+    private com.harvesthub.backend.config.MarketplaceRules rules;
+
+    /** Listing statuses shown on My Listings (everything except history). */
+    public static final List<String> MY_LISTING_STATUSES = Arrays.asList(
+            "DRAFT", "PENDING", "UNDER_REVIEW", "ACTIVE", "RETAKE_REQUESTED", "REJECTED", "ONGOING");
+
+    public java.util.Map<String, Object> locationCheck(String farmerId, double lat, double lng) {
+        var farmer = userRepository.findById(farmerId).orElseThrow(() -> new IllegalStateException("User not found"));
+        var farm = farmer.getFarmLocation();
+        if (farm == null || farm.getLatitude() == null || farm.getLongitude() == null) {
+            throw new IllegalStateException("Register your farm location first");
+        }
+        double meters = FeeCalculator.haversineKm(lat, lng, farm.getLatitude(), farm.getLongitude()) * 1000;
+        java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+        out.put("withinFarm", meters <= rules.getFarmRadiusMeters());
+        out.put("distanceMeters", Math.round(meters));
+        out.put("radiusMeters", rules.getFarmRadiusMeters());
+        out.put("farmAddress", farm.getAddress());
+        return out;
+    }
+
+    /**
+     * Creates (existingId == null) or re-submits after a retake request. Enforces workflow 1.2-1.4 and 5.3:
+     * not suspended, physically at the registered farm, 2 photos + 1 video captured in the app.
+     */
+    public Listing submitListing(Listing in, String farmerId, String existingId) {
+        var farmer = userRepository.findById(farmerId).orElseThrow(() -> new IllegalStateException("User not found"));
+        if (ledger.wallet(farmerId).isSuspended()) {
+            throw new IllegalStateException("Your wallet balance is negative. Pay back the Empty Trip Fee before listing new crops.");
+        }
+        if (in.getGpsLatitude() == null || in.getGpsLongitude() == null) {
+            throw new IllegalStateException("Location is required. Turn on GPS and try again.");
+        }
+        var check = locationCheck(farmerId, in.getGpsLatitude(), in.getGpsLongitude());
+        if (!Boolean.TRUE.equals(check.get("withinFarm"))) {
+            throw new IllegalStateException("You must be at your registered farm to submit a listing (you are "
+                    + check.get("distanceMeters") + " m away).");
+        }
+        List<String> media = in.getMediaUrls();
+        if (media == null || media.size() < 3) {
+            throw new IllegalStateException("Capture the wide-angle photo, the close-up photo and the 10-second video.");
+        }
+        for (String url : media) {
+            String name = url == null ? "" : url.substring(url.lastIndexOf('/') + 1);
+            if (url == null || !url.startsWith("/uploads/") || mediaStorage.resolve(name) == null) {
+                throw new IllegalStateException("A captured file was not uploaded. Please capture it again.");
+            }
+        }
+
+        Listing target;
+        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        if (existingId != null) {
+            target = listingRepository.findById(existingId).orElseThrow(() -> new IllegalStateException("Listing not found"));
+            if (!farmerId.equals(target.getFarmerId())) throw new IllegalStateException("Not your listing");
+            if (!Arrays.asList("RETAKE_REQUESTED", "DRAFT").contains(target.getStatus())) {
+                throw new IllegalStateException("This listing does not need new photos");
+            }
+        } else {
+            double qty = Listing.parseNumber(in.getQuantity());
+            double price = Listing.parseNumber(in.getPrice());
+            if (in.getCropName() == null || in.getCropName().isBlank()) throw new IllegalStateException("Choose a crop");
+            if (qty <= 0) throw new IllegalStateException("Enter the estimated total yield in kg");
+            if (price <= 0) throw new IllegalStateException("Enter the expected price per kg");
+            target = new Listing();
+            target.setFarmerId(farmerId);
+            target.setFarmerName(farmer.getFullName());
+            target.setCropName(in.getCropName().trim());
+            target.setVariety(in.getVariety());
+            target.setQuantity(stripZeros(qty));
+            target.setPrice(stripZeros(price));
+            target.setCreatedDate(now);
+            target.setReferenceCode(referenceCode(target.getCropName()));
+            target.setVariancePercent("5");
+            target.setCropPending(ensureCrop(target.getCropName(), farmerId, price));
+        }
+        target.setLocation(farmer.getFarmLocation() != null && farmer.getFarmLocation().getAddress() != null
+                ? farmer.getFarmLocation().getAddress() : target.getLocation());
+        target.setGpsLatitude(in.getGpsLatitude());
+        target.setGpsLongitude(in.getGpsLongitude());
+        target.setGpsCoordinates(String.format(java.util.Locale.US, "%.6f, %.6f", in.getGpsLatitude(), in.getGpsLongitude()));
+        target.setDistanceFromFarmMeters(((Number) check.get("distanceMeters")).doubleValue());
+        target.setMediaUrls(new java.util.ArrayList<>(media.subList(0, 3)));
+        target.setMediaFileCount(3);
+        target.setMediaCaption1("Wide angle - cultivated area");
+        target.setMediaCaption2("Close up - harvested sample");
+        target.setVideoLabel("10 s field + 360 degree sample video");
+        target.setDeviceModel(in.getDeviceModel());
+        target.setCapturedAt(in.getCapturedAt() != null ? in.getCapturedAt() : now);
+        target.setStatus("PENDING");
+        target.setGrade(null);
+        target.setClaimedByOfficerId(null);
+        target.setClaimedByOfficerName(null);
+        target.setUpdatedTime(now);
+        return listingRepository.save(target);
+    }
+
+    /** true = crop was added as pending (not in the verified catalogue). */
+    private boolean ensureCrop(String name, String farmerId, double price) {
+        var existing = cropRepository.findFirstByNameIgnoreCase(name);
+        if (existing.isPresent()) return existing.get().isPending();
+        var crop = new com.harvesthub.backend.model.Crop(null, name, "Added by farmer", "kg", price, false, farmerId,
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        cropRepository.save(crop);
+        return true;
+    }
+
+    static String referenceCode(String crop) {
+        String letters = crop.replaceAll("[^A-Za-z ]", "").trim();
+        if (letters.isEmpty()) letters = "CR";
+        String[] parts = letters.split("\\s+");
+        String code = parts.length > 1 ? ("" + parts[0].charAt(0) + parts[1].charAt(0))
+                : letters.substring(0, Math.min(2, letters.length()));
+        return code.toUpperCase() + "-" + (1000 + new java.security.SecureRandom().nextInt(9000));
+    }
+
+    private static String stripZeros(double v) {
+        return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v);
+    }
 
     public List<Listing> getActiveListings(String farmerId) {
-        List<Listing> list = new java.util.ArrayList<>(listingRepository.findByFarmerIdAndStatusIn(
-                farmerId, Arrays.asList("ACTIVE", "LISTED", "ONGOING", "PENDING", "DRAFT", "UNDER_REVIEW", "RETAKE_REQUESTED", "DEACTIVATED", "APPROVED")));
+        List<Listing> list = new java.util.ArrayList<>(listingRepository.findByFarmerIdAndStatusIn(farmerId, MY_LISTING_STATUSES));
         list.sort((a, b) -> {
             String dateA = a.getCreatedDate() != null ? a.getCreatedDate() : "";
             String dateB = b.getCreatedDate() != null ? b.getCreatedDate() : "";
@@ -28,12 +154,37 @@ public class ListingService {
     }
 
         public List<Listing> getMarketplaceListings(String searchQuery, String grade) {
+        return getMarketplaceListings(searchQuery, grade, null, null, null, null);
+        }
+
+    /**
+     * Buyer marketplace (Figma buyer 2.1/2.2). Only verified ACTIVE lots; optional filters: grade(s) "A,B",
+     * crop category (from the crop catalogue), district/location text, max price per kg, min quantity. Newest first.
+     */
+    public List<Listing> getMarketplaceListings(String searchQuery, String grade, String category, String district,
+                                                Double maxPrice, Double minQty) {
+        java.util.Set<String> grades = grade == null || grade.isBlank() || "All".equalsIgnoreCase(grade) ? java.util.Set.of()
+                : Arrays.stream(grade.split(",")).map(g -> g.trim().toUpperCase().replace("GRADE", "").trim())
+                .filter(g -> !g.isEmpty()).collect(Collectors.toSet());
+        java.util.Set<String> categoryCrops = category == null || category.isBlank() || "All".equalsIgnoreCase(category) ? null
+                : cropRepository.findAll().stream()
+                .filter(c -> c.getCategory() != null && Arrays.stream(category.split(","))
+                        .anyMatch(cat -> c.getCategory().equalsIgnoreCase(cat.trim())
+                                || c.getCategory().toLowerCase().startsWith(cat.trim().toLowerCase().replaceAll("s$", ""))))
+                .map(c -> c.getName().toLowerCase()).collect(Collectors.toSet());
         return listingRepository.findByStatusIn(Arrays.asList("ACTIVE", "LISTED", "APPROVED")).stream()
             .filter(listing -> searchQuery == null || searchQuery.isBlank()
                 || containsIgnoreCase(listing.getCropName(), searchQuery)
                 || containsIgnoreCase(listing.getLocation(), searchQuery))
-            .filter(listing -> grade == null || grade.isBlank()
-                || containsIgnoreCase(listing.getGrade(), grade))
+            .filter(listing -> grades.isEmpty() || (listing.getGrade() != null
+                && grades.contains(listing.getGrade().toUpperCase().replace("GRADE", "").trim())))
+            .filter(listing -> categoryCrops == null || (listing.getCropName() != null
+                && categoryCrops.contains(listing.getCropName().toLowerCase())))
+            .filter(listing -> district == null || district.isBlank() || containsIgnoreCase(listing.getLocation(), district))
+            .filter(listing -> maxPrice == null || maxPrice <= 0 || listing.pricePerKgValue() <= maxPrice)
+            .filter(listing -> minQty == null || minQty <= 0 || listing.quantityKgValue() >= minQty)
+            .sorted(java.util.Comparator.comparing((Listing l) -> String.valueOf(
+                    l.getUpdatedTime() != null ? l.getUpdatedTime() : l.getCreatedDate())).reversed())
             .toList();
         }
 

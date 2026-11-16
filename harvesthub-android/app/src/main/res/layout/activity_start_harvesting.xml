@@ -73,7 +73,8 @@
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/plus_jakarta_sans"
                         android:gravity="center"
-                        android:text="The transport vehicle is 45 minutes away from your farm."
+                        android:id="@+id/tvVehicleInfo"
+            android:text="The transport vehicle is 45 minutes away from your farm."
                         android:textColor="#4B5563"
                         android:textSize="14sp" />
 
@@ -231,7 +232,8 @@
                         android:layout_gravity="bottom|start"
                         android:layout_margin="14dp"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:text="Live Field Status: Zone A-12"
+                        android:id="@+id/tvFieldStatus"
+            android:text="Live Field Status: Zone A-12"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp" />
                 </FrameLayout>

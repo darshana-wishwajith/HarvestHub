@@ -107,17 +107,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             @Override
             public void onFailure(@NonNull Call<List<NotificationItem>> call, @NonNull Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                // Load dummy data for demonstration if API fails
-                loadDummyData();
+                android.widget.Toast.makeText(NotificationsActivity.this,
+                        "Can't reach the server. Check your internet connection.", android.widget.Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void loadDummyData() {
-        notificationList.add(new NotificationItem("1", "DELIVERY_SUCCESS", "Delivery Successful", "LKR 140,000 credited to your wallet.", "2 mins ago", false));
-        notificationList.add(new NotificationItem("2", "PENALTY", "Penalty Notice", "Small deduction due to moisture levels.", "1 hour ago", true));
-        notificationList.add(new NotificationItem("3", "LISTING_APPROVED", "Listing Approved", "Your Carrot listing is now live.", "3 hours ago", true));
-        adapter.notifyDataSetChanged();
     }
 
     private void markAllAsRead() {

@@ -1,80 +1,66 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import com.harvesthub.mobile.R;
-import android.content.Intent;
-import com.harvesthub.mobile.model.Order;
-import com.harvesthub.mobile.model.TransporterEventRequest;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.SessionManager;
-
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import androidx.annotation.NonNull;
 
-public class DestinationArrivedActivity extends AppCompatActivity {
+import com.harvesthub.mobile.model.Order;
 
-    private LinearLayout btnDeliveryCompleted;
+import java.util.Locale;
+
+/**
+ * Figma "Arrived at destination" (buyer inspecting) and "2-Way Verification Handshake" (workflow 5.1–5.2):
+ * ARRIVED_AT_DESTINATION → wait for the buyer to accept (pays 80%) or reject;
+ * BALANCE_PAID / DELIVERED → driver taps Delivery Completed; buyer taps Goods Received; both → COMPLETED.
+ */
+public class DestinationArrivedActivity extends BaseTransporterOrderActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.transporter_activity_destination_arrived);
-
-        setupStatusBar();
-        initViews();
-        setupListeners();
+    protected String title() {
+        return "Delivery";
     }
 
-    private void setupStatusBar() {
-        Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.white));
+    @Override
+    protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
+        String s = o.getStatus();
+        boolean inspecting = "ARRIVED_AT_DESTINATION".equals(s);
+        boolean driverDone = o.isTransporterConfirmedDelivery();
+        boolean buyerDone = o.isBuyerConfirmedReceipt();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decorView = window.getDecorView();
-            decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        if (inspecting) {
+            TUi.banner(c, TUi.DARK, android.graphics.Color.WHITE, "Arrived • Buyer inspecting the goods",
+                    "Arrival recorded " + time(o.getActualDeliveryDate()) + ". Wait while " + (o.getBuyerName() == null ? "the buyer" : o.getBuyerName())
+                            + " compares the goods with the pre-loading photos and accepts or rejects the delivery.");
+        } else {
+            TUi.pill(c, "● Physical handshake in progress", TUi.SURFACE, TUi.DARK);
+            LinearLayout h = TUi.card(c);
+            TUi.title(h, "2-Way Verification Handshake");
+            TUi.body(h, "Both parties confirm the handover. Settlement runs when both have confirmed.");
+            TUi.step(h, "Buyer accepted the goods and paid the 80% balance", 2, "Paid");
+            TUi.step(h, "Buyer action: Goods Received", buyerDone ? 2 : 0, buyerDone ? "Confirmed" : "Pending");
+            TUi.step(h, "Your action: Unloading complete", driverDone ? 2 : 1, driverDone ? "Confirmed" : "Your sign-off");
         }
-    }
 
-    private void initViews() {
-        btnDeliveryCompleted = findViewById(R.id.btnDeliveryCompleted);
-    }
+        LinearLayout m = TUi.card(c);
+        TUi.caption(m, "Shipment manifest " + ref());
+        TUi.text(m, cargo(o), 16, TUi.INK, true);
+        TUi.route(m, "Origin", o.getPickupAddress(), "Current destination", o.getDropAddress());
 
-    private void setupListeners() {
-        if (btnDeliveryCompleted != null) {
-            btnDeliveryCompleted.setOnClickListener(v -> {
-                SessionManager session = new SessionManager(this);
-                String orderId = getIntent().getStringExtra("ORDER_ID");
-                TransporterEventRequest event = new TransporterEventRequest(session.getUser().getId(),
-                        "DELIVERY_COMPLETED", "Transporter confirmed delivery completion");
-                ApiClient.getClient(session).create(ApiService.class).applyTransporterEvent(orderId, event)
-                        .enqueue(new Callback<Order>() {
-                            @Override public void onResponse(Call<Order> call, Response<Order> response) {
-                                if (!response.isSuccessful()) return;
-                                Toast.makeText(DestinationArrivedActivity.this,
-                                        "Delivery completed and recorded.", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(DestinationArrivedActivity.this, DeliveryDashboardActivity.class));
-                                finish();
-                            }
-                            @Override public void onFailure(Call<Order> call, Throwable throwable) {
-                                Toast.makeText(DestinationArrivedActivity.this,
-                                        "Unable to record delivery completion.", Toast.LENGTH_LONG).show();
-                            }
-                        });
-            });
+        LinearLayout pay = TUi.card(c, TUi.SURFACE, TUi.SURFACE);
+        double fee = o.getPayment() == null ? 0 : o.getPayment().transportFee;
+        TUi.text(pay, "🔒 Escrow final payout protected", 15, TUi.DARK, true);
+        TUi.row(pay, "Gross freight fee", rs(fee));
+        TUi.row(pay, "Platform commission (5%)", "-" + rs(fee - o.driverPayout()), TUi.RED, false);
+        TUi.row(pay, "Net transporter payout", rs(o.driverPayout()), TUi.DARK, true);
+        TUi.body(pay, "Credited to your HarvestHub wallet when both confirmations are in.");
+
+        if (inspecting) {
+            TUi.secondary(actions, "Waiting for the buyer's decision…", null).setEnabled(false);
+        } else if (!driverDone) {
+            TUi.primary(actions, "✓✓  Delivery Completed", v -> sendEvent("DELIVERY_COMPLETED", "Unloaded at the buyer", null, v));
+        } else {
+            TUi.secondary(actions, "Waiting for the buyer to confirm Goods Received…", null).setEnabled(false);
         }
+        if (o.isDisputeOpen()) TUi.pill(c, String.format(Locale.US, "An issue was reported on this order – an officer will review it."), TUi.AMBER_BG, TUi.AMBER);
     }
 }
-

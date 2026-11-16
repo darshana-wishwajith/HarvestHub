@@ -1,191 +1,255 @@
 package com.harvesthub.mobile.ui.buyer;
 
-import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.Order;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.SessionManager;
-
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.button.MaterialButton;
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.model.WalletSummaryResponse;
+import com.harvesthub.mobile.utils.AuthInputUtils;
+
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SecureCheckoutActivity extends AppCompatActivity {
+/**
+ * Figma buyer 4.2 "Simulated Payment Gateway". Pays the advance (AWAITING_PAYMENT) or, with
+ * EXTRA_STAGE = BALANCE, the remaining 80% when accepting the delivery (ARRIVED_AT_DESTINATION).
+ * Decision 15 Nov: the buyer chooses a simulated card (no real money) or the mock wallet balance.
+ */
+public class SecureCheckoutActivity extends BaseBuyerOrderActivity {
 
-    private ImageView btnBack;
-    private TextView tvAdvanceAmount;
-    private TextView tvContractPill;
-    private TextView pillCropCost;
-    private TextView pillLogisticsCost;
-    private TextView pillEscrowFee;
-    private EditText etCardNumber;
-    private EditText etExpiry;
-    private EditText etCvv;
-    private EditText etCardholderName;
-    private ImageView btnCvvHelp;
-    private TextView tvBatchDescription;
-    private MaterialButton btnPayNow;
+    public static final String EXTRA_STAGE = "PAY_STAGE";
+    public static final String STAGE_BALANCE = "BALANCE";
 
-    private boolean isPaymentCompleted = false;
-    private String orderId;
+    private boolean balanceStage;
+    private double amount;
+    private double walletBalance = -1;
+    private boolean busy;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_secure_checkout);
-
-        initViews();
-        loadIntentData();
-        setupListeners();
+    protected int layout() {
+        return R.layout.activity_secure_checkout;
     }
 
-    private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
-        tvAdvanceAmount = findViewById(R.id.tvAdvanceAmount);
-        tvContractPill = findViewById(R.id.tvContractPill);
-        pillCropCost = findViewById(R.id.pillCropCost);
-        pillLogisticsCost = findViewById(R.id.pillLogisticsCost);
-        pillEscrowFee = findViewById(R.id.pillEscrowFee);
-        etCardNumber = findViewById(R.id.etCardNumber);
-        etExpiry = findViewById(R.id.etExpiry);
-        etCvv = findViewById(R.id.etCvv);
-        etCardholderName = findViewById(R.id.etCardholderName);
-        btnCvvHelp = findViewById(R.id.btnCvvHelp);
-        tvBatchDescription = findViewById(R.id.tvBatchDescription);
-        btnPayNow = findViewById(R.id.btnPayNow);
+    @Override
+    protected boolean followStatus() {
+        return false; // we decide below; paying moves the order on
     }
 
-    private void loadIntentData() {
-        String totalAmount = getIntent().getStringExtra("total_amount");
-        String contractRef = getIntent().getStringExtra("contract_ref");
-        String cropCost = getIntent().getStringExtra("crop_cost");
-        String logisticsCost = getIntent().getStringExtra("logistics_cost");
-        String escrowFee = getIntent().getStringExtra("escrow_fee");
-        String batchDescription = getIntent().getStringExtra("batch_description");
-        orderId = getIntent().getStringExtra("order_id");
-
-        if (totalAmount != null && !totalAmount.isEmpty()) {
-            tvAdvanceAmount.setText(totalAmount);
-            btnPayNow.setText("Pay " + totalAmount);
-        }
-        if (contractRef != null && !contractRef.isEmpty()) {
-            tvContractPill.setText(contractRef.startsWith("Contract") ? contractRef : "Contract " + contractRef);
-        }
-        if (cropCost != null && !cropCost.isEmpty()) {
-            pillCropCost.setText(cropCost.startsWith("Crop:") ? cropCost : "Crop: " + cropCost);
-        }
-        if (logisticsCost != null && !logisticsCost.isEmpty()) {
-            pillLogisticsCost.setText(logisticsCost.startsWith("Logistics:") ? logisticsCost : "Logistics: " + logisticsCost);
-        }
-        if (escrowFee != null && !escrowFee.isEmpty()) {
-            pillEscrowFee.setText(escrowFee.startsWith("Escrow Fee:") ? escrowFee : "Escrow Fee: " + escrowFee);
-        }
-        if (batchDescription != null && !batchDescription.isEmpty()) {
-            tvBatchDescription.setText(batchDescription);
-        }
+    @Override
+    protected void onResume() {
+        balanceStage = STAGE_BALANCE.equals(getIntent().getStringExtra(EXTRA_STAGE));
+        super.onResume();
+        loadWallet();
+        RadioGroup group = findViewById(R.id.rgPaymentMethod);
+        group.setOnCheckedChangeListener((g, id) -> updateMethodUi());
+        findViewById(R.id.btnTopUpWallet).setOnClickListener(v -> BuyerWalletActivity.showTopUp(this, this::loadWallet));
+        View help = findViewById(R.id.btnCvvHelp);
+        if (help != null) help.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("CVV")
+                .setMessage("The 3-digit code on the back of the card. This is a simulated checkout: no real card is charged.")
+                .setPositiveButton("OK", null).show());
     }
 
-    private void setupListeners() {
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
+    @Override
+    protected void bind(@NonNull Order o) {
+        if (busy) return;
+        String expected = balanceStage ? "ARRIVED_AT_DESTINATION" : "AWAITING_PAYMENT";
+        if (!expected.equals(o.getStatus())) { // already paid / moved on elsewhere
+            handOver(o);
+            return;
         }
-
-        if (btnCvvHelp != null) {
-            btnCvvHelp.setOnClickListener(v -> new AlertDialog.Builder(this)
-                    .setTitle("CVV Verification")
-                    .setMessage("The 3-digit security code located on the signature strip on the back of your card.")
-                    .setPositiveButton("Got it", null)
-                    .show()
-            );
+        Order.Payment p = o.getPayment();
+        if (p == null) {
+            Toast.makeText(this, "This order has no payment quote yet.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
+        amount = balanceStage ? p.balanceDue : p.advanceDue;
+        setText(R.id.tvHeaderTitle, balanceStage ? "Pay Balance" : "Secure Checkout");
+        setText(R.id.tvContractPill, "Order " + ref(o));
+        setText(R.id.tvAdvanceAmount, rs(amount));
+        if (balanceStage) {
+            setText(R.id.pillCropCost, "Crop balance (80%): " + rs(p.balanceDue));
+            show(R.id.pillLogisticsCost, false);
+            show(R.id.pillEscrowFee, false);
+        } else {
+            setText(R.id.pillCropCost, "Crop (20%): " + rs(p.advanceCropPortion));
+            setText(R.id.pillLogisticsCost, "Logistics: " + rs(p.transportFee));
+            setText(R.id.pillEscrowFee, "Fee (3%): " + rs(p.buyerFee));
+        }
+        setText(R.id.tvBatchDescription, String.format(Locale.US, "%s %s • %s • Order %s",
+                kg(o.getQuantity()), o.getCropName(), o.getFarmerName(), ref(o)));
+        updateMethodUi();
+    }
 
-        btnPayNow.setOnClickListener(v -> {
-            if (isPaymentCompleted) return;
+    private boolean walletSelected() {
+        return ((RadioButton) findViewById(R.id.rbMethodWallet)).isChecked();
+    }
 
-            String cardNumber = etCardNumber.getText().toString().trim();
-            String expiry = etExpiry.getText().toString().trim();
-            String cvv = etCvv.getText().toString().trim();
-
-            if (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty()) {
-                Toast.makeText(this, "Please verify payment details", Toast.LENGTH_SHORT).show();
-                return;
+    private void loadWallet() {
+        String me = session.getUserId();
+        if (me == null) return;
+        api.getWalletSummary(me).enqueue(new Callback<WalletSummaryResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<WalletSummaryResponse> call, @NonNull Response<WalletSummaryResponse> r) {
+                if (r.isSuccessful() && r.body() != null) {
+                    walletBalance = r.body().getBalance();
+                    ((RadioButton) findViewById(R.id.rbMethodWallet)).setText("HarvestHub Wallet (" + rs(walletBalance) + " available)");
+                    updateMethodUi();
+                }
             }
 
-            btnPayNow.setEnabled(false);
-            btnPayNow.setText("Processing Encrypted Payment...");
-            recordPayment();
+            @Override
+            public void onFailure(@NonNull Call<WalletSummaryResponse> call, @NonNull Throwable t) { }
         });
     }
 
-    private void recordPayment() {
-        if (orderId == null || orderId.isEmpty()) {
-            showPaymentError("Missing order reference.");
-            return;
+    private void updateMethodUi() {
+        boolean wallet = walletSelected();
+        show(R.id.cardPaymentForm, !wallet);
+        TextView hint = findViewById(R.id.tvWalletHint);
+        boolean shortOfFunds = wallet && walletBalance >= 0 && walletBalance + 0.005 < amount;
+        hint.setVisibility(wallet ? View.VISIBLE : View.GONE);
+        if (wallet) {
+            hint.setText(walletBalance < 0 ? "Checking your balance…"
+                    : shortOfFunds ? "Not enough balance. You need " + rs(amount - walletBalance) + " more."
+                    : "The amount is moved from your wallet into escrow.");
+            hint.setTextColor(shortOfFunds ? 0xFFB91C1C : 0xFF64748B);
         }
-        SessionManager sessionManager = new SessionManager(this);
-        Map<String, Object> payment = new HashMap<>();
-        payment.put("amount", parseAmount(tvAdvanceAmount.getText().toString()));
-        ApiService apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-        apiService.recordAdvancePayment(orderId, payment).enqueue(new Callback<Order>() {
+        show(R.id.btnTopUpWallet, wallet);
+        MaterialButton pay = findViewById(R.id.btnPayNow);
+        pay.setText(amount > 0 ? "Pay " + rs(amount) : "Pay");
+        pay.setEnabled(!busy && amount > 0 && !shortOfFunds);
+        pay.setOnClickListener(v -> submit());
+    }
+
+    private void submit() {
+        String method = walletSelected() ? "WALLET" : "CARD";
+        if ("CARD".equals(method) && !cardValid()) return;
+        busy = true;
+        MaterialButton pay = findViewById(R.id.btnPayNow);
+        pay.setEnabled(false);
+        pay.setText("Processing…");
+        Callback<Order> done = new Callback<Order>() {
             @Override
-            public void onResponse(Call<Order> call, Response<Order> response) {
+            public void onResponse(@NonNull Call<Order> call, @NonNull Response<Order> response) {
+                busy = false;
                 if (!response.isSuccessful() || response.body() == null) {
-                    showPaymentError("Payment could not be recorded.");
+                    Toast.makeText(SecureCheckoutActivity.this,
+                            AuthInputUtils.errorMessage(response, "Payment could not be recorded."), Toast.LENGTH_LONG).show();
+                    loadWallet();
+                    load();
                     return;
                 }
-                isPaymentCompleted = true;
-                btnPayNow.setText("Payment Completed");
-                btnPayNow.setBackgroundColor(0xFF16A34A);
+                Order updated = response.body();
                 new AlertDialog.Builder(SecureCheckoutActivity.this)
-                        .setTitle("Payment Successful")
-                        .setMessage(tvAdvanceAmount.getText().toString()
-                                + " has been recorded in HarvestHub Escrow.\n\nAutomated logistics dispatch is now active.")
-                        .setPositiveButton("View Transaction Ledger", (dialog, which) -> {
-                            Intent intentLedger = new Intent(SecureCheckoutActivity.this, TransactionLedgerActivity.class);
-                            intentLedger.putExtra("order_id", orderId);
-                            intentLedger.putExtra("secured_amount", tvAdvanceAmount.getText().toString());
-                            intentLedger.putExtra("txn_ref", "Txn " + orderId);
-                            intentLedger.putExtra("system_status", "System Status: Payment Processing / Dispatching");
-                            startActivity(intentLedger);
+                        .setTitle("Payment successful")
+                        .setMessage(rs(amount) + (balanceStage
+                                ? " balance paid into escrow. Confirm \"Goods Received\" to release the funds."
+                                : " is locked in HarvestHub escrow. A vehicle is being assigned now."))
+                        .setCancelable(false)
+                        .setPositiveButton("Continue", (d, w) -> {
+                            startActivity(BuyerOrderRouter.intentFor(SecureCheckoutActivity.this, updated, session.getUserId()));
                             finish();
                         })
-                        .setCancelable(false)
                         .show();
             }
 
             @Override
-            public void onFailure(Call<Order> call, Throwable throwable) {
-                showPaymentError("Network error while recording payment.");
+            public void onFailure(@NonNull Call<Order> call, @NonNull Throwable t) {
+                busy = false;
+                updateMethodUi();
+                Toast.makeText(SecureCheckoutActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
             }
-        });
-    }
-
-    private double parseAmount(String value) {
-        String normalized = value == null ? "" : value.replaceAll("[^0-9.]", "");
-        try {
-            return normalized.isEmpty() ? 0 : Double.parseDouble(normalized);
-        } catch (NumberFormatException e) {
-            return 0;
+        };
+        if (balanceStage) {
+            Map<String, String> body = new HashMap<>();
+            body.put("event", "ACCEPT_DELIVERY");
+            body.put("method", method);
+            api.sendOrderEvent(orderId, body).enqueue(done);
+        } else {
+            Map<String, Object> body = new HashMap<>();
+            body.put("amount", amount);
+            body.put("method", method);
+            api.recordAdvancePayment(orderId, body).enqueue(done);
         }
     }
 
-    private void showPaymentError(String message) {
-        btnPayNow.setEnabled(true);
-        btnPayNow.setText("Try Payment Again");
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    /** Format checks only — the gateway is simulated (proposal §4.2, no real money). */
+    private boolean cardValid() {
+        EditText number = findViewById(R.id.etCardNumber);
+        EditText expiry = findViewById(R.id.etExpiry);
+        EditText cvv = findViewById(R.id.etCvv);
+        EditText name = findViewById(R.id.etCardholderName);
+        String digits = number.getText().toString().replaceAll("\\s", "");
+        if (!digits.matches("\\d{13,19}") || !luhn(digits)) {
+            number.setError("Enter a valid card number");
+            number.requestFocus();
+            return false;
+        }
+        String exp = expiry.getText().toString().trim();
+        if (!exp.matches("(0[1-9]|1[0-2])/\\d{2}") || expired(exp)) {
+            expiry.setError("MM/YY, not expired");
+            expiry.requestFocus();
+            return false;
+        }
+        if (!cvv.getText().toString().trim().matches("\\d{3,4}")) {
+            cvv.setError("3 or 4 digits");
+            cvv.requestFocus();
+            return false;
+        }
+        if (name.getText().toString().trim().length() < 2) {
+            name.setError("Enter the name on the card");
+            name.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    static boolean luhn(String digits) {
+        int sum = 0;
+        boolean dbl = false;
+        for (int i = digits.length() - 1; i >= 0; i--) {
+            int d = digits.charAt(i) - '0';
+            if (dbl) {
+                d *= 2;
+                if (d > 9) d -= 9;
+            }
+            sum += d;
+            dbl = !dbl;
+        }
+        return sum % 10 == 0;
+    }
+
+    static boolean expired(String mmYy) {
+        int month = Integer.parseInt(mmYy.substring(0, 2));
+        int year = 2000 + Integer.parseInt(mmYy.substring(3));
+        Calendar now = Calendar.getInstance();
+        int cy = now.get(Calendar.YEAR), cm = now.get(Calendar.MONTH) + 1;
+        return year < cy || (year == cy && month < cm);
+    }
+
+    /** Opens the balance checkout from 6.1. */
+    static Intent balanceIntent(android.content.Context ctx, String orderId) {
+        Intent i = new Intent(ctx, SecureCheckoutActivity.class);
+        i.putExtra(BuyerOrderRouter.EXTRA_ORDER_ID, orderId);
+        i.putExtra(EXTRA_STAGE, STAGE_BALANCE);
+        return i;
     }
 }
-

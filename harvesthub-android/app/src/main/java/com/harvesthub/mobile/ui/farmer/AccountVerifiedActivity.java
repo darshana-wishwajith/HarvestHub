@@ -38,7 +38,7 @@ public class AccountVerifiedActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Intent intent = new Intent(AccountVerifiedActivity.this, FarmerLoginActivity.class);
+                Intent intent = new Intent(AccountVerifiedActivity.this, ForgotPasswordActivity.loginScreen());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();

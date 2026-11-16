@@ -58,7 +58,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/order_status_title_stub"
-                            android:text="@string/order_id_full"
+                            android:id="@+id/tvOrderId"
+            android:text="@string/order_id_full"
                             android:textColor="@color/text_gray_medium"
                             android:textSize="14sp" />
 
@@ -87,7 +88,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:text="@string/status_pending"
+                                android:id="@+id/tvStatusPill"
+            android:text="@string/status_pending"
                                 android:textColor="@color/escrow_amber_text"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -100,7 +102,8 @@
                         android:layout_marginBottom="24dp"
                         android:background="@drawable/bg_order_details_gray"
                         android:padding="16dp"
-                        android:text="@string/waiting_for_buyer_confirm"
+                        android:id="@+id/tvWaitingText"
+            android:text="@string/waiting_for_buyer_confirm"
                         android:textColor="@color/text_black_bold"
                         android:textSize="14sp" />
 
@@ -120,7 +123,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="@string/commodity_value"
+                            android:id="@+id/tvCommodity"
+            android:text="@string/commodity_value"
                             android:textColor="@color/text_black_bold"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -142,7 +146,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="@string/quantity_value_bold"
+                            android:id="@+id/tvQuantity"
+            android:text="@string/quantity_value_bold"
                             android:textColor="@color/text_black_bold"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -164,7 +169,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="@string/unit_rate_value"
+                            android:id="@+id/tvUnitRate"
+            android:text="@string/unit_rate_value"
                             android:textColor="@color/status_text_green"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -192,7 +198,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="@string/total_value_amount"
+                            android:id="@+id/tvTotalValue"
+            android:text="@string/total_value_amount"
                             android:textColor="@color/text_black_bold"
                             android:textSize="18sp"
                             android:textStyle="bold" />

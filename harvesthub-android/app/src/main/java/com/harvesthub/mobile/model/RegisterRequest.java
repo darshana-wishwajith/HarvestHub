@@ -25,6 +25,11 @@ public class RegisterRequest implements Parcelable {
 
     @SerializedName("farmLocation")
     private FarmLocation farmLocation;
+    // transporter sign-up (Figma "Vehicle Profile")
+    private String vehicleType;
+    private String vehiclePlate;
+    private Double vehicleCapacityKg;
+    private String vehicleBodyType;
 
     public RegisterRequest(String fullName, String mobileNumber, String nic, String email, String password, String role) {
         this.fullName = fullName;
@@ -43,6 +48,10 @@ public class RegisterRequest implements Parcelable {
         password = in.readString();
         role = in.readString();
         farmLocation = in.readParcelable(FarmLocation.class.getClassLoader());
+        vehicleType = in.readString();
+        vehiclePlate = in.readString();
+        vehicleCapacityKg = (Double) in.readValue(Double.class.getClassLoader());
+        vehicleBodyType = in.readString();
     }
 
     public static final Creator<RegisterRequest> CREATOR = new Creator<RegisterRequest>() {
@@ -69,6 +78,10 @@ public class RegisterRequest implements Parcelable {
         dest.writeString(password);
         dest.writeString(role);
         dest.writeParcelable(farmLocation, flags);
+        dest.writeString(vehicleType);
+        dest.writeString(vehiclePlate);
+        dest.writeValue(vehicleCapacityKg);
+        dest.writeString(vehicleBodyType);
     }
 
     public String getFullName() { return fullName; }
@@ -79,4 +92,12 @@ public class RegisterRequest implements Parcelable {
     public String getRole() { return role; }
     public FarmLocation getFarmLocation() { return farmLocation; }
     public void setFarmLocation(FarmLocation farmLocation) { this.farmLocation = farmLocation; }
+    public void setVehicle(String type, String plate, Double capacityKg, String bodyType) {
+        this.vehicleType = type;
+        this.vehiclePlate = plate;
+        this.vehicleCapacityKg = capacityKg;
+        this.vehicleBodyType = bodyType;
+    }
+    public String getVehicleType() { return vehicleType; }
+    public String getVehiclePlate() { return vehiclePlate; }
 }

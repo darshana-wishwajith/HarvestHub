@@ -159,6 +159,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvCargoVehicle"
                             android:text="1–Ton Lorry"
                             android:textColor="#64748B"
                             android:textSize="11sp" />
@@ -166,6 +167,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvCargoCarrier"
                             android:text="Carrier ID #TK-902"
                             android:textColor="#475569"
                             android:textSize="11sp"
@@ -187,7 +189,20 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Live Cargo Loading Evidence"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/img_cargo_evidence" />
+                        android:background="#E2E8F0" />
+
+                    <TextView
+                        android:id="@+id/tvEvidencePager"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="10dp"
+                        android:background="#99000000"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="Loading photos…"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Telemetry Row (LAT, LONG, ALT) -->
@@ -273,6 +288,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvTelemetryAltLabel"
                             android:text="ALT"
                             android:textColor="#94A3B8"
                             android:textSize="11sp"

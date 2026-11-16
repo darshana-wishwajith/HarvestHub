@@ -58,7 +58,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:text="LKR 125,000"
+                        android:text="LKR —"
                         android:textColor="#073B27"
                         android:textSize="28sp" />
 
@@ -116,7 +116,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
-                            android:text="4.9 / 5.0"
+                            android:text="—"
                             android:textColor="#1A1A1A"
                             android:textSize="20sp" />
 

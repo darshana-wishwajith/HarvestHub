@@ -19,9 +19,12 @@ public class BuyerDashboardActivity extends AppCompatActivity {
     public static final String EXTRA_INITIAL_TAB = "extra_initial_tab";
     public static final String EXTRA_AD_TITLE = "extra_ad_title";
 
+    /** MARKET has no bottom-nav item: it opens from Home ("View Market", Figma 564:330). */
     public enum Tab {
-        HOME, ORDERS, DEMANDS, OFFERS
+        HOME, ORDERS, DEMANDS, OFFERS, MARKET
     }
+
+    private String offersAdId;
 
     private Tab currentTab = null;
     private View buyerTopNav;
@@ -90,7 +93,9 @@ public class BuyerDashboardActivity extends AppCompatActivity {
                 SessionManager session = new SessionManager(this);
                 String name = (session.getUser() != null && session.getUser().getFullName() != null)
                         ? session.getUser().getFullName() : "Buyer";
-                Toast.makeText(this, "Notifications active for " + name, Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, com.harvesthub.mobile.ui.farmer.NotificationsActivity.class);
+                i.putExtra(com.harvesthub.mobile.ui.farmer.NotificationsActivity.EXTRA_HIDE_NAV, true);
+                startActivity(i);
             });
         }
     }
@@ -101,7 +106,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
         TextView tvSubtitle = buyerTopNav.findViewById(R.id.tvBuyerNavSubtitle);
         if (tvSubtitle != null) {
             String name = (session.getUser() != null && session.getUser().getFullName() != null && !session.getUser().getFullName().isEmpty())
-                    ? session.getUser().getFullName() : "Perera Supermarket";
+                    ? session.getUser().getFullName() : "Buyer";
             tvSubtitle.setText("Hi, " + name);
         }
     }
@@ -124,9 +129,16 @@ public class BuyerDashboardActivity extends AppCompatActivity {
         selectTab(tab, null);
     }
 
+    /** 2.4 "View Offers" → 3.1 for one wanted ad. */
+    public void showOffersFor(String adTitle, String adId) {
+        offersAdId = adId;
+        currentTab = null;
+        selectTab(Tab.OFFERS, adTitle);
+    }
+
     public void selectTab(Tab tab, String customAdTitle) {
         if (tab == null) tab = Tab.HOME;
-        if (currentTab == tab && customAdTitle == null) return;
+        if (currentTab == tab && customAdTitle == null && offersAdId == null) return;
 
         Fragment fragment = createFragmentForTab(tab, customAdTitle);
         getSupportFragmentManager().beginTransaction()
@@ -144,10 +156,14 @@ public class BuyerDashboardActivity extends AppCompatActivity {
             case DEMANDS:
                 return new BuyerDemandsFragment();
             case OFFERS:
-                return BuyerOffersFragment.newInstance(customAdTitle);
+                Fragment f = BuyerOffersFragment.newInstance(customAdTitle, offersAdId);
+                offersAdId = null;
+                return f;
+            case MARKET:
+                return new BuyerMarketplaceFragment();
             case HOME:
             default:
-                return new BuyerMarketplaceFragment();
+                return new BuyerHomeFragment();
         }
     }
 
@@ -157,7 +173,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
         int[] pills = {R.id.buyerPillHome, R.id.buyerPillOrders, R.id.buyerPillDemands, R.id.buyerPillOffers};
         int[] icons = {R.id.buyerIconHome, R.id.buyerIconOrders, R.id.buyerIconDemands, R.id.buyerIconOffers};
         int[] labels = {R.id.buyerLabelHome, R.id.buyerLabelOrders, R.id.buyerLabelDemands, R.id.buyerLabelOffers};
-        int activeIndex = activeTab.ordinal();
+        int activeIndex = activeTab == Tab.MARKET ? Tab.HOME.ordinal() : activeTab.ordinal();
 
         for (int index = 0; index < pills.length; index++) {
             View pill = buyerBottomNav.findViewById(pills[index]);

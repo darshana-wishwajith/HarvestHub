@@ -53,7 +53,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingV
         ItemListingVariantBinding b = holder.binding;
 
         b.tvTitle.setText(item.getCropName());
-        String idText = item.getId();
+        String idText = item.getReferenceCode() != null ? "#" + item.getReferenceCode() : item.getId();
         if (idText != null && idText.length() > 8 && !idText.contains("-") && !idText.contains(" ")) {
             idText = idText.substring(0, 8).toUpperCase();
         }
@@ -140,8 +140,11 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingV
 
             case PENDING:
                 setBadge(b.tvStatusBadge, "PENDING", Color.parseColor("#D97706"), Color.WHITE);
-                b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
-                b.btnSecondary.setOnClickListener(v -> listener.onDeactivate(item));
+                b.tvReviewNote.setVisibility(View.VISIBLE);
+                b.tvReviewNote.setText(item.isCropPending()
+                        ? "Waiting for an officer – new crop type will be reviewed too."
+                        : "Waiting in the officer verification queue.");
+                b.llActions.setVisibility(View.GONE);
                 break;
 
             case UNDER_REVIEW:
@@ -153,25 +156,28 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingV
             case ACTIVE:
             case LISTED:
             case APPROVED:
-                setBadge(b.tvStatusBadge, "LISTED", Color.parseColor("#16A34A"), Color.WHITE);
+                setBadge(b.tvStatusBadge, item.getGrade() != null ? "LISTED · GRADE " + item.getGrade() : "LISTED",
+                        Color.parseColor("#16A34A"), Color.WHITE);
                 b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
-                b.btnSecondary.setOnClickListener(v -> listener.onDeactivate(item));
+                b.btnSecondary.setVisibility(View.GONE);
                 break;
 
             case RETAKE_REQUESTED:
-                setBadge(b.tvStatusBadge, "RETAKE", Color.parseColor("#E11D48"), Color.WHITE);
+                setBadge(b.tvStatusBadge, "ACTION REQUIRED", Color.parseColor("#E11D48"), Color.WHITE);
                 b.tvReviewNote.setVisibility(View.VISIBLE);
-                b.tvReviewNote.setText("Media retake requested by officer");
-                b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
+                b.tvReviewNote.setText("Retake requested: " + (item.getReviewNotes() != null && !item.getReviewNotes().isEmpty()
+                        ? item.getReviewNotes() : "please capture clearer photos."));
+                b.btnPrimary.setText("Retake Photos");
+                b.btnPrimary.setOnClickListener(v -> listener.onAction(item));
                 b.btnSecondary.setVisibility(View.GONE);
                 break;
 
             case REJECTED:
                 setBadge(b.tvStatusBadge, "REJECTED", Color.parseColor("#EF4444"), Color.WHITE);
                 b.tvReviewNote.setVisibility(View.VISIBLE);
-                b.tvReviewNote.setText("Listing was rejected by officer");
-                b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
-                b.btnSecondary.setVisibility(View.GONE);
+                b.tvReviewNote.setText("Rejected: " + (item.getReviewNotes() != null && !item.getReviewNotes().isEmpty()
+                        ? item.getReviewNotes() : "does not meet marketplace standards."));
+                b.llActions.setVisibility(View.GONE);
                 break;
 
             case ONGOING:
@@ -199,23 +205,9 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingV
                 b.btnSecondary.setOnClickListener(v -> listener.onTrack(item));
                 break;
 
-            case DEACTIVATED:
-                setBadge(b.tvStatusBadge, "DEACTIVATED", Color.parseColor("#5A6B82"), Color.WHITE);
-                applyGrayscale(b.ivThumbnail);
-                b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
-
-                // Re-activate Button (Solid Dark Forest Green)
-                b.btnSecondary.setText("Re-activate");
-                b.btnSecondary.setIcon(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_rotate_refresh));
-                b.btnSecondary.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#082F1E")));
-                b.btnSecondary.setTextColor(Color.WHITE);
-                b.btnSecondary.setIconTint(ColorStateList.valueOf(Color.WHITE));
-                b.btnSecondary.setStrokeWidth(0);
-                b.btnSecondary.setOnClickListener(v -> listener.onReactivate(item));
-                break;
 
             case WANTED:
-                setBadge(b.tvStatusBadge, "WANTED", Color.parseColor("#D97706"), Color.WHITE);
+                setBadge(b.tvStatusBadge, item.isUrgent() ? "URGENT" : "WANTED", Color.parseColor("#D97706"), Color.WHITE);
                 b.btnSecondary.setVisibility(View.GONE);
                 b.btnPrimary.setText("Supply Offer");
                 b.btnPrimary.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#16A34A")));
@@ -225,10 +217,16 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingV
                 b.btnPrimary.setOnClickListener(v -> listener.onSupply(item));
                 break;
 
+            case COMPLETED:
+                setBadge(b.tvStatusBadge, "COMPLETED", Color.parseColor("#16A34A"), Color.WHITE);
+                b.btnSecondary.setVisibility(View.GONE);
+                b.btnPrimary.setText("View Details");
+                b.btnPrimary.setOnClickListener(v -> listener.onTrack(item));
+                break;
+
             default:
-                setBadge(b.tvStatusBadge, status.name(), Color.parseColor("#50667F"), Color.WHITE);
-                b.btnPrimary.setOnClickListener(v -> listener.onEdit(item));
-                b.btnSecondary.setOnClickListener(v -> listener.onDeactivate(item));
+                setBadge(b.tvStatusBadge, status.name().replace('_', ' '), Color.parseColor("#50667F"), Color.WHITE);
+                b.llActions.setVisibility(View.GONE);
                 break;
         }
     }

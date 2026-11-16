@@ -1,85 +1,63 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import com.harvesthub.mobile.R;
-
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.content.Intent;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
 
-public class CargoRejectedActivity extends AppCompatActivity {
+import com.harvesthub.mobile.model.Order;
 
-    private TextView tvViewEvidence;
-    private LinearLayout btnFarmerSupport;
-    private LinearLayout btnPhotoEvidence;
-    private LinearLayout btnReturnDispatchQueue;
-    private androidx.core.widget.NestedScrollView nestedScrollView;
+/**
+ * Figma "Cargo Rejected by Buyer" – pre-loading rejection (workflow 5.3, farmer at fault): nothing is loaded,
+ * the driver receives the Empty Trip Fee (= full transport fee) from the farmer's wallet.
+ */
+public class CargoRejectedActivity extends BaseTransporterOrderActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.transporter_activity_cargo_rejected);
-
-        setupStatusBar();
-        initViews();
-        setupListeners();
-
-        if (nestedScrollView != null) {
-            nestedScrollView.post(() -> nestedScrollView.scrollTo(0, 0));
-        }
+    protected String title() {
+        return "Dispatch Aborted";
     }
 
-    private void setupStatusBar() {
-        Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.white));
+    @Override
+    protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
+        TUi.pill(c, "● DISPATCH STATUS: ABORTED • " + ref(), TUi.RED_BG, TUi.RED);
+        TUi.banner(c, TUi.RED_BG, TUi.RED, "Cargo rejected by the buyer at pre-loading",
+                reason(o) + "\nNothing is loaded. The order is closed.");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decorView = window.getDecorView();
-            decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+        LinearLayout b = TUi.card(c);
+        TUi.row(b, "Commodity", cargo(o));
+        TUi.row(b, "Farm", o.getFarmerName() == null ? "—" : o.getFarmerName());
+        TUi.row(b, "Buyer", o.getBuyerName() == null ? "—" : o.getBuyerName());
+        TUi.caption(b, "Your pre-loading photos");
+        TUi.photos(b, o.getLoadingEvidenceUrls());
+
+        LinearLayout s = TUi.card(c);
+        TUi.title(s, "What to do now");
+        TUi.step(s, "Do not load the crates", 2, null);
+        TUi.step(s, "Hand the produce back to the farmer at the gate", 1, null);
+        TUi.step(s, "Go online again for the next job", 0, null);
+
+        double fee = o.getPayment() == null ? 0 : o.getPayment().emptyTripFee;
+        LinearLayout pay = TUi.banner(c, TUi.SURFACE, TUi.DARK, "Transporter protection – Empty Trip Fee", null);
+        TUi.big(pay, "+" + rs(fee), TUi.DARK);
+        TUi.body(pay, "Paid by the farmer to compensate your fuel and time. Already in your HarvestHub wallet.");
+
+        TUi.primary(actions, "Return to Dispatch Home", v -> {
+            startActivity(new Intent(this, DeliveryDashboardActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            finish();
+        });
     }
 
-    private void initViews() {
-        nestedScrollView = findViewById(R.id.nestedScrollView);
-        tvViewEvidence = findViewById(R.id.tvViewEvidence);
-        btnFarmerSupport = findViewById(R.id.btnFarmerSupport);
-        btnPhotoEvidence = findViewById(R.id.btnPhotoEvidence);
-        btnReturnDispatchQueue = findViewById(R.id.btnReturnDispatchQueue);
-    }
-
-    private void setupListeners() {
-        if (tvViewEvidence != null) {
-            tvViewEvidence.setOnClickListener(v -> {
-                Toast.makeText(this, "Viewing QA Inspection Evidence (Moisture 24.8% flagged)", Toast.LENGTH_SHORT).show();
-            });
+    static String reason(Order o) {
+        if (o.getStatusHistory() != null) {
+            for (int i = o.getStatusHistory().size() - 1; i >= 0; i--) {
+                Order.StatusChange sc = o.getStatusHistory().get(i);
+                if (sc.status != null && sc.status.equals(o.getStatus()) && sc.note != null) {
+                    int k = sc.note.indexOf(':');
+                    return k > 0 ? "Buyer's reason: " + sc.note.substring(k + 1).trim() : sc.note;
+                }
+            }
         }
-
-        if (btnFarmerSupport != null) {
-            btnFarmerSupport.setOnClickListener(v -> {
-                Toast.makeText(this, "Calling Farmer Support (Dambulla Farm #12)...", Toast.LENGTH_SHORT).show();
-            });
-        }
-
-        if (btnPhotoEvidence != null) {
-            btnPhotoEvidence.setOnClickListener(v -> {
-                Toast.makeText(this, "Opening Consignment Photo Evidence Gallery...", Toast.LENGTH_SHORT).show();
-            });
-        }
-
-        if (btnReturnDispatchQueue != null) {
-            btnReturnDispatchQueue.setOnClickListener(v -> {
-                Toast.makeText(this, "Returned to Dispatch Queue: Next load prioritized (15 km range)", Toast.LENGTH_LONG).show();
-            });
-        }
+        return "The buyer rejected the delivery.";
     }
 }
-

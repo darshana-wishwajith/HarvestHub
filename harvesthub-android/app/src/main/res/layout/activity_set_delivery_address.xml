@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -30,6 +31,7 @@
             android:src="@drawable/ic_arrow_back" />
 
         <TextView
+            android:id="@+id/tvDeliveryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -46,28 +48,43 @@
         android:layout_above="@id/bottomConfirmCard"
         android:layout_below="@id/topBar">
 
-        <!-- Exact Authentic Map from reference image -->
-        <ImageView
-            android:id="@+id/ivMap"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/mapDelivery"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="Map Area"
-            android:scaleType="fitXY"
-            android:src="@drawable/img_delivery_map" />
+            android:layout_height="match_parent" />
 
-        <!-- Transparent Clickable Touch Target over Recenter FAB on Map -->
+        <!-- Fixed pin in the centre: the map moves under it -->
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="22dp"
+            android:contentDescription="Delivery point"
+            android:src="@drawable/ic_pin_drop_green" />
+
         <FrameLayout
             android:id="@+id/btnRecenter"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="@android:color/white"
             android:clickable="true"
-            android:contentDescription="Recenter Map"
-            android:focusable="true" />
+            android:contentDescription="Use my location"
+            android:elevation="4dp"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_my_location"
+                app:tint="#1B4332" />
+        </FrameLayout>
     </RelativeLayout>
 
     <!-- Bottom Confirmation Card -->
@@ -91,6 +108,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvConfirmTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -106,6 +124,7 @@
                 android:letterSpacing="0.04"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
+                android:id="@+id/tvStepLabel"
                 android:text="STEP 2 OF 2"
                 android:textColor="#16A34A"
                 android:textSize="11sp"
@@ -141,7 +160,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="No. 45, Main Street, Dambulla"
+                android:text="Move the map to place the pin"
                 android:textColor="#111827"
                 android:textSize="14.5sp"
                 android:textStyle="bold" />
@@ -198,6 +217,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/tvSaveAddressLabel"
                 android:text="Save Delivery Address"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"

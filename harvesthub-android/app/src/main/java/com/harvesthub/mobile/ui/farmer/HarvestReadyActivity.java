@@ -1,94 +1,36 @@
 package com.harvesthub.mobile.ui.farmer;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 
 import com.harvesthub.mobile.R;
-import com.harvesthub.mobile.model.GenericResponse;
-import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.network.ApiService;
-import com.harvesthub.mobile.utils.BottomNavHelper;
-import com.harvesthub.mobile.utils.SessionManager;
+import com.harvesthub.mobile.model.Order;
 
-import java.util.HashMap;
-import java.util.Map;
+/** Figma 29: harvesting in progress → "Confirm Harvest Ready" pings the driver with the pickup GPS (workflow 4.1). */
+public class HarvestReadyActivity extends BaseOrderActivity {
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class HarvestReadyActivity extends AppCompatActivity {
-
-    private ApiService apiService;
-    private SessionManager sessionManager;
-    private String orderId;
+    @Override
+    protected int layout() {
+        return R.layout.activity_harvest_ready;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_harvest_ready);
-
-        orderId = getIntent().getStringExtra("ORDER_ID");
-        if (orderId == null) orderId = "demo-order";
-
-        sessionManager = new SessionManager(this);
-        apiService = ApiClient.getClient(sessionManager).create(ApiService.class);
-
-        setupNavigation();
-
-        ImageView btnCallDriver = findViewById(R.id.btnCallDriver);
-        Button btnConfirmReady = findViewById(R.id.btnConfirmReady);
-
-        btnCallDriver.setOnClickListener(v -> {
-            String phoneNumber = "0771234567";
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        });
-
-        btnConfirmReady.setOnClickListener(v -> {
-            Map<String, String> statusMap = new HashMap<>();
-            statusMap.put("status", "HARVEST_READY");
-            
-            apiService.updateOrderStatus(orderId, statusMap).enqueue(new Callback<GenericResponse>() {
-                @Override
-                public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(HarvestReadyActivity.this, "Harvest confirmed as ready!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(HarvestReadyActivity.this, VehicleArrivalActivity.class);
-                        intent.putExtra("ORDER_ID", orderId);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(HarvestReadyActivity.this, "Failed to update status", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GenericResponse> call, Throwable t) {
-                    Toast.makeText(HarvestReadyActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+        if (orderId == null) return;
+        findViewById(R.id.btnConfirmReady).setOnClickListener(v -> sendEvent("HARVEST_READY", v));
+        findViewById(R.id.btnCallDriver).setOnClickListener(v -> dial(order == null ? null : order.getTransporterPhone()));
     }
 
-    private void setupNavigation() {
-        // Setup Top Navigation
-        View topNav = findViewById(R.id.included_top_nav);
-        View btnNotification = topNav.findViewById(R.id.btnNotification);
-        btnNotification.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-        });
-
-        // Setup Bottom Navigation
-        View navBar = findViewById(R.id.included_nav);
-        BottomNavHelper.setup(this, navBar, BottomNavHelper.Tab.LISTINGS);
+    @Override
+    protected void bind(@NonNull Order o) {
+        setText(R.id.tvStatusBadge, "Status: Harvesting in Progress");
+        setText(R.id.tvOrderNumber, orderLabel(o));
+        setText(R.id.tvHarvestInfo, "Pack " + kg(o.getQuantity()) + " of " + o.getCropName()
+                + " in crates. When you confirm, " + (o.getTransporterName() != null ? o.getTransporterName() : "the driver")
+                + " gets your farm's GPS location.");
+        setText(R.id.tvDriverLabel, driverLine(o));
+        setText(R.id.tvDriverEta, vehicleLine(o));
     }
 }

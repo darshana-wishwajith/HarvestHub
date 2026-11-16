@@ -82,7 +82,8 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tvOrderCrop"
                         android:layout_marginTop="3dp"
-                        android:text="Buyer: Roshan Silva"
+                        android:id="@+id/tvBuyer"
+            android:text="Buyer: Roshan Silva"
                         android:textColor="#657794"
                         android:textSize="14sp" />
                 </RelativeLayout>
@@ -127,7 +128,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="28dp"
                         android:gravity="center_vertical"
-                        android:text="Buyer Payment Cleared"
+                        android:id="@+id/tvCurrentStep"
+            android:text="Buyer Payment Cleared"
                         android:textColor="#657794"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -176,7 +178,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Driver: Sunil Perera"
+                            android:id="@+id/tvDriver"
+            android:text="Driver: Sunil Perera"
                             android:textColor="#657794"
                             android:textSize="14sp" />
 
@@ -184,7 +187,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="(Lorry - WPLC-4589)"
+                            android:id="@+id/tvVehicle"
+            android:text="(Lorry - WPLC-4589)"
                             android:textColor="#3F4944"
                             android:textSize="14sp" />
                     </LinearLayout>

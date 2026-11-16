@@ -63,6 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:id="@+id/tvHandshakeStatus"
                 android:text="Status: Pending Buyer Confirmation"
                 android:textColor="#B45309"
                 android:textSize="13sp"
@@ -213,6 +214,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvDriverVerified"
                             android:text="Verified"
                             android:textColor="#047857"
                             android:textSize="11sp"
@@ -276,6 +278,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/tvDriverSignal"
                             android:text="Transmitted: Delivery Completed"
                             android:textColor="#15803D"
                             android:textSize="13.5sp"
@@ -285,6 +288,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:id="@+id/tvDriverSignalSub"
                             android:text="Transporter verified offload at depot bay"
                             android:textColor="#475569"
                             android:textSize="12sp" />
@@ -388,6 +392,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:id="@+id/tvSettlementBadge"
                                 android:text="Instant Dispatch"
                                 android:textColor="#047857"
                                 android:textSize="10sp"
@@ -489,6 +494,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:lineSpacingExtra="3dp"
+                    android:id="@+id/tvHandshakeNote"
                     android:text="Tapping confirm will permanently release the final crop payment to the farmer's wallet and the transport fee to the driver. This action cannot be undone."
                     android:textColor="#64748B"
                     android:textSize="13sp" />

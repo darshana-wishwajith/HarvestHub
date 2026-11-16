@@ -43,7 +43,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/buyer_name"
+                android:id="@+id/tvBuyerName"
+                    android:text="@string/buyer_name"
                 android:textColor="@color/text_black_bold"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -59,7 +60,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
-                android:text="@string/buyer_rating"
+                android:id="@+id/tvBuyerRating"
+                    android:text="@string/buyer_rating"
                 android:textColor="@color/text_black_bold"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -96,7 +98,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/product_summary"
+            android:id="@+id/tvProductSummary"
+                    android:text="@string/product_summary"
             android:textColor="@color/text_gray_medium"
             android:textSize="13sp" />
     </LinearLayout>
@@ -131,7 +134,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="@string/total_price_label"
+                android:id="@+id/tvTotalPrice"
+                    android:text="@string/total_price_label"
                 android:textColor="@color/text_black_bold"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -157,6 +161,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:inputType="number"
+                    android:id="@+id/etQuantity"
                     android:text="500"
                     android:textSize="14sp" />
 
@@ -183,6 +188,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:inputType="number"
+                    android:id="@+id/etPrice"
                     android:text="250"
                     android:textSize="14sp" />
 
@@ -206,6 +212,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:id="@+id/tvPickupDate"
                     android:text="Oct 24"
                     android:textSize="14sp" />
 

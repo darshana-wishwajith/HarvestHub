@@ -75,6 +75,17 @@ public class UserService {
         if (Roles.FARMER.equals(role) && req.getFarmLocation() == null) {
             throw new IllegalStateException("Farm location is required for farmers");
         }
+        if (Roles.BUYER.equals(role) && req.getFarmLocation() == null) { // decision 15 Nov: required delivery pin
+            throw new IllegalStateException("Delivery location is required for buyers");
+        }
+        if (Roles.TRANSPORTER.equals(role)) { // decision 15 Nov: vehicle + base pin at sign-up
+            if (req.getFarmLocation() == null) throw new IllegalStateException("Vehicle address is required for transporters");
+            if (!TransporterProfile.VEHICLE_TYPES.contains(req.getVehicleType() == null ? "" : req.getVehicleType())) {
+                throw new IllegalStateException("Choose a vehicle type");
+            }
+            TransporterProfile.checkPlate(req.getVehiclePlate());
+            TransporterProfile.checkBody(req.getVehicleBodyType());
+        }
         if (req.getFarmLocation() != null) {
             double lat = req.getFarmLocation().getLatitude(), lng = req.getFarmLocation().getLongitude();
             // Sri Lanka bounding box (with a small margin) - rejects 0,0 and other unset / bogus pins.
@@ -100,6 +111,16 @@ public class UserService {
         user.setNic(req.getNic().toUpperCase());
         user.setRole(role);
         user.setFarmLocation(req.getFarmLocation());
+        if (Roles.TRANSPORTER.equals(role)) {
+            user.setVehicleType(req.getVehicleType());
+            user.setVehiclePlate(TransporterProfile.normalisePlate(req.getVehiclePlate()));
+            user.setVehicleCapacityKg(req.getVehicleCapacityKg() != null && req.getVehicleCapacityKg() > 0 ? req.getVehicleCapacityKg() : null);
+            user.setVehicleBodyType(req.getVehicleBodyType() == null ? null : req.getVehicleBodyType().toUpperCase());
+            user.setAvailable(true);
+            user.setOnline(true);
+            user.setLastLatitude(req.getFarmLocation().getLatitude());
+            user.setLastLongitude(req.getFarmLocation().getLongitude());
+        }
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setPasswordLastUpdated(LocalDateTime.now().toString());
         return userRepository.save(user);
@@ -212,6 +233,24 @@ public class UserService {
         user.setResetPasswordTokenExpiry(null);
         userRepository.save(user);
         resetAttempts.remove(user.getId());
+    }
+
+    /** Settings → Change Password while logged in. Same rule as registration: 8+ chars with letters and numbers. */
+    public void changePassword(String userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalStateException("User not found"));
+        if (currentPassword == null || user.getPassword() == null || !passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalStateException("Current password is incorrect.");
+        }
+        if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
+                || !newPassword.matches(".*[A-Za-z].*") || !newPassword.matches(".*\\d.*")) {
+            throw new IllegalStateException("Use at least 8 characters with letters and numbers.");
+        }
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalStateException("New password must be different from your current password.");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordLastUpdated(LocalDateTime.now().toString());
+        userRepository.save(user);
     }
 
     private void requireValidResetCode(User user, String code) {

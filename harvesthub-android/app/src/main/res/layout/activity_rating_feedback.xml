@@ -100,7 +100,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="@string/total_payout"
+                        android:id="@+id/tvTotalPayout"
+            android:text="@string/total_payout"
                         android:textColor="#1B4A36"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -144,7 +145,8 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/rate_buyer"
+                        android:id="@+id/tvRateBuyer"
+            android:text="@string/rate_buyer"
                         android:textColor="#202124"
                         android:textSize="18sp" />
 
@@ -226,7 +228,8 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/rate_transporter"
+                        android:id="@+id/tvRateTransporter"
+            android:text="@string/rate_transporter"
                         android:textColor="#202124"
                         android:textSize="18sp" />
 

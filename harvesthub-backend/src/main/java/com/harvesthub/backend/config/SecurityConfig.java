@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     private static final String[] OFFICER_AREA = {
             "/api/queue/**", "/api/review-history/**", "/api/dashboard/activity", "/api/dashboard/stats",
-            "/api/officers/**", "/api/listings/**"
+            "/api/officers/**", "/api/listings/**", "/api/officer/**"
     };
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_AUTH).permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vehicle-types", "/vehicle-types").permitAll() // sign-up cards
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(OFFICER_AREA).hasAnyRole("OFFICER", "ADMIN")
                         .requestMatchers("/api/users/**", "/users/**").hasRole("ADMIN")
