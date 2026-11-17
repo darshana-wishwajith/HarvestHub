@@ -1,5 +1,7 @@
 package com.harvesthub.mobile.ui.transporter;
 
+import android.widget.TextView;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
@@ -78,27 +80,43 @@ public class TransporterWalletActivity extends AppCompatActivity {
 
     private void render(WalletSummaryResponse w, List<Transaction> txns) {
         content.removeAllViews();
+        int green = Color.parseColor("#15803D");
         LinearLayout b = TUi.card(content);
-        TUi.caption(b, "Available balance");
-        TUi.big(b, TUi.rs(w.getBalance()) + " LKR", w.getBalance() < 0 ? TUi.RED : TUi.DARK);
+        LinearLayout bh = TUi.hrow(b, 0);
+        TUi.fill(bh, "Available Payout Balance", 13, TUi.MUTED, false).setTypeface(TUi.semi(this));
+        TUi.tag(bh, w.isSuspended() ? "Suspended" : "Mock Wallet", w.isSuspended() ? TUi.RED_BG : TUi.MINT, w.isSuspended() ? TUi.RED : TUi.MINT_INK);
+        LinearLayout br = TUi.hrow(b, 2);
+        br.setGravity(android.view.Gravity.BOTTOM);
+        TUi.label(br, TUi.rs(w.getBalance()), 32, w.getBalance() < 0 ? TUi.RED : TUi.INK, true);
+        TUi.label(br, "  LKR", 12, TUi.DARK, true).setPadding(0, 0, 0, TUi.dp(this, 6));
         if (w.isSuspended()) {
-            TUi.pill(b, "Suspended – balance below zero", TUi.RED_BG, TUi.RED);
-            TUi.primary(b, "Pay back " + TUi.rs(-w.getBalance()), v -> amountDialog("Pay back (mock top-up)", -w.getBalance(), true));
+            TUi.iconButton(b, "Pay Back " + TUi.rs(-w.getBalance()), R.drawable.ic_bolt_green, TUi.RED, Color.WHITE,
+                    v -> amountDialog("Pay back (mock top-up)", -w.getBalance(), true));
         } else {
-            TUi.primary(b, "Withdraw (mock)", v -> amountDialog("Withdraw to your account", w.getBalance(), false));
+            TUi.iconButton(b, "Withdraw (Mock)", R.drawable.ic_bolt_green, TUi.DARK, Color.WHITE,
+                    v -> amountDialog("Withdraw to your account", w.getBalance(), false));
         }
-        TUi.secondary(b, "Add funds (mock top-up)", v -> amountDialog("Add funds", 0, true));
+        TUi.iconButton(b, "Add Funds (Mock Top-up)", R.drawable.ic_add_circle, Color.parseColor("#E9E7E5"), TUi.INK, v -> amountDialog("Add funds", 0, true));
 
-        TUi.title(content, "Transactions").setPadding(0, TUi.dp(this, 16), 0, 0);
+        TUi.sectionTitle(content, "Transactions", null);
         if (txns == null || txns.isEmpty()) {
             TUi.body(content, "No transactions yet.");
             return;
         }
-        LinearLayout list = TUi.card(content);
         for (Transaction t : txns) {
             double amt = t.isCredit() ? t.getAmountValue() : -t.getAmountValue();
-            TUi.row(list, t.getTitle() + "\n" + com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(t.getTimestamp()),
-                    TUi.signedRs(amt), amt >= 0 ? TUi.ACCENT : TUi.RED, false);
+            boolean plus = amt >= 0;
+            LinearLayout c = TUi.card(content);
+            ((LinearLayout.LayoutParams) ((android.view.View) c.getParent()).getLayoutParams()).topMargin = TUi.dp(this, 10);
+            LinearLayout r = TUi.hrow(c, 0);
+            TUi.iconTile(r, plus ? R.drawable.ic_banknote : R.drawable.ic_credit_card, 40, plus ? TUi.MINT : TUi.RED_BG, plus ? TUi.DARK : TUi.RED, true);
+            LinearLayout tt = TUi.col(r, 1f);
+            tt.setPadding(TUi.dp(this, 12), 0, TUi.dp(this, 8), 0);
+            TextView title = TUi.text(tt, t.getTitle(), 14, TUi.INK, true);
+            title.setMaxLines(2);
+            title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            TUi.text(tt, com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(t.getTimestamp()), 12, TUi.MUTED, false);
+            TUi.label(r, TUi.signedRs(amt), 15, plus ? green : TUi.RED, true);
         }
     }
 

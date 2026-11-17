@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Captured media on Listing Details: 2 photos + 1 video (play badge), no add tile -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
+    android:layout_width="68dp"
+    android:layout_height="68dp"
     android:layout_marginEnd="12dp"
-    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="#E5E7EB"
+    app:cardCornerRadius="10dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/border_gray"
     app:strokeWidth="1dp">
@@ -13,7 +15,15 @@
         android:id="@+id/ivThumbnail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:contentDescription="Photo Thumbnail" />
+        android:contentDescription="Photo Thumbnail"
+        android:scaleType="centerCrop" />
 
+    <ImageView
+        android:id="@+id/ivPlay"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:contentDescription="Video"
+        android:src="@drawable/ic_play_badge"
+        android:visibility="gone" />
 </com.google.android.material.card.MaterialCardView>

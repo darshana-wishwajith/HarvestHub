@@ -44,17 +44,25 @@ public class ListingController {
         return ResponseEntity.ok(listingService.locationCheck(currentUser.id(), lat, lng));
     }
 
+    /** Farmer card "Edit": estimated yield and price per kg only (crop and media were verified). */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateListing(@PathVariable String id, @RequestBody Listing updates) {
-        Listing existing = listingService.getListingById(id);
-        if (existing == null) {
-            return ResponseEntity.notFound().build();
-        }
-        currentUser.requireSelfOrStaff(existing.getFarmerId());
-        if (!"DRAFT".equals(existing.getStatus()) && !"ACTIVE".equals(existing.getStatus())) {
-            return ResponseEntity.badRequest().body("Can only update DRAFT or ACTIVE listings");
-        }
-        return ResponseEntity.ok(listingService.updateListing(id, updates));
+        currentUser.requireRole("FARMER");
+        return ResponseEntity.ok(listingService.editYieldAndPrice(id, currentUser.id(), updates.getQuantity(), updates.getPrice()));
+    }
+
+    /** Farmer card "Deactivate": hidden from the marketplace and the officer queue. */
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<Listing> deactivate(@PathVariable String id) {
+        currentUser.requireRole("FARMER");
+        return ResponseEntity.ok(listingService.deactivate(id, currentUser.id()));
+    }
+
+    /** Farmer card "Re-activate": back to Listed (same grade) or to the officer queue. */
+    @PostMapping("/{id}/reactivate")
+    public ResponseEntity<Listing> reactivate(@PathVariable String id) {
+        currentUser.requireRole("FARMER");
+        return ResponseEntity.ok(listingService.reactivate(id, currentUser.id()));
     }
 
     @PutMapping("/{id}/status")

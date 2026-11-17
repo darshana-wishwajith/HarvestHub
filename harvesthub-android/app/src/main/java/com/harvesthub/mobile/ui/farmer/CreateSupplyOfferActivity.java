@@ -87,6 +87,51 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
         String respondingText = String.format("Responding to: %s Req (%s KG | Target: LKR %s/kg - %s)",
                 cropName, formatter.format(requestedQuantity), formatter.format(targetPrice), location);
         tvRespondingTo.setText(respondingText);
+        loadMarketInsight();
+    }
+
+    private Double marketAverage;
+
+    /** Real 7-day average from GET /market/trend; compared with the price the farmer types. */
+    private void loadMarketInsight() {
+        TextView tv = findViewById(R.id.tvMarketInsight);
+        if (tv == null) return;
+        if (cropName == null || cropName.isEmpty()) {
+            tv.setText("No market price data for this crop yet.");
+            return;
+        }
+        ApiClient.getApiService().getMarketTrend(cropName, 7).enqueue(new Callback<com.harvesthub.mobile.model.MarketTrendResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<com.harvesthub.mobile.model.MarketTrendResponse> call,
+                                   @NonNull Response<com.harvesthub.mobile.model.MarketTrendResponse> r) {
+                if (isFinishing()) return;
+                if (!r.isSuccessful() || r.body() == null || r.body().getCurrentAverage() == null || r.body().getSamples() == 0) {
+                    tv.setText("No recent market price data for " + cropName + ".");
+                    return;
+                }
+                marketAverage = r.body().getCurrentAverage();
+                updateInsight();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.harvesthub.mobile.model.MarketTrendResponse> call, @NonNull Throwable t) {
+                tv.setText("Market prices unavailable right now.");
+            }
+        });
+    }
+
+    private void updateInsight() {
+        TextView tv = findViewById(R.id.tvMarketInsight);
+        if (tv == null || marketAverage == null) return;
+        String base = "7-day average price for " + cropName + ": LKR " + formatter.format(marketAverage) + "/kg.";
+        double price = 0;
+        try {
+            price = Double.parseDouble(etPrice.getText().toString().trim());
+        } catch (Exception ignored) { }
+        if (price <= 0) tv.setText(base);
+        else if (price > marketAverage * 1.10) tv.setText(base + " Your price is above the market average.");
+        else if (price < marketAverage * 0.90) tv.setText(base + " Your price is below the market average.");
+        else tv.setText(base + " Your price is competitive.");
     }
 
     private void setupListeners() {
@@ -98,6 +143,7 @@ public class CreateSupplyOfferActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 calculatePayout();
+                updateInsight();
             }
             @Override
             public void afterTextChanged(Editable s) {}

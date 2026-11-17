@@ -21,6 +21,8 @@ public class FarmerController {
     @Autowired
     private com.harvesthub.backend.security.CurrentUser currentUser;
     @Autowired
+    private com.harvesthub.backend.repository.OrderRepository orderRepository;
+    @Autowired
     private FarmerProfileService farmerProfileService;
     @Autowired
     private DashboardService dashboardService;
@@ -37,6 +39,10 @@ public class FarmerController {
     public ResponseEntity<?> getActiveListings(@PathVariable String id) {
         currentUser.requireSelfOrStaff(id);
         List<Listing> listings = listingService.getActiveListings(id);
+        // purchase requests still being negotiated (the listing stays on the market until a deal is accepted)
+        Map<String, List<com.harvesthub.backend.model.Order>> negotiating = orderRepository.findByFarmerId(id).stream()
+                .filter(o -> "NEGOTIATING".equals(o.getStatus()) && o.getListingId() != null)
+                .collect(Collectors.groupingBy(com.harvesthub.backend.model.Order::getListingId));
         // Transform to match Android's ListingItem format
         List<Map<String, Object>> result = listings.stream().map(l -> {
             Map<String, Object> map = new HashMap<>();
@@ -55,6 +61,15 @@ public class FarmerController {
             map.put("activeOrderId", l.getActiveOrderId());
             map.put("cropPending", Boolean.TRUE.equals(l.getCropPending()));
             map.put("mediaUrls", l.getMediaUrls());
+            List<com.harvesthub.backend.model.Order> open = negotiating.getOrDefault(l.getId(), List.of());
+            if (!open.isEmpty()) {
+                // newest conversation first
+                com.harvesthub.backend.model.Order latest = open.stream()
+                        .max(java.util.Comparator.comparing(o -> o.getCreatedDate() == null ? "" : o.getCreatedDate())).get();
+                map.put("negotiationOrderId", latest.getOrderId());
+                map.put("negotiationBuyerName", latest.getBuyerName());
+                map.put("negotiationCount", open.size());
+            }
             return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(result);

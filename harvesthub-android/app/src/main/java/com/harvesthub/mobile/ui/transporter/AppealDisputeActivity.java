@@ -1,5 +1,7 @@
 package com.harvesthub.mobile.ui.transporter;
 
+import com.harvesthub.mobile.R;
+import android.graphics.Color;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -86,38 +88,86 @@ public class AppealDisputeActivity extends BaseTransporterOrderActivity {
 
     @Override
     protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
+        int green = Color.parseColor("#15803D");
+        String photo = o.getLoadingEvidenceUrls() == null || o.getLoadingEvidenceUrls().isEmpty() ? null : o.getLoadingEvidenceUrls().get(0);
+        int photos = o.getLoadingEvidenceUrls() == null ? 0 : o.getLoadingEvidenceUrls().size();
+
         LinearLayout head = TUi.card(c, TUi.DARK, TUi.DARK);
-        TUi.text(head, (o.getFarmerName() == null ? "" : o.getFarmerName() + " • ") + ref(), 12, TUi.SURFACE, true);
-        TUi.text(head, cargo(o), 17, android.graphics.Color.WHITE, true);
+        LinearLayout hr = TUi.hrow(head, 0);
+        TUi.thumb(hr, photo, 60, 60);
+        LinearLayout ht = TUi.col(hr, 1f);
+        ht.setPadding(TUi.dp(this, 12), 0, 0, 0);
+        TUi.text(ht, "\u2713 " + (o.getFarmerName() == null ? "" : o.getFarmerName().toUpperCase(java.util.Locale.US) + " \u2022 ") + ref(), 11,
+                Color.parseColor("#86EFAC"), true);
+        TextView cg = TUi.text(ht, cargo(o), 16, Color.WHITE, true);
+        cg.setMaxLines(1);
+        cg.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TUi.text(ht, (o.getPickupAddress() == null ? "Farm" : o.getPickupAddress()) + " \u2192 " + (o.getDropAddress() == null ? "Buyer" : o.getDropAddress()),
+                12, Color.parseColor("#D1FAE5"), false);
 
         LinearLayout sys = TUi.card(c);
-        TUi.text(sys, "System evidence attached automatically", 15, TUi.INK, true);
-        int photos = o.getLoadingEvidenceUrls() == null ? 0 : o.getLoadingEvidenceUrls().size();
-        TUi.step(sys, "Geotagged pre-loading photos (" + photos + ") – approved by the buyer", 2, null);
-        TUi.step(sys, "GPS track of the journey", 2, null);
-        TUi.step(sys, "Arrival time at the buyer: " + time(o.getActualDeliveryDate()), 2, null);
+        LinearLayout sh = TUi.hrow(sys, 0);
+        TUi.iconTile(sh, R.drawable.ic_shield_check, 36, TUi.MINT, TUi.DARK, true);
+        LinearLayout st = TUi.col(sh, 1f);
+        st.setPadding(TUi.dp(this, 10), 0, 0, 0);
+        TUi.text(st, "System Evidence Attached", 16, TUi.INK, true);
+        TUi.text(st, "Automatically linked from the trip record", 12, TUi.MUTED, false);
+        proof(sys, "Geotagged Pre-Loading Photos", photos + (photos == 1 ? " file" : " files") + " \u2022 Approved by the buyer at origin", "Attached");
+        proof(sys, "Continuous GPS Track", o.getDistanceKm() == null ? "Journey positions every 30 s" : TUi.km(o.getDistanceKm()) + " route \u2022 positions every 30 s", "Verified");
+        proof(sys, "Arrival Timestamp", "Arrived " + time(o.getActualDeliveryDate()) + (o.getDropAddress() == null ? "" : " \u2022 " + o.getDropAddress()), "Recorded");
 
         LinearLayout f = TUi.card(c);
-        TUi.caption(f, "Dispute reason category");
+        TUi.text(f, "DISPUTE REASON CATEGORY", 11, TUi.MUTED, true).setLetterSpacing(0.05f);
         reasonChips = TUi.chips(f, REASONS, false, null);
         TUi.setChip(reasonChips.get(0), true);
-        TUi.text(f, "Transporter statement", 14, TUi.INK, true).setPadding(0, TUi.dp(this, 12), 0, 0);
-        statement = TUi.input(f, "What happened? (max 500 characters)", true);
-        TUi.text(f, "Supplementary photos (optional, up to 4)", 14, TUi.INK, true).setPadding(0, TUi.dp(this, 12), 0, 0);
-        photoStrip = new LinearLayout(this);
-        f.addView(photoStrip);
-        TUi.secondary(f, "+ Add supplementary photo", v -> {
+        LinearLayout sl = TUi.hrow(f, 14);
+        TUi.fill(sl, "Transporter Statement", 14, TUi.INK, true);
+        final TextView counter = TUi.label(sl, "0 / 500", 12, TUi.MUTED, true);
+        statement = TUi.input(f, "What happened? Describe the handover and the condition of the goods.", true);
+        statement.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(500)});
+        statement.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
+            public void onTextChanged(CharSequence s, int a, int b, int n) { counter.setText(s.length() + " / 500"); }
+            public void afterTextChanged(android.text.Editable s) { }
+        });
+        LinearLayout el = TUi.hrow(f, 14);
+        TUi.fill(el, "Supplementary Evidence", 14, TUi.INK, true);
+        TUi.label(el, "Optional", 12, green, true);
+        LinearLayout add = TUi.box(f, TUi.GREY_BG, 8);
+        add.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+        add.setPadding(TUi.dp(this, 12), TUi.dp(this, 16), TUi.dp(this, 12), TUi.dp(this, 16));
+        TUi.iconTile(add, R.drawable.ic_camera_add, 44, TUi.MINT, TUi.DARK, true);
+        TextView at = TUi.text(add, "+ Add Supplementary Photo", 13, TUi.DARK, true);
+        at.setGravity(android.view.Gravity.CENTER);
+        at.setPadding(0, TUi.dp(this, 8), 0, 0);
+        TextView ah = TUi.text(add, "Up to 4 photos, e.g. unloading area, damaged crates", 12, TUi.MUTED, false);
+        ah.setGravity(android.view.Gravity.CENTER);
+        add.setOnClickListener(v -> {
             if (extraPhotos.size() >= 4) Toast.makeText(this, "Up to 4 photos.", Toast.LENGTH_SHORT).show();
             else camera.launch(new Intent(this, EvidenceCameraActivity.class).putExtra(EvidenceCameraActivity.EXTRA_LABEL, "Appeal " + ref()));
         });
+        photoStrip = new LinearLayout(this);
+        f.addView(photoStrip);
         showThumbs();
 
-        LinearLayout note = TUi.card(c, TUi.SURFACE, TUi.SURFACE);
-        TUi.text(note, "How appeals work", 14, TUi.DARK, true);
-        TUi.body(note, "Your appeal goes to the agricultural officers for review. The damage charge stays on your wallet "
-                + "unless an officer decides otherwise.");
+        TUi.notice(c, R.drawable.ic_escrow_recoil, Color.parseColor("#D7F5DD"), green, "How Appeals Work",
+                "Your appeal goes to the agricultural officers for review. The damage charge stays on your wallet unless an officer decides otherwise.");
 
-        TUi.primary(actions, "Submit Official Appeal →", v -> submit((MaterialButton) v));
+        TUi.primary(actions, "Submit Official Appeal \u2192", v -> submit((MaterialButton) v));
+        TextView cancel = TUi.link(actions, "Cancel & Go Back", TUi.MUTED, v -> finish());
+        cancel.setPaintFlags(cancel.getPaintFlags() & ~android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+    }
+
+    private void proof(LinearLayout parent, String title, String sub, String tagText) {
+        LinearLayout b = TUi.box(parent, TUi.GREY_BG, 8);
+        LinearLayout r = TUi.hrow(b, 0);
+        r.setGravity(android.view.Gravity.TOP);
+        TUi.icon(r, R.drawable.ic_check_circle_green, 18, Color.parseColor("#15803D"));
+        LinearLayout t = TUi.col(r, 1f);
+        t.setPadding(TUi.dp(this, 8), 0, TUi.dp(this, 8), 0);
+        TUi.text(t, title, 14, TUi.INK, true);
+        TUi.text(t, sub, 12, TUi.MUTED, false);
+        TUi.tag(r, tagText, TUi.MINT, TUi.MINT_INK);
     }
 
     private void showThumbs() {

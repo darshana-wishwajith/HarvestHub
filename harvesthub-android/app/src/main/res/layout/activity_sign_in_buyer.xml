@@ -55,6 +55,7 @@
 
         <!-- Tagline -->
         <TextView
+            android:id="@+id/tvTagline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -65,6 +66,7 @@
 
         <!-- Welcome Buyer Heading -->
         <TextView
+            android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -76,6 +78,7 @@
 
         <!-- Subtitle -->
         <TextView
+            android:id="@+id/tvWelcomeSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -231,6 +234,7 @@
 
         <!-- Bottom Card: VERIFIED ENTERPRISE NETWORK -->
         <LinearLayout
+            android:id="@+id/layoutFooterCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
@@ -258,7 +262,7 @@
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.03"
                     android:text="VERIFIED ENTERPRISE NETWORK"
-                    android:textColor="#183D2C"
+                    android:textColor="#1B4332"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 

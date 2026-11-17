@@ -1,43 +1,47 @@
 package com.harvesthub.mobile.ui.buyer;
 
-import com.harvesthub.mobile.R;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.harvesthub.mobile.R;
+import com.harvesthub.mobile.model.RegisterRequest;
+import com.harvesthub.mobile.network.ApiClient;
+import com.harvesthub.mobile.utils.AuthInputUtils;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 /**
- * Page 1.2: HarvestHub - Create Account
- * Register to Next Generation Agricultural MarketPlace
+ * Page 1.2: HarvestHub - Create Account (buyer; also used by transporters with TARGET_ROLE=TRANSPORTER).
+ * Validation matches farmer registration: every field is checked at once and each message is shown
+ * under its own field; messages clear as soon as the field is edited. Email / mobile / NIC are then
+ * checked against the server before moving to step 2.
  */
 public class CreateAccountActivity extends AppCompatActivity {
 
-    private EditText etFullName;
-    private EditText etMobile;
-    private EditText etNic;
-    private ImageView ivNicInfo;
-    private EditText etCreatePassword;
-    private ImageView ivToggleCreatePassword;
-    private EditText etConfirmPassword;
-    private ImageView ivToggleConfirmPassword;
+    private TextInputLayout tilFullName, tilEmail, tilMobile, tilNic, tilCreatePassword, tilConfirmPassword;
+    private TextInputEditText etFullName, etEmail, etMobile, etNic, etCreatePassword, etConfirmPassword;
     private LinearLayout btnContinueLocation;
-    private TextView tvSignInLink;
-
-    private boolean isCreatePasswordVisible = false;
-    private boolean isConfirmPasswordVisible = false;
+    private TextView tvContinueLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,167 +54,155 @@ public class CreateAccountActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.WHITE);
         }
 
-        initViews();
-        setupListeners();
-    }
-
-    private void initViews() {
+        tilFullName = findViewById(R.id.tilFullName);
+        tilEmail = findViewById(R.id.tilEmail);
+        tilMobile = findViewById(R.id.tilMobile);
+        tilNic = findViewById(R.id.tilNic);
+        tilCreatePassword = findViewById(R.id.tilCreatePassword);
+        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
         etFullName = findViewById(R.id.etFullName);
+        etEmail = findViewById(R.id.etEmail);
         etMobile = findViewById(R.id.etMobile);
         etNic = findViewById(R.id.etNic);
-        ivNicInfo = findViewById(R.id.ivNicInfo);
         etCreatePassword = findViewById(R.id.etCreatePassword);
-        ivToggleCreatePassword = findViewById(R.id.ivToggleCreatePassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
-        ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
         btnContinueLocation = findViewById(R.id.btnContinueLocation);
-        tvSignInLink = findViewById(R.id.tvSignInLink);
+        tvContinueLabel = (TextView) btnContinueLocation.getChildAt(0);
+
+        tilNic.setEndIconOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("National Identity Card (NIC)")
+                .setMessage("Please enter your valid Sri Lankan NIC number:\n"
+                        + "• 12-digit format (e.g., 199012345678)\n"
+                        + "• 9 digits with V/X (e.g., 901234567V)\n\n"
+                        + "This is required for verified agricultural escrow contracts.")
+                .setPositiveButton("Understood", null)
+                .show());
+
+        clearErrorOnEdit(etFullName, tilFullName);
+        clearErrorOnEdit(etEmail, tilEmail);
+        clearErrorOnEdit(etMobile, tilMobile);
+        clearErrorOnEdit(etNic, tilNic);
+        clearErrorOnEdit(etCreatePassword, tilCreatePassword);
+        clearErrorOnEdit(etConfirmPassword, tilConfirmPassword);
+
+        btnContinueLocation.setOnClickListener(v -> validateAndContinue());
+        // Back to the sign-in screen this form was opened from (buyer or transporter)
+        findViewById(R.id.tvSignInLink).setOnClickListener(v -> finish());
     }
 
-    private void setupListeners() {
-        // NIC Info Click
-        ivNicInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(CreateAccountActivity.this)
-                        .setTitle("National Identity Card (NIC)")
-                        .setMessage("Please enter your valid Sri Lankan NIC number:\nâ€¢ 12-digit format (e.g., 199012345678)\nâ€¢ 9-digit format with V/X (e.g., 901234567V)\n\nThis is strictly required for verified agricultural escrow contracts.")
-                        .setPositiveButton("Understood", null)
-                        .show();
-            }
+    /** Clears a field's error as soon as the user edits it. */
+    private static void clearErrorOnEdit(TextInputEditText et, TextInputLayout til) {
+        et.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence c, int a, int b, int d) { }
+            @Override public void onTextChanged(CharSequence c, int a, int b, int d) { til.setError(null); }
+            @Override public void afterTextChanged(Editable e) { }
         });
+    }
 
-        // Toggle Create Password
-        ivToggleCreatePassword.setOnClickListener(new View.OnClickListener() {
+    private static String text(TextInputEditText et) {
+        return et.getText() == null ? "" : et.getText().toString();
+    }
+
+    private void validateAndContinue() {
+        String fullName = text(etFullName).trim().replaceAll("\\s+", " ");
+        String rawMobile = text(etMobile).trim();
+        String mobile = AuthInputUtils.normaliseMobile(rawMobile);
+        String email = text(etEmail).trim().toLowerCase(Locale.US);
+        String nic = text(etNic).trim().toUpperCase(Locale.US);
+        String password = text(etCreatePassword);            // sent as typed; never trimmed
+        String confirmPassword = text(etConfirmPassword);
+
+        TextInputLayout firstError = null;
+
+        if (fullName.isEmpty()) {
+            firstError = fail(tilFullName, "Full name is required", firstError);
+        } else if (fullName.length() < 3 || !fullName.matches("^[A-Za-z][A-Za-z .']*$")) {
+            firstError = fail(tilFullName, "Use letters, spaces and dots only (min 3 characters)", firstError);
+        }
+        if (email.isEmpty()) {
+            firstError = fail(tilEmail, "Email is required", firstError);
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            firstError = fail(tilEmail, "Enter a valid email address", firstError);
+        }
+        if (rawMobile.isEmpty()) {
+            firstError = fail(tilMobile, "Mobile number is required", firstError);
+        } else if (mobile == null) {
+            firstError = fail(tilMobile, "Enter a 10-digit number starting with 07", firstError);
+        }
+        if (nic.isEmpty()) {
+            firstError = fail(tilNic, "NIC is required", firstError);
+        } else if (!AuthInputUtils.isValidNic(nic)) {
+            firstError = fail(tilNic, "Enter a valid NIC (123456789V or 200012345678)", firstError);
+        }
+        if (password.isEmpty()) {
+            firstError = fail(tilCreatePassword, "Password is required", firstError);
+        } else if (!AuthInputUtils.isStrongEnough(password)) {
+            firstError = fail(tilCreatePassword, "At least 8 characters with letters and numbers", firstError);
+        }
+        if (confirmPassword.isEmpty()) {
+            firstError = fail(tilConfirmPassword, "Please confirm your password", firstError);
+        } else if (!confirmPassword.equals(password)) {
+            firstError = fail(tilConfirmPassword, "Passwords do not match", firstError);
+        }
+
+        if (firstError != null) {
+            firstError.requestFocus();
+            return;
+        }
+        checkAvailabilityThenContinue(new RegisterRequest(fullName, mobile, nic, email, password, targetRole()));
+    }
+
+    /** Shows {@code message} under the field; returns the first field with an error (for focus). */
+    private static TextInputLayout fail(TextInputLayout til, String message, TextInputLayout firstError) {
+        til.setError(message);
+        return firstError != null ? firstError : til;
+    }
+
+    /** Asks the server whether email / mobile / NIC are already registered before moving to step 2. */
+    private void checkAvailabilityThenContinue(RegisterRequest request) {
+        Map<String, String> body = new HashMap<>();
+        body.put("email", request.getEmail());
+        body.put("mobileNumber", request.getMobileNumber());
+        body.put("nic", request.getNic());
+        setBusy(true);
+        ApiClient.getApiService().checkAvailability(body).enqueue(new Callback<Map<String, Boolean>>() {
             @Override
-            public void onClick(View v) {
-                if (isCreatePasswordVisible) {
-                    etCreatePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    ivToggleCreatePassword.setImageResource(R.drawable.ic_visibility_eye);
-                    isCreatePasswordVisible = false;
-                } else {
-                    etCreatePassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    ivToggleCreatePassword.setImageResource(R.drawable.ic_visibility_eye_off);
-                    isCreatePasswordVisible = true;
+            public void onResponse(@NonNull Call<Map<String, Boolean>> call, @NonNull Response<Map<String, Boolean>> response) {
+                setBusy(false);
+                Map<String, Boolean> r = response.body();
+                if (!response.isSuccessful() || r == null) {
+                    Toast.makeText(CreateAccountActivity.this,
+                            "Could not verify your details (" + response.code() + "). Please try again.", Toast.LENGTH_LONG).show();
+                    return;
                 }
-                etCreatePassword.setSelection(etCreatePassword.getText().length());
-            }
-        });
-
-        // Toggle Confirm Password
-        ivToggleConfirmPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isConfirmPasswordVisible) {
-                    etConfirmPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_eye);
-                    isConfirmPasswordVisible = false;
-                } else {
-                    etConfirmPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_eye_off);
-                    isConfirmPasswordVisible = true;
+                TextInputLayout firstError = null;
+                if (Boolean.FALSE.equals(r.get("email"))) firstError = fail(tilEmail, "This email is already registered", null);
+                if (Boolean.FALSE.equals(r.get("mobileNumber"))) firstError = fail(tilMobile, "This mobile number is already registered", firstError);
+                if (Boolean.FALSE.equals(r.get("nic"))) firstError = fail(tilNic, "This NIC is already registered", firstError);
+                if (firstError != null) {
+                    firstError.requestFocus();
+                    return;
                 }
-                etConfirmPassword.setSelection(etConfirmPassword.getText().length());
-            }
-        });
-
-        // Continue to Location Setup Button
-        btnContinueLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handleContinue();
-            }
-        });
-
-        // Already have an account? Sign In link
-        tvSignInLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CreateAccountActivity.this, SignInBuyerActivity.class);
+                // Step 2: required delivery pin; the account is created there (decision 15 Nov)
+                // transporters: vehicle profile first (Figma transporter "Vehicle Profile"), then the vehicle address
+                Intent intent = new Intent(CreateAccountActivity.this, "TRANSPORTER".equals(targetRole())
+                        ? com.harvesthub.mobile.ui.transporter.TransporterVehicleProfileActivity.class : SetDeliveryAddressActivity.class);
+                intent.putExtra(SetDeliveryAddressActivity.EXTRA_REGISTER, request);
                 startActivity(intent);
-                finish();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, Boolean>> call, @NonNull Throwable t) {
+                setBusy(false);
+                Toast.makeText(CreateAccountActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void handleContinue() {
-        EditText etEmail = findViewById(R.id.etEmail);
-        String fullName = etFullName.getText().toString().trim();
-        String mobile = com.harvesthub.mobile.utils.AuthInputUtils.normaliseMobile(etMobile.getText().toString());
-        String email = etEmail.getText().toString().trim().toLowerCase(java.util.Locale.US);
-        String nic = etNic.getText().toString().trim().toUpperCase(java.util.Locale.US);
-        String password = etCreatePassword.getText().toString();
-        String confirmPassword = etConfirmPassword.getText().toString();
-
-        if (fullName.length() < 3 || !fullName.matches("^[A-Za-z][A-Za-z .']*$")) {
-            etFullName.setError("Use letters, spaces and dots only (min 3 characters)");
-            etFullName.requestFocus();
-            return;
-        }
-        if (!mobile.matches("^07[0-9]{8}$")) {
-            etMobile.setError("Enter a 10-digit number starting with 07");
-            etMobile.requestFocus();
-            return;
-        }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Enter a valid email address");
-            etEmail.requestFocus();
-            return;
-        }
-        if (!nic.matches("^([0-9]{9}[VX]|[0-9]{12})$")) {
-            etNic.setError("Enter a valid NIC (123456789V or 200012345678)");
-            etNic.requestFocus();
-            return;
-        }
-        if (password.length() < 8 || !password.matches(".*[A-Za-z].*") || !password.matches(".*[0-9].*")) {
-            etCreatePassword.setError("At least 8 characters with letters and numbers");
-            etCreatePassword.requestFocus();
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
-            etConfirmPassword.requestFocus();
-            return;
-        }
-
-        com.harvesthub.mobile.model.RegisterRequest request =
-                new com.harvesthub.mobile.model.RegisterRequest(fullName, mobile, nic, email, password, targetRole());
-        java.util.Map<String, String> body = new java.util.HashMap<>();
-        body.put("email", email);
-        body.put("mobileNumber", mobile);
-        body.put("nic", nic);
-        btnContinueLocation.setEnabled(false);
-        com.harvesthub.mobile.network.ApiClient.getApiService().checkAvailability(body)
-                .enqueue(new retrofit2.Callback<java.util.Map<String, Boolean>>() {
-                    @Override
-                    public void onResponse(retrofit2.Call<java.util.Map<String, Boolean>> call,
-                                           retrofit2.Response<java.util.Map<String, Boolean>> response) {
-                        btnContinueLocation.setEnabled(true);
-                        java.util.Map<String, Boolean> r = response.body();
-                        if (!response.isSuccessful() || r == null) {
-                            Toast.makeText(CreateAccountActivity.this, "Could not verify your details. Please try again.",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        boolean ok = true;
-                        if (Boolean.FALSE.equals(r.get("mobileNumber"))) { etMobile.setError("This mobile number is already registered"); ok = false; }
-                        if (Boolean.FALSE.equals(r.get("email"))) { etEmail.setError("This email is already registered"); ok = false; }
-                        if (Boolean.FALSE.equals(r.get("nic"))) { etNic.setError("This NIC is already registered"); ok = false; }
-                        if (!ok) return;
-                        // Step 2: required delivery pin; the account is created there (decision 15 Nov)
-                        // transporters: vehicle profile first (Figma transporter "Vehicle Profile"), then the vehicle address
-                        Intent intent = new Intent(CreateAccountActivity.this, "TRANSPORTER".equals(targetRole())
-                                ? com.harvesthub.mobile.ui.transporter.TransporterVehicleProfileActivity.class : SetDeliveryAddressActivity.class);
-                        intent.putExtra(SetDeliveryAddressActivity.EXTRA_REGISTER, request);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onFailure(retrofit2.Call<java.util.Map<String, Boolean>> call, Throwable t) {
-                        btnContinueLocation.setEnabled(true);
-                        Toast.makeText(CreateAccountActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void setBusy(boolean busy) {
+        btnContinueLocation.setEnabled(!busy);
+        btnContinueLocation.setAlpha(busy ? 0.7f : 1f);
+        if (tvContinueLabel != null) tvContinueLabel.setText(busy ? "Checking details..." : "Continue to Location Setup");
     }
 
     /** BUYER by default; the transporter login opens this screen with TARGET_ROLE=TRANSPORTER. */

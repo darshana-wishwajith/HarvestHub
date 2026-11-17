@@ -124,6 +124,7 @@ public abstract class BaseTransporterOrderActivity extends AppCompatActivity {
 
     protected void render() {
         content.removeAllViews();
+        ((android.widget.TextView) findViewById(R.id.tvTpTitle)).setText(title());
         LinearLayout actions = findViewById(R.id.tpActions);
         actions.removeAllViews();
         actions.setVisibility(View.GONE);

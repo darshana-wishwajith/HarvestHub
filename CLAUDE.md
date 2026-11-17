@@ -2,7 +2,7 @@
 
 Agricultural marketplace + logistics system (ICT 2212, Group 12 "CodeX", Rajarata University).
 Deadlines: **Final report 2026-11-17, presentation 2026-11-18.**
-Status, gaps and the task board live in `DEVELOPMENT_STATUS.md`; the triaged plan is in `docs/RELEASE_PLAN.md`. Read those before starting work; don't duplicate them here.
+**Start with `PROJECT_HANDOVER.md`** (full system overview, current progress, gaps, how to continue). Verification log: `DEVELOPMENT_STATUS.md` §6 (its §3 gap matrix is outdated — use the handover's §4). Read those before starting work; don't duplicate them here.
 
 ## Scope authority
 1. Approved proposal (`Project Proposal - Revised.pdf`, kept outside the repo) **wins**.

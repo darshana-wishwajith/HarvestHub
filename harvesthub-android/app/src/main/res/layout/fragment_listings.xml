@@ -390,6 +390,21 @@
                             android:text="Ongoing"
                             android:textColor="#64748B"
                             android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/filterDeactivated"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:paddingHorizontal="18dp"
+                            android:paddingVertical="7.5dp"
+                            android:text="Deactivated"
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </HorizontalScrollView>
 

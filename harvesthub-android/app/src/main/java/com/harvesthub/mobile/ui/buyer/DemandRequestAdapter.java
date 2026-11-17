@@ -64,6 +64,16 @@ public class DemandRequestAdapter extends RecyclerView.Adapter<DemandRequestAdap
             holder.layoutClosedActions.setVisibility(View.VISIBLE);
         }
 
+        View banner = holder.itemView.findViewById(R.id.layoutOffersBanner);
+        boolean hasOffers = item.getStatus() == DemandStatus.ACTIVE && item.getOfferCount() > 0;
+        banner.setVisibility(hasOffers ? View.VISIBLE : View.GONE);
+        if (hasOffers) {
+            int n = item.getOfferCount();
+            String text = n + (n == 1 ? " Supply Offer Received" : " Supply Offers Received");
+            if (item.getNewOfferCount() > 0) text += " (" + item.getNewOfferCount() + " new)";
+            ((TextView) holder.itemView.findViewById(R.id.tvOffersBanner)).setText(text);
+        }
+
         holder.btnViewOffers.setOnClickListener(v -> {
             if (onActionClick != null) onActionClick.onActionClick(item, "view_offers");
         });

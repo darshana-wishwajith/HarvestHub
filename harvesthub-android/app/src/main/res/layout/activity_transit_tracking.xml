@@ -7,13 +7,12 @@
     android:background="#E2E8F0">
 
     <!-- Map View Filling Background -->
-    <androidx.fragment.app.FragmentContainerView
+    <org.osmdroid.views.MapView
         android:id="@+id/mapTransit"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/cardBottomSheet"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="-24dp"
         android:contentDescription="Live Transit GPS Map" />
 
     <!-- Top Floating Order Info Card -->
@@ -49,7 +48,6 @@
                     android:id="@+id/tvOrderNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
                     android:text="Order #HH–842"
                     android:textColor="#111827"
                     android:textSize="18sp"
@@ -89,7 +87,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
                     android:id="@+id/tvTransitStatus"
                     android:text="Status: In Transit"
                     android:textColor="#FFFFFF"
@@ -145,7 +142,6 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
                         android:text="Arriving in"
                         android:textColor="#475569"
                         android:textSize="16sp" />
@@ -289,7 +285,6 @@
                         android:id="@+id/tvDriverName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
                         android:text="Sunil Perera"
                         android:textColor="#111827"
                         android:textSize="16sp"
@@ -324,7 +319,6 @@
                 android:background="@drawable/bg_btn_loading_evidence"
                 android:drawableStart="@drawable/ic_archive_box"
                 android:drawablePadding="10dp"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"

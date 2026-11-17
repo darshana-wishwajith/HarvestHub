@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -76,167 +77,205 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- Form Inputs -->
+        <!-- Form Inputs: Material outlined boxes so errors show under each field (same as farmer registration) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:orientation="vertical">
 
-            <!-- Field 1: Full Name -->
-            <EditText
-                android:id="@+id/etFullName"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilFullName"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/bg_login_input_field"
-                android:hint="Full Name (e.g., W.B.D.W. Bandara)"
-                android:imeOptions="actionNext"
-                android:inputType="textCapWords|textPersonName"
-                android:paddingHorizontal="16dp"
-                android:singleLine="true"
-                android:textColor="#111827"
-                android:textColorHint="#94A3B8"
-                android:textSize="15sp" />
+                android:layout_height="wrap_content"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Full Name (e.g., W.B.D.W. Bandara)"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapWords|textPersonName"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
+                    android:singleLine="true"
+                    android:textColor="#111827"
+                    android:textColorHint="#94A3B8"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email (not in Figma 1.2: needed for sign-in and password reset codes, 15 Nov) -->
-            <EditText
-                android:id="@+id/etEmail"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_login_input_field"
-                android:hint="Email (for sign-in and password reset)"
-                android:imeOptions="actionNext"
-                android:inputType="textEmailAddress"
-                android:paddingHorizontal="16dp"
-                android:singleLine="true"
-                android:textColor="#111827"
-                android:textColorHint="#94A3B8"
-                android:textSize="15sp" />
+                android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false">
 
-            <!-- Field 2: Mobile Number -->
-            <EditText
-                android:id="@+id/etMobile"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email (for sign-in and password reset)"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
+                    android:singleLine="true"
+                    android:textColor="#111827"
+                    android:textColorHint="#94A3B8"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilMobile"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_login_input_field"
-                android:hint="Mobile Number (e.g., 07X XXX XXXX)"
-                android:imeOptions="actionNext"
-                android:inputType="phone"
-                android:paddingHorizontal="16dp"
-                android:singleLine="true"
-                android:textColor="#111827"
-                android:textColorHint="#94A3B8"
-                android:textSize="15sp" />
+                android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false">
 
-            <!-- Field 3: National Identity Card (NIC) with Info Icon -->
-            <RelativeLayout
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mobile Number (e.g., 07X XXX XXXX)"
+                    android:imeOptions="actionNext"
+                    android:inputType="phone"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
+                    android:singleLine="true"
+                    android:textColor="#111827"
+                    android:textColorHint="#94A3B8"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNic"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_login_input_field">
+                android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false"
+                app:endIconContentDescription="NIC info"
+                app:endIconDrawable="@drawable/ic_info_outline"
+                app:endIconMode="custom">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNic"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
+                    android:layout_height="wrap_content"
                     android:hint="National Identity Card (NIC)"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="48dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
                     android:singleLine="true"
                     android:textColor="#111827"
                     android:textColorHint="#94A3B8"
                     android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageView
-                    android:id="@+id/ivNicInfo"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:contentDescription="NIC info"
-                    android:focusable="true"
-                    android:src="@drawable/ic_info_outline" />
-            </RelativeLayout>
-
-            <!-- Field 4: Create Password with Eye Toggle -->
-            <RelativeLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCreatePassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_login_input_field">
+                android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#1B4332">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCreatePassword"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
+                    android:layout_height="wrap_content"
                     android:hint="Create Password"
                     android:imeOptions="actionNext"
                     android:inputType="textPassword"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="48dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
                     android:singleLine="true"
                     android:textColor="#111827"
                     android:textColorHint="#94A3B8"
                     android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageView
-                    android:id="@+id/ivToggleCreatePassword"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:contentDescription="Toggle Password Visibility"
-                    android:focusable="true"
-                    android:src="@drawable/ic_visibility_eye" />
-            </RelativeLayout>
-
-            <!-- Field 5: Confirm Password with Eye Toggle -->
-            <RelativeLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilConfirmPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_login_input_field">
+                android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#1B4332"
+                app:boxStrokeErrorColor="#DC2626"
+                app:errorTextColor="#DC2626"
+                app:errorIconDrawable="@null"
+                app:hintEnabled="false"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#1B4332">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
+                    android:layout_height="wrap_content"
                     android:hint="Confirm Password"
                     android:imeOptions="actionDone"
                     android:inputType="textPassword"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="48dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="15dp"
                     android:singleLine="true"
                     android:textColor="#111827"
                     android:textColorHint="#94A3B8"
                     android:textSize="15sp" />
-
-                <ImageView
-                    android:id="@+id/ivToggleConfirmPassword"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:contentDescription="Toggle Confirm Password Visibility"
-                    android:focusable="true"
-                    android:src="@drawable/ic_visibility_eye" />
-            </RelativeLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
 

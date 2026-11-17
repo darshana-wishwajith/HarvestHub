@@ -126,6 +126,39 @@ public class ListingItem {
     private String referenceCode;
     @SerializedName("cropPending")
     private boolean cropPending;
+    /** Open purchase request still being negotiated (the listing stays on the market until a deal is accepted). */
+    @SerializedName("negotiationOrderId")
+    private String negotiationOrderId;
+    @SerializedName("negotiationBuyerName")
+    private String negotiationBuyerName;
+    @SerializedName("negotiationCount")
+    private int negotiationCount;
+
+    public String getNegotiationOrderId() { return negotiationOrderId; }
+    public String getNegotiationBuyerName() { return negotiationBuyerName; }
+    public int getNegotiationCount() { return negotiationCount; }
+
+    /** The order the card's Chat / Track buttons belong to: the running order, else the open negotiation. */
+    public String getChatOrderId() { return activeOrderId != null ? activeOrderId : negotiationOrderId; }
+
+    /** [wide photo, close-up photo, video] as "/uploads/..." paths; the card shows the wide photo. */
+    @SerializedName("mediaUrls")
+    private java.util.List<String> mediaUrls;
+
+    public java.util.List<String> getMediaUrls() { return mediaUrls; }
+
+    /** Small server-made JPEG of an uploaded photo: "/uploads/x.jpg" -> "/uploads/thumb/x.jpg?size=N". */
+    public static String thumbUrl(String upload, int size) {
+        if (upload == null || !upload.startsWith("/uploads/") || upload.toLowerCase().endsWith(".mp4")) return upload;
+        return "/uploads/thumb/" + upload.substring("/uploads/".length()) + "?size=" + size;
+    }
+
+    /** First photo of the capture, or null. */
+    public String getCoverPhotoUrl() {
+        if (mediaUrls == null) return null;
+        for (String u : mediaUrls) if (u != null && !u.toLowerCase().endsWith(".mp4")) return u;
+        return null;
+    }
     private boolean urgent;
 
     public String getActiveOrderId() { return activeOrderId; }

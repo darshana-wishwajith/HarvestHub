@@ -23,6 +23,18 @@ public class DemandRequestItem {
         this(id, status, timeAgo, title, null, targetGrade);
     }
 
+    private int offerCount;
+    private int newOfferCount;
+
+    public DemandRequestItem offers(int total, int fresh) {
+        this.offerCount = total;
+        this.newOfferCount = fresh;
+        return this;
+    }
+
+    public int getOfferCount() { return offerCount; }
+    public int getNewOfferCount() { return newOfferCount; }
+
     public String getId() { return id; }
     public DemandStatus getStatus() { return status; }
     public String getTimeAgo() { return timeAgo; }

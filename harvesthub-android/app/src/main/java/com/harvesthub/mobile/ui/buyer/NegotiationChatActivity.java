@@ -247,7 +247,7 @@ public class NegotiationChatActivity extends BaseBuyerOrderActivity {
                 LinearLayout list = findViewById(R.id.layoutDynamicMessages);
                 list.removeAllViews();
                 for (ChatMessage m : r.body()) {
-                    if (m.getText() != null) bubble(list, m.getText(), m.isSentByMe(), time(m.getTimestamp()));
+                    if (m.getText() != null) bubble(list, m.getText(), m.isSentByMe(), com.harvesthub.mobile.utils.TimeText.chat(m.getTimestamp()));
                 }
                 NestedScrollView scroll = findViewById(R.id.scrollChatArea);
                 scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));

@@ -39,7 +39,8 @@ public final class OfficerViews {
                             String location, Double quantityKg, Double pricePerKg, String submittedAt,
                             String status, String statusLabel, String claimedByOfficerId,
                             String claimedByOfficerName, boolean claimedByMe, int mediaCount,
-                            Double distanceFromFarmMeters, boolean cropPending, boolean resubmitted) {
+                            Double distanceFromFarmMeters, boolean cropPending, boolean resubmitted,
+                            String coverUrl) {
     }
 
     public record Check(String label, boolean ok, String detail) {
@@ -62,7 +63,7 @@ public final class OfficerViews {
 
     public record HistoryItem(String listingId, String cropName, String variety, String farmerName, String location,
                               String decision, String grade, String notes, String officerId, String officerName,
-                              boolean byMe, String at, String listingStatus) {
+                              boolean byMe, String at, String listingStatus, String coverUrl) {
     }
 
     public record UserRow(String id, String fullName, String role, String email, String mobile, String address,

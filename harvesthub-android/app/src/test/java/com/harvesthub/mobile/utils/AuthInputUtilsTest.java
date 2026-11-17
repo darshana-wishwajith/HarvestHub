@@ -32,4 +32,14 @@ public class AuthInputUtilsTest {
         assertFalse(AuthInputUtils.isStrongEnough("lettersonly"));
         assertFalse(AuthInputUtils.isStrongEnough("12345678"));
     }
+
+    @Test
+    public void nicRuleSharedByFarmerAndBuyerRegistration() {
+        assertTrue(AuthInputUtils.isValidNic("901234567V"));
+        assertTrue(AuthInputUtils.isValidNic("199512345678"));
+        assertTrue(AuthInputUtils.isValidNic("199575012345"));    // female: day of year + 500
+        assertFalse(AuthInputUtils.isValidNic("199540012345"));   // day 400 is not a date
+        assertFalse(AuthInputUtils.isValidNic("12345"));
+        assertFalse(AuthInputUtils.isValidNic(null));
+    }
 }
