@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One vehicle class card in the Vehicle Profile 2x2 grid (filled from GET /api/vehicle-types) -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/vp_card_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:padding="14dp">
+
+    <FrameLayout
+        android:id="@+id/vtIconBox"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:background="@drawable/vp_soft_bg">
+
+        <ImageView
+            android:id="@+id/vtIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_truck"
+            app:tint="#64748B" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/vtCheck"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_check_circle_green"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/vtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vtIconBox"
+        android:layout_marginTop="14dp"
+        android:maxLines="2"
+        android:textColor="#111827"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/vtCapacity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vtName"
+        android:layout_marginTop="2dp"
+        android:textColor="#64748B"
+        android:textSize="12.5sp" />
+</RelativeLayout>

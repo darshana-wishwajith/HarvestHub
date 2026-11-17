@@ -65,7 +65,7 @@ public class User {
         if (farmLocation != null && farmLocation.getAddress() != null) {
             return farmLocation.getAddress();
         }
-        return "Dambulla, LK";
+        return "";
     }
 
     // Compatibility methods for existing RoleSelectionActivity code

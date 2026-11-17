@@ -71,6 +71,71 @@ public class MediaStorageService {
         return p.startsWith(root) && Files.isRegularFile(p) ? p : null;
     }
 
+    /** Thumbnail widths we generate (requests are rounded up to the nearest one). */
+    public static final int[] THUMB_SIZES = {160, 320, 640};
+
+    /**
+     * Small JPEG of a stored photo for list rows and cards (a phone photo is ~1 MB; the thumbnail a few KB).
+     * Made on first request and kept under uploads/thumbs, so it also works for photos uploaded earlier.
+     * Returns null for videos / unknown names / unreadable images.
+     */
+    public Path thumbnail(String name, int requested) {
+        Path src = resolve(name);
+        if (src == null || name.endsWith(".mp4")) return null;
+        int size = THUMB_SIZES[THUMB_SIZES.length - 1];
+        for (int s : THUMB_SIZES) {
+            if (requested <= s) {
+                size = s;
+                break;
+            }
+        }
+        Path dir = root.resolve("thumbs");
+        Path out = dir.resolve(name.substring(0, name.lastIndexOf('.')) + "_" + size + ".jpg");
+        if (Files.isRegularFile(out)) return out;
+        synchronized (this) {   // one decode at a time keeps memory low on the small server
+            if (Files.isRegularFile(out)) return out;
+            try {
+                java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(src.toFile());
+                if (img == null) return null;
+                int w = img.getWidth(), h = img.getHeight();
+                double scale = Math.min(1.0, (double) size / Math.max(w, h));
+                int tw = Math.max(1, (int) Math.round(w * scale)), th = Math.max(1, (int) Math.round(h * scale));
+                // halve repeatedly first: plain one-step bilinear shrinking of a 12 MP photo looks grainy
+                java.awt.image.BufferedImage cur = img;
+                while (cur.getWidth() / 2 >= tw && cur.getHeight() / 2 >= th) cur = scaled(cur, cur.getWidth() / 2, cur.getHeight() / 2);
+                cur = scaled(cur, tw, th);
+                Files.createDirectories(dir);
+                Path tmp = dir.resolve(out.getFileName() + ".tmp");
+                javax.imageio.ImageWriter writer = javax.imageio.ImageIO.getImageWritersByFormatName("jpg").next();
+                javax.imageio.ImageWriteParam param = writer.getDefaultWriteParam();
+                param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(0.82f);
+                try (javax.imageio.stream.ImageOutputStream ios = javax.imageio.ImageIO.createImageOutputStream(tmp.toFile())) {
+                    writer.setOutput(ios);
+                    writer.write(null, new javax.imageio.IIOImage(cur, null, null), param);
+                } finally {
+                    writer.dispose();
+                }
+                Files.move(tmp, out, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                return out;
+            } catch (Exception | OutOfMemoryError e) {
+                return null;
+            }
+        }
+    }
+
+    private static java.awt.image.BufferedImage scaled(java.awt.image.BufferedImage in, int w, int h) {
+        java.awt.image.BufferedImage out = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = out.createGraphics();
+        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+        g.setColor(java.awt.Color.WHITE);   // PNG transparency -> white
+        g.fillRect(0, 0, w, h);
+        g.drawImage(in, 0, 0, w, h, null);
+        g.dispose();
+        return out;
+    }
+
     public String contentType(String name) {
         String ext = name.substring(name.lastIndexOf('.') + 1);
         return CONTENT_TYPES.getOrDefault(ext, "application/octet-stream");

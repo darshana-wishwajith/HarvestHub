@@ -124,7 +124,14 @@ public class OfficerPortalService {
                 l.getStatus(), statusLabel(l.getStatus()), l.getClaimedByOfficerId(), l.getClaimedByOfficerName(),
                 me != null && me.id().equals(l.getClaimedByOfficerId()),
                 l.getMediaUrls() == null ? 0 : l.getMediaUrls().size(), distanceFromFarm(l),
-                Boolean.TRUE.equals(l.getCropPending()), "PENDING".equals(l.getStatus()) && hadRetake(l));
+                Boolean.TRUE.equals(l.getCropPending()), "PENDING".equals(l.getStatus()) && hadRetake(l), coverUrl(l));
+    }
+
+    /** Thumbnail of the first photo of the capture (the wide-angle shot) for list rows; null when there is none. */
+    static String coverUrl(Listing l) {
+        if (l.getMediaUrls() == null) return null;
+        return l.getMediaUrls().stream().filter(u -> u != null && u.startsWith("/uploads/") && !u.toLowerCase().endsWith(".mp4"))
+                .findFirst().map(u -> "/uploads/thumb/" + u.substring("/uploads/".length()) + "?size=160").orElse(null);
     }
 
     public ListingDetail detail(Listing l, AuthUser me) {
@@ -200,7 +207,7 @@ public class OfficerPortalService {
         if (l.getReviews() != null && !l.getReviews().isEmpty()) {
             return l.getReviews().stream().map(r -> new HistoryItem(l.getId(), l.getCropName(), l.getVariety(), farmer,
                     l.getLocation(), r.getDecision(), r.getGrade(), r.getNotes(), r.getOfficerId(), r.getOfficerName(),
-                    myId != null && myId.equals(r.getOfficerId()), norm(r.getAt()), l.getStatus())).toList();
+                    myId != null && myId.equals(r.getOfficerId()), norm(r.getAt()), l.getStatus(), coverUrl(l))).toList();
         }
         String decision;
         if ("REJECTED".equals(l.getStatus())) decision = "REJECTED";
@@ -210,7 +217,7 @@ public class OfficerPortalService {
         String at = norm(l.getReviewedAt() != null ? l.getReviewedAt() : l.getUpdatedTime());
         return List.of(new HistoryItem(l.getId(), l.getCropName(), l.getVariety(), farmer, l.getLocation(), decision,
                 l.getGrade(), l.getReviewNotes(), l.getReviewedByOfficerId(), l.getReviewedByOfficerName(),
-                myId != null && myId.equals(l.getReviewedByOfficerId()), at, l.getStatus()));
+                myId != null && myId.equals(l.getReviewedByOfficerId()), at, l.getStatus(), coverUrl(l)));
     }
 
     // ================================================================= users

@@ -71,14 +71,21 @@ public class ProfilePage implements Page {
                 default -> { }
             }
         }
-        VBox work = Ui.card(Ui.label("My verification work", "h2"), Ui.details(
-                "Decisions", String.valueOf(history.size()),
-                "Today", String.valueOf(Fmt.count(stats, "myReviewedToday")),
-                "Approved", approved + "  (Grade A " + grades[0] + " · B " + grades[1] + " · C " + grades[2] + ")",
-                "Retakes requested", String.valueOf(retake),
-                "Rejected", String.valueOf(rejected),
-                "Approval rate", history.size() == 0 ? null : Fmt.count(stats, "approvalRate") + " %",
-                "Claimed right now", String.valueOf(Fmt.count(stats, "inReviewByMe"))));
+        // performance overview: metric tiles (like the design's "Performance Overview")
+        GridPane tiles = new GridPane();
+        tiles.setHgap(12);
+        tiles.setVgap(12);
+        for (int i = 0; i < 3; i++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            cc.setPercentWidth(100.0 / 3);
+            tiles.getColumnConstraints().add(cc);
+        }
+        tiles.add(metric("TOTAL DECISIONS", String.valueOf(history.size()), Fmt.count(stats, "myReviewedToday") + " today"), 0, 0);
+        tiles.add(metric("APPROVAL RATE", history.size() == 0 ? Fmt.NONE : Fmt.count(stats, "approvalRate") + "%", approved + " approved"), 1, 0);
+        tiles.add(metric("CLAIMED NOW", String.valueOf(Fmt.count(stats, "inReviewByMe")), "being reviewed by you"), 2, 0);
+        tiles.add(metric("GRADES GIVEN", "A " + grades[0] + " · B " + grades[1] + " · C " + grades[2], "approved lots by grade"), 0, 1, 2, 1);
+        tiles.add(metric("RETAKES / REJECTED", retake + " / " + rejected, "sent back or refused"), 2, 1);
+        VBox work = Ui.card(Ui.label("Performance overview", "h2"), tiles);
 
         GridPane grid = new GridPane();
         grid.setHgap(16);
@@ -142,5 +149,13 @@ public class ProfilePage implements Page {
                         "Server", ApiClient.getBaseUrl(),
                         "Remembered email", com.harvesthub.desktop.util.Prefs.rememberedLogin().isBlank() ? "None" : com.harvesthub.desktop.util.Prefs.rememberedLogin()),
                 Ui.wrap("Your password is never stored on this computer. Log out when you leave the desk.", "muted", "small"), logout);
+    }
+
+    /** Small metric tile: caps label, big value, note. */
+    private static VBox metric(String label, String value, String note) {
+        VBox v = new VBox(4, Ui.label(label, "caps"), Ui.label(value, "h1"), Ui.label(note, "muted", "small"));
+        v.getStyleClass().add("card-flat");
+        v.setMaxWidth(Double.MAX_VALUE);
+        return v;
     }
 }

@@ -134,13 +134,17 @@ public class BuyerWalletActivity extends AppCompatActivity {
         row.setPadding(0, pad, 0, pad);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
+        boolean hold = HOLD_TYPES.contains(t.getType());
+        com.harvesthub.mobile.ui.transporter.TUi.iconTile(row, t.isCredit() ? R.drawable.ic_banknote : hold ? R.drawable.ic_lock : R.drawable.ic_credit_card,
+                38, t.isCredit() ? 0xFFDCFCE7 : hold ? 0xFFFEF3C7 : 0xFFFDE2E2, t.isCredit() ? 0xFF15803D : hold ? 0xFFB45309 : 0xFFB91C1C, true);
         LinearLayout left = new LinearLayout(this);
         left.setOrientation(LinearLayout.VERTICAL);
+        left.setPadding(dp(12), 0, dp(8), 0);
         TextView title = new TextView(this);
         title.setText(t.getTitle());
         title.setTextColor(0xFF111827);
         title.setTextSize(14);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(title.getContext()));
         TextView sub = new TextView(this);
         sub.setText(label(t.getType()) + " • " + BaseBuyerOrderActivity.time(t.getTimestamp() == null ? null : t.getTimestamp().replace(' ', 'T')));
         sub.setTextColor(0xFF64748B);
@@ -154,7 +158,7 @@ public class BuyerWalletActivity extends AppCompatActivity {
         amount.setText((t.isCredit() ? "+" : "−") + BaseBuyerOrderActivity.rs(v));
         amount.setTextColor(t.isCredit() ? 0xFF2E7D32 : HOLD_TYPES.contains(t.getType()) ? 0xFFB45309 : 0xFFB91C1C);
         amount.setTextSize(14);
-        amount.setTypeface(Typeface.DEFAULT_BOLD);
+        amount.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(amount.getContext()));
         row.addView(amount);
         return row;
     }

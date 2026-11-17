@@ -70,6 +70,8 @@ public class Listing {
     private Boolean cropPending;
     /** Order currently running on this listing (status ONGOING). */
     private String activeOrderId;
+    /** Status before the farmer deactivated the listing (ACTIVE or PENDING); restored on re-activate. */
+    private String previousStatus;
 
     public double quantityKgValue() {
         return parseNumber(quantity);

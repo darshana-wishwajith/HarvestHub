@@ -1,89 +1,182 @@
 package com.harvesthub.mobile.ui.transporter;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Tracking;
+import com.harvesthub.mobile.utils.OsmMaps;
 
-/** Google map in the scaffold's map area (Figma "Pickup Route Map", in-transit map). */
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polyline;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * OpenStreetMap (osmdroid) in the scaffold's map area (Figma "Pickup Route Map", in-transit map), with a
+ * floating info chip. Turn-by-turn directions open in Google Maps.
+ */
 final class RouteMap {
 
     private final AppCompatActivity activity;
-    private GoogleMap map;
-    private Tracking pending;
-    private boolean toDrop;
+    private final MapView map;
+    private final List<Overlay> drawn = new ArrayList<>();
+    private final TextView chipTitle;
+    private final TextView chipSub;
+    private final View chip;
+    private boolean framed;
 
     RouteMap(AppCompatActivity activity) {
         this.activity = activity;
-        activity.findViewById(R.id.tpMapHost).setVisibility(View.VISIBLE);
-        SupportMapFragment f = SupportMapFragment.newInstance();
-        activity.getSupportFragmentManager().beginTransaction().replace(R.id.tpMapHost, f).commitNow();
-        f.getMapAsync(m -> {
-            map = m;
-            map.getUiSettings().setZoomControlsEnabled(true);
-            map.getUiSettings().setMapToolbarEnabled(false);
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                try { map.setMyLocationEnabled(true); } catch (SecurityException ignored) { }
-            }
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(7.8731, 80.7718), 7f));
-            if (pending != null) show(pending, toDrop);
+        OsmMaps.init(activity);
+        FrameLayout host = activity.findViewById(R.id.tpMapHost);
+        host.setVisibility(View.VISIBLE);
+        host.removeAllViews();
+        map = new MapView(activity);
+        host.addView(map, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        OsmMaps.setUp(map);
+        map.getController().setZoom(8.0);
+        map.getController().setCenter(new GeoPoint(7.8731, 80.7718));
+
+        // floating "18 min (12.4 km)" chip, bottom-left (Figma)
+        LinearLayout c = new LinearLayout(activity);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(TUi.round(Color.WHITE, TUi.dp(activity, 12)));
+        c.setElevation(TUi.dp(activity, 4));
+        int p = TUi.dp(activity, 10);
+        c.setPadding(p + p / 2, p, p + p / 2, p);
+        chipTitle = TUi.label(c, "", 14, TUi.INK, true);
+        chipSub = TUi.label(c, "", 11, TUi.MUTED, false);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.START);
+        lp.setMargins(TUi.dp(activity, 12), 0, 0, TUi.dp(activity, 22));
+        host.addView(c, lp);
+        c.setVisibility(View.GONE);
+        chip = c;
+
+        activity.getLifecycle().addObserver((LifecycleEventObserver) (owner, event) -> {
+            if (event == Lifecycle.Event.ON_RESUME) map.onResume();
+            else if (event == Lifecycle.Event.ON_PAUSE) map.onPause();
+            else if (event == Lifecycle.Event.ON_DESTROY) map.onDetach();
         });
+    }
+
+    /** Text on the floating chip, e.g. "18 min (12.4 km)" / "Last GPS point 10:42". */
+    void chip(String title, String sub) {
+        chip.setVisibility(title == null ? View.GONE : View.VISIBLE);
+        chipTitle.setText(title == null ? "" : "●  " + title);
+        chipSub.setText(sub == null ? "" : sub);
+        chipSub.setVisibility(sub == null ? View.GONE : View.VISIBLE);
     }
 
     /** Pickup and drop-off pins, the vehicle's last GPS point, and a line for the current leg. */
     void show(Tracking t, boolean legToDrop) {
-        pending = t;
-        toDrop = legToDrop;
-        if (map == null || t == null) return;
-        map.clear();
-        LatLngBounds.Builder b = new LatLngBounds.Builder();
-        int n = 0;
-        LatLng from = t.pickupLatitude == null ? null : new LatLng(t.pickupLatitude, t.pickupLongitude);
-        LatLng to = t.dropLatitude == null ? null : new LatLng(t.dropLatitude, t.dropLongitude);
-        LatLng now = t.currentLatitude == null ? null : new LatLng(t.currentLatitude, t.currentLongitude);
+        if (t == null) return;
+        map.getOverlays().removeAll(drawn);
+        drawn.clear();
+        GeoPoint from = point(t.pickupLatitude, t.pickupLongitude);
+        GeoPoint to = point(t.dropLatitude, t.dropLongitude);
+        GeoPoint now = point(t.currentLatitude, t.currentLongitude);
+        List<GeoPoint> pts = new ArrayList<>();
+        if (legToDrop && from != null && to != null) {
+            if (now != null) {
+                line(from, now, 0xFF1B4332, false);   // driven
+                line(now, to, 0xFF8A9A90, true);      // still to go
+            } else {
+                line(from, to, 0xFF1B4332, false);
+            }
+        } else if (!legToDrop && now != null && from != null) {
+            line(now, from, 0xFF15803D, true);
+        }
         if (from != null) {
-            map.addMarker(new MarkerOptions().position(from).title("Pickup: " + (t.pickupAddress == null ? "farm" : t.pickupAddress))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-            b.include(from);
-            n++;
+            marker(from, "Pickup: " + (t.pickupAddress == null ? "farm" : t.pickupAddress), dot(0xFF15803D, 16));
+            pts.add(from);
         }
         if (to != null && legToDrop) {
-            map.addMarker(new MarkerOptions().position(to).title("Drop-off: " + (t.dropAddress == null ? "buyer" : t.dropAddress)));
-            b.include(to);
-            n++;
+            marker(to, "Drop-off: " + (t.dropAddress == null ? "buyer" : t.dropAddress), dot(0xFFDC2626, 16));
+            pts.add(to);
         }
         if (now != null) {
-            map.addMarker(new MarkerOptions().position(now).title("Last GPS point")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            b.include(now);
-            n++;
+            marker(now, "Your last GPS point", dot(0xFF1B4332, 24));
+            pts.add(now);
         }
-        LatLng target = legToDrop ? to : from;
-        if (now != null && target != null) {
-            map.addPolyline(new PolylineOptions().color(0xFF1B4332).width(8f).add(now, target));
-        } else if (from != null && to != null && legToDrop) {
-            map.addPolyline(new PolylineOptions().color(0xFF1B4332).width(8f).add(from, to));
+        if (!pts.isEmpty() && !framed) {
+            framed = true;
+            if (pts.size() == 1) {
+                map.getController().setZoom(13.0);
+                map.getController().setCenter(pts.get(0));
+            } else {
+                final BoundingBox box = BoundingBox.fromGeoPoints(pts).increaseByScale(1.6f);
+                map.post(() -> map.zoomToBoundingBox(box, false));
+            }
         }
-        try {
-            if (n >= 2) map.animateCamera(CameraUpdateFactory.newLatLngBounds(b.build(), 80));
-            else if (n == 1) map.animateCamera(CameraUpdateFactory.newLatLngZoom(from != null ? from : to != null ? to : now, 13f));
-        } catch (IllegalStateException ignored) { } // map not laid out yet
+        map.invalidate();
+    }
+
+    private static GeoPoint point(Double lat, Double lng) {
+        return lat == null || lng == null ? null : new GeoPoint(lat, lng);
+    }
+
+    private void line(GeoPoint a, GeoPoint b, int color, boolean dashed) {
+        float d = activity.getResources().getDisplayMetrics().density;
+        Polyline l = new Polyline(map);
+        List<GeoPoint> p = new ArrayList<>();
+        p.add(a);
+        p.add(b);
+        l.setPoints(p);
+        l.getOutlinePaint().setColor(color);
+        l.getOutlinePaint().setStrokeWidth(5 * d);
+        l.getOutlinePaint().setStrokeCap(Paint.Cap.ROUND);
+        if (dashed) l.getOutlinePaint().setPathEffect(new DashPathEffect(new float[]{10 * d, 8 * d}, 0));
+        l.setInfoWindow(null);
+        map.getOverlays().add(l);
+        drawn.add(l);
+    }
+
+    private void marker(GeoPoint at, String title, Drawable icon) {
+        Marker m = new Marker(map);
+        m.setPosition(at);
+        m.setTitle(title);
+        m.setIcon(icon);
+        m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        map.getOverlays().add(m);
+        drawn.add(m);
+    }
+
+    private Drawable dot(int color, int dp) {
+        float d = activity.getResources().getDisplayMetrics().density;
+        int size = Math.round(dp * d);
+        Bitmap b = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(Color.WHITE);
+        c.drawCircle(size / 2f, size / 2f, size / 2f, p);
+        p.setColor(color);
+        c.drawCircle(size / 2f, size / 2f, size / 2f - 3 * d, p);
+        return new BitmapDrawable(activity.getResources(), b);
     }
 
     /** Opens turn-by-turn navigation in Google Maps (the app itself does not draw turn instructions). */

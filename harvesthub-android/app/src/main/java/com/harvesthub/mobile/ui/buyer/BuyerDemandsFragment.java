@@ -124,19 +124,19 @@ public class BuyerDemandsFragment extends Fragment {
         if (isActiveTab) {
             tabActiveAds.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_chip_selected));
             tabActiveAds.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-            tabActiveAds.setTypeface(Typeface.DEFAULT_BOLD);
+            tabActiveAds.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(tabActiveAds.getContext()));
 
             tabClosed.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_chip_unselected));
             tabClosed.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
-            tabClosed.setTypeface(Typeface.DEFAULT);
+            tabClosed.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.regular(tabClosed.getContext()));
         } else {
             tabClosed.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_chip_selected));
             tabClosed.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-            tabClosed.setTypeface(Typeface.DEFAULT_BOLD);
+            tabClosed.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(tabClosed.getContext()));
 
             tabActiveAds.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_chip_unselected));
             tabActiveAds.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
-            tabActiveAds.setTypeface(Typeface.DEFAULT);
+            tabActiveAds.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.regular(tabActiveAds.getContext()));
         }
         filterList();
     }
@@ -165,17 +165,14 @@ public class BuyerDemandsFragment extends Fragment {
                         String when = ad.isOpen()
                                 ? "Posted " + BaseBuyerOrderActivity.time(ad.getCreatedDate())
                                 : closedLabel(ad);
-                        if (ad.getOfferCount() > 0) {
-                            when += " • " + ad.getOfferCount() + (ad.getOfferCount() == 1 ? " offer" : " offers")
-                                    + (ad.getPendingOfferCount() > 0 ? " (" + ad.getPendingOfferCount() + " new)" : "");
-                        }
                         String title = String.format(java.util.Locale.US, "Need %,.0f kg of %s", ad.getRequiredQuantityKg(),
                                 ad.getCropName() == null ? "produce" : ad.getCropName());
                         String deadline = ad.getDeadline() == null || ad.getDeadline().isEmpty() ? null : "Deadline: " + ad.getDeadline();
                         String grade = "Target: " + (ad.getTargetGrade() == null || ad.getTargetGrade().isEmpty() ? "Any grade"
                                 : "Grade " + ad.getTargetGrade().replace("Grade ", ""))
                                 + (ad.getTargetPricePerKg() > 0 ? String.format(java.util.Locale.US, " • Rs. %,.0f/kg", ad.getTargetPricePerKg()) : "");
-                        allDemandList.add(new DemandRequestItem(ad.getRequestId(), status, when, title, deadline, grade));
+                        allDemandList.add(new DemandRequestItem(ad.getRequestId(), status, when, title, deadline, grade)
+                                .offers(ad.getOfferCount(), ad.getPendingOfferCount()));
                     }
                 }
                 long open = 0;

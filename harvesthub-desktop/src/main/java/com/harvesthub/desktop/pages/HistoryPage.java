@@ -29,7 +29,7 @@ public class HistoryPage implements Page {
     private final DatePicker to = new DatePicker();
     private final TextField search = new TextField();
     private final VBox feedback = new VBox();
-    private final Label summary = Ui.label("", "muted");
+    private final HBox summary = Ui.row(10);
     private final TableView<JsonNode> table = Ui.table("No decisions yet.");
     private final Pager<JsonNode> pager = new Pager<>(12);
     private final HBox pagerHost = new HBox();
@@ -83,30 +83,34 @@ public class HistoryPage implements Page {
         search.textProperty().addListener((o, a, b) -> debounce.playFromStart());
 
         table.getColumns().setAll(List.of(
-                Ui.nodeCol("CROP & FARMER", 220, n -> Ui.twoLine(Fmt.textOr(n, "cropName", "Crop")
-                        + (Fmt.text(n, "variety") != null ? " (" + Fmt.text(n, "variety") + ")" : ""), Fmt.textOr(n, "farmerName", "Farmer not recorded"))),
-                Ui.textCol("LOCATION", 150, n -> Fmt.text(n, "location")),
+                Ui.nodeCol("CROP & FARMER", 240, n -> Ui.cropCell(Fmt.textOr(n, "cropName", "Crop")
+                        + (Fmt.text(n, "variety") != null ? " (" + Fmt.text(n, "variety") + ")" : ""), Fmt.textOr(n, "farmerName", "Farmer not recorded"),
+                        Fmt.text(n, "coverUrl"), Fmt.text(n, "cropName"))),
+                Ui.textCol("LOCATION", 135, n -> Fmt.text(n, "location")),
                 Ui.nodeCol("DECISION", 170, n -> {
                     String d = Fmt.text(n, "decision");
                     return Ui.pill(Fmt.decision(d) + (Fmt.text(n, "grade") != null ? " · Grade " + Fmt.text(n, "grade") : ""), Ui.toneForDecision(d));
                 }),
-                Ui.nodeCol("NOTE TO FARMER", 240, n -> {
+                Ui.nodeCol("NOTE TO FARMER", 210, n -> {
                     Label l = Ui.label(Fmt.orDash(Fmt.text(n, "notes")), "small");
                     l.setTooltip(Fmt.text(n, "notes") == null ? null : new Tooltip(Fmt.text(n, "notes")));
                     return l;
                 }),
                 Ui.textCol("OFFICER", 140, n -> Fmt.bool(n, "byMe") ? "You" : Fmt.text(n, "officerName")),
-                Ui.textCol("DATE", 150, n -> Fmt.dateTime(Fmt.text(n, "at"))),
-                Ui.nodeCol("", 90, n -> {
+                Ui.textCol("DATE", 160, n -> Fmt.dateTime(Fmt.text(n, "at"))),
+                Ui.nodeCol("", 100, n -> {
                     Button b = Ui.button("Open", "fas-eye", "btn-small");
                     b.setOnAction(e -> Shell.current().open(new ReviewPage(Fmt.text(n, "listingId"), Shell.Nav.HISTORY)));
                     return b;
                 })));
         Ui.onOpen(table, n -> Shell.current().open(new ReviewPage(Fmt.text(n, "listingId"), Shell.Nav.HISTORY)));
 
-        HBox filters = Ui.row(10, mine, all, Ui.grow(), search, decision, crop, from, to, clear);
+        HBox.setHgrow(search, Priority.ALWAYS);
+        search.setMaxWidth(420);
+        HBox filters = Ui.row(10, Ui.segmented(mine, all), Ui.grow(), search);
+        HBox filters2 = Ui.row(10, decision, crop, from, to, clear, Ui.grow(), summary);
         VBox.setVgrow(table, Priority.ALWAYS);
-        root.getChildren().setAll(filters, feedback, summary, table, pagerHost);
+        root.getChildren().setAll(filters, filters2, feedback, table, pagerHost);
         refresh();
         return root;
     }
@@ -155,7 +159,8 @@ public class HistoryPage implements Page {
             long approved = list.stream().filter(n -> "APPROVED".equals(Fmt.text(n, "decision"))).count();
             long retake = list.stream().filter(n -> "RETAKE".equals(Fmt.text(n, "decision"))).count();
             long rejected = list.stream().filter(n -> "REJECTED".equals(Fmt.text(n, "decision"))).count();
-            summary.setText(list.size() + " decisions · " + approved + " approved · " + retake + " retakes · " + rejected + " rejected");
+            summary.getChildren().setAll(Ui.pill("● " + approved + " Approved", "green"), Ui.pill("● " + retake + " Retake requested", "amber"),
+                    Ui.pill("● " + rejected + " Rejected", "red"));
             table.setPlaceholder(Ui.label("No decisions match these filters.", "muted"));
             pager.setItems(list);
             pager.go(1);

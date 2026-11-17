@@ -13,6 +13,48 @@
     app:strokeWidth="1dp"
     app:cardBackgroundColor="@color/white">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <!-- Farmer's photo of the lot; tap for both photos + 10 s video -->
+    <FrameLayout
+        android:id="@+id/layoutHarvestMedia"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:background="#E5E7EB"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivHarvestPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Harvest photo"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/tvHarvestMediaCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_pill_badge"
+            android:backgroundTint="#B3000000"
+            android:drawableStart="@drawable/ic_play_badge"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="View photos &amp; video"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -184,4 +226,5 @@
             app:layout_constraintTop_toTopOf="@id/tvUnitPriceLabel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -573,7 +573,7 @@
             android:id="@+id/btnPayNow"
             android:layout_width="match_parent"
             android:layout_height="54dp"
-            android:backgroundTint="#19422D"
+            android:backgroundTint="#1B4332"
             android:text="Pay Rs. 11,845"
             android:textAllCaps="false"
             android:textColor="@color/white"

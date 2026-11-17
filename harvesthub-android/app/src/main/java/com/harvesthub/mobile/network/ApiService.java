@@ -153,8 +153,15 @@ public interface ApiService {
     @POST("listings/create")
     Call<Listing> createListing(@Body Listing listing);
 
+    /** Farmer card "Edit": estimated yield (quantity) and price per kg only. */
     @PUT("listings/{id}")
-    Call<GenericResponse> updateListing(@Path("id") String id, @Body Listing listing);
+    Call<okhttp3.ResponseBody> updateListing(@Path("id") String id, @Body Listing listing);
+
+    @POST("listings/{id}/deactivate")
+    Call<okhttp3.ResponseBody> deactivateListing(@Path("id") String id);
+
+    @POST("listings/{id}/reactivate")
+    Call<okhttp3.ResponseBody> reactivateListing(@Path("id") String id);
 
     @PUT("listings/{id}/status")
     Call<GenericResponse> changeListingStatus(@Path("id") String id, @Body Map<String, String> status);

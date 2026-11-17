@@ -52,14 +52,15 @@ public class DashboardPage implements Page {
 
     private void render(JsonNode s, JsonNode queue, JsonNode activity, JsonNode disputes) {
         HBox review = new HBox(16,
-                Ui.statCard("fas-hourglass-half", "amber", String.valueOf(Fmt.count(s, "pendingCount")), "Waiting for verification",
-                        Fmt.count(s, "unclaimedCount") + " not yet claimed by any officer"),
+                Ui.statCard("fas-hourglass-half", "amber", String.valueOf(Fmt.count(s, "pendingCount")), "Pending verification",
+                        Fmt.count(s, "unclaimedCount") + " not yet claimed by any officer",
+                        Fmt.count(s, "unclaimedCount") > 0 ? "Needs attention" : null),
                 Ui.statCard("fas-user-check", "blue", String.valueOf(Fmt.count(s, "inReviewByMe")), "Claimed by you",
                         "Finish or release them so others can help"),
-                Ui.statCard("fas-clipboard-check", "green", String.valueOf(Fmt.count(s, "myReviewedToday")), "Your decisions today",
-                        Fmt.count(s, "reviewedTodayCount") + " by all officers today"),
-                Ui.statCard("fas-percentage", "grey", Fmt.count(s, "myReviewedTotal") == 0 ? Fmt.NONE : Fmt.count(s, "approvalRate") + "%",
-                        "Your approval rate", Fmt.count(s, "myReviewedTotal") + " decisions in total"));
+                Ui.statCard("fas-clipboard-check", "green", String.valueOf(Fmt.count(s, "myReviewedToday")), "Reviewed today",
+                        Fmt.count(s, "reviewedTodayCount") + " by all officers today", "You"),
+                Ui.statCard("fas-shield-alt", "green", Fmt.count(s, "myReviewedTotal") == 0 ? Fmt.NONE : Fmt.count(s, "approvalRate") + "%",
+                        "Approval rate", Fmt.count(s, "myReviewedTotal") + " decisions in total", "All time"));
         HBox monitor = new HBox(16,
                 Ui.statCard("fas-balance-scale", "red", String.valueOf(Fmt.count(s, "openDisputes")), "Open disputes & appeals", "Need an officer decision"),
                 Ui.statCard("fas-truck", "blue", String.valueOf(Fmt.count(s, "activeOrders")), "Orders in progress",
@@ -113,7 +114,11 @@ public class DashboardPage implements Page {
         lower.add(new VBox(16, open, recent), 1, 0);
         GridPane.setValignment(waiting, javafx.geometry.VPos.TOP);
 
-        root.getChildren().setAll(Ui.label("LISTING VERIFICATION", "caps"), review, Ui.label("MONITORING", "caps"), monitor, lower);
+        long waitingCount = Fmt.count(s, "unclaimedCount");
+        HBox hero = Ui.hero("QUEUE ACTION", "Go to Verification Queue",
+                waitingCount == 0 ? "Nothing waiting – all caught up" : waitingCount + (waitingCount == 1 ? " item" : " items") + " awaiting review",
+                () -> Shell.current().go(Shell.Nav.QUEUE));
+        root.getChildren().setAll(Ui.label("LISTING VERIFICATION", "caps"), review, hero, Ui.label("MONITORING", "caps"), monitor, lower);
     }
 
     private Node queueRow(JsonNode item) {
@@ -121,7 +126,7 @@ public class DashboardPage implements Page {
         Label pill = Fmt.bool(item, "claimedByMe") ? Ui.pill("Claimed by you", "blue")
                 : "UNDER_REVIEW".equals(status) && Fmt.text(item, "claimedByOfficerId") != null ? Ui.pill("With " + Fmt.textOr(item, "claimedByOfficerName", "an officer"), "grey")
                 : Fmt.bool(item, "resubmitted") ? Ui.pill("New photos", "amber") : Ui.pill("Pending", "amber");
-        HBox r = Ui.row(12, Ui.avatar(Fmt.text(item, "cropName"), 38, true),
+        HBox r = Ui.row(12, Ui.cropTile(Fmt.text(item, "cropName"), Fmt.text(item, "coverUrl")),
                 Ui.twoLine(Fmt.textOr(item, "cropName", "Crop") + "  ·  " + Fmt.kg(Fmt.num(item, "quantityKg")),
                         Fmt.textOr(item, "farmerName", "Farmer") + " · " + Fmt.textOr(item, "location", "Location not recorded")),
                 Ui.grow(), pill, Ui.label(Fmt.ago(Fmt.text(item, "submittedAt")), "muted", "small"));

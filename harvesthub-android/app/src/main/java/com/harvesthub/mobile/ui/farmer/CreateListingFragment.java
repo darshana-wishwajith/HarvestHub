@@ -52,6 +52,8 @@ public class CreateListingFragment extends Fragment {
     private final List<String> cropList = new ArrayList<>();
     private ArrayAdapter<String> cropAdapter;
     private ArrayList<String> media;
+    /** Local copies of the 3 captured files (wide photo, close-up photo, video) for the thumbnails. */
+    private ArrayList<String> localMedia;
     private double lat, lng;
 
     @Nullable
@@ -67,6 +69,7 @@ public class CreateListingFragment extends Fragment {
             getParentFragmentManager().popBackStack();
             return binding.getRoot();
         }
+        localMedia = args.getStringArrayList(CameraCaptureActivity.EXTRA_LOCAL_MEDIA);
         lat = args.getDouble(LocationVerificationActivity.EXTRA_LAT);
         lng = args.getDouble(LocationVerificationActivity.EXTRA_LNG);
 
@@ -231,9 +234,57 @@ public class CreateListingFragment extends Fragment {
         binding = null;
     }
 
-    /** Shows the three captured items (already uploaded). */
+    /** Shows the three captured items (already uploaded): 2 photos + 1 video. No add tile - exactly 3 are required. */
     private class CapturedAdapter extends RecyclerView.Adapter<CapturedAdapter.Holder> {
-        private final int[] icons = {R.drawable.ic_check_circle, R.drawable.ic_check_circle, R.drawable.ic_check_circle};
+        private final android.graphics.Bitmap[] thumbs = new android.graphics.Bitmap[3];
+
+        CapturedAdapter() {
+            // decode small thumbnails off the main thread
+            new Thread(() -> {
+                for (int i = 0; i < 3; i++) thumbs[i] = thumbnail(i);
+                if (binding != null) binding.rvPhotos.post(this::notifyDataSetChanged);
+            }).start();
+        }
+
+        private android.graphics.Bitmap thumbnail(int i) {
+            String path = localMedia != null && i < localMedia.size() ? localMedia.get(i) : null;
+            if (path == null || !new java.io.File(path).exists()) return null;
+            try {
+                if (i == 2) {   // video: a frame from the clip
+                    android.media.MediaMetadataRetriever r = new android.media.MediaMetadataRetriever();
+                    try {
+                        r.setDataSource(path);
+                        android.graphics.Bitmap frame = r.getFrameAtTime(1_000_000);
+                        return frame == null ? null : android.graphics.Bitmap.createScaledBitmap(frame, 200,
+                                Math.max(1, 200 * frame.getHeight() / Math.max(1, frame.getWidth())), true);
+                    } finally {
+                        try { r.release(); } catch (Exception ignored) { }
+                    }
+                }
+                android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+                o.inSampleSize = 8;   // ~400 px from a 12 MP photo
+                android.graphics.Bitmap b = android.graphics.BitmapFactory.decodeFile(path, o);
+                return b == null ? null : rotateForExif(path, b);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        private android.graphics.Bitmap rotateForExif(String path, android.graphics.Bitmap b) {
+            try {
+                int o = new androidx.exifinterface.media.ExifInterface(path).getAttributeInt(
+                        androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL);
+                int deg = o == androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 ? 90
+                        : o == androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 ? 180
+                        : o == androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 ? 270 : 0;
+                if (deg == 0) return b;
+                android.graphics.Matrix m = new android.graphics.Matrix();
+                m.postRotate(deg);
+                return android.graphics.Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+            } catch (Exception e) {
+                return b;
+            }
+        }
 
         @NonNull
         @Override
@@ -243,10 +294,16 @@ public class CreateListingFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull Holder h, int position) {
-            h.b.ivThumbnail.setImageResource(icons[position]);
-            h.b.ivThumbnail.setPadding(30, 30, 30, 30);
-            h.b.ivThumbnail.setContentDescription(position == 0 ? "Wide angle photo uploaded"
-                    : position == 1 ? "Close-up photo uploaded" : "Video uploaded");
+            if (thumbs[position] != null) {
+                h.b.ivThumbnail.setImageBitmap(thumbs[position]);
+                h.b.ivThumbnail.setPadding(0, 0, 0, 0);
+            } else {   // thumbnail not ready / not available: show that the upload is done
+                h.b.ivThumbnail.setImageResource(R.drawable.ic_check_circle_dark_green);
+                h.b.ivThumbnail.setPadding(36, 36, 36, 36);
+            }
+            h.b.ivPlay.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+            h.b.getRoot().setContentDescription(position == 0 ? "Wide angle photo"
+                    : position == 1 ? "Close-up photo" : "10-second video");
         }
 
         @Override

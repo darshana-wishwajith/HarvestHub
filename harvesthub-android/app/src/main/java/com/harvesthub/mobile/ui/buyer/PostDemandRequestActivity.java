@@ -179,25 +179,25 @@ public class PostDemandRequestActivity extends AppCompatActivity {
         ivCheckGradeB.setVisibility(View.GONE);
         ivCheckGradeC.setVisibility(View.GONE);
 
-        tvGradeA.setTypeface(Typeface.DEFAULT);
-        tvGradeB.setTypeface(Typeface.DEFAULT);
-        tvGradeC.setTypeface(Typeface.DEFAULT);
+        tvGradeA.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.regular(tvGradeA.getContext()));
+        tvGradeB.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.regular(tvGradeB.getContext()));
+        tvGradeC.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.regular(tvGradeC.getContext()));
 
         switch (grade) {
             case "Grade A":
                 btnGradeA.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_grade_a_selected));
                 ivCheckGradeA.setVisibility(View.VISIBLE);
-                tvGradeA.setTypeface(Typeface.DEFAULT_BOLD);
+                tvGradeA.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(tvGradeA.getContext()));
                 break;
             case "Grade B":
                 btnGradeB.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_grade_a_selected));
                 ivCheckGradeB.setVisibility(View.VISIBLE);
-                tvGradeB.setTypeface(Typeface.DEFAULT_BOLD);
+                tvGradeB.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(tvGradeB.getContext()));
                 break;
             case "Grade C":
                 btnGradeC.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_grade_a_selected));
                 ivCheckGradeC.setVisibility(View.VISIBLE);
-                tvGradeC.setTypeface(Typeface.DEFAULT_BOLD);
+                tvGradeC.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(tvGradeC.getContext()));
                 break;
         }
     }

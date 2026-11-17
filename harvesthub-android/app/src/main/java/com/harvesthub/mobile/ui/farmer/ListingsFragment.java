@@ -97,29 +97,37 @@ public class ListingsFragment extends Fragment {
                 startActivity(intent);
             }
             @Override public void onChat(ListingItem item) {
-                OrderFlowRouter.open(requireContext(), item.getActiveOrderId(), false);
+                if (item.getChatOrderId() == null) {
+                    Toast.makeText(requireContext(), "No buyer conversation for this listing yet.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(requireContext(), ChatActivity.class);
+                intent.putExtra(OrderFlowRouter.EXTRA_ORDER_ID, item.getChatOrderId());
+                startActivity(intent);
             }
             @Override public void onTrack(ListingItem item) {
-                if (item.getActiveOrderId() == null) {
+                if (item.getChatOrderId() == null) {
                     Toast.makeText(requireContext(), "No order is linked to this listing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent intent = new Intent(requireContext(), ActiveOrderTrackerActivity.class);
-                intent.putExtra(OrderFlowRouter.EXTRA_ORDER_ID, item.getActiveOrderId());
-                startActivity(intent);
+                // the screen for the order's current step (negotiation, payment wait, harvest, transit ...)
+                OrderFlowRouter.open(requireContext(), item.getChatOrderId(), false);
             }
             @Override public void onEdit(ListingItem item) {
-                CreateListingFragment fragment = new CreateListingFragment();
-                Bundle args = new Bundle();
-                args.putString("listingId", item.getId());
-                fragment.setArguments(args);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, fragment)
-                        .addToBackStack(null)
-                        .commit();
+                showEditDialog(item);
             }
-            @Override public void onDeactivate(ListingItem item) {}
-            @Override public void onReactivate(ListingItem item) {}
+            @Override public void onDeactivate(ListingItem item) {
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Deactivate " + item.getCropName() + "?")
+                        .setMessage("Buyers will not see this listing and officers will not review it until you re-activate it.")
+                        .setPositiveButton("Deactivate", (d, w) -> listingAction(apiService.deactivateListing(item.getId()), "Listing deactivated."))
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+            @Override public void onReactivate(ListingItem item) {
+                listingAction(apiService.reactivateListing(item.getId()),
+                        item.getGrade() != null ? "Listing is back on the marketplace." : "Listing sent back for officer verification.");
+            }
             @Override public void onSupply(ListingItem item) {
                 Intent intent = new Intent(requireContext(), CreateSupplyOfferActivity.class);
                 intent.putExtra("requestId", item.getId());
@@ -185,6 +193,58 @@ public class ListingsFragment extends Fragment {
         binding.indicatorWantedAds.setVisibility(View.INVISIBLE);
     }
 
+    /** Card "Edit": estimated yield and price per kg (crop and photos stay - they were verified). */
+    private void showEditDialog(ListingItem item) {
+        android.view.View v = getLayoutInflater().inflate(R.layout.dialog_edit_listing, null);
+        com.google.android.material.textfield.TextInputLayout tilYield = v.findViewById(R.id.tilEditYield);
+        com.google.android.material.textfield.TextInputLayout tilPrice = v.findViewById(R.id.tilEditPrice);
+        android.widget.EditText etYield = v.findViewById(R.id.etEditYield);
+        android.widget.EditText etPrice = v.findViewById(R.id.etEditPrice);
+        etYield.setText(digits(item.getQuantity()));
+        etPrice.setText(digits(item.getPrice()));
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Edit " + item.getCropName())
+                .setView(v)
+                .setPositiveButton("Save", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.setOnShowListener(x -> dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
+            double yield = number(etYield.getText().toString());
+            double price = number(etPrice.getText().toString());
+            tilYield.setError(yield > 0 ? null : "Enter the estimated total yield in kg");
+            tilPrice.setError(price > 0 ? null : "Enter the expected price per kg");
+            if (yield <= 0 || price <= 0) return;
+            com.harvesthub.mobile.model.Listing body = new com.harvesthub.mobile.model.Listing();
+            body.setQuantity(etYield.getText().toString().trim());
+            body.setPrice(etPrice.getText().toString().trim());
+            dialog.dismiss();
+            listingAction(apiService.updateListing(item.getId(), body), "Listing updated.");
+        }));
+        dialog.show();
+    }
+
+    private static String digits(String s) {
+        return s == null ? "" : s.replaceAll("[^0-9.]", "");
+    }
+
+    /** Runs a card action, shows the server's message on failure and reloads the list. */
+    private void listingAction(retrofit2.Call<okhttp3.ResponseBody> call, String success) {
+        call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull retrofit2.Call<okhttp3.ResponseBody> c, @NonNull retrofit2.Response<okhttp3.ResponseBody> r) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), r.isSuccessful() ? success
+                        : com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(r, "Could not update the listing."), Toast.LENGTH_LONG).show();
+                if (r.isSuccessful()) selectTab(currentTab);
+            }
+
+            @Override
+            public void onFailure(@NonNull retrofit2.Call<okhttp3.ResponseBody> c, @NonNull Throwable t) {
+                if (isAdded()) Toast.makeText(requireContext(), R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void setupFilters() {
         binding.filterAll.setOnClickListener(v -> filterByStatus(null));
         binding.filterDraft.setOnClickListener(v -> filterByStatus(ListingItem.Status.DRAFT));
@@ -193,6 +253,7 @@ public class ListingsFragment extends Fragment {
         binding.filterListed.setOnClickListener(v -> filterByStatus(ListingItem.Status.LISTED));
         binding.filterActionRequired.setOnClickListener(v -> filterByStatus(ListingItem.Status.RETAKE_REQUESTED));
         binding.filterOngoing.setOnClickListener(v -> filterByStatus(ListingItem.Status.ONGOING));
+        binding.filterDeactivated.setOnClickListener(v -> filterByStatus(ListingItem.Status.DEACTIVATED));
         updateFilterUI();
     }
 
@@ -205,9 +266,10 @@ public class ListingsFragment extends Fragment {
     private void updateFilterUI() {
         if (binding == null) return;
         TextView[] filters = {binding.filterAll, binding.filterDraft, binding.filterPending, binding.filterUnderReview,
-                binding.filterListed, binding.filterActionRequired, binding.filterOngoing};
+                binding.filterListed, binding.filterActionRequired, binding.filterOngoing, binding.filterDeactivated};
         ListingItem.Status[] statuses = {null, ListingItem.Status.DRAFT, ListingItem.Status.PENDING, ListingItem.Status.UNDER_REVIEW,
-                ListingItem.Status.LISTED, ListingItem.Status.RETAKE_REQUESTED, ListingItem.Status.ONGOING};
+                ListingItem.Status.LISTED, ListingItem.Status.RETAKE_REQUESTED, ListingItem.Status.ONGOING,
+                ListingItem.Status.DEACTIVATED};
 
         for (int i = 0; i < filters.length; i++) {
             if (selectedFilter == statuses[i]) {

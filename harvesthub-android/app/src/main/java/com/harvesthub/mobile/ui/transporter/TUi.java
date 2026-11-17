@@ -46,7 +46,53 @@ public final class TUi {
     public static final int RED_BG = Color.parseColor("#FDE2E2");
     public static final int AMBER = Color.parseColor("#92400E");
     public static final int AMBER_BG = Color.parseColor("#FEF3C7");
-    public static final int GREY_BG = Color.parseColor("#F1F5F9");
+    public static final int GREY_BG = Color.parseColor("#F3F0EE");
+    public static final int MINT = Color.parseColor("#B9F2C4");
+    public static final int MINT_INK = Color.parseColor("#14532D");
+    public static final int PAGE = Color.parseColor("#FDF8F6");
+    public static final int BLUE_BG = Color.parseColor("#EEF4FF");
+
+    private static Typeface boldFace, semiFace;
+
+    /** Plus Jakarta Sans Bold (Typeface.DEFAULT_BOLD would fall back to Roboto). */
+    public static Typeface bold(Context c) {
+        if (boldFace == null) {
+            try {
+                boldFace = androidx.core.content.res.ResourcesCompat.getFont(c, R.font.plus_jakarta_sans_bold);
+            } catch (Exception ignored) { }
+            if (boldFace == null) boldFace = Typeface.DEFAULT_BOLD;
+        }
+        return boldFace;
+    }
+
+    private static Typeface regularFace;
+
+    public static Typeface regular(Context c) {
+        if (regularFace == null) {
+            try {
+                regularFace = androidx.core.content.res.ResourcesCompat.getFont(c, R.font.plus_jakarta_sans);
+            } catch (Exception ignored) { }
+            if (regularFace == null) regularFace = Typeface.DEFAULT;
+        }
+        return regularFace;
+    }
+
+    public static Typeface semi(Context c) {
+        if (semiFace == null) {
+            try {
+                semiFace = androidx.core.content.res.ResourcesCompat.getFont(c, R.font.plus_jakarta_sans_semibold);
+            } catch (Exception ignored) { }
+            if (semiFace == null) semiFace = bold(c);
+        }
+        return semiFace;
+    }
+
+    public static GradientDrawable round(int color, float radiusPx) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(color);
+        d.setCornerRadius(radiusPx);
+        return d;
+    }
 
     private TUi() {}
 
@@ -75,10 +121,11 @@ public final class TUi {
         Context c = parent.getContext();
         MaterialCardView card = new MaterialCardView(c);
         card.setCardBackgroundColor(bg);
-        card.setRadius(dp(c, 18));
-        card.setCardElevation(0);
+        card.setRadius(dp(c, 16));
+        boolean plain = bg == Color.WHITE && stroke == LINE;
+        card.setCardElevation(plain ? dp(c, 1.5f) : 0);
         card.setStrokeColor(stroke);
-        card.setStrokeWidth(dp(c, 1));
+        card.setStrokeWidth(plain ? 0 : dp(c, 1));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(c, 14);
         parent.addView(card, lp);
@@ -96,7 +143,7 @@ public final class TUi {
         t.setText(s);
         t.setTextSize(sp);
         t.setTextColor(color);
-        if (bold) t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        if (bold) t.setTypeface(bold(c));
         parent.addView(t, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return t;
     }
@@ -141,13 +188,13 @@ public final class TUi {
         l.setText(label);
         l.setTextSize(14);
         l.setTextColor(strong ? INK : MUTED);
-        if (strong) l.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        l.setTypeface(strong ? bold(c) : semi(c));
         r.addView(l, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         TextView v = new TextView(c);
         v.setText(value);
         v.setTextSize(strong ? 17 : 14);
         v.setTextColor(valueColor);
-        v.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        v.setTypeface(bold(c));
         v.setGravity(Gravity.END);
         r.addView(v, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         parent.addView(r);
@@ -161,7 +208,7 @@ public final class TUi {
         t.setText(s);
         t.setTextSize(12);
         t.setTextColor(fg);
-        t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        t.setTypeface(bold(c));
         t.setPadding(dp(c, 10), dp(c, 4), dp(c, 10), dp(c, 4));
         GradientDrawable d = new GradientDrawable();
         d.setColor(bg);
@@ -213,7 +260,7 @@ public final class TUi {
         TextView icon = new TextView(c);
         icon.setText(state == 2 ? "✓" : state == 1 ? "●" : "○");
         icon.setTextSize(16);
-        icon.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        icon.setTypeface(bold(c));
         icon.setTextColor(state == 2 ? ACCENT : state == 1 ? DARK : MUTED);
         icon.setWidth(dp(c, 28));
         r.addView(icon);
@@ -221,7 +268,7 @@ public final class TUi {
         l.setText(label);
         l.setTextSize(15);
         l.setTextColor(state == 0 ? MUTED : INK);
-        if (state == 1) l.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        if (state == 1) l.setTypeface(bold(c));
         r.addView(l, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         parent.addView(r);
         if (pillText != null) {
@@ -259,7 +306,7 @@ public final class TUi {
     }
 
     public static MaterialButton secondary(ViewGroup parent, CharSequence s, View.OnClickListener l) {
-        return button(parent, s, Color.parseColor("#E5E7EB"), INK, l);
+        return button(parent, s, Color.parseColor("#E9E7E5"), INK, l);
     }
 
     public static MaterialButton danger(ViewGroup parent, CharSequence s, View.OnClickListener l) {
@@ -272,6 +319,8 @@ public final class TUi {
         b.setText(s);
         b.setAllCaps(false);
         b.setTextSize(16);
+        b.setTypeface(bold(c));
+        b.setLetterSpacing(0f);
         b.setTextColor(fg);
         b.setBackgroundTintList(ColorStateList.valueOf(bg));
         b.setCornerRadius(dp(c, 14));
@@ -296,7 +345,7 @@ public final class TUi {
             TextView t = new TextView(c);
             t.setText(s);
             t.setTextSize(13);
-            t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            t.setTypeface(bold(c));
             t.setPadding(dp(c, 14), dp(c, 8), dp(c, 14), dp(c, 8));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.rightMargin = dp(c, 8);
@@ -319,7 +368,7 @@ public final class TUi {
     public static void setChip(TextView t, boolean on) {
         t.setTag(on);
         GradientDrawable d = new GradientDrawable();
-        d.setColor(on ? DARK : Color.parseColor("#EEEEEE"));
+        d.setColor(on ? DARK : Color.parseColor("#ECEAE8"));
         d.setCornerRadius(dp(t.getContext(), 50));
         t.setBackground(d);
         t.setTextColor(on ? Color.WHITE : INK);
@@ -355,6 +404,302 @@ public final class TUi {
         lp.topMargin = dp(c, 8);
         parent.addView(e, lp);
         return e;
+    }
+
+    // ---------------------------------------------------------------- Figma building blocks
+
+    /** Horizontal, vertically centred row. */
+    public static LinearLayout hrow(ViewGroup parent, int topMarginDp) {
+        Context c = parent.getContext();
+        LinearLayout r = new LinearLayout(c);
+        r.setOrientation(LinearLayout.HORIZONTAL);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(c, topMarginDp);
+        parent.addView(r, lp);
+        return r;
+    }
+
+    /** Vertical column inside a row; weight 0 = wrap. */
+    public static LinearLayout col(LinearLayout row, float weight) {
+        LinearLayout v = new LinearLayout(row.getContext());
+        v.setOrientation(LinearLayout.VERTICAL);
+        row.addView(v, weight > 0 ? new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, weight)
+                : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return v;
+    }
+
+    /** Text that wraps its own width (for rows). */
+    public static TextView label(ViewGroup parent, CharSequence s, float sp, int color, boolean bold) {
+        TextView t = text(parent, s, sp, color, bold);
+        t.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        return t;
+    }
+
+    /** Text that takes the remaining width of a row. */
+    public static TextView fill(LinearLayout row, CharSequence s, float sp, int color, boolean bold) {
+        TextView t = text(row, s, sp, color, bold);
+        t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        return t;
+    }
+
+    /** Tinted inner box (Figma grey panels). */
+    public static LinearLayout box(ViewGroup parent, int bg, int topMarginDp) {
+        Context c = parent.getContext();
+        LinearLayout b = new LinearLayout(c);
+        b.setOrientation(LinearLayout.VERTICAL);
+        b.setBackground(round(bg, dp(c, 12)));
+        int p = dp(c, 12);
+        b.setPadding(p, p, p, p);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(c, topMarginDp);
+        parent.addView(b, lp);
+        return b;
+    }
+
+    public static ImageView icon(ViewGroup parent, int res, int sizeDp, int tint) {
+        Context c = parent.getContext();
+        ImageView iv = new ImageView(c);
+        iv.setImageResource(res);
+        if (tint != 0) iv.setColorFilter(tint);
+        parent.addView(iv, new LinearLayout.LayoutParams(dp(c, sizeDp), dp(c, sizeDp)));
+        return iv;
+    }
+
+    /** Icon on a rounded-square (or round) coloured tile. */
+    public static android.widget.FrameLayout iconTile(ViewGroup parent, int res, int sizeDp, int bg, int tint, boolean circle) {
+        Context c = parent.getContext();
+        android.widget.FrameLayout f = new android.widget.FrameLayout(c);
+        f.setBackground(round(bg, dp(c, circle ? sizeDp : 12)));
+        ImageView iv = new ImageView(c);
+        iv.setImageResource(res);
+        if (tint != 0) iv.setColorFilter(tint);
+        int in = dp(c, sizeDp * 0.5f);
+        f.addView(iv, new android.widget.FrameLayout.LayoutParams(in, in, Gravity.CENTER));
+        parent.addView(f, new LinearLayout.LayoutParams(dp(c, sizeDp), dp(c, sizeDp)));
+        return f;
+    }
+
+    /** Pill without top margin, for use inside rows. */
+    public static TextView tag(ViewGroup parent, CharSequence s, int bg, int fg) {
+        TextView t = pill(parent, s, bg, fg);
+        ((LinearLayout.LayoutParams) t.getLayoutParams()).topMargin = 0;
+        t.setTextSize(11);
+        return t;
+    }
+
+    /** Card heading with an optional pill on the right; returns the pill (or null). */
+    public static TextView header(ViewGroup parent, CharSequence title, @Nullable CharSequence pillText, int pillBg, int pillFg) {
+        LinearLayout r = hrow(parent, 0);
+        fill(r, title, 17, DARK, true);
+        return pillText == null ? null : tag(r, pillText, pillBg, pillFg);
+    }
+
+    /** Heading with an icon in front (Figma "Manifest", "Pre-Loading Sequence"...). */
+    public static TextView iconHeader(ViewGroup parent, int iconRes, CharSequence title, @Nullable CharSequence pillText, int pillBg, int pillFg) {
+        Context c = parent.getContext();
+        LinearLayout r = hrow(parent, 0);
+        icon(r, iconRes, 20, DARK);
+        TextView t = fill(r, title, 18, DARK, true);
+        ((LinearLayout.LayoutParams) t.getLayoutParams()).leftMargin = dp(c, 8);
+        return pillText == null ? null : tag(r, pillText, pillBg, pillFg);
+    }
+
+    /** Section heading outside cards ("Current Job", "Recent Payouts") with an optional right label. */
+    public static TextView sectionTitle(ViewGroup parent, CharSequence title, @Nullable CharSequence right) {
+        LinearLayout r = hrow(parent, 20);
+        fill(r, title, 17, INK, true);
+        return right == null ? null : label(r, right, 13, DARK, true);
+    }
+
+    /** Row of equal grey tiles; add tiles with {@link #tile}. */
+    public static LinearLayout tiles(ViewGroup parent) {
+        return hrow(parent, 10);
+    }
+
+    /** One grey tile: small label, bold value, optional sub line, optional icon. */
+    public static LinearLayout tile(LinearLayout row, int iconRes, CharSequence labelText, CharSequence value, @Nullable CharSequence sub) {
+        Context c = row.getContext();
+        LinearLayout t = new LinearLayout(c);
+        t.setGravity(Gravity.CENTER_VERTICAL);
+        t.setBackground(round(GREY_BG, dp(c, 12)));
+        int p = dp(c, 12);
+        t.setPadding(p, p, p, p);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        if (row.getChildCount() > 0) lp.leftMargin = dp(c, 8);
+        row.addView(t, lp);
+        if (iconRes != 0) {
+            android.widget.FrameLayout f = iconTile(t, iconRes, 32, Color.WHITE, INK, true);
+            ((LinearLayout.LayoutParams) f.getLayoutParams()).rightMargin = dp(c, 8);
+        }
+        LinearLayout v = col(t, 1f);
+        TextView l = text(v, labelText, 11, MUTED, false);
+        l.setTypeface(semi(c));
+        text(v, value, 15, INK, true);
+        if (sub != null) text(v, sub, 11, MUTED, false);
+        return t;
+    }
+
+    /** Stops joined by a line: each stop is {LABEL, title, sub}. First dots dark, last dot green. */
+    public static void timeline(ViewGroup parent, String[]... stops) {
+        Context c = parent.getContext();
+        for (int i = 0; i < stops.length; i++) {
+            boolean last = i == stops.length - 1;
+            LinearLayout r = new LinearLayout(c);
+            r.setOrientation(LinearLayout.HORIZONTAL);
+            parent.addView(r, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            LinearLayout rail = new LinearLayout(c);
+            rail.setOrientation(LinearLayout.VERTICAL);
+            rail.setGravity(Gravity.CENTER_HORIZONTAL);
+            r.addView(rail, new LinearLayout.LayoutParams(dp(c, 22), ViewGroup.LayoutParams.MATCH_PARENT));
+            View dot = new View(c);
+            dot.setBackground(round(last ? Color.parseColor("#15803D") : DARK, dp(c, 10)));
+            LinearLayout.LayoutParams dl = new LinearLayout.LayoutParams(dp(c, 11), dp(c, 11));
+            dl.topMargin = dp(c, 3);
+            rail.addView(dot, dl);
+            if (!last) {
+                View line = new View(c);
+                line.setBackgroundColor(Color.parseColor("#C9C5C2"));
+                rail.addView(line, new LinearLayout.LayoutParams(dp(c, 2), 0, 1f));
+            }
+            LinearLayout v = col(r, 1f);
+            v.setPadding(dp(c, 6), 0, 0, dp(c, last ? 0 : 12));
+            String[] s = stops[i];
+            TextView cap = text(v, s[0].toUpperCase(Locale.US), 11, last ? Color.parseColor("#15803D") : MUTED, true);
+            cap.setLetterSpacing(0.04f);
+            text(v, s[1] == null || s[1].isEmpty() ? "—" : s[1], 15, INK, true);
+            if (s.length > 2 && s[2] != null && !s[2].isEmpty()) text(v, s[2], 12, MUTED, false);
+        }
+    }
+
+    /** White check row inside a sequence box: icon, label, status pill. state 2 done, 1 current, 0 pending. */
+    public static LinearLayout checkRow(ViewGroup parent, CharSequence labelText, int state, @Nullable CharSequence pillText) {
+        Context c = parent.getContext();
+        LinearLayout r = hrow(parent, 8);
+        r.setBackground(round(Color.WHITE, dp(c, 12)));
+        int p = dp(c, 12);
+        r.setPadding(p, p, p, p);
+        if (state == 2) icon(r, R.drawable.ic_check_circle_green, 20, Color.parseColor("#15803D"));
+        else iconTile(r, state == 1 ? R.drawable.ic_camera_add : R.drawable.ic_clock, state == 1 ? 34 : 22,
+                state == 1 ? DARK : GREY_BG, state == 1 ? Color.WHITE : MUTED, false);
+        TextView l = fill(r, labelText, 14, state == 0 ? MUTED : state == 1 ? DARK : INK, state == 1);
+        ((LinearLayout.LayoutParams) l.getLayoutParams()).leftMargin = dp(c, 10);
+        if (pillText != null) tag(r, pillText, state == 2 ? MINT : state == 1 ? RED_BG : GREY_BG, state == 2 ? MINT_INK : state == 1 ? RED : MUTED);
+        return r;
+    }
+
+    /** Numbered instruction card (Figma "Mandatory Driver Actions"); returns the text column for extra buttons. */
+    public static LinearLayout numStep(ViewGroup parent, int number, CharSequence title, CharSequence bodyText, boolean alert) {
+        Context c = parent.getContext();
+        LinearLayout r = new LinearLayout(c);
+        r.setBackground(round(Color.WHITE, dp(c, 12)));
+        int p = dp(c, 12);
+        r.setPadding(p, p, p, p);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(c, 8);
+        parent.addView(r, lp);
+        TextView n = new TextView(c);
+        n.setText(String.valueOf(number));
+        n.setGravity(Gravity.CENTER);
+        n.setTextSize(12);
+        n.setTypeface(bold(c));
+        n.setTextColor(alert ? RED : MINT_INK);
+        n.setBackground(round(alert ? RED_BG : MINT, dp(c, 20)));
+        r.addView(n, new LinearLayout.LayoutParams(dp(c, 26), dp(c, 26)));
+        LinearLayout v = col(r, 1f);
+        v.setPadding(dp(c, 10), 0, 0, 0);
+        text(v, title, 15, alert ? RED : INK, true);
+        text(v, bodyText, 13, MUTED, false);
+        return v;
+    }
+
+    /** Coloured notice with a round icon, title and body (Figma "Smart Contract Notice", "Escrow ... Protected"). */
+    public static LinearLayout notice(ViewGroup parent, int iconRes, int bg, int iconBg, CharSequence title, CharSequence bodyText) {
+        Context c = parent.getContext();
+        LinearLayout card = card(parent, bg, bg);
+        LinearLayout r = hrow(card, 0);
+        r.setGravity(Gravity.TOP);
+        iconTile(r, iconRes, 38, iconBg, Color.WHITE, true);
+        LinearLayout v = col(r, 1f);
+        v.setPadding(dp(c, 12), 0, 0, 0);
+        text(v, title, 15, bg == RED_BG ? RED : DARK, true);
+        TextView b = text(v, bodyText, 13, bg == RED_BG ? RED : Color.parseColor("#374151"), false);
+        ((LinearLayout.LayoutParams) b.getLayoutParams()).topMargin = dp(c, 2);
+        return v;
+    }
+
+    /** Button with a leading icon. */
+    public static MaterialButton iconButton(ViewGroup parent, CharSequence s, int iconRes, int bg, int fg, View.OnClickListener l) {
+        MaterialButton b = button(parent, s, bg, fg, l);
+        b.setIconResource(iconRes);
+        b.setIconTint(ColorStateList.valueOf(fg));
+        b.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+        b.setIconPadding(dp(parent.getContext(), 8));
+        b.setIconSize(dp(parent.getContext(), 20));
+        return b;
+    }
+
+    /** Small inline button (inside cards). */
+    public static MaterialButton smallButton(ViewGroup parent, CharSequence s, int iconRes, int bg, int fg, View.OnClickListener l) {
+        Context c = parent.getContext();
+        MaterialButton b = iconRes == 0 ? button(parent, s, bg, fg, l) : iconButton(parent, s, iconRes, bg, fg, l);
+        b.setTextSize(13);
+        b.setCornerRadius(dp(c, 10));
+        b.setMinWidth(0);
+        b.setMinimumWidth(0);
+        b.setPadding(dp(c, 14), 0, dp(c, 14), 0);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(c, 38));
+        lp.topMargin = dp(c, 8);
+        b.setLayoutParams(lp);
+        return b;
+    }
+
+    /** Centred text link under the main button. */
+    public static TextView link(ViewGroup parent, CharSequence s, int color, View.OnClickListener l) {
+        Context c = parent.getContext();
+        TextView t = text(parent, s, 13, color, true);
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(0, dp(c, 12), 0, dp(c, 6));
+        t.setPaintFlags(t.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+        t.setOnClickListener(l);
+        return t;
+    }
+
+    /** Thin progress bar, 0–100. */
+    public static android.widget.ProgressBar progress(ViewGroup parent, int percent, int topMarginDp) {
+        Context c = parent.getContext();
+        android.widget.ProgressBar bar = new android.widget.ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);
+        bar.setProgress(Math.max(0, Math.min(100, percent)));
+        bar.setProgressTintList(ColorStateList.valueOf(DARK));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#D6D3D1")));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(c, 8));
+        lp.topMargin = dp(c, topMarginDp);
+        parent.addView(bar, lp);
+        return bar;
+    }
+
+    public static View divider(ViewGroup parent, int vMarginDp) {
+        Context c = parent.getContext();
+        View v = new View(c);
+        v.setBackgroundColor(Color.parseColor("#E7E5E4"));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(c, 1));
+        lp.topMargin = dp(c, vMarginDp);
+        lp.bottomMargin = dp(c, vMarginDp);
+        parent.addView(v, lp);
+        return v;
+    }
+
+    /** Remote photo with rounded corners. */
+    public static ImageView thumb(ViewGroup parent, @Nullable String path, int wDp, int hDp) {
+        Context c = parent.getContext();
+        ImageView iv = new ImageView(c);
+        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        iv.setBackground(round(Color.parseColor("#E5E7EB"), dp(c, 10)));
+        iv.setClipToOutline(true);
+        parent.addView(iv, new LinearLayout.LayoutParams(dp(c, wDp), dp(c, hDp)));
+        if (path != null && !path.isEmpty()) RemoteImage.load(iv, BaseBuyerOrderActivity.mediaUrl(path));
+        return iv;
     }
 
     // ---------------------------------------------------------------- scaffold

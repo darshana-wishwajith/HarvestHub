@@ -1,5 +1,8 @@
 package com.harvesthub.mobile.ui.transporter;
 
+import com.harvesthub.mobile.R;
+import android.widget.TextView;
+import android.graphics.Color;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -76,26 +79,53 @@ public class LiabilityCheckpointActivity extends BaseTransporterOrderActivity {
 
     @Override
     protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
-        LinearLayout at = TUi.card(c);
-        TUi.pill(at, "✓ Arrival recorded • At farm", TUi.SURFACE, TUi.DARK);
-        TUi.text(at, o.getFarmerName() == null ? "Farm" : o.getFarmerName(), 20, TUi.INK, true);
-        TUi.body(at, o.getPickupAddress() == null ? "" : o.getPickupAddress());
+        int green = Color.parseColor("#15803D");
+        LinearLayout at = TUi.card(c, TUi.GREY_BG, TUi.GREY_BG);
+        LinearLayout ar = TUi.hrow(at, 0);
+        TUi.icon(ar, R.drawable.ic_check_circle_green, 18, green);
+        TextView ok = TUi.fill(ar, "GPS Position Recorded \u2022 At Farm", 13, green, true);
+        ((LinearLayout.LayoutParams) ok.getLayoutParams()).leftMargin = TUi.dp(this, 6);
+        String arrived = o.reachedAt("ARRIVED_AT_PICKUP");
+        if (arrived != null) TUi.label(ar, time(arrived), 11, TUi.MUTED, false);
+        TUi.text(at, o.getFarmerName() == null ? "Farm" : o.getFarmerName(), 20, TUi.INK, true).setPadding(0, TUi.dp(this, 8), 0, 0);
+        if (o.getPickupAddress() != null) {
+            LinearLayout ad = TUi.hrow(at, 2);
+            TUi.icon(ad, R.drawable.ic_location_pin, 14, TUi.MUTED);
+            TUi.fill(ad, " " + o.getPickupAddress(), 12, TUi.MUTED, false);
+        }
 
-        LinearLayout man = TUi.card(c);
-        TUi.title(man, "Manifest " + ref());
-        TUi.text(man, o.getCropName() == null ? "Produce" : o.getCropName(), 16, TUi.INK, true);
-        TUi.row(man, "Net weight", String.format(java.util.Locale.US, "%,.0f kg", o.getQuantity()));
-        if (o.getVehicleLabel() != null) TUi.row(man, "Vehicle class", o.getVehicleLabel());
-        TUi.row(man, "Buyer", o.getBuyerName() == null ? "—" : o.getBuyerName());
+        LinearLayout man = TUi.card(c, TUi.GREY_BG, TUi.GREY_BG);
+        TUi.iconHeader(man, R.drawable.ic_archive_box, "Manifest " + ref(), null, 0, 0);
+        LinearLayout mb = TUi.box(man, Color.WHITE, 12);
+        LinearLayout mr = TUi.hrow(mb, 0);
+        TUi.iconTile(mr, R.drawable.ic_leaf, 38, TUi.GREY_BG, TUi.DARK, false);
+        LinearLayout mt = TUi.col(mr, 1f);
+        mt.setPadding(TUi.dp(this, 10), 0, 0, 0);
+        TUi.text(mt, o.getCropName() == null ? "Produce" : o.getCropName(), 16, TUi.INK, true);
+        TUi.text(mt, "Buyer: " + (o.getBuyerName() == null ? "\u2014" : o.getBuyerName()), 12, TUi.MUTED, false);
+        LinearLayout tl = TUi.tiles(mb);
+        TUi.tile(tl, 0, "ORDER", ref(), o.getDeliveryDate() == null ? null : "Deliver by " + o.getDeliveryDate());
+        TUi.tile(tl, 0, "NET WEIGHT", String.format(java.util.Locale.US, "%,.0f kg", o.getQuantity()),
+                o.getVehicleLabel() == null ? null : "Fits " + o.getVehicleLabel());
 
-        LinearLayout seq = TUi.card(c);
-        TUi.title(seq, "Pre-Loading Sequence");
-        TUi.step(seq, "1. Farm arrival recorded", 2, "Done");
-        TUi.step(seq, "2. Harvest marked ready by the farmer", 2, "Done");
         int n = photoFiles.size();
-        TUi.step(seq, "3. Pre-loading photos (" + n + " / min " + MIN_PHOTOS + ")", n >= MIN_PHOTOS ? 2 : 1, n >= MIN_PHOTOS ? "Ready" : "Required");
-        TUi.step(seq, "4. Buyer approval", 0, null);
-        TUi.body(seq, "Photograph the crates and the produce up close before loading. Each photo is stamped with time and GPS.");
+        boolean enough = n >= MIN_PHOTOS;
+        LinearLayout seq = TUi.card(c, TUi.GREY_BG, TUi.GREY_BG);
+        TUi.iconHeader(seq, R.drawable.ic_list, "Pre-Loading Sequence", "Step 3 of 4", Color.parseColor("#E2DFDC"), TUi.INK);
+        TUi.checkRow(seq, "1. Farm Arrival Recorded", 2, "Verified");
+        TUi.checkRow(seq, "2. Farmer Handover Confirmed", 2, "Verified");
+        LinearLayout shots = TUi.box(seq, Color.WHITE, 8);
+        shots.setElevation(TUi.dp(this, 2));
+        LinearLayout sr = TUi.hrow(shots, 0);
+        if (enough) TUi.icon(sr, R.drawable.ic_check_circle_green, 20, green);
+        else TUi.iconTile(sr, R.drawable.ic_camera_add, 36, TUi.DARK, Color.WHITE, false);
+        TextView st = TUi.fill(sr, "3. Pre-Loading Photos", 15, TUi.DARK, true);
+        ((LinearLayout.LayoutParams) st.getLayoutParams()).leftMargin = TUi.dp(this, 10);
+        TUi.tag(sr, enough ? "Ready" : "Required", enough ? TUi.MINT : TUi.RED_BG, enough ? TUi.MINT_INK : TUi.RED);
+        LinearLayout gr = TUi.hrow(shots, 10);
+        TUi.icon(gr, R.drawable.ic_gps_crosshair, 14, green);
+        TUi.fill(gr, " GPS Auto-Stamping Active", 12, TUi.MUTED, true);
+        TUi.label(gr, n + " / " + MIN_PHOTOS + " Shots", 12, TUi.INK, true);
         if (n > 0) {
             HorizontalScrollView hs = new HorizontalScrollView(this);
             LinearLayout strip = new LinearLayout(this);
@@ -103,11 +133,14 @@ public class LiabilityCheckpointActivity extends BaseTransporterOrderActivity {
             for (String p : photoFiles) {
                 ImageView iv = new ImageView(this);
                 iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                iv.setBackground(TUi.round(TUi.GREY_BG, TUi.dp(this, 10)));
+                iv.setClipToOutline(true);
                 BitmapFactory.Options opt = new BitmapFactory.Options();
                 opt.inSampleSize = 8;
                 iv.setImageBitmap(BitmapFactory.decodeFile(p, opt));
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(TUi.dp(this, 110), TUi.dp(this, 90));
                 lp.rightMargin = TUi.dp(this, 8);
+                lp.topMargin = TUi.dp(this, 10);
                 iv.setOnLongClickListener(v -> {
                     photoFiles.remove(p);
                     render();
@@ -115,16 +148,24 @@ public class LiabilityCheckpointActivity extends BaseTransporterOrderActivity {
                 });
                 strip.addView(iv, lp);
             }
-            seq.addView(hs);
-            TUi.body(seq, "Long-press a photo to remove it.");
+            shots.addView(hs);
+            TUi.text(shots, "Long-press a photo to remove it.", 11, TUi.MUTED, false);
         }
+        TUi.checkRow(seq, "4. Buyer Approval", 0, "Next");
+        TUi.text(seq, "Photograph the crates and the produce up close before loading. Take " + MIN_PHOTOS + " to " + MAX_PHOTOS + " photos.",
+                12, TUi.MUTED, false).setPadding(0, TUi.dp(this, 10), 0, 0);
 
         if (n < MAX_PHOTOS) {
-            TUi.secondary(actions, "📷  Launch Evidence Camera", v -> camera.launch(new Intent(this, EvidenceCameraActivity.class)
-                    .putExtra(EvidenceCameraActivity.EXTRA_LABEL, "Order " + ref() + " • photo " + (n + 1))));
+            TUi.iconButton(actions, enough ? "Add Another Photo" : "Launch Smart Evidence Camera", R.drawable.ic_viewfinder_bracket,
+                    enough ? Color.parseColor("#E9E7E5") : TUi.DARK, enough ? TUi.INK : Color.WHITE,
+                    v -> camera.launch(new Intent(this, EvidenceCameraActivity.class)
+                            .putExtra(EvidenceCameraActivity.EXTRA_LABEL, "Order " + ref() + " \u2022 photo " + (n + 1))));
         }
-        MaterialButton submit = TUi.primary(actions, uploading ? "Uploading…" : "Submit for Buyer Approval", v -> submit((MaterialButton) v));
-        submit.setEnabled(n >= MIN_PHOTOS && !uploading);
+        if (enough || uploading) {
+            MaterialButton submit = TUi.iconButton(actions, uploading ? "Uploading\u2026" : "Submit for Buyer Approval",
+                    R.drawable.ic_check_circle_outline_white, TUi.DARK, Color.WHITE, v -> submit((MaterialButton) v));
+            submit.setEnabled(!uploading);
+        }
     }
 
     private void submit(MaterialButton button) {

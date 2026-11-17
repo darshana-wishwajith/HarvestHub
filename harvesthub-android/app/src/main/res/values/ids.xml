@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="mediaSpinner" type="id" />
+    <item name="mediaPhoto" type="id" />
+    <item name="mediaVideo" type="id" />
+    <item name="mediaPlay" type="id" />
 </resources>

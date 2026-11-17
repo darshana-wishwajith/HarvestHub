@@ -76,7 +76,7 @@ public class QueuePage implements Page {
         sort.setOnAction(e -> redraw());
 
         buildTable();
-        HBox filters = Ui.row(10, tAll, tFree, tMine, Ui.grow(), search, crop, sort);
+        HBox filters = Ui.row(10, Ui.segmented(tAll, tFree, tMine), Ui.grow(), search, crop, sort);
         VBox tableCard = new VBox(10, table, pagerHost);
         VBox.setVgrow(table, Priority.ALWAYS);
         VBox.setVgrow(tableCard, Priority.ALWAYS);
@@ -87,26 +87,26 @@ public class QueuePage implements Page {
 
     private void buildTable() {
         table.getColumns().setAll(List.of(
-                Ui.nodeCol("CROP & FARMER", 230, n -> {
-                    VBox v = Ui.twoLine(Fmt.textOr(n, "cropName", "Crop") + (Fmt.text(n, "variety") != null ? " (" + Fmt.text(n, "variety") + ")" : ""),
-                            Fmt.textOr(n, "farmerName", "Farmer not recorded"));
-                    if (Fmt.bool(n, "cropPending")) v.getChildren().add(Ui.pill("New crop – not in catalogue", "blue"));
-                    return v;
+                Ui.nodeCol("CROP & FARMER", 235, n -> {
+                    HBox cell = Ui.cropCell(Fmt.textOr(n, "cropName", "Crop") + (Fmt.text(n, "variety") != null ? " (" + Fmt.text(n, "variety") + ")" : ""),
+                            Fmt.textOr(n, "farmerName", "Farmer not recorded"), Fmt.text(n, "coverUrl"), Fmt.text(n, "cropName"));
+                    if (Fmt.bool(n, "cropPending")) ((VBox) cell.getChildren().get(1)).getChildren().add(Ui.pill("New crop", "blue"));
+                    return cell;
                 }),
-                Ui.textCol("LOCATION", 170, n -> Fmt.text(n, "location")),
-                Ui.textCol("QUANTITY", 100, n -> Fmt.kg(Fmt.num(n, "quantityKg"))),
-                Ui.textCol("ASKING PRICE", 120, n -> Fmt.perKg(Fmt.num(n, "pricePerKg"))),
-                Ui.nodeCol("EVIDENCE", 150, n -> {
+                Ui.textCol("LOCATION", 125, n -> Fmt.text(n, "location")),
+                Ui.textCol("QUANTITY", 85, n -> Fmt.kg(Fmt.num(n, "quantityKg"))),
+                Ui.textCol("PRICE", 100, n -> Fmt.perKg(Fmt.num(n, "pricePerKg"))),
+                Ui.nodeCol("EVIDENCE", 140, n -> {
                     int media = (int) Fmt.count(n, "mediaCount");
                     Double d = Fmt.num(n, "distanceFromFarmMeters");
-                    String gps = d == null ? "no GPS" : Fmt.metres(d) + " from farm";
+                    String gps = d == null ? "No GPS" : Fmt.metres(d) + " from farm";
                     boolean ok = media >= 3 && d != null && d <= 500;
-                    return Ui.row(6, Ui.icon(ok ? "fas-check-circle" : "fas-exclamation-triangle", 13, ok ? "#1E7B3A" : "#B54708"),
-                            Ui.label(media + " files · " + gps, "small"));
+                    return Ui.row(7, Ui.icon(ok ? "fas-check-circle" : "fas-exclamation-triangle", 14, ok ? "#1E7B3A" : "#B54708"),
+                            new VBox(1, Ui.label(media + (media == 1 ? " file" : " files"), "small", "strong"), Ui.label(gps, "small", "muted")));
                 }),
-                Ui.textCol("SUBMITTED", 120, n -> Fmt.ago(Fmt.text(n, "submittedAt"))),
-                Ui.nodeCol("STATUS", 150, this::statusPill),
-                Ui.nodeCol("", 170, this::actionButton)));
+                Ui.textCol("SUBMITTED", 100, n -> Fmt.ago(Fmt.text(n, "submittedAt"))),
+                Ui.nodeCol("STATUS", 135, this::statusPill),
+                Ui.nodeCol("", 160, this::actionButton)));
         Ui.onOpen(table, n -> Shell.current().open(new ReviewPage(Fmt.text(n, "id"), Shell.Nav.QUEUE)));
     }
 
