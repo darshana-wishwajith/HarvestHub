@@ -1,12 +1,55 @@
 package com.harvesthub.mobile.ui.farmer;
 
+import android.graphics.Color;
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
+import com.harvesthub.mobile.model.Tracking;
+import com.harvesthub.mobile.ui.transporter.TUi;
+import com.harvesthub.mobile.utils.OsmMaps;
+import com.harvesthub.mobile.utils.TripMap;
+
+import org.osmdroid.views.MapView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /** Figma 22: overview of any order (escrow state, buyer, driver, current step). Does not auto-advance. */
 public class ActiveOrderTrackerActivity extends BaseOrderActivity {
+
+    private MapView mapView;
+    private TripMap trip;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        OsmMaps.init(this); // before the layout with the MapView is inflated
+        super.onCreate(savedInstanceState);
+        if (orderId == null) return;
+        mapView = findViewById(R.id.deliveryMap);
+        trip = new TripMap(mapView, TUi.DARK, Color.parseColor("#93C5A4"));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapView != null) mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (mapView != null) mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mapView != null) mapView.onDetach();
+        super.onDestroy();
+    }
 
     @Override
     protected int layout() {
@@ -27,6 +70,17 @@ public class ActiveOrderTrackerActivity extends BaseOrderActivity {
         setText(R.id.tvCurrentStep, stepLabel(o));
         setText(R.id.tvDriver, driverLine(o));
         setText(R.id.tvVehicle, "(" + vehicleLine(o) + ")");
+        if (trip == null) return;
+        // real farm / delivery pins, road route and (during the trip) the driver's GPS point
+        api.getTracking(orderId).enqueue(new Callback<Tracking>() {
+            @Override
+            public void onResponse(@NonNull Call<Tracking> call, @NonNull Response<Tracking> r) {
+                if (!isFinishing() && !isDestroyed() && r.isSuccessful() && r.body() != null) trip.show(r.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Tracking> call, @NonNull Throwable t) { }
+        });
     }
 
     static String escrowLabel(Order o) {

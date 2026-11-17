@@ -228,6 +228,7 @@ public class DeliveryDashboardActivity extends AppCompatActivity {
         route.setMaxLines(1);
         route.setEllipsize(android.text.TextUtils.TruncateAt.END);
         TUi.text(m, "Order #" + shortId(j.orderId) + " \u2022 " + String.format(Locale.US, "%,.0f kg", j.quantityKg), 12, TUi.MUTED, false);
+        if (j.pickupDate != null) TUi.text(m, "Pickup " + BaseTransporterOrderActivity.day(j.pickupDate), 12, TUi.DARK, true);
         LinearLayout right = TUi.col(r, 0);
         right.setGravity(android.view.Gravity.END);
         TUi.label(right, TUi.rs(j.payout), 15, TUi.INK, true);
