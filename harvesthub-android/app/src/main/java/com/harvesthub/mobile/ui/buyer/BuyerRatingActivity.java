@@ -3,10 +3,9 @@ package com.harvesthub.mobile.ui.buyer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,18 +25,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 6.4 "Post-Transaction Rating Sheet": the buyer rates the farmer (crop quality) and the driver
- * (communication, punctuality). Ratings feed the trust scores. Reuses the farmer rating layout without its
- * farmer navigation bars.
+ * Figma buyer 6.4 "Rate Your Experience": the buyer rates the farmer (crop quality) and the driver
+ * (communication, punctuality), each with its own stars and comment. Ratings feed the trust scores.
  */
 public class BuyerRatingActivity extends BaseBuyerOrderActivity {
 
     private final List<List<ImageView>> rows = new ArrayList<>();
     private final int[] stars = {5, 5};
+    private final int[] scoreIds = {R.id.tvFarmerScore, R.id.tvDriverScore};
 
     @Override
     protected int layout() {
-        return R.layout.activity_rating_feedback;
+        return R.layout.activity_buyer_rating;
     }
 
     @Override
@@ -49,83 +48,80 @@ public class BuyerRatingActivity extends BaseBuyerOrderActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (api == null) return;
-        show(R.id.included_top_nav, false);
-        show(R.id.included_nav, false);
-        rows.add(starRow(findViewById(R.id.buyerRatingCard)));
-        rows.add(starRow(findViewById(R.id.transporterRatingCard)));
-        for (int r = 0; r < rows.size(); r++) {
-            final int row = r;
-            for (int i = 0; i < rows.get(r).size(); i++) {
-                final int value = i + 1;
-                rows.get(r).get(i).setOnClickListener(v -> {
-                    stars[row] = value;
-                    paint(row);
-                });
-            }
-            paint(r);
-        }
-        relabel(findViewById(R.id.buyerRatingCard), getString(R.string.communication_fairness), "How was the crop quality?");
-        relabel(findViewById(R.id.transporterRatingCard), getString(R.string.punctuality_handling), "How was the communication and punctuality?");
-        ((EditText) findViewById(R.id.etFeedback)).setHint("Anything else? (optional)");
+        rows.add(buildStars(findViewById(R.id.starsFarmer), 0));
+        rows.add(buildStars(findViewById(R.id.starsDriver), 1));
+        paint(0);
+        paint(1);
         findViewById(R.id.btnSubmitFeedback).setOnClickListener(this::submit);
     }
 
-    private static List<ImageView> starRow(View card) {
-        List<ImageView> best = new ArrayList<>();
-        collect(card, best);
-        return best;
-    }
-
-    private static void collect(View v, List<ImageView> best) {
-        if (!(v instanceof ViewGroup)) return;
-        ViewGroup g = (ViewGroup) v;
-        List<ImageView> direct = new ArrayList<>();
-        for (int i = 0; i < g.getChildCount(); i++) {
-            if (g.getChildAt(i) instanceof ImageView) direct.add((ImageView) g.getChildAt(i));
+    private List<ImageView> buildStars(LinearLayout holder, int row) {
+        List<ImageView> list = new ArrayList<>();
+        float d = getResources().getDisplayMetrics().density;
+        for (int i = 0; i < 5; i++) {
+            final int value = i + 1;
+            ImageView star = new ImageView(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Math.round(36 * d), Math.round(36 * d));
+            lp.setMarginEnd(Math.round(8 * d));
+            star.setLayoutParams(lp);
+            star.setPadding(Math.round(3 * d), Math.round(3 * d), Math.round(3 * d), Math.round(3 * d));
+            star.setContentDescription(value + " star");
+            star.setOnClickListener(v -> {
+                stars[row] = value;
+                paint(row);
+            });
+            holder.addView(star);
+            list.add(star);
         }
-        if (direct.size() == 5 && best.isEmpty()) {
-            best.addAll(direct);
-            return;
-        }
-        for (int i = 0; i < g.getChildCount(); i++) collect(g.getChildAt(i), best);
-    }
-
-    private static void relabel(View v, String from, String to) {
-        if (v instanceof TextView && from.contentEquals(((TextView) v).getText())) {
-            ((TextView) v).setText(to);
-        } else if (v instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) v).getChildCount(); i++) relabel(((ViewGroup) v).getChildAt(i), from, to);
-        }
+        return list;
     }
 
     private void paint(int row) {
         List<ImageView> r = rows.get(row);
         for (int i = 0; i < r.size(); i++) {
-            r.get(i).setImageResource(i < stars[row] ? R.drawable.ic_rating_star_filled : R.drawable.ic_rating_star_unfilled);
+            r.get(i).setImageResource(i < stars[row] ? R.drawable.ic_star_filled : R.drawable.ic_star_outline);
         }
+        setText(scoreIds[row], stars[row] + ".0");
+    }
+
+    private static String initials(String name) {
+        if (name == null || name.trim().isEmpty()) return "?";
+        String[] parts = name.trim().split(" +");
+        String a = parts[0].substring(0, 1);
+        String b = parts.length > 1 ? parts[parts.length - 1].substring(0, 1) : "";
+        return (a + b).toUpperCase(java.util.Locale.US);
     }
 
     @Override
     protected void bind(@NonNull Order o) {
-        setText(R.id.tvBatch, "Order " + ref(o) + " | " + o.getCropName() + " | " + kg(o.getQuantity()));
-        Order.Payment p = o.getPayment();
-        setText(R.id.tvTotalPayout, "Total paid: " + rs(p == null ? o.cropValue() : p.advanceDue + p.balanceDue));
-        setText(R.id.tvRateBuyer, "Farmer: " + (o.getFarmerName() == null ? "" : o.getFarmerName()));
+        setText(R.id.tvRatingOrderRef, ref(o));
+        String farmer = o.getFarmerName() == null ? "" : o.getFarmerName();
+        setText(R.id.tvRateFarmerName, "Farmer: " + farmer);
+        setText(R.id.tvFarmerInitials, initials(farmer));
+        String place = o.getPickupAddress() == null ? "" : o.getPickupAddress() + " • ";
+        setText(R.id.tvRateFarmerMeta, place + kg(o.getQuantity()) + " " + o.getCropName());
         boolean hasDriver = o.getTransporterName() != null;
-        setText(R.id.tvRateTransporter, hasDriver ? "Driver: " + o.getTransporterName() + " • " + vehicleLine(o) : "");
-        show(R.id.transporterRatingCard, hasDriver);
+        show(R.id.cardRateDriver, hasDriver);
+        if (hasDriver) {
+            setText(R.id.tvRateDriverName, "Driver: " + o.getTransporterName());
+            setText(R.id.tvDriverInitials, initials(o.getTransporterName()));
+            setText(R.id.tvRateDriverMeta, vehicleLine(o));
+        }
         if (o.getRatedBy() != null && o.getRatedBy().contains(session.getUserId())) {
             findViewById(R.id.btnSubmitFeedback).setEnabled(false);
             setText(R.id.btnSubmitFeedback, "Feedback sent – thank you");
         }
     }
 
+    private String text(int id) {
+        return ((EditText) findViewById(id)).getText().toString().trim();
+    }
+
     private void submit(View button) {
         button.setEnabled(false);
-        String comment = ((EditText) findViewById(R.id.etFeedback)).getText().toString().trim();
         boolean rateDriver = order != null && order.getTransporterName() != null;
-        rate("FARMER", stars[0], comment, () -> {
-            if (rateDriver) rate("TRANSPORTER", stars[1], comment, this::done, button);
+        rate("FARMER", stars[0], text(R.id.etFarmerComment), () -> {
+            if (rateDriver) rate("TRANSPORTER", stars[1], text(R.id.etDriverComment), this::done, button);
             else done();
         }, button);
     }

@@ -3,18 +3,18 @@ package com.harvesthub.mobile.ui.farmer;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.net.Uri;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
@@ -22,6 +22,14 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.video.FallbackStrategy;
+import androidx.camera.video.FileOutputOptions;
+import androidx.camera.video.Quality;
+import androidx.camera.video.QualitySelector;
+import androidx.camera.video.Recorder;
+import androidx.camera.video.Recording;
+import androidx.camera.video.VideoCapture;
+import androidx.camera.video.VideoRecordEvent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -36,9 +44,6 @@ import com.harvesthub.mobile.utils.BottomNavHelper;
 import com.harvesthub.mobile.utils.NotificationPanelHelper;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,33 +58,33 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma 13 "Smart Guided Camera" (workflow 1.3). Live capture only (no gallery):
- * step 1 wide-angle photo, step 2 close-up photo, step 3 a 10-second video. Each file is uploaded
- * right away; with all three the farmer continues to the listing details (or the retake is re-submitted).
- * GPS comes from the location lock that opened this screen.
+ * Figma 13 "Smart Guided Camera" (workflow 1.3, design 16 Nov). Live capture only (no gallery), all inside the app:
+ * step 1 wide-angle photo, step 2 close-up photo, step 3 a 10-second video (stops by itself). Each file is
+ * uploaded right away; after the third the farmer goes straight to the Listing Details form, which shows the
+ * captured media (or, for a retake, the new media is re-submitted). GPS comes from the location lock.
  */
 public class CameraCaptureActivity extends AppCompatActivity {
 
     private static final String TAG = "CameraCapture";
     private static final int REQUEST_CODE_PERMISSIONS = 10;
+    private static final int VIDEO_SECONDS = 10;
+    /** Local copies of the captured files, shown as thumbnails on the details form. */
+    public static final String EXTRA_LOCAL_MEDIA = "localMedia";
 
     private ActivityCameraCaptureBinding binding;
+    private ProcessCameraProvider cameraProvider;
     private ImageCapture imageCapture;
+    private VideoCapture<Recorder> videoCapture;
+    private Recording recording;
+    private CountDownTimer recordTimer;
+    private int lensFacing = CameraSelector.LENS_FACING_BACK;
+
     private int step = 0;                       // 0 wide, 1 close-up, 2 video
     private final String[] uploaded = new String[3];
+    private final String[] localFiles = new String[3];
     private double lat, lng;
     private String retakeListingId;
     private boolean busy;
-
-    private final ActivityResultLauncher<Intent> recordVideo = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), result -> {
-                Uri uri = result.getData() != null ? result.getData().getData() : null;
-                if (result.getResultCode() == RESULT_OK && uri != null) {
-                    uploadUri(uri, "video/mp4", 2);
-                } else {
-                    Toast.makeText(this, "Video not recorded. Tap the button to record 10 seconds.", Toast.LENGTH_SHORT).show();
-                }
-            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,24 +104,28 @@ public class CameraCaptureActivity extends AppCompatActivity {
 
         binding.topNavBar.btnNotification.setOnClickListener(v -> NotificationPanelHelper.showNotificationPanel(this, v));
         BottomNavHelper.setup(this, binding.bottomNavBar.getRoot(), BottomNavHelper.Tab.LISTINGS);
-        binding.btnFlip.setVisibility(View.GONE);   // back camera only: the crop, not the farmer
-        binding.btnLock.setSelected(true);           // location already locked
-        binding.btnLock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                ContextCompat.getColor(this, R.color.accent_green)));
+
+        // Location lock: already locked by the previous screen (green lock)
+        binding.btnLock.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accent_green)));
         binding.btnLock.setOnClickListener(v ->
-                Toast.makeText(this, String.format(Locale.US, "Location locked: %.5f, %.5f", lat, lng), Toast.LENGTH_SHORT).show());
+                Toast.makeText(this, String.format(Locale.US, "Location locked at your farm: %.5f, %.5f", lat, lng), Toast.LENGTH_SHORT).show());
+        binding.btnFlip.setOnClickListener(v -> {
+            if (busy) return;
+            lensFacing = lensFacing == CameraSelector.LENS_FACING_BACK ? CameraSelector.LENS_FACING_FRONT : CameraSelector.LENS_FACING_BACK;
+            bindUseCases();
+        });
         binding.btnCapture.setOnClickListener(v -> capture());
-        // tabs only show progress; steps are done in order
-        binding.tabWideAngle.setOnClickListener(null);
-        binding.tabCloseUp.setOnClickListener(null);
-        binding.tabVideo.setOnClickListener(null);
         showStep();
 
-        if (allPermissionsGranted()) {
-            startCamera();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_PERMISSIONS);
-        }
+        if (allPermissionsGranted()) startCamera();
+        else ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_PERMISSIONS);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (recordTimer != null) recordTimer.cancel();
+        if (recording != null) recording.close();
     }
 
     private void showStep() {
@@ -128,27 +137,33 @@ public class CameraCaptureActivity extends AppCompatActivity {
         binding.tvStepSubtitle.setText(subs[step]);
         for (int i = 0; i < tabs.length; i++) {
             tabs[i].setTextColor(i == step ? ContextCompat.getColor(this, R.color.accent_green)
-                    : (uploaded[i] != null ? Color.parseColor("#A7F3D0") : Color.WHITE));
+                    : (uploaded[i] != null ? Color.parseColor("#A7F3D0") : Color.parseColor("#D1D5DB")));
+        }
+        setShutterColor(step == 2 ? "#DC2626" : "#1B4332");
+    }
+
+    private void setShutterColor(String color) {
+        if (binding.btnCapture.getBackground() instanceof LayerDrawable) {
+            android.graphics.drawable.Drawable core = ((LayerDrawable) binding.btnCapture.getBackground().mutate())
+                    .findDrawableByLayerId(R.id.shutterCore);
+            if (core instanceof GradientDrawable) ((GradientDrawable) core).setColor(Color.parseColor(color));
         }
     }
+
+    // ---------------------------------------------------------------- capture
 
     private void capture() {
         if (busy) return;
         if (step == 2) {
-            Intent i = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            i.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
-            i.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0); // small file (server limit 25 MB)
-            try {
-                recordVideo.launch(i);
-            } catch (Exception e) {
-                Toast.makeText(this, "No camera app available to record video.", Toast.LENGTH_LONG).show();
-            }
+            if (recording == null) startRecording();
             return;
         }
         if (imageCapture == null) return;
         File file = new File(getCacheDir(), "capture_" + step + "_" + System.currentTimeMillis() + ".jpg");
         busy = true;
-        imageCapture.takePicture(new ImageCapture.OutputFileOptions.Builder(file).build(), ContextCompat.getMainExecutor(this),
+        ImageCapture.Metadata meta = new ImageCapture.Metadata();
+        meta.setLocation(farmLocation());   // geotag: GPS written into the photo's EXIF
+        imageCapture.takePicture(new ImageCapture.OutputFileOptions.Builder(file).setMetadata(meta).build(), ContextCompat.getMainExecutor(this),
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults r) {
@@ -165,30 +180,61 @@ public class CameraCaptureActivity extends AppCompatActivity {
                 });
     }
 
-    private void uploadUri(Uri uri, String type, int forStep) {
-        try (InputStream in = getContentResolver().openInputStream(uri)) {
-            File f = new File(getCacheDir(), "capture_video_" + System.currentTimeMillis() + ".mp4");
-            try (OutputStream out = new FileOutputStream(f)) {
-                byte[] buf = new byte[64 * 1024];
-                int n;
-                while (in != null && (n = in.read(buf)) > 0) out.write(buf, 0, n);
-            }
-            upload(f, type, forStep);
+    /** Records exactly {@value #VIDEO_SECONDS} seconds in the app, then uploads it. */
+    private void startRecording() {
+        if (videoCapture == null) return;
+        File file = new File(getCacheDir(), "capture_video_" + System.currentTimeMillis() + ".mp4");
+        busy = true;
+        binding.tvRecording.setVisibility(View.VISIBLE);
+        binding.tvRecording.setText("● REC " + VIDEO_SECONDS + "s");
+        try {
+            recording = videoCapture.getOutput()
+                    .prepareRecording(this, new FileOutputOptions.Builder(file).setLocation(farmLocation()).build())   // geotagged; no audio
+                    .start(ContextCompat.getMainExecutor(this), event -> {
+                        if (!(event instanceof VideoRecordEvent.Finalize)) return;
+                        VideoRecordEvent.Finalize fin = (VideoRecordEvent.Finalize) event;
+                        recording = null;
+                        if (recordTimer != null) recordTimer.cancel();
+                        binding.tvRecording.setVisibility(View.GONE);
+                        busy = false;
+                        if (fin.hasError() && fin.getError() != VideoRecordEvent.Finalize.ERROR_DURATION_LIMIT_REACHED || !file.exists() || file.length() == 0) {
+                            Log.e(TAG, "Recording failed: " + fin.getError(), fin.getCause());
+                            Toast.makeText(this, "Video could not be recorded. Tap the button to try again.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        upload(file, "video/mp4", 2);
+                    });
         } catch (Exception e) {
-            Toast.makeText(this, "Could not read the video, record it again.", Toast.LENGTH_LONG).show();
+            busy = false;
+            binding.tvRecording.setVisibility(View.GONE);
+            Toast.makeText(this, "Video recording is not available on this phone.", Toast.LENGTH_LONG).show();
+            return;
         }
+        recordTimer = new CountDownTimer(VIDEO_SECONDS * 1000L, 1000) {
+            @Override
+            public void onTick(long left) {
+                binding.tvRecording.setText(String.format(Locale.US, "● REC %ds", (left + 999) / 1000));
+            }
+
+            @Override
+            public void onFinish() {
+                if (recording != null) recording.stop();
+            }
+        }.start();
     }
 
     private void upload(File file, String type, int forStep) {
         busy = true;
-        binding.tvStepSubtitle.setText("Uploading…");
+        localFiles[forStep] = file.getAbsolutePath();
+        binding.uploadOverlay.setVisibility(View.VISIBLE);
+        binding.tvUploading.setText(String.format(Locale.US, "Uploading %s (%d of 3)…", forStep == 2 ? "video" : "photo", forStep + 1));
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(),
                 RequestBody.create(MediaType.parse(type), file));
         ApiClient.getApiService().uploadMedia(part).enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> response) {
                 busy = false;
-                file.delete();
+                binding.uploadOverlay.setVisibility(View.GONE);
                 if (!response.isSuccessful() || response.body() == null || response.body().get("url") == null) {
                     Toast.makeText(CameraCaptureActivity.this, AuthInputUtils.errorMessage(response, "Upload failed, capture again."),
                             Toast.LENGTH_LONG).show();
@@ -199,6 +245,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
                 if (forStep < 2) {
                     step = forStep + 1;
                     showStep();
+                    if (step == 2) bindUseCases();   // switch the camera to video
                 } else {
                     finishCapture();
                 }
@@ -207,7 +254,8 @@ public class CameraCaptureActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Map<String, String>> call, @NonNull Throwable t) {
                 busy = false;
-                Toast.makeText(CameraCaptureActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
+                binding.uploadOverlay.setVisibility(View.GONE);
+                Toast.makeText(CameraCaptureActivity.this, "Upload failed: check your internet and capture again.", Toast.LENGTH_LONG).show();
                 showStep();
             }
         });
@@ -215,7 +263,11 @@ public class CameraCaptureActivity extends AppCompatActivity {
 
     private void finishCapture() {
         ArrayList<String> media = new ArrayList<>();
-        for (String u : uploaded) media.add(u);
+        ArrayList<String> local = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            media.add(uploaded[i]);
+            local.add(localFiles[i]);
+        }
         String capturedAt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(new Date());
         if (retakeListingId != null) {
             Listing capture = new Listing();
@@ -229,7 +281,7 @@ public class CameraCaptureActivity extends AppCompatActivity {
                 public void onResponse(@NonNull Call<Listing> call, @NonNull Response<Listing> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(CameraCaptureActivity.this, "New photos sent for verification.", Toast.LENGTH_LONG).show();
-                        openListings(null);
+                        openMain(null);
                     } else {
                         Toast.makeText(CameraCaptureActivity.this, AuthInputUtils.errorMessage(response, "Could not re-submit."),
                                 Toast.LENGTH_LONG).show();
@@ -243,18 +295,20 @@ public class CameraCaptureActivity extends AppCompatActivity {
             });
             return;
         }
+        // New listing: straight to the Listing Details form with the captured media.
         Bundle extras = new Bundle();
         extras.putStringArrayList(MainActivity.EXTRA_CAPTURED_MEDIA, media);
+        extras.putStringArrayList(EXTRA_LOCAL_MEDIA, local);
         extras.putDouble(LocationVerificationActivity.EXTRA_LAT, lat);
         extras.putDouble(LocationVerificationActivity.EXTRA_LNG, lng);
         extras.putString(CreateListingFragment.ARG_CAPTURED_AT, capturedAt);
         extras.putString(CreateListingFragment.ARG_DEVICE, Build.MANUFACTURER + " " + Build.MODEL);
         String crop = getIntent().getStringExtra(LocationVerificationActivity.EXTRA_CROP);
         if (crop != null) extras.putString(LocationVerificationActivity.EXTRA_CROP, crop);
-        openListings(extras);
+        openMain(extras);
     }
 
-    private void openListings(Bundle extras) {
+    private void openMain(Bundle extras) {
         Intent i = new Intent(this, MainActivity.class);
         i.putExtra(MainActivity.EXTRA_INITIAL_TAB, MainActivity.Tab.LISTINGS.name());
         if (extras != null) i.putExtras(extras);
@@ -263,21 +317,57 @@ public class CameraCaptureActivity extends AppCompatActivity {
         finish();
     }
 
+    // ---------------------------------------------------------------- camera
+
     private void startCamera() {
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
         future.addListener(() -> {
             try {
-                ProcessCameraProvider provider = future.get();
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(binding.viewFinder.getSurfaceProvider());
-                imageCapture = new ImageCapture.Builder().setTargetRotation(binding.viewFinder.getDisplay() != null
-                        ? binding.viewFinder.getDisplay().getRotation() : 0).build();
-                provider.unbindAll();
-                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture);
+                cameraProvider = future.get();
+                bindUseCases();
             } catch (Exception e) {
-                Log.e(TAG, "Use case binding failed", e);
+                Log.e(TAG, "Camera start failed", e);
             }
         }, ContextCompat.getMainExecutor(this));
+    }
+
+    /** Photo steps bind preview + photo; the video step binds preview + video (works on every phone). */
+    private void bindUseCases() {
+        if (cameraProvider == null) return;
+        Preview preview = new Preview.Builder().build();
+        preview.setSurfaceProvider(binding.viewFinder.getSurfaceProvider());
+        CameraSelector selector = new CameraSelector.Builder().requireLensFacing(lensFacing).build();
+        try {
+            cameraProvider.unbindAll();
+            if (step == 2) {
+                Recorder recorder = new Recorder.Builder()   // small file: the server limit is 25 MB
+                        .setQualitySelector(QualitySelector.from(Quality.SD, FallbackStrategy.higherQualityOrLowerThan(Quality.SD)))
+                        .build();
+                videoCapture = VideoCapture.withOutput(recorder);
+                cameraProvider.bindToLifecycle(this, selector, preview, videoCapture);
+            } else {
+                imageCapture = new ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .setTargetRotation(binding.viewFinder.getDisplay() != null ? binding.viewFinder.getDisplay().getRotation() : 0)
+                        .build();
+                cameraProvider.bindToLifecycle(this, selector, preview, imageCapture);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Use case binding failed", e);
+            if (lensFacing == CameraSelector.LENS_FACING_FRONT) {   // no front camera: back to the main one
+                lensFacing = CameraSelector.LENS_FACING_BACK;
+                bindUseCases();
+            }
+        }
+    }
+
+    /** The locked capture position (from the location-lock screen), used to geotag every photo and the video. */
+    private android.location.Location farmLocation() {
+        android.location.Location l = new android.location.Location("harvesthub-lock");
+        l.setLatitude(lat);
+        l.setLongitude(lng);
+        l.setTime(System.currentTimeMillis());
+        return l;
     }
 
     private boolean allPermissionsGranted() {

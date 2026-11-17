@@ -28,7 +28,7 @@ public class ListingService {
 
     /** Listing statuses shown on My Listings (everything except history). */
     public static final List<String> MY_LISTING_STATUSES = Arrays.asList(
-            "DRAFT", "PENDING", "UNDER_REVIEW", "ACTIVE", "RETAKE_REQUESTED", "REJECTED", "ONGOING");
+            "DRAFT", "PENDING", "UNDER_REVIEW", "ACTIVE", "RETAKE_REQUESTED", "REJECTED", "ONGOING", "DEACTIVATED");
 
     public java.util.Map<String, Object> locationCheck(String farmerId, double lat, double lng) {
         var farmer = userRepository.findById(farmerId).orElseThrow(() -> new IllegalStateException("User not found"));
@@ -239,6 +239,66 @@ public class ListingService {
             return listingRepository.save(existing);
         }
         return null;
+    }
+
+    // ---------------------------------------------------------------- farmer card actions (user rules, 16 Nov)
+
+    private Listing ownListing(String id, String farmerId) {
+        Listing l = listingRepository.findById(id).orElseThrow(() -> new IllegalStateException("Listing not found"));
+        if (!farmerId.equals(l.getFarmerId())) throw new IllegalStateException("Not your listing");
+        return l;
+    }
+
+    private static String nowIso() {
+        return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    /**
+     * Edit = estimated yield and price per kg only. Crop and media stay (they were verified with the photos),
+     * so the status and grade are kept. Not while an order is running.
+     */
+    public Listing editYieldAndPrice(String id, String farmerId, String quantity, String price) {
+        Listing l = ownListing(id, farmerId);
+        if (!Arrays.asList("DRAFT", "PENDING", "ACTIVE", "DEACTIVATED").contains(l.getStatus()) || l.getActiveOrderId() != null) {
+            throw new IllegalStateException("This listing cannot be edited now");
+        }
+        if (quantity != null) {
+            double q = Listing.parseNumber(quantity);
+            if (q <= 0) throw new IllegalStateException("Enter the estimated total yield in kg");
+            l.setQuantity(stripZeros(q));
+        }
+        if (price != null) {
+            double p = Listing.parseNumber(price);
+            if (p <= 0) throw new IllegalStateException("Enter the expected price per kg");
+            l.setPrice(stripZeros(p));
+        }
+        l.setUpdatedTime(nowIso());
+        return listingRepository.save(l);
+    }
+
+    /** Deactivate = hide from the marketplace and the officer queue (Pending or Listed, no running order). */
+    public Listing deactivate(String id, String farmerId) {
+        Listing l = ownListing(id, farmerId);
+        if (!Arrays.asList("PENDING", "ACTIVE").contains(l.getStatus()) || l.getActiveOrderId() != null) {
+            throw new IllegalStateException("Only pending or listed lots without an order can be deactivated");
+        }
+        l.setPreviousStatus(l.getStatus());
+        l.setStatus("DEACTIVATED");
+        l.setClaimedByOfficerId(null);
+        l.setClaimedByOfficerName(null);
+        l.setUpdatedTime(nowIso());
+        return listingRepository.save(l);
+    }
+
+    /** Re-activate = back to the status it had: Listed stays Listed (same grade), Pending goes back to the queue. */
+    public Listing reactivate(String id, String farmerId) {
+        Listing l = ownListing(id, farmerId);
+        if (!"DEACTIVATED".equals(l.getStatus())) throw new IllegalStateException("This listing is not deactivated");
+        boolean wasListed = "ACTIVE".equals(l.getPreviousStatus()) && l.getGrade() != null;
+        l.setStatus(wasListed ? "ACTIVE" : "PENDING");
+        l.setPreviousStatus(null);
+        l.setUpdatedTime(nowIso());
+        return listingRepository.save(l);
     }
 
     public Listing changeStatus(String id, String newStatus) {

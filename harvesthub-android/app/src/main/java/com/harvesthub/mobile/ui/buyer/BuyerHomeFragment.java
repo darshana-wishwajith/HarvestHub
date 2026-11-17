@@ -1,13 +1,14 @@
 package com.harvesthub.mobile.ui.buyer;
 
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,9 +21,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.BuyerDashboard;
 import com.harvesthub.mobile.network.ApiClient;
-import com.harvesthub.mobile.utils.RemoteImage;
+import com.harvesthub.mobile.ui.transporter.TUi;
 import com.harvesthub.mobile.utils.SessionManager;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -30,10 +32,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer "Buyer Home Dashboard" (564:330): active orders and escrow held, pending offers, quick actions,
- * three newest verified lots and the escrow ledger — all from GET /dashboard/buyer/{id}, nothing hard-coded.
+ * Buyer Home (Figma buyer 564:330): greeting, wallet + escrow hero, stat tiles, quick actions, orders holding money
+ * in escrow and fresh verified harvests. Everything comes from GET /dashboard/buyer/{id}; built with the shared
+ * {@link TUi} kit so the buyer app has the same structure and look as the transporter screens.
  */
 public class BuyerHomeFragment extends Fragment {
+
+    private static final int GREEN = Color.parseColor("#15803D");
+
+    private LinearLayout content;
 
     @Nullable
     @Override
@@ -44,16 +51,7 @@ public class BuyerHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        BuyerDashboardActivity host = (BuyerDashboardActivity) requireActivity();
-        v.findViewById(R.id.btnHomePostAd).setOnClickListener(x -> startActivity(new Intent(requireContext(), PostDemandRequestActivity.class)));
-        v.findViewById(R.id.btnHomeMarket).setOnClickListener(x -> host.selectTab(BuyerDashboardActivity.Tab.MARKET));
-        v.findViewById(R.id.btnHomeSeeAll).setOnClickListener(x -> host.selectTab(BuyerDashboardActivity.Tab.MARKET));
-        v.findViewById(R.id.btnHomeWallet).setOnClickListener(x -> startActivity(new Intent(requireContext(), BuyerWalletActivity.class)));
-        v.findViewById(R.id.btnHomeProfile).setOnClickListener(x -> startActivity(new Intent(requireContext(), BuyerProfileActivity.class)));
-        v.findViewById(R.id.cardActiveOrders).setOnClickListener(x -> host.selectTab(BuyerDashboardActivity.Tab.ORDERS));
-        v.findViewById(R.id.cardPendingOffers).setOnClickListener(x -> host.selectTab(BuyerDashboardActivity.Tab.OFFERS));
-        v.findViewById(R.id.tvHomeLocationWarning).setOnClickListener(x ->
-                startActivity(new Intent(requireContext(), SetDeliveryAddressActivity.class)));
+        content = v.findViewById(R.id.homeContent);
         ((SwipeRefreshLayout) v.findViewById(R.id.swipeBuyerHome)).setOnRefreshListener(this::load);
     }
 
@@ -61,6 +59,10 @@ public class BuyerHomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         load();
+    }
+
+    private BuyerDashboardActivity host() {
+        return (BuyerDashboardActivity) requireActivity();
     }
 
     private void load() {
@@ -75,7 +77,7 @@ public class BuyerHomeFragment extends Fragment {
                     Toast.makeText(requireContext(), "Could not load your dashboard.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                bind(getView(), r.body());
+                render(r.body());
             }
 
             @Override
@@ -87,91 +89,184 @@ public class BuyerHomeFragment extends Fragment {
         });
     }
 
-    private void bind(View v, BuyerDashboard d) {
-        text(v, R.id.tvHomeGreeting, d.greeting);
-        String rating = d.ratingAverage == null ? "" : String.format(Locale.US, " • %.1f★", d.ratingAverage);
-        text(v, R.id.tvHomeBadge, "✓ Escrow Protected • Trust " + d.trustPercent + "%" + rating);
-        String initials = initials(d.buyerName);
-        text(v, R.id.btnHomeProfile, initials);
-        v.findViewById(R.id.tvHomeLocationWarning).setVisibility(d.hasDeliveryLocation ? View.GONE : View.VISIBLE);
+    private void render(BuyerDashboard d) {
+        content.removeAllViews();
 
-        text(v, R.id.tvActiveOrders, String.valueOf(d.activeOrders));
-        text(v, R.id.tvActiveOrdersSub, BaseBuyerOrderActivity.rs(d.escrowHeld) + " in escrow"
-                + (d.actionRequired > 0 ? "\n" + d.actionRequired + " need your action" : ""));
-        text(v, R.id.tvPendingOffers, String.valueOf(d.pendingOffers));
-        text(v, R.id.tvPendingOffersSub, d.offersExpiringToday > 0 ? d.offersExpiringToday + " expiring today"
-                : d.openWantedAds + (d.openWantedAds == 1 ? " open wanted ad" : " open wanted ads"));
-        text(v, R.id.tvEscrowTotal, BaseBuyerOrderActivity.rs(d.escrowHeld));
+        // greeting + avatar
+        LinearLayout gr = TUi.hrow(content, 8);
+        LinearLayout gt = TUi.col(gr, 1f);
+        TUi.text(gt, greeting(), 13, TUi.MUTED, false).setTypeface(TUi.semi(requireContext()));
+        TextView name = TUi.text(gt, d.buyerName == null ? "Buyer" : d.buyerName, 22, TUi.DARK, true);
+        name.setMaxLines(1);
+        name.setEllipsize(TextUtils.TruncateAt.END);
+        TextView av = new TextView(requireContext());
+        av.setText(initials(d.buyerName));
+        av.setGravity(Gravity.CENTER);
+        av.setTextSize(16);
+        av.setTypeface(TUi.bold(requireContext()));
+        av.setTextColor(Color.WHITE);
+        av.setBackground(TUi.round(TUi.DARK, dp(30)));
+        av.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.ACCOUNT));
+        gr.addView(av, new LinearLayout.LayoutParams(dp(48), dp(48)));
 
-        LinearLayout hl = v.findViewById(R.id.layoutHighlights);
-        hl.removeAllViews();
-        if (d.highlights == null || d.highlights.isEmpty()) {
-            hl.addView(note("No verified harvests are listed right now."));
-        } else {
-            for (BuyerDashboard.Highlight h : d.highlights) hl.addView(highlight(h));
+        if (!d.hasDeliveryLocation) {
+            LinearLayout n = TUi.notice(content, R.drawable.ic_location_pin, TUi.AMBER_BG, Color.parseColor("#D97706"),
+                    "Set your delivery point", "Transport cost and vehicle are calculated from it. You can't order without it.");
+            ((View) n.getParent().getParent()).setOnClickListener(x -> startActivity(new Intent(requireContext(), SetDeliveryAddressActivity.class)));
         }
 
-        LinearLayout esc = v.findViewById(R.id.layoutEscrowOrders);
-        esc.removeAllViews();
+        // wallet + escrow hero
+        LinearLayout hero = TUi.card(content, TUi.DARK, TUi.DARK);
+        LinearLayout hr = TUi.hrow(hero, 0);
+        TUi.fill(hr, "AVAILABLE WALLET BALANCE", 11, Color.parseColor("#A7F3D0"), true).setLetterSpacing(0.05f);
+        TUi.tag(hr, "✓ Trust " + d.trustPercent + "%", TUi.MINT, TUi.MINT_INK);
+        TUi.text(hero, BaseBuyerOrderActivity.rs(d.walletBalance), 30, Color.WHITE, true);
+        LinearLayout er = TUi.hrow(hero, 2);
+        TUi.icon(er, R.drawable.ic_lock, 14, Color.parseColor("#A7F3D0"));
+        TUi.fill(er, "  " + BaseBuyerOrderActivity.rs(d.escrowHeld) + " locked in escrow"
+                + (d.ratingAverage == null ? "" : String.format(Locale.US, "  •  %.1f★ (%d)", d.ratingAverage, d.ratingCount)),
+                12, Color.parseColor("#D1FAE5"), false);
+        LinearLayout hb = TUi.hrow(hero, 6);
+        half(TUi.smallButton(hb, "Wallet", R.drawable.ic_wallet, TUi.MINT, TUi.MINT_INK,
+                x -> startActivity(new Intent(requireContext(), BuyerWalletActivity.class))), false);
+        half(TUi.smallButton(hb, "Post Demand", R.drawable.ic_add_circle, Color.parseColor("#2D6A4F"), Color.WHITE,
+                x -> startActivity(new Intent(requireContext(), PostDemandRequestActivity.class))), true);
+
+        // stat tiles
+        LinearLayout tiles = TUi.tiles(content);
+        tiles.setPadding(0, dp(4), 0, 0);
+        View t1 = TUi.tile(tiles, 0, "Active Orders", String.valueOf(d.activeOrders), null);
+        View t2 = TUi.tile(tiles, 0, "Need Action", String.valueOf(d.actionRequired), d.actionRequired > 0 ? "Tap to review" : "All clear");
+        View t3 = TUi.tile(tiles, 0, "Offers", String.valueOf(d.pendingOffers),
+                d.offersExpiringToday > 0 ? d.offersExpiringToday + " expire today" : d.openWantedAds + " open ads");
+        for (View t : new View[]{t1, t2, t3}) t.setBackground(TUi.round(Color.WHITE, dp(14)));
+        t1.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.ORDERS));
+        t2.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.ORDERS));
+        t3.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.OFFERS));
+
+        // quick actions
+        TUi.sectionTitle(content, "Quick Actions", null);
+        LinearLayout q1 = TUi.hrow(content, 10);
+        action(q1, R.drawable.ic_shopping_bag, "Browse Market", "Officer-verified harvests", x -> host().selectTab(BuyerDashboardActivity.Tab.MARKET));
+        action(q1, R.drawable.ic_document_ad, "My Requests", d.openWantedAds + " open wanted ads", x -> host().selectTab(BuyerDashboardActivity.Tab.DEMANDS));
+        LinearLayout q2 = TUi.hrow(content, 10);
+        action(q2, R.drawable.ic_truck, "Track Orders", d.activeOrders + " in progress", x -> host().selectTab(BuyerDashboardActivity.Tab.ORDERS));
+        action(q2, R.drawable.ic_handshake, "Supply Offers", d.pendingOffers + " waiting for you", x -> host().selectTab(BuyerDashboardActivity.Tab.OFFERS));
+
+        // orders holding money in escrow
+        TextView all = TUi.sectionTitle(content, "Escrow Protected Orders", "See all ›");
+        all.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.ORDERS));
         if (d.escrowOrders == null || d.escrowOrders.isEmpty()) {
-            esc.addView(note("No money is locked in escrow."));
+            LinearLayout e = TUi.card(content);
+            TUi.text(e, "No money is locked in escrow right now.", 13, TUi.MUTED, false);
         } else {
-            for (BuyerDashboard.EscrowOrder e : d.escrowOrders) {
-                TextView row = new TextView(requireContext());
-                String id = e.orderId == null ? "" : e.orderId.substring(Math.max(0, e.orderId.length() - 6)).toUpperCase(Locale.US);
-                row.setText(String.format(Locale.US, "🔒 Order #%s • %s\n%s • Farmer: %s", id, BaseBuyerOrderActivity.rs(e.amountHeld),
-                        e.cropName, e.farmerName));
-                row.setTextColor(0xFF334155);
-                row.setTextSize(13f);
-                row.setBackgroundColor(0xFFF1F5F9);
-                int p = dp(10);
-                row.setPadding(p, p, p, p);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.bottomMargin = dp(8);
-                row.setOnClickListener(x -> BuyerOrderRouter.open(requireContext(), e.orderId));
-                esc.addView(row, lp);
-            }
+            for (BuyerDashboard.EscrowOrder e : d.escrowOrders) escrowCard(e);
+        }
+
+        // fresh verified harvests
+        TextView browse = TUi.sectionTitle(content, "Fresh Verified Harvests", "Browse ›");
+        browse.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.MARKET));
+        if (d.highlights == null || d.highlights.isEmpty()) {
+            LinearLayout e = TUi.card(content);
+            TUi.text(e, "No verified harvests are listed right now.", 13, TUi.MUTED, false);
+        } else {
+            HorizontalScrollView hs = new HorizontalScrollView(requireContext());
+            hs.setHorizontalScrollBarEnabled(false);
+            hs.setClipToPadding(false);
+            LinearLayout strip = new LinearLayout(requireContext());
+            strip.setPadding(0, 0, 0, dp(6));
+            hs.addView(strip);
+            for (BuyerDashboard.Highlight h : d.highlights) harvestCard(strip, h);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.topMargin = dp(10);
+            content.addView(hs, lp);
         }
     }
 
-    private View highlight(BuyerDashboard.Highlight h) {
-        LinearLayout row = new LinearLayout(requireContext());
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(0, dp(8), 0, dp(8));
-        ImageView img = new ImageView(requireContext());
-        img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        img.setBackgroundColor(0xFFE2E8F0);
-        row.addView(img, new LinearLayout.LayoutParams(dp(56), dp(56)));
-        if (h.imageUrl != null) RemoteImage.load(img, BaseBuyerOrderActivity.mediaUrl(h.imageUrl));
-
-        LinearLayout text = new LinearLayout(requireContext());
-        text.setOrientation(LinearLayout.VERTICAL);
-        text.setPadding(dp(12), 0, 0, 0);
-        TextView t = new TextView(requireContext());
-        t.setText(String.format(Locale.US, "Grade %s %s – Rs %,.0f/kg", h.grade == null ? "-" : h.grade, h.cropName, h.pricePerKg));
-        t.setTextColor(0xFF111827);
-        t.setTextSize(15f);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        TextView s = new TextView(requireContext());
-        s.setText(String.format(Locale.US, "%s • %s • %,.0f KG\n✓ Officer verified • listed %s",
-                h.farmerName == null ? "" : h.farmerName, h.location == null ? "" : h.location, h.quantityKg,
-                BaseBuyerOrderActivity.time(h.listedAt)));
-        s.setTextColor(0xFF64748B);
-        s.setTextSize(12f);
-        text.addView(t);
-        text.addView(s);
-        row.addView(text, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        row.setOnClickListener(x -> ((BuyerDashboardActivity) requireActivity()).selectTab(BuyerDashboardActivity.Tab.MARKET));
-        return row;
+    /** Half-width button inside a row. */
+    private void half(View b, boolean second) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(42), 1f);
+        lp.topMargin = dp(10);
+        if (second) lp.leftMargin = dp(8);
+        b.setLayoutParams(lp);
     }
 
-    private TextView note(String s) {
-        TextView t = new TextView(requireContext());
-        t.setText(s);
-        t.setTextColor(0xFF64748B);
-        t.setPadding(dp(4), dp(8), dp(4), dp(8));
-        return t;
+    /** One of the 2×2 quick-action cards. */
+    private void action(LinearLayout row, int iconRes, String title, String sub, View.OnClickListener click) {
+        LinearLayout c = new LinearLayout(requireContext());
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(TUi.round(Color.WHITE, dp(16)));
+        c.setElevation(dp(1.5f));
+        int p = dp(14);
+        c.setPadding(p, p, p, p);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        if (row.getChildCount() > 0) lp.leftMargin = dp(10);
+        row.addView(c, lp);
+        TUi.iconTile(c, iconRes, 40, TUi.SURFACE, TUi.DARK, false);
+        TUi.text(c, title, 14, TUi.INK, true).setPadding(0, dp(10), 0, 0);
+        TUi.text(c, sub, 12, TUi.MUTED, false);
+        c.setOnClickListener(click);
+    }
+
+    private void escrowCard(BuyerDashboard.EscrowOrder e) {
+        LinearLayout c = TUi.card(content);
+        ((LinearLayout.LayoutParams) ((View) c.getParent()).getLayoutParams()).topMargin = dp(10);
+        ((View) c.getParent()).setOnClickListener(x -> BuyerOrderRouter.open(requireContext(), e.orderId));
+        LinearLayout r = TUi.hrow(c, 0);
+        TUi.iconTile(r, R.drawable.ic_lock, 42, TUi.SURFACE, TUi.DARK, false);
+        LinearLayout t = TUi.col(r, 1f);
+        t.setPadding(dp(12), 0, dp(8), 0);
+        TextView crop = TUi.text(t, e.cropName == null ? "Order" : e.cropName, 15, TUi.INK, true);
+        crop.setMaxLines(1);
+        crop.setEllipsize(TextUtils.TruncateAt.END);
+        TUi.text(t, "Order #" + shortId(e.orderId) + " • Farmer: " + (e.farmerName == null ? "—" : e.farmerName), 12, TUi.MUTED, false);
+        TUi.pill(t, pretty(e.status), Color.parseColor("#EEF4FF"), Color.parseColor("#1E3A8A")).setTextSize(10);
+        LinearLayout v = TUi.col(r, 0);
+        v.setGravity(Gravity.END);
+        TUi.label(v, BaseBuyerOrderActivity.rs(e.amountHeld), 15, TUi.DARK, true);
+        TUi.label(v, "held", 11, TUi.MUTED, false);
+    }
+
+    private void harvestCard(LinearLayout strip, BuyerDashboard.Highlight h) {
+        LinearLayout c = new LinearLayout(requireContext());
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(TUi.round(Color.WHITE, dp(16)));
+        c.setElevation(dp(1.5f));
+        c.setPadding(dp(10), dp(10), dp(10), dp(12));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(210), ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.rightMargin = dp(12);
+        lp.bottomMargin = dp(4);
+        strip.addView(c, lp);
+        TUi.thumb(c, h.imageUrl, 190, 110);
+        String g = h.grade == null ? "" : h.grade.replace("Grade ", "");
+        int gBg = "A".equals(g) ? Color.parseColor("#16A34A") : "B".equals(g) ? Color.parseColor("#D97706") : Color.parseColor("#64748B");
+        TUi.pill(c, "✓ Grade " + (g.isEmpty() ? "—" : g) + " Verified", gBg, Color.WHITE).setTextSize(10);
+        TextView n = TUi.text(c, h.cropName, 16, TUi.INK, true);
+        n.setMaxLines(1);
+        n.setEllipsize(TextUtils.TruncateAt.END);
+        TUi.text(c, String.format(Locale.US, "%,.0f KG • %s", h.quantityKg, h.location == null ? "" : h.location), 12, TUi.MUTED, false)
+                .setMaxLines(1);
+        LinearLayout pr = TUi.hrow(c, 6);
+        TUi.tag(pr, String.format(Locale.US, "Rs. %,.0f /KG", h.pricePerKg), TUi.SURFACE, TUi.DARK);
+        TextView when = TUi.fill(pr, BaseBuyerOrderActivity.time(h.listedAt), 10, TUi.MUTED, false);
+        when.setGravity(Gravity.END);
+        c.setOnClickListener(x -> host().selectTab(BuyerDashboardActivity.Tab.MARKET));
+    }
+
+    private static String greeting() {
+        int h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        return h < 12 ? "Good morning," : h < 17 ? "Good afternoon," : "Good evening,";
+    }
+
+    static String pretty(String status) {
+        if (status == null || status.isEmpty()) return "";
+        String t = status.replace('_', ' ').toLowerCase(Locale.US);
+        return Character.toUpperCase(t.charAt(0)) + t.substring(1);
+    }
+
+    private static String shortId(String id) {
+        if (id == null) return "";
+        return id.substring(Math.max(0, id.length() - 6)).toUpperCase(Locale.US);
     }
 
     private static String initials(String name) {
@@ -182,12 +277,7 @@ public class BuyerHomeFragment extends Fragment {
         return (a + b).toUpperCase(Locale.US);
     }
 
-    private void text(View root, int id, String s) {
-        TextView t = root.findViewById(id);
-        if (t != null) t.setText(s == null ? "" : s);
-    }
-
-    private int dp(int v) {
+    private int dp(float v) {
         return Math.round(v * getResources().getDisplayMetrics().density);
     }
 }

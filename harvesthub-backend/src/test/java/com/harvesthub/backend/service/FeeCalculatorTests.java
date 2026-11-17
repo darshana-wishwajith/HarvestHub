@@ -63,9 +63,10 @@ class FeeCalculatorTests {
 
     @Test
     void trustScoreFormula() {
-        assertEquals(75, TrustService.score(null, 0, 0));      // new user: neutral
-        assertEquals(100, TrustService.score(5.0, 20, 0));     // perfect
-        assertEquals(88, TrustService.score(4.5, 10, 0));      // 0.45 + 0.35 + 0.075 = 87.5
+        assertEquals(100, TrustService.score(null, 0, 0));     // new user starts at 100 % (decision 17 Nov)
+        assertEquals(100, TrustService.score(5.0, 20, 0));     // perfect record
+        assertEquals(94, TrustService.score(4.5, 10, 0));      // 0.60 x 0.9 + 0.40 = 0.94
+        assertEquals(88, TrustService.score(4.0, 0, 0));       // one 4-star rating, no orders yet: 0.48 + 0.40
         assertTrue(TrustService.score(4.5, 10, 5) < TrustService.score(4.5, 10, 0)); // failures lower trust
     }
 }

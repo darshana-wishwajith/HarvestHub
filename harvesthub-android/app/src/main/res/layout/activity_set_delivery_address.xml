@@ -41,20 +41,19 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <!-- Map Area (Fills space between top bar and bottom card) -->
+    <!-- Map Area: OpenStreetMap (osmdroid, no API key) between the top bar and the bottom card -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottomConfirmCard"
         android:layout_below="@id/topBar">
 
-        <androidx.fragment.app.FragmentContainerView
+        <org.osmdroid.views.MapView
             android:id="@+id/mapDelivery"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- Fixed pin in the centre: the map moves under it -->
+        <!-- Fixed pin in the centre: the map moves under it (tip on the centre) -->
         <ImageView
             android:layout_width="44dp"
             android:layout_height="44dp"
@@ -63,14 +62,80 @@
             android:contentDescription="Delivery point"
             android:src="@drawable/ic_pin_drop_green" />
 
+        <!-- Search: place name, coordinates or a Google Maps link -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp">
+
+                <EditText
+                    android:id="@+id/etMapSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="Search a place or paste coordinates"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textColor="#111827"
+                    android:textColorHint="#94A3B8"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btnMapSearch"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Search"
+                    android:padding="13dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="#1B4332" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Shown when the clipboard holds coordinates (e.g. copied in Google Maps) -->
+        <TextView
+            android:id="@+id/tvUseCopied"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cardSearch"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_pill_badge"
+            android:backgroundTint="#E8F5E9"
+            android:drawableStart="@drawable/ic_pin_drop_green"
+            android:drawablePadding="6dp"
+            android:elevation="2dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="Use copied coordinates"
+            android:textColor="#1B4332"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <FrameLayout
             android:id="@+id/btnRecenter"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginEnd="12dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/circle_background"
             android:backgroundTint="@android:color/white"
             android:clickable="true"
@@ -200,12 +265,27 @@
                 android:textSize="12.5sp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/btnCheckGoogle"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_map_folded"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="2dp"
+            android:text="Check this pin in Google Maps"
+            android:textColor="#1B4332"
+            android:textSize="13.5sp"
+            android:textStyle="bold" />
+
         <!-- Save Delivery Address Button -->
         <LinearLayout
             android:id="@+id/btnSaveAddress"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/bg_btn_sign_in"
             android:clickable="true"

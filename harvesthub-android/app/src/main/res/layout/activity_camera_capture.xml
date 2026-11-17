@@ -1,193 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma 13 "Smart Guided Camera" (design 16 Nov): step title, framed viewfinder with corner brackets
+     and crosshair, WIDE ANGLE / CLOSE UP / VIDEO steps, location lock, shutter, flip; app top + bottom bars. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#000000"
+    android:orientation="vertical">
 
-    <!-- Camera Viewfinder (Fullscreen) -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Viewfinder Overlay Gradient -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:background="@drawable/bg_gradient"
-        android:rotation="180"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@drawable/bg_gradient"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- Top Navigation -->
     <include
         android:id="@+id/top_nav_bar"
         layout="@layout/top_nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content" />
 
-    <!-- Header Content -->
-    <LinearLayout
-        android:id="@+id/headerLayout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/top_nav_bar">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tvStepTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
-            android:text="Step 1: Capture Wide Angle"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+        <!-- Live camera behind everything -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:scaleType="fillCenter" />
 
-        <TextView
-            android:id="@+id/tvStepSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/plus_jakarta_sans"
-            android:text="Show the entire cultivated area"
-            android:textColor="#CBD5E0"
-            android:textSize="14sp" />
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <!-- Center Viewfinder Bracket -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        app:cardBackgroundColor="#00000000"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:strokeColor="#FFFFFF"
-        app:strokeWidth="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            <!-- Step title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#80000000"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="20dp"
+                android:paddingBottom="14dp">
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:alpha="0.5"
-            android:src="@drawable/ic_viewfinder_bracket"
-            app:tint="#FFFFFF" />
+                <TextView
+                    android:id="@+id/tvStepTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:text="Step 1: Capture Wide Angle"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp" />
 
-    </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/tvStepSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:paddingHorizontal="24dp"
+                    android:text="Show the entire cultivated area"
+                    android:textColor="#E2E8F0"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-    <!-- Mode Select Tabs -->
-    <LinearLayout
-        android:id="@+id/modeTabs"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/bg_date_pill"
-        android:backgroundTint="#40000000"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+            <!-- Framed viewfinder -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tabWideAngle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
-            android:text="WIDE"
-            android:textColor="@color/accent_green"
-            android:textSize="12sp"
-            android:letterSpacing="0.05" />
+                <FrameLayout
+                    android:id="@+id/frame"
+                    android:layout_width="310dp"
+                    android:layout_height="236dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/cam_frame_border">
 
-        <TextView
-            android:id="@+id/tabCloseUp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
-            android:text="CLOSE-UP"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:letterSpacing="0.05" />
+                    <!-- corner brackets: 4 corners x (horizontal + vertical bar) -->
+                    <View android:layout_width="26dp" android:layout_height="4dp" android:layout_gravity="top|start" android:background="#FFFFFF" />
+                    <View android:layout_width="4dp" android:layout_height="26dp" android:layout_gravity="top|start" android:background="#FFFFFF" />
+                    <View android:layout_width="26dp" android:layout_height="4dp" android:layout_gravity="top|end" android:background="#FFFFFF" />
+                    <View android:layout_width="4dp" android:layout_height="26dp" android:layout_gravity="top|end" android:background="#FFFFFF" />
+                    <View android:layout_width="26dp" android:layout_height="4dp" android:layout_gravity="bottom|start" android:background="#FFFFFF" />
+                    <View android:layout_width="4dp" android:layout_height="26dp" android:layout_gravity="bottom|start" android:background="#FFFFFF" />
+                    <View android:layout_width="26dp" android:layout_height="4dp" android:layout_gravity="bottom|end" android:background="#FFFFFF" />
+                    <View android:layout_width="4dp" android:layout_height="26dp" android:layout_gravity="bottom|end" android:background="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/tabVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
-            android:text="VIDEO"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:letterSpacing="0.05" />
-    </LinearLayout>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/cam_crosshair"
+                        android:contentDescription="Centre" />
 
-    <!-- Capture Controls -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/controlsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar">
+                    <!-- Recording countdown -->
+                    <TextView
+                        android:id="@+id/tvRecording"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|center_horizontal"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_pill_badge"
+                        android:backgroundTint="#DC2626"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="● REC 10s"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/btnLock"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_circle_outline"
-            android:backgroundTint="#40FFFFFF"
-            android:src="@drawable/ic_shield_check"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnCapture"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#FFFFFF" />
+                <!-- Upload progress -->
+                <LinearLayout
+                    android:id="@+id/uploadOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_pill_badge"
+                    android:backgroundTint="#CC000000"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
+                    android:visibility="gone">
 
-        <ImageButton
-            android:id="@+id/btnCapture"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_shutter_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                    <ProgressBar
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:indeterminateTint="#4CAF50" />
 
-        <ImageButton
-            android:id="@+id/btnFlip"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_circle_outline"
-            android:backgroundTint="#40FFFFFF"
-            android:src="@drawable/ic_flip"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnCapture"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#FFFFFF" />
+                    <TextView
+                        android:id="@+id/tvUploading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Uploading…"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Steps + controls -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#80000000"
+                android:orientation="vertical"
+                android:paddingTop="14dp"
+                android:paddingBottom="20dp">
 
-    <!-- Bottom Navigation -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tabWideAngle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:letterSpacing="0.03"
+                        android:text="WIDE ANGLE"
+                        android:textColor="@color/accent_green"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tabCloseUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:letterSpacing="0.03"
+                        android:text="CLOSE UP"
+                        android:textColor="#D1D5DB"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tabVideo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:letterSpacing="0.03"
+                        android:text="VIDEO"
+                        android:textColor="#D1D5DB"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="22dp"
+                    android:paddingHorizontal="36dp">
+
+                    <ImageButton
+                        android:id="@+id/btnLock"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/bg_pill_badge"
+                        android:backgroundTint="#374151"
+                        android:contentDescription="Location lock"
+                        android:padding="10dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_lock" />
+
+                    <ImageButton
+                        android:id="@+id/btnCapture"
+                        android:layout_width="78dp"
+                        android:layout_height="78dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/cam_shutter"
+                        android:contentDescription="Capture" />
+
+                    <ImageButton
+                        android:id="@+id/btnFlip"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="@drawable/circle_background"
+                        android:backgroundTint="#374151"
+                        android:contentDescription="Switch camera"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_flip"
+                        app:tint="#FFFFFF" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
     <include
         android:id="@+id/bottom_nav_bar"
         layout="@layout/bottom_nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content" />
+</LinearLayout>

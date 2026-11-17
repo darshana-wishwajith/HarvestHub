@@ -1,12 +1,17 @@
 package com.harvesthub.mobile.ui.transporter;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,81 +39,222 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma transporter "Vehicle Profile" (sign-up step 2 of 3, and "Edit vehicle" in Settings). Vehicle classes come
- * from GET /api/vehicle-types (decision 15 Nov: backend classes, not the Figma 500/1,000/3,000/5,000 kg cards);
- * body type is a label only; the driving-licence photo is uploaded right after the account is created.
+ * Transporter "Vehicle Profile" (design 16 Nov): sign-up step 2 of 3 and "Edit vehicle" in Settings.
+ * Vehicle classes come from GET /api/vehicle-types (decision 15 Nov: backend classes in the design's card grid);
+ * the configuration (body type) is required; the driving-licence photo is required at sign-up and uploaded right
+ * after the account is created. Every field is checked at once and errors show under the field (like farmer
+ * registration).
  */
 public class TransporterVehicleProfileActivity extends AppCompatActivity {
 
-    private static final String[] BODY_LABELS = {"Refrigerated (reefer)", "Flatbed farm truck", "Box truck"};
     private static final String[] BODY_CODES = {"REEFER", "FLATBED", "BOX"};
+    private static final int[] BODY_CARD_IDS = {R.id.cfgReefer, R.id.cfgFlatbed, R.id.cfgBox};
 
     private RegisterRequest register;   // null = editing the signed-in driver's vehicle
     private final List<Map<String, Object>> types = new ArrayList<>();
-    private final List<TextView> typeCards = new ArrayList<>();
+    private final List<View> typeCards = new ArrayList<>();
     private String selectedType;
-    private List<TextView> bodyChips;
-    private EditText payload, plate;
+    private String selectedBody;
     private Uri licence;
-    private TextView licenceLabel;
+    private boolean hasSavedLicence;
+
+    private EditText etPayload, etPlate;
+    private TextView tvProvince, tvLicenceStatus, tvTypeStatus;
+    private TextView errType, errConfig, errPayload, errPlate, errLicence;
     private ActivityResultLauncher<String> pickLicence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_transporter_vehicle_profile);
+        register = getIntent().getParcelableExtra(SetDeliveryAddressActivity.EXTRA_REGISTER);
+
+        etPayload = findViewById(R.id.etPayload);
+        etPlate = findViewById(R.id.etPlate);
+        tvProvince = findViewById(R.id.tvProvince);
+        tvLicenceStatus = findViewById(R.id.tvLicenceStatus);
+        tvTypeStatus = findViewById(R.id.tvTypeStatus);
+        errType = findViewById(R.id.errType);
+        errConfig = findViewById(R.id.errConfig);
+        errPayload = findViewById(R.id.errPayload);
+        errPlate = findViewById(R.id.errPlate);
+        errLicence = findViewById(R.id.errLicence);
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        findViewById(R.id.btnSave).setOnClickListener(v -> save());
+        if (register == null) {   // editing from Settings
+            findViewById(R.id.cardProgress).setVisibility(View.GONE);
+            ((TextView) findViewById(R.id.tvSaveLabel)).setText("Save Vehicle");
+            ((TextView) findViewById(R.id.tvDocsSubtitle)).setText("Upload a new photo only if your licence changed");
+        }
+
+        setUpConfigCard(0, R.drawable.ic_snowflake, "Refrigerated Truck (Reefer)", "Temp controlled (+2°C to +8°C)", "Dairy & Berries Safe");
+        setUpConfigCard(1, R.drawable.ic_lorry, "Flatbed Farm Truck", "Heavy produce & field crates", "Open Cargo Deck");
+        setUpConfigCard(2, R.drawable.ic_archive_box, "Sprinter Box Truck", "Dry organic bulk & grains", "Weather Protected");
+
         pickLicence = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri == null) return;
-            licence = copyToCache(uri); // keep it readable after leaving this screen
+            licence = copyToCache(uri);   // keep it readable after leaving this screen
             if (licence == null) return;
-            licenceLabel.setText("✓ Licence photo selected");
-            licenceLabel.setTextColor(TUi.DARK);
+            showLicenceState();
+            hide(errLicence);
         });
-        register = getIntent().getParcelableExtra(SetDeliveryAddressActivity.EXTRA_REGISTER);
-        LinearLayout c = TUi.scaffold(this, "Vehicle Profile", null);
-        if (register != null) ((View) findViewById(R.id.navTpHome).getParent()).setVisibility(View.GONE);
-        findViewById(R.id.btnTpBell).setVisibility(register != null ? View.GONE : View.VISIBLE);
+        findViewById(R.id.btnUploadLicence).setOnClickListener(v -> pickLicence.launch("image/*"));
 
-        if (register != null) {
-            LinearLayout s = TUi.card(c);
-            TUi.caption(s, "Step 2 of 3");
-            TUi.text(s, "Vehicle & capacity verification", 15, TUi.DARK, true);
-        }
-        TUi.title(c, "Register your transport vehicle").setPadding(0, TUi.dp(this, 16), 0, 0);
-        TUi.body(c, "Used to match you with loads your vehicle can carry.");
-
-        TUi.caption(c, "Select vehicle type • required");
-        LinearLayout typeBox = new LinearLayout(this);
-        typeBox.setOrientation(LinearLayout.VERTICAL);
-        c.addView(typeBox);
-
-        TUi.caption(c, "Vehicle configuration");
-        bodyChips = TUi.chips(c, BODY_LABELS, false, null);
-
-        LinearLayout specs = TUi.card(c);
-        TUi.text(specs, "Capacity & legal specs", 16, TUi.DARK, true);
-        TUi.caption(specs, "Max payload (kg, optional – defaults to the class limit)");
-        payload = TUi.input(specs, "e.g. 900", false);
-        payload.setInputType(InputType.TYPE_CLASS_NUMBER);
-        TUi.caption(specs, "Licence plate number • required");
-        plate = TUi.input(specs, "e.g. WP ND-4892", false);
-        plate.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-
-        LinearLayout docs = TUi.card(c);
-        TUi.text(docs, "Compliance document", 16, TUi.DARK, true);
-        TUi.body(docs, "Photo of your driving licence (stored for the agricultural officers).");
-        licenceLabel = TUi.text(docs, "No photo selected", 14, TUi.MUTED, true);
-        TUi.secondary(docs, "Upload driving licence photo", v -> pickLicence.launch("image/*"));
-
-        TUi.primary(TUi.actions(this), register != null ? "Save & continue to vehicle address →" : "Save vehicle", v -> save());
+        etPlate.addTextChangedListener(new SimpleWatcher(() -> {
+            hide(errPlate);
+            showProvince();
+        }));
+        etPayload.addTextChangedListener(new SimpleWatcher(() -> hide(errPayload)));
 
         User me = new SessionManager(this).getUser();
         if (register == null && me != null) {
-            if (me.getVehiclePlate() != null) plate.setText(me.getVehiclePlate());
-            if (me.getVehicleCapacityKg() != null) payload.setText(String.valueOf(me.getVehicleCapacityKg().intValue()));
+            if (me.getVehiclePlate() != null) etPlate.setText(me.getVehiclePlate());
+            if (me.getVehicleCapacityKg() != null) etPayload.setText(String.valueOf(me.getVehicleCapacityKg().intValue()));
             selectedType = me.getVehicleType();
-            for (int i = 0; i < BODY_CODES.length; i++) if (BODY_CODES[i].equals(me.getVehicleBodyType())) TUi.setChip(bodyChips.get(i), true);
+            selectBody(me.getVehicleBodyType());
+            hasSavedLicence = me.isLicenceUploaded();
         }
-        loadTypes(typeBox);
+        showLicenceState();
+        loadTypes();
+    }
+
+    // ---------------------------------------------------------------- vehicle type grid
+
+    private void loadTypes() {
+        ApiClient.getApiService().getVehicleTypes().enqueue(new Callback<List<Map<String, Object>>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Map<String, Object>>> call, @NonNull Response<List<Map<String, Object>>> r) {
+                if (!r.isSuccessful() || r.body() == null || r.body().isEmpty()) {
+                    tvTypeStatus.setText("Could not load vehicle types. Go back and try again.");
+                    return;
+                }
+                tvTypeStatus.setVisibility(View.GONE);
+                types.clear();
+                types.addAll(r.body());
+                buildGrid();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Map<String, Object>>> call, @NonNull Throwable t) {
+                tvTypeStatus.setText("Can't reach the server. Check your internet and try again.");
+            }
+        });
+    }
+
+    private void buildGrid() {
+        LinearLayout grid = findViewById(R.id.typeGrid);
+        grid.removeAllViews();
+        typeCards.clear();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        int gap = dp(10);
+        LinearLayout row = null;
+        for (int i = 0; i < types.size(); i++) {
+            if (i % 2 == 0) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                if (i > 0) rp.topMargin = gap;
+                grid.addView(row, rp);
+            }
+            Map<String, Object> t = types.get(i);
+            String type = String.valueOf(t.get("type"));
+            double cap = t.get("capacityKg") instanceof Number ? ((Number) t.get("capacityKg")).doubleValue() : 0;
+            View card = inflater.inflate(R.layout.item_vehicle_type_card, row, false);
+            ((TextView) card.findViewById(R.id.vtName)).setText(String.valueOf(t.get("label")));
+            ((TextView) card.findViewById(R.id.vtCapacity)).setText(String.format(Locale.US, "Up to %,.0f kg", cap));
+            ((ImageView) card.findViewById(R.id.vtIcon)).setImageResource(cap <= 1_000 ? R.drawable.ic_truck_mini : R.drawable.ic_truck);
+            card.setTag(type);
+            card.setOnClickListener(v -> selectType(type));
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+            if (i % 2 == 1) cp.setMarginStart(gap);
+            row.addView(card, cp);
+            typeCards.add(card);
+        }
+        if (types.size() % 2 == 1 && row != null) {   // keep the last card half width
+            row.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1f));
+        }
+        selectType(selectedType);
+    }
+
+    private void selectType(String type) {
+        selectedType = type;
+        if (type != null) hide(errType);
+        for (View card : typeCards) {
+            boolean on = card.getTag().equals(type);
+            card.setBackgroundResource(on ? R.drawable.vp_card_selected_bg : R.drawable.vp_card_bg);
+            card.findViewById(R.id.vtCheck).setVisibility(on ? View.VISIBLE : View.INVISIBLE);
+            View box = card.findViewById(R.id.vtIconBox);
+            box.setBackgroundResource(on ? R.drawable.bg_btn_sign_in : R.drawable.vp_soft_bg);
+            ((ImageView) card.findViewById(R.id.vtIcon)).setColorFilter(on ? Color.WHITE : Color.parseColor("#64748B"));
+        }
+    }
+
+    // ---------------------------------------------------------------- configuration cards
+
+    private void setUpConfigCard(int index, int icon, String title, String desc, String tag) {
+        View card = findViewById(BODY_CARD_IDS[index]);
+        ((ImageView) card.findViewById(R.id.cfgIcon)).setImageResource(icon);
+        ((TextView) card.findViewById(R.id.cfgTitle)).setText(title);
+        ((TextView) card.findViewById(R.id.cfgDesc)).setText(desc);
+        ((TextView) card.findViewById(R.id.cfgTag)).setText(tag);
+        card.setOnClickListener(v -> selectBody(BODY_CODES[index]));
+        selectBody(selectedBody);
+    }
+
+    private void selectBody(String code) {
+        selectedBody = code;
+        if (code != null) hide(errConfig);
+        for (int i = 0; i < BODY_CODES.length; i++) {
+            View card = findViewById(BODY_CARD_IDS[i]);
+            boolean on = BODY_CODES[i].equals(code);
+            card.setBackgroundResource(on ? R.drawable.vp_card_selected_bg : R.drawable.vp_card_bg);
+            ((ImageView) card.findViewById(R.id.cfgCheck)).setImageResource(on ? R.drawable.ic_check_circle_green : R.drawable.vp_radio_off);
+            card.findViewById(R.id.cfgIconBox).setBackgroundResource(on ? R.drawable.bg_btn_sign_in : R.drawable.vp_soft_bg);
+            ((ImageView) card.findViewById(R.id.cfgIcon)).setColorFilter(on ? Color.WHITE : Color.parseColor("#475569"));
+            TextView tag = card.findViewById(R.id.cfgTag);
+            tag.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor(on ? "#BBF7D0" : "#E5E7EB")));
+            tag.setTextColor(Color.parseColor(on ? "#166534" : "#475569"));
+        }
+    }
+
+    // ---------------------------------------------------------------- plate & licence
+
+    /** "WP ND-4892" -> "Western Province (LK)" badge, like the design. */
+    private void showProvince() {
+        String p = etPlate.getText().toString().trim().toUpperCase(Locale.US);
+        String province = p.length() >= 2 ? provinceFor(p.substring(0, 2)) : null;
+        tvProvince.setVisibility(province != null ? View.VISIBLE : View.GONE);
+        if (province != null) tvProvince.setText(province + "\n(LK)");
+    }
+
+    static String provinceFor(String code) {
+        switch (code) {
+            case "WP": return "Western Province";
+            case "CP": return "Central Province";
+            case "SP": return "Southern Province";
+            case "NP": return "Northern Province";
+            case "EP": return "Eastern Province";
+            case "NW": return "North Western Province";
+            case "NC": return "North Central Province";
+            case "UP": return "Uva Province";
+            case "SG": return "Sabaragamuwa Province";
+            default: return null;
+        }
+    }
+
+    private void showLicenceState() {
+        ImageView icon = findViewById(R.id.ivLicenceState);
+        if (licence != null) {
+            tvLicenceStatus.setText("Photo selected • uploads when you save");
+            icon.setImageResource(R.drawable.ic_check_circle_dark_green);
+        } else if (hasSavedLicence) {
+            tvLicenceStatus.setText("Uploaded • tap Upload to replace");
+            icon.setImageResource(R.drawable.ic_check_circle_dark_green);
+        } else {
+            tvLicenceStatus.setText("Not uploaded yet");
+            icon.setImageResource(R.drawable.ic_badge_license);
+        }
     }
 
     private Uri copyToCache(Uri uri) {
@@ -128,49 +274,6 @@ public class TransporterVehicleProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void loadTypes(LinearLayout box) {
-        ApiClient.getApiService().getVehicleTypes().enqueue(new Callback<List<Map<String, Object>>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Map<String, Object>>> call, @NonNull Response<List<Map<String, Object>>> r) {
-                if (!r.isSuccessful() || r.body() == null) {
-                    TUi.body(box, "Could not load vehicle types. Go back and try again.");
-                    return;
-                }
-                types.clear();
-                types.addAll(r.body());
-                for (Map<String, Object> t : types) {
-                    String type = String.valueOf(t.get("type"));
-                    double cap = t.get("capacityKg") instanceof Number ? ((Number) t.get("capacityKg")).doubleValue() : 0;
-                    TextView card = TUi.text(box, t.get("label") + "\nUp to " + String.format(Locale.US, "%,.0f kg", cap), 15, TUi.INK, true);
-                    int p = TUi.dp(TransporterVehicleProfileActivity.this, 14);
-                    card.setPadding(p, p, p, p);
-                    ((LinearLayout.LayoutParams) card.getLayoutParams()).topMargin = TUi.dp(TransporterVehicleProfileActivity.this, 8);
-                    card.setTag(type);
-                    card.setOnClickListener(v -> select(type));
-                    typeCards.add(card);
-                }
-                select(selectedType);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Map<String, Object>>> call, @NonNull Throwable t) {
-                TUi.body(box, "Can't reach the server.");
-            }
-        });
-    }
-
-    private void select(String type) {
-        selectedType = type;
-        for (TextView t : typeCards) {
-            boolean on = t.getTag().equals(type);
-            android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable();
-            d.setColor(on ? TUi.SURFACE : android.graphics.Color.WHITE);
-            d.setStroke(TUi.dp(this, on ? 2 : 1), on ? TUi.DARK : TUi.LINE);
-            d.setCornerRadius(TUi.dp(this, 14));
-            t.setBackground(d);
-        }
-    }
-
     private double capacityOf(String type) {
         for (Map<String, Object> t : types) {
             if (type.equals(t.get("type")) && t.get("capacityKg") instanceof Number) return ((Number) t.get("capacityKg")).doubleValue();
@@ -178,39 +281,44 @@ public class TransporterVehicleProfileActivity extends AppCompatActivity {
         return Double.MAX_VALUE;
     }
 
+    // ---------------------------------------------------------------- save
+
     private void save() {
-        if (selectedType == null) {
-            Toast.makeText(this, "Choose a vehicle type.", Toast.LENGTH_SHORT).show();
-            return;
+        View firstError = null;
+        if (selectedType == null) firstError = show(errType, "Choose your vehicle type", null);
+        if (selectedBody == null) firstError = show(errConfig, "Choose your vehicle configuration", firstError);
+
+        String plate = etPlate.getText().toString().trim().toUpperCase(Locale.US).replaceAll("\\s+", " ");
+        if (plate.isEmpty()) {
+            firstError = show(errPlate, "License plate number is required", firstError);
+        } else if (!plate.matches("^([A-Z]{2} )?[A-Z0-9]{2,3}[- ]?\\d{4}$")) {
+            firstError = show(errPlate, "License plate must look like WP ND-4892", firstError);
         }
-        String p = plate.getText().toString().trim().toUpperCase(Locale.US).replaceAll("\\s+", " ");
-        if (!p.matches("^([A-Z]{2} )?[A-Z0-9]{2,3}[- ]?\\d{4}$")) {
-            plate.setError("Licence plate must look like WP ND-4892");
-            return;
-        }
+
         Double cap = null;
-        String capText = payload.getText().toString().trim();
+        String capText = etPayload.getText().toString().trim().replace(",", "");
         if (!capText.isEmpty()) {
             try {
                 cap = Double.parseDouble(capText);
+                if (selectedType != null && (cap <= 0 || cap > capacityOf(selectedType))) {
+                    firstError = show(errPayload, "Must be between 1 and " + (int) capacityOf(selectedType) + " kg for this vehicle type", firstError);
+                }
             } catch (NumberFormatException e) {
-                payload.setError("Enter kilograms");
-                return;
-            }
-            if (cap <= 0 || cap > capacityOf(selectedType)) {
-                payload.setError("Must be between 1 and " + (int) capacityOf(selectedType) + " kg for this class");
-                return;
+                firstError = show(errPayload, "Enter the payload in kilograms", firstError);
             }
         }
-        String bodyType = null;
-        for (int i = 0; i < bodyChips.size(); i++) if (TUi.isOn(bodyChips.get(i))) bodyType = BODY_CODES[i];
+        if (register != null && licence == null) {
+            firstError = show(errLicence, "Upload a photo of your driving licence", firstError);
+        }
+        if (firstError != null) {
+            View target = firstError;
+            ScrollView scroll = findViewById(R.id.scroll);
+            scroll.post(() -> scroll.smoothScrollTo(0, Math.max(0, topIn(scroll, target) - dp(120))));
+            return;
+        }
 
         if (register != null) {
-            if (licence == null) {
-                Toast.makeText(this, "Add a photo of your driving licence.", Toast.LENGTH_LONG).show();
-                return;
-            }
-            register.setVehicle(selectedType, p, cap, bodyType);
+            register.setVehicle(selectedType, plate, cap, selectedBody);
             startActivity(new Intent(this, SetDeliveryAddressActivity.class)
                     .putExtra(SetDeliveryAddressActivity.EXTRA_REGISTER, register)
                     .putExtra(SetDeliveryAddressActivity.EXTRA_TRANSPORTER, true)
@@ -219,12 +327,15 @@ public class TransporterVehicleProfileActivity extends AppCompatActivity {
         }
         Map<String, Object> body = new HashMap<>();
         body.put("vehicleType", selectedType);
-        body.put("vehiclePlate", p);
+        body.put("vehiclePlate", plate);
         body.put("vehicleCapacityKg", cap);
-        if (bodyType != null) body.put("vehicleBodyType", bodyType);
+        body.put("vehicleBodyType", selectedBody);
+        View btn = findViewById(R.id.btnSave);
+        btn.setEnabled(false);
         ApiClient.getApiService().updateVehicle(body).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> r) {
+                btn.setEnabled(true);
                 if (!r.isSuccessful() || r.body() == null) {
                     Toast.makeText(TransporterVehicleProfileActivity.this, AuthInputUtils.errorMessage(r, "Could not save the vehicle."), Toast.LENGTH_LONG).show();
                     return;
@@ -240,8 +351,48 @@ public class TransporterVehicleProfileActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                btn.setEnabled(true);
                 Toast.makeText(TransporterVehicleProfileActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // ---------------------------------------------------------------- helpers
+
+    /** Shows {@code message} in the red label; returns the first error view (for scrolling). */
+    private static View show(TextView label, String message, View firstError) {
+        label.setText(message);
+        label.setVisibility(View.VISIBLE);
+        return firstError != null ? firstError : label;
+    }
+
+    private static void hide(TextView label) {
+        label.setVisibility(View.GONE);
+    }
+
+    private static int topIn(View ancestor, View v) {
+        int y = 0;
+        View cur = v;
+        while (cur != null && cur != ancestor) {
+            y += cur.getTop();
+            cur = (View) cur.getParent();
+        }
+        return y;
+    }
+
+    private int dp(int v) {
+        return Math.round(v * getResources().getDisplayMetrics().density);
+    }
+
+    private static final class SimpleWatcher implements TextWatcher {
+        private final Runnable onChange;
+
+        SimpleWatcher(Runnable onChange) {
+            this.onChange = onChange;
+        }
+
+        @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) { }
+        @Override public void onTextChanged(CharSequence s, int a, int b, int c) { onChange.run(); }
+        @Override public void afterTextChanged(Editable e) { }
     }
 }

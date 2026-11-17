@@ -30,7 +30,7 @@
         android:id="@+id/buyer_bottom_nav_bar"
         layout="@layout/buyer_bottom_nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="78dp"
+        android:layout_height="76dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

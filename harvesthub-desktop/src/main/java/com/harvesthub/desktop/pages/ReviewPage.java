@@ -6,6 +6,7 @@ import com.harvesthub.desktop.api.ApiClient;
 import com.harvesthub.desktop.ui.Page;
 import com.harvesthub.desktop.ui.Shell;
 import com.harvesthub.desktop.ui.Ui;
+import com.harvesthub.desktop.ui.ZoomImageView;
 import com.harvesthub.desktop.util.Fmt;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -173,6 +174,9 @@ public class ReviewPage implements Page {
         return s;
     }
 
+    /** Videos already downloaded in this session (url -> local file), so replays start at once. */
+    private static final Map<String, java.io.File> VIDEO_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
     private void showMedia(StackPane viewer, String url, boolean video) {
         stopVideo();
         String abs = ApiClient.absolute(url);
@@ -180,46 +184,126 @@ public class ReviewPage implements Page {
             Label wait = Ui.label("Loading photo…", "muted");
             wait.setStyle("-fx-text-fill: #D8F3DC;");
             viewer.getChildren().setAll(wait);
-            Image img = new Image(abs, 1200, 900, true, true, true);
-            ImageView iv = new ImageView(img);
-            iv.setPreserveRatio(true);
-            iv.fitWidthProperty().bind(viewer.widthProperty().subtract(16));
-            iv.setFitHeight(364);
-            img.progressProperty().addListener((o, a, b) -> {
-                if (b.doubleValue() >= 1 && !img.isError()) viewer.getChildren().setAll(iv);
+            // full resolution (capped) so officers can zoom into the crop
+            Image img = new Image(abs, 3000, 3000, true, true, true);
+            Runnable ready = () -> {
+                ZoomImageView zoom = new ZoomImageView(img);
+                Button enlarge = Ui.button("Enlarge", "fas-expand", "btn-small", "btn-accent");
+                enlarge.setOnAction(e -> openLarge(img));
+                ((HBox) zoom.getChildren().get(1)).getChildren().add(enlarge);
+                zoom.setPadding(new Insets(6));
+                viewer.getChildren().setAll(zoom);
+            };
+            if (img.getProgress() >= 1 && !img.isError()) ready.run();
+            img.progressProperty().addListener((o, x, y) -> {
+                if (y.doubleValue() >= 1 && !img.isError()) ready.run();
             });
-            img.errorProperty().addListener((o, a, b) -> {
-                if (b) viewer.getChildren().setAll(Ui.label("The photo could not be loaded from the server.", "error-text"));
+            img.errorProperty().addListener((o, x, y) -> {
+                if (y) viewer.getChildren().setAll(Ui.label("The photo could not be loaded from the server.", "error-text"));
             });
             return;
         }
+        // Video: download once, then play the local file (streaming over HTTPS stuttered in JavaFX).
+        java.io.File cached = VIDEO_CACHE.get(abs);
+        if (cached != null && cached.length() > 0) {
+            playVideo(viewer, cached, abs);
+            return;
+        }
+        ProgressBar bar = new ProgressBar(-1);
+        bar.setPrefWidth(220);
+        Label msg = Ui.label("Loading video…", "small");
+        msg.setStyle("-fx-text-fill: #D8F3DC;");
+        VBox loading = new VBox(10, Ui.icon("fas-film", 28, "#95D5B2"), msg, bar);
+        loading.setAlignment(Pos.CENTER);
+        viewer.getChildren().setAll(loading);
+        Thread t = new Thread(() -> {
+            try {
+                java.io.File f = java.io.File.createTempFile("harvesthub-video-", ".mp4");
+                f.deleteOnExit();
+                java.net.URLConnection c = java.net.URI.create(abs).toURL().openConnection();
+                c.setConnectTimeout(15_000);
+                c.setReadTimeout(30_000);
+                long total = c.getContentLengthLong();
+                try (java.io.InputStream in = c.getInputStream(); java.io.OutputStream out = new java.io.FileOutputStream(f)) {
+                    byte[] buf = new byte[64 * 1024];
+                    long done = 0;
+                    int n;
+                    while ((n = in.read(buf)) > 0) {
+                        out.write(buf, 0, n);
+                        done += n;
+                        if (total > 0) {
+                            double p = (double) done / total;
+                            long kb = done / 1024;
+                            javafx.application.Platform.runLater(() -> {
+                                bar.setProgress(p);
+                                msg.setText(String.format("Loading video… %d KB", kb));
+                            });
+                        }
+                    }
+                }
+                VIDEO_CACHE.put(abs, f);
+                javafx.application.Platform.runLater(() -> {
+                    if (viewer.getChildren().contains(loading)) playVideo(viewer, f, abs);
+                });
+            } catch (Exception ex) {
+                javafx.application.Platform.runLater(() -> viewer.getChildren().setAll(videoFallback(abs)));
+            }
+        }, "video-download");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private void playVideo(StackPane viewer, java.io.File file, String abs) {
+        stopVideo();
         try {
-            player = new MediaPlayer(new Media(abs));
+            player = new MediaPlayer(new Media(file.toURI().toString()));
             MediaView mv = new MediaView(player);
             mv.setPreserveRatio(true);
+            mv.setSmooth(true);
             mv.fitWidthProperty().bind(viewer.widthProperty().subtract(16));
-            mv.setFitHeight(330);
-            Button play = Ui.button("Play", "fas-play", "btn-small", "btn-accent");
+            mv.setFitHeight(320);
+            Button play = Ui.button("Pause", "fas-pause", "btn-small", "btn-accent");
             play.setOnAction(e -> {
                 if (player.getStatus() == MediaPlayer.Status.PLAYING) {
                     player.pause();
                 } else {
-                    if (player.getCurrentTime().greaterThanOrEqualTo(player.getTotalDuration())) player.seek(javafx.util.Duration.ZERO);
+                    if (player.getTotalDuration() != null && player.getCurrentTime().greaterThanOrEqualTo(player.getTotalDuration())) {
+                        player.seek(javafx.util.Duration.ZERO);
+                    }
                     player.play();
                 }
             });
-            Label time = Ui.label("", "small");
+            Slider seek = new Slider(0, 1, 0);
+            seek.setPrefWidth(260);
+            HBox.setHgrow(seek, Priority.ALWAYS);
+            boolean[] dragging = {false};
+            seek.setOnMousePressed(e -> dragging[0] = true);
+            seek.setOnMouseReleased(e -> {
+                dragging[0] = false;
+                if (player.getTotalDuration() != null) player.seek(player.getTotalDuration().multiply(seek.getValue()));
+            });
+            Label time = Ui.label("0 s", "small");
             time.setStyle("-fx-text-fill: #D8F3DC;");
-            player.statusProperty().addListener((o, a, b) -> {
-                boolean playing = b == MediaPlayer.Status.PLAYING;
+            player.statusProperty().addListener((o, x, y) -> {
+                boolean playing = y == MediaPlayer.Status.PLAYING;
                 play.setText(playing ? "Pause" : "Play");
                 ((org.kordamp.ikonli.javafx.FontIcon) play.getGraphic()).setIconLiteral(playing ? "fas-pause" : "fas-play");
             });
-            player.currentTimeProperty().addListener((o, a, b) -> time.setText(String.format("%.0f s / %.0f s",
-                    b.toSeconds(), player.getTotalDuration() == null ? 0 : player.getTotalDuration().toSeconds())));
+            player.currentTimeProperty().addListener((o, x, y) -> {
+                javafx.util.Duration total = player.getTotalDuration();
+                double secs = total == null ? 0 : total.toSeconds();
+                if (!dragging[0] && secs > 0) seek.setValue(y.toSeconds() / secs);
+                time.setText(String.format("%.0f s / %.0f s", y.toSeconds(), secs));
+            });
+            player.setOnEndOfMedia(() -> {
+                player.pause();
+                play.setText("Replay");
+                ((org.kordamp.ikonli.javafx.FontIcon) play.getGraphic()).setIconLiteral("fas-redo");
+            });
             player.setOnError(() -> viewer.getChildren().setAll(videoFallback(abs)));
-            HBox controls = Ui.row(10, play, time);
-            controls.setPadding(new Insets(0, 0, 8, 0));
+            player.setAutoPlay(true);
+            HBox controls = Ui.row(10, play, seek, time);
+            controls.setPadding(new Insets(0, 12, 8, 12));
             controls.setAlignment(Pos.CENTER);
             VBox box = new VBox(6, mv, controls);
             box.setAlignment(Pos.CENTER);
@@ -227,6 +311,21 @@ public class ReviewPage implements Page {
         } catch (Exception ex) {
             viewer.getChildren().setAll(videoFallback(abs));
         }
+    }
+
+    /** Big window for close inspection of a photo (same zoom controls). */
+    private void openLarge(Image img) {
+        javafx.stage.Stage st = new javafx.stage.Stage();
+        st.initOwner(PortalApp.stage());
+        st.setTitle("HarvestHub · Photo inspection");
+        ZoomImageView zoom = new ZoomImageView(img);
+        zoom.setPadding(new Insets(8));
+        zoom.setStyle("-fx-background-color: #0B1F17;");
+        javafx.scene.Scene scene = new javafx.scene.Scene(zoom, 1100, 760);
+        scene.getStylesheets().addAll(PortalApp.stage().getScene().getStylesheets());
+        st.setScene(scene);
+        st.setMaximized(true);
+        st.show();
     }
 
     private Node videoFallback(String abs) {

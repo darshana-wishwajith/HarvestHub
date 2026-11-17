@@ -23,12 +23,12 @@ public final class BuyerNavigationHelper {
         View navHome = root.findViewById(R.id.buyerNavHome);
         View navOrders = root.findViewById(R.id.buyerNavOrders);
         View navDemands = root.findViewById(R.id.buyerNavDemands);
-        View navOffers = root.findViewById(R.id.buyerNavOffers);
+        View navOffers = root.findViewById(R.id.buyerNavAccount);
 
         if (navHome != null) navHome.setOnClickListener(v -> navigate(activity, BuyerDashboardActivity.Tab.HOME));
         if (navOrders != null) navOrders.setOnClickListener(v -> navigate(activity, BuyerDashboardActivity.Tab.ORDERS));
         if (navDemands != null) navDemands.setOnClickListener(v -> navigate(activity, BuyerDashboardActivity.Tab.DEMANDS));
-        if (navOffers != null) navOffers.setOnClickListener(v -> navigate(activity, BuyerDashboardActivity.Tab.OFFERS));
+        if (navOffers != null) navOffers.setOnClickListener(v -> navigate(activity, BuyerDashboardActivity.Tab.ACCOUNT));
     }
 
     public static void setupNotifications(Activity activity, View root) {
@@ -37,7 +37,7 @@ public final class BuyerNavigationHelper {
         TextView tvSubtitle = root.findViewById(R.id.tvBuyerNavSubtitle);
         if (tvSubtitle != null) {
             String name = (session.getUser() != null && session.getUser().getFullName() != null && !session.getUser().getFullName().isEmpty())
-                    ? session.getUser().getFullName() : "Perera Supermarket";
+                    ? session.getUser().getFullName() : "Buyer";
             tvSubtitle.setText("Hi, " + name);
         }
         View notifications = root.findViewById(R.id.btnBuyerNotifications);
@@ -60,9 +60,9 @@ public final class BuyerNavigationHelper {
 
     public static void setActiveState(View root, Tab activeTab) {
         if (root == null || activeTab == null) return;
-        int[] pills = {R.id.buyerPillHome, R.id.buyerPillOrders, R.id.buyerPillDemands, R.id.buyerPillOffers};
-        int[] icons = {R.id.buyerIconHome, R.id.buyerIconOrders, R.id.buyerIconDemands, R.id.buyerIconOffers};
-        int[] labels = {R.id.buyerLabelHome, R.id.buyerLabelOrders, R.id.buyerLabelDemands, R.id.buyerLabelOffers};
+        int[] pills = {R.id.buyerPillHome, R.id.buyerPillOrders, R.id.buyerPillDemands, R.id.buyerPillAccount};
+        int[] icons = {R.id.buyerIconHome, R.id.buyerIconOrders, R.id.buyerIconDemands, R.id.buyerIconAccount};
+        int[] labels = {R.id.buyerLabelHome, R.id.buyerLabelOrders, R.id.buyerLabelDemands, R.id.buyerLabelAccount};
         int activeIndex = activeTab.ordinal();
         for (int index = 0; index < pills.length; index++) {
             View pill = root.findViewById(pills[index]);

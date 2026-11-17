@@ -622,7 +622,7 @@
             android:id="@+id/btnSecurePayment"
             android:layout_width="match_parent"
             android:layout_height="54dp"
-            android:backgroundTint="#19422D"
+            android:backgroundTint="#1B4332"
             android:text="Secure Advance Payment"
             android:textAllCaps="false"
             android:textColor="@color/white"

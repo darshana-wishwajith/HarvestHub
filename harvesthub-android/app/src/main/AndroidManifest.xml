@@ -76,6 +76,7 @@
         <activity android:name=".ui.buyer.BuyerOrdersActivity" />
         <activity android:name=".ui.buyer.MarketplaceSearchActivity" />
         <activity android:name=".ui.buyer.SignInBuyerActivity" />
+        <activity android:name=".ui.common.MediaViewerActivity" android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".ui.buyer.CreateAccountActivity" />
         <activity android:name=".ui.buyer.SetDeliveryAddressActivity" />
         <activity android:name=".ui.buyer.CreateNewPasswordActivity" />

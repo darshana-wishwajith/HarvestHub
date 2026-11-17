@@ -23,7 +23,7 @@ public class ChatService {
         message.setOrderId(orderId);
         message.setSenderId(senderId);
         message.setText(text);
-        message.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        message.setTimestamp(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         message.setSentByMe(true);
         message.setRead(false);
         return chatMessageRepository.save(message);

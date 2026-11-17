@@ -127,12 +127,9 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                         LoginResponse body = response.body();
                         User user = body == null ? null : body.getUser();
-                        if (response.isSuccessful() && user != null && "FARMER".equalsIgnoreCase(user.getRole())) {
-                            SessionManager session = new SessionManager(CreateNewPasswordActivity.this);
-                            session.saveAuthToken(body.getToken());
-                            session.saveUser(user);
-                            session.setLogin(true, "FARMER");
-                            openAndClearTask(MainActivity.class);
+                        if (response.isSuccessful() && user != null && com.harvesthub.mobile.ui.common.RoleHome.homeFor(user.getRole()) != null) {
+                            // Shared by farmer, buyer and transporter: sign in to the account's own home screen.
+                            com.harvesthub.mobile.ui.common.RoleHome.openHome(CreateNewPasswordActivity.this, body);
                         } else {
                             goToSignIn();
                         }
@@ -147,8 +144,9 @@ public class CreateNewPasswordActivity extends AppCompatActivity {
 
     private void goToSignIn() {
         Toast.makeText(this, R.string.fp_password_updated, Toast.LENGTH_LONG).show();
-        openAndClearTask(FarmerLoginActivity.class);
+        openAndClearTask(ForgotPasswordActivity.loginScreen());   // the sign-in screen the reset started from
     }
+
 
     private void openAndClearTask(Class<?> target) {
         Intent intent = new Intent(this, target);

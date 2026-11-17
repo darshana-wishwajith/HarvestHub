@@ -51,7 +51,7 @@ public class DisputesPage implements Page {
         type.getItems().setAll("Issues and appeals", "Issues only", "Driver appeals only");
         type.setValue("Issues and appeals");
         type.setOnAction(e -> refresh());
-        root.getChildren().setAll(Ui.row(10, open, closed, all, Ui.grow(), type), summary, list);
+        root.getChildren().setAll(Ui.row(10, Ui.segmented(open, closed, all), Ui.grow(), type), summary, list);
         refresh();
         return Ui.scroll(root);
     }

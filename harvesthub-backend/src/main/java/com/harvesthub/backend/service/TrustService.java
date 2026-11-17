@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Trust score (proposal §6.10, workflow 5.4) from average rating, completed transactions and reliability:
- * <pre>trust% = 100 × (0.50 × rating/5 + 0.35 × reliability + 0.15 × min(1, completed/20))</pre>
- * rating = average stars (0.8 × 5 before the first rating); reliability = completed / (completed + failed).
+ * Trust score (proposal §6.10, workflow 5.4) from average rating and reliability. Every user starts at 100 %
+ * (user decision 17 Nov) and it moves with their record:
+ * <pre>trust% = 100 × (0.60 × rating/5 + 0.40 × reliability)</pre>
+ * rating = average stars received (5 before the first rating); reliability = completed / (completed + failed),
+ * 1.0 before the first order. Failed = orders that ended through this user's fault.
  */
 @Service
 public class TrustService {
@@ -34,10 +36,22 @@ public class TrustService {
     }
 
     public static int score(Double ratingAverage, int completed, int failed) {
-        double rating = ratingAverage == null ? 0.8 : ratingAverage / 5.0;
+        double rating = ratingAverage == null ? 1.0 : ratingAverage / 5.0;
         double reliability = completed + failed == 0 ? 1.0 : (double) completed / (completed + failed);
-        double experience = Math.min(1.0, completed / 20.0);
-        return (int) Math.round(100 * (0.50 * rating + 0.35 * reliability + 0.15 * experience));
+        return (int) Math.round(100 * (0.60 * rating + 0.40 * reliability));
+    }
+
+    /** Recalculates every user once at start-up so stored scores follow the current rule. */
+    @org.springframework.context.event.EventListener(org.springframework.boot.context.event.ApplicationReadyEvent.class)
+    public void recomputeAllOnStartup() {
+        int changed = 0;
+        for (User u : users.findAll()) {
+            if (u.getRole() == null || !java.util.Set.of("FARMER", "BUYER", "TRANSPORTER").contains(u.getRole())) continue;
+            Integer before = u.getTrustScore();
+            User after = recompute(u.getId());
+            if (after != null && !java.util.Objects.equals(before, after.getTrustScore())) changed++;
+        }
+        org.slf4j.LoggerFactory.getLogger(TrustService.class).info("Trust scores recalculated ({} changed)", changed);
     }
 
     public User recompute(String userId) {

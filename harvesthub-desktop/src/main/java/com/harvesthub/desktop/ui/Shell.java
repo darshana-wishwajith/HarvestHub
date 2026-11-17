@@ -70,24 +70,25 @@ public final class Shell {
 
     private void build() {
         root.getStyleClass().add("page");
-        root.setLeft(sidebar());
-        root.setTop(topbar());
-        content.setPadding(new Insets(16, 20, 16, 20));
-        root.setCenter(content);
+        root.setLeft(sidebar());   // full-height sidebar; the top bar sits beside it
+        content.setPadding(new Insets(20, 24, 20, 24));
+        VBox main = new VBox(topbar(), content);
+        VBox.setVgrow(content, Priority.ALWAYS);
+        root.setCenter(main);
     }
 
     // ---- sidebar ---------------------------------------------------------------------------------
 
     private Node sidebar() {
-        ImageView logo = new ImageView(Ui.resource("logo-full.png"));
-        logo.setFitWidth(96);
-        logo.setPreserveRatio(true);
-        logo.setSmooth(true);
-        VBox brand = new VBox(4, logo, Ui.label("OFFICER PORTAL", "sidebar-tag"));
-        brand.setAlignment(Pos.CENTER);
-        brand.setPadding(new Insets(6, 0, 10, 0));
+        // brand: light logo mark (decoded at display size, so it stays sharp) + wordmark
+        ImageView mark = Ui.crispImage("logo-mark-light.png", 34);
+        VBox words = new VBox(0, Ui.label("HarvestHub", "brand-name"), Ui.label("OFFICER PORTAL", "sidebar-tag"));
+        words.setAlignment(Pos.CENTER_LEFT);
+        HBox brand = new HBox(10, mark, words);
+        brand.setAlignment(Pos.CENTER_LEFT);
+        brand.setPadding(new Insets(10, 8, 14, 10));
 
-        VBox nav = new VBox(2,
+        VBox nav = new VBox(3,
                 section("VERIFICATION"),
                 navItem(Nav.DASHBOARD, "fas-th-large", "Dashboard"),
                 navItem(Nav.QUEUE, "fas-clipboard-list", "Verification Queue"),
@@ -99,7 +100,17 @@ public final class Shell {
                 section("ACCOUNT"),
                 navItem(Nav.PROFILE, "fas-user-circle", "My Profile"));
 
-        Button logout = Ui.button("Log out", "fas-sign-out-alt", "btn-ghost");
+        // signed-in officer card (opens the profile), then log out
+        OfficerDto me = Session.getOfficer();
+        String name = me == null ? "Officer" : Fmt.orDash(me.fullName);
+        Label officerName = Ui.label(name, "strong");
+        Label officerSub = Ui.label("Agricultural Officer", "side-sub");
+        HBox officer = new HBox(10, Ui.avatar(name, 36, true), new VBox(1, officerName, officerSub));
+        officer.setAlignment(Pos.CENTER_LEFT);
+        officer.getStyleClass().add("side-officer");
+        officer.setOnMouseClicked(e -> go(Nav.PROFILE));
+
+        Button logout = Ui.button("Log out", "fas-sign-out-alt", "side-logout");
         logout.setMaxWidth(Double.MAX_VALUE);
         logout.setAlignment(Pos.CENTER_LEFT);
         logout.setOnAction(e -> {
@@ -108,13 +119,14 @@ public final class Shell {
                 PortalApp.showLogin(null);
             }
         });
-        Label server = Ui.wrap("Connected to " + ApiClient.getBaseUrl().replace("https://", ""), "muted", "small");
+        Label server = Ui.label("Connected to " + ApiClient.getBaseUrl().replace("https://", ""), "side-server");
+        server.setPadding(new Insets(0, 0, 0, 12));
 
-        VBox side = new VBox(10, brand, nav, Ui.grow(), new Separator(), logout, server);
+        VBox side = new VBox(8, brand, nav, Ui.grow(), officer, logout, server);
         side.getStyleClass().add("sidebar");
-        side.setPadding(new Insets(12, 12, 12, 12));
-        side.setPrefWidth(246);
-        side.setMinWidth(246);
+        side.setPadding(new Insets(14, 12, 12, 12));
+        side.setPrefWidth(244);
+        side.setMinWidth(244);
         return side;
     }
 
@@ -161,16 +173,20 @@ public final class Shell {
 
         OfficerDto me = Session.getOfficer();
         String name = me == null ? "Officer" : Fmt.orDash(me.fullName);
-        HBox chip = new HBox(8, Ui.avatar(name, 30, false),
+        HBox chip = new HBox(8, Ui.avatar(name, 34, false),
                 new VBox(0, Ui.label(name, "strong"), Ui.label("Agricultural Officer", "muted", "small")));
         chip.setAlignment(Pos.CENTER_LEFT);
         chip.getStyleClass().add("officer-chip");
         chip.setOnMouseClicked(e -> go(Nav.PROFILE));
+        Region divider = new Region();
+        divider.setMinWidth(1);
+        divider.setPrefHeight(30);
+        divider.setStyle("-fx-background-color: #E7E6E0;");
 
-        HBox bar = new HBox(14, titles, Ui.grow(), refresh, bellBox, chip);
+        HBox bar = new HBox(12, titles, Ui.grow(), refresh, bellBox, divider, chip);
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add("topbar");
-        bar.setPadding(new Insets(9, 20, 9, 20));
+        bar.setPadding(new Insets(12, 24, 12, 24));
         return bar;
     }
 

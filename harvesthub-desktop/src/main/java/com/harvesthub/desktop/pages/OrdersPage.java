@@ -43,7 +43,7 @@ public class OrdersPage implements Page {
 
     @Override
     public Node view() {
-        HBox chips = Ui.row(8);
+        HBox chips = Ui.segmented();
         String[][] options = {{"All", "all"}, {"In progress", "active"}, {"Completed", "completed"}, {"Problems", "problem"}};
         for (String[] o : options) {
             ToggleButton t = Ui.chip(o[0], stages);

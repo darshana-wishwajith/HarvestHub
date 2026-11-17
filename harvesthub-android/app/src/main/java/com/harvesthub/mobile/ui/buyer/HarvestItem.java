@@ -15,6 +15,8 @@ public class HarvestItem {
     private String listingId;
     private String farmerId;
     private String farmerName;
+    /** [wide photo, close-up photo, video] uploaded by the farmer; shown on the card and in the media viewer. */
+    private java.util.List<String> mediaUrls;
 
     public HarvestItem(String gradeText, int badgeBgRes, int badgeIconRes, String listedTime, 
                        String cropName, String quantity, String location, String unitPrice) {
@@ -38,6 +40,12 @@ public class HarvestItem {
     }
 
     public static HarvestItem fromListing(ListingItem listing) {
+        HarvestItem item = fromListingNoMedia(listing);
+        item.mediaUrls = listing.getMediaUrls();
+        return item;
+    }
+
+    private static HarvestItem fromListingNoMedia(ListingItem listing) {
         String grade = listing.getGrade();
         if (grade == null || grade.trim().isEmpty()) {
                 return new HarvestItem("Verified Harvest", R.drawable.bg_badge_grade_a,
@@ -69,5 +77,13 @@ public class HarvestItem {
     public String getListingId() { return listingId; }
     public String getFarmerId() { return farmerId; }
     public String getFarmerName() { return farmerName; }
+    public java.util.List<String> getMediaUrls() { return mediaUrls; }
+
+    /** First photo of the capture, or null. */
+    public String getCoverPhotoUrl() {
+        if (mediaUrls == null) return null;
+        for (String u : mediaUrls) if (u != null && !u.toLowerCase().endsWith(".mp4")) return u;
+        return null;
+    }
 }
 

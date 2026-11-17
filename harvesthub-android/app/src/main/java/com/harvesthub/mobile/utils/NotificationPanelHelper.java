@@ -46,19 +46,38 @@ public class NotificationPanelHelper {
         RecyclerView rv = popupView.findViewById(R.id.rvNotifications);
         rv.setLayoutManager(new LinearLayoutManager(context));
         
-        // Use dummy data for demo, in real app this would fetch from a ViewModel or shared state
-        List<NotificationItem> dummyData = new ArrayList<>();
-        dummyData.add(new NotificationItem("1", "DELIVERY_SUCCESS", "Delivery Successful", "LKR 140,000 credited to your wallet.", "2 mins ago", false));
-        dummyData.add(new NotificationItem("2", "PENALTY", "Penalty Notice", "Small deduction due to moisture levels.", "1 hour ago", true));
-        dummyData.add(new NotificationItem("3", "LISTING_APPROVED", "Listing Approved", "Your Carrot listing is now live.", "3 hours ago", true));
-
-        NotificationAdapter adapter = new NotificationAdapter(dummyData, (notification, position) -> {
-            notification.setRead(true);
+        // the signed-in user's real notifications (latest 5); the full list is under "View all"
+        List<NotificationItem> items = new ArrayList<>();
+        NotificationAdapter adapter = new NotificationAdapter(items, (notification, position) -> {
+            if (!notification.isRead()) {
+                notification.setRead(true);
+                com.harvesthub.mobile.network.ApiClient.getApiService().markNotificationRead(notification.getId())
+                        .enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+                            @Override public void onResponse(retrofit2.Call<okhttp3.ResponseBody> c, retrofit2.Response<okhttp3.ResponseBody> r) { }
+                            @Override public void onFailure(retrofit2.Call<okhttp3.ResponseBody> c, Throwable t) { }
+                        });
+            }
             if (rv.getAdapter() != null) {
                 rv.getAdapter().notifyItemChanged(position);
             }
         });
         rv.setAdapter(adapter);
+        String me = new SessionManager(context).getUserId();
+        if (me != null) {
+            com.harvesthub.mobile.network.ApiClient.getApiService().getNotifications(me)
+                    .enqueue(new retrofit2.Callback<List<NotificationItem>>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<List<NotificationItem>> c, retrofit2.Response<List<NotificationItem>> r) {
+                            if (!r.isSuccessful() || r.body() == null) return;
+                            items.clear();
+                            for (int i = 0; i < Math.min(5, r.body().size()); i++) items.add(r.body().get(i));
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<List<NotificationItem>> c, Throwable t) { }
+                    });
+        }
 
         popupView.findViewById(R.id.tvViewAll).setOnClickListener(v -> {
             notificationPopup.dismiss();
@@ -68,10 +87,17 @@ public class NotificationPanelHelper {
         });
 
         popupView.findViewById(R.id.tvMarkAllRead).setOnClickListener(v -> {
-            for (NotificationItem item : dummyData) {
+            for (NotificationItem item : items) {
                 item.setRead(true);
             }
             adapter.notifyDataSetChanged();
+            if (me != null) {
+                com.harvesthub.mobile.network.ApiClient.getApiService().markAllNotificationsRead(me)
+                        .enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+                            @Override public void onResponse(retrofit2.Call<okhttp3.ResponseBody> c, retrofit2.Response<okhttp3.ResponseBody> r) { }
+                            @Override public void onFailure(retrofit2.Call<okhttp3.ResponseBody> c, Throwable t) { }
+                        });
+            }
         });
 
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);

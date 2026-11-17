@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.LinearLayout;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -68,34 +70,74 @@ public class HarvestTrackerActivity extends BaseBuyerOrderActivity {
         });
     }
 
+    /** Stepper row in the style of Figma 4.3 "Dispatch Loop": status circle, connector line, title, detail, time. */
     private void addStep(LinearLayout parent, String title, String body, boolean done, boolean active, String when) {
+        boolean last = parent.getChildCount() == 3;
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, dp(8), 0, dp(8));
+        parent.addView(row, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        TextView dot = new TextView(this);
-        dot.setText(done ? "✓" : active ? "●" : "○");
-        dot.setTextSize(16);
-        dot.setGravity(Gravity.CENTER);
-        dot.setTextColor(done ? 0xFF2E7D32 : active ? 0xFFF59E0B : 0xFF94A3B8);
-        row.addView(dot, new LinearLayout.LayoutParams(dp(28), dp(28)));
+        LinearLayout rail = new LinearLayout(this);
+        rail.setOrientation(LinearLayout.VERTICAL);
+        rail.setGravity(Gravity.CENTER_HORIZONTAL);
+        row.addView(rail, new LinearLayout.LayoutParams(dp(30), LinearLayout.LayoutParams.MATCH_PARENT));
+        android.widget.FrameLayout dot = new android.widget.FrameLayout(this);
+        int green = 0xFF15803D, dark = 0xFF1B4332, grey = 0xFFCBD5E1;
+        android.graphics.drawable.GradientDrawable circle = new android.graphics.drawable.GradientDrawable();
+        circle.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        if (done) {
+            circle.setColor(0xFFDCFCE7);
+        } else if (active) {
+            circle.setColor(0xFFEEF4FF);
+            circle.setStroke(dp(2), 0xFF2563EB);
+        } else {
+            circle.setColor(0xFFFFFFFF);
+            circle.setStroke(dp(2), grey);
+        }
+        dot.setBackground(circle);
+        if (done) {
+            ImageView ok = new ImageView(this);
+            ok.setImageResource(R.drawable.ic_check);
+            ok.setColorFilter(green);
+            dot.addView(ok, new android.widget.FrameLayout.LayoutParams(dp(14), dp(14), Gravity.CENTER));
+        } else if (active) {
+            View inner = new View(this);
+            inner.setBackground(com.harvesthub.mobile.ui.transporter.TUi.round(0xFF2563EB, dp(6)));
+            dot.addView(inner, new android.widget.FrameLayout.LayoutParams(dp(10), dp(10), Gravity.CENTER));
+        }
+        rail.addView(dot, new LinearLayout.LayoutParams(dp(28), dp(28)));
+        if (!last) {
+            View line = new View(this);
+            line.setBackgroundColor(done ? 0xFF86EFAC : 0xFFE5E7EB);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(2), 0, 1f);
+            lp.topMargin = dp(2);
+            rail.addView(line, lp);
+        }
 
         LinearLayout text = new LinearLayout(this);
         text.setOrientation(LinearLayout.VERTICAL);
-        text.setPadding(dp(10), 0, 0, 0);
+        text.setPadding(dp(12), dp(3), 0, last ? 0 : dp(18));
+        LinearLayout head = new LinearLayout(this);
+        head.setGravity(Gravity.CENTER_VERTICAL);
         TextView t = new TextView(this);
-        t.setText(active ? title + "  ·  IN PROGRESS" : title);
-        t.setTextColor(done || active ? 0xFF1B4332 : 0xFF64748B);
+        t.setText(title);
+        t.setTextColor(active ? 0xFF2563EB : done ? 0xFF111827 : 0xFF94A3B8);
         t.setTextSize(15);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setTypeface(com.harvesthub.mobile.ui.transporter.TUi.bold(t.getContext()));
+        head.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        TextView w = new TextView(this);
+        w.setText(done && when != null ? when : active ? "In progress" : "");
+        w.setTextColor(0xFF9CA3AF);
+        w.setTextSize(11);
+        head.addView(w);
+        text.addView(head);
         TextView b = new TextView(this);
-        b.setText(done && when != null && !when.isEmpty() ? body + "\n" + when : body);
-        b.setTextColor(0xFF475569);
-        b.setTextSize(13);
-        text.addView(t);
+        b.setText(body);
+        b.setTextColor(done || active ? 0xFF6B7280 : 0xFFA1A1AA);
+        b.setTextSize(12);
+        b.setPadding(0, dp(2), 0, 0);
         text.addView(b);
         row.addView(text, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        parent.addView(row);
     }
 
     private int dp(int v) {

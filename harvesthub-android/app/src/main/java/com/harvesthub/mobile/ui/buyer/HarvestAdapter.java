@@ -53,6 +53,21 @@ public class HarvestAdapter extends RecyclerView.Adapter<HarvestAdapter.HarvestV
         Drawable icon = ContextCompat.getDrawable(context, item.getBadgeIconRes());
         holder.tvBadge.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
 
+        // Farmer's own photo of this lot; tap to see both photos and the 10 s video before buying.
+        String photo = item.getCoverPhotoUrl();
+        int count = item.getMediaUrls() == null ? 0 : item.getMediaUrls().size();
+        holder.layoutMedia.setVisibility(photo != null ? View.VISIBLE : View.GONE);
+        if (photo != null) {
+            com.bumptech.glide.Glide.with(holder.ivHarvestPhoto)
+                    .load(com.harvesthub.mobile.ui.common.MediaViewerActivity.absolute(
+                            com.harvesthub.mobile.model.ListingItem.thumbUrl(photo, 640)))   // thumbnail; full photo in the viewer
+                    .centerCrop()
+                    .into(holder.ivHarvestPhoto);
+            holder.tvMediaCount.setText(count > 1 ? "View " + count + " photos & video" : "View photo");
+            holder.layoutMedia.setOnClickListener(v ->
+                    com.harvesthub.mobile.ui.common.MediaViewerActivity.open(v.getContext(), item.getMediaUrls(), item.getCropName(), 0));
+        }
+
         holder.btnPurchaseRequest.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(item);
@@ -73,10 +88,16 @@ public class HarvestAdapter extends RecyclerView.Adapter<HarvestAdapter.HarvestV
         TextView tvLocation;
         TextView tvPrice;
         MaterialButton btnPurchaseRequest;
+        View layoutMedia;
+        android.widget.ImageView ivHarvestPhoto;
+        TextView tvMediaCount;
 
         HarvestViewHolder(View view) {
             super(view);
             tvBadge = view.findViewById(R.id.tvBadge);
+            layoutMedia = view.findViewById(R.id.layoutHarvestMedia);
+            ivHarvestPhoto = view.findViewById(R.id.ivHarvestPhoto);
+            tvMediaCount = view.findViewById(R.id.tvHarvestMediaCount);
             tvListedTime = view.findViewById(R.id.tvListedTime);
             tvCropName = view.findViewById(R.id.tvCropName);
             tvEstimatedQty = view.findViewById(R.id.tvEstimatedQty);
