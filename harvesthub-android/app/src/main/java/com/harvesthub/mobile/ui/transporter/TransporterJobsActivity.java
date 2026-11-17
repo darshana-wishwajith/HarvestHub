@@ -167,6 +167,7 @@ public class TransporterJobsActivity extends AppCompatActivity {
         LinearLayout box = TUi.box(b, TUi.GREY_BG, 14);
         TUi.timeline(box, new String[]{"Pickup", j.pickupAddress, j.farmerName == null ? null : "Farmer: " + j.farmerName},
                 new String[]{"Drop-off", j.dropoffAddress, j.buyerName == null ? null : "Buyer: " + j.buyerName});
+        if (j.pickupDate != null) TUi.text(b, "Pickup date: " + BaseTransporterOrderActivity.day(j.pickupDate), 13, TUi.DARK, true).setPadding(0, TUi.dp(this, 8), 0, 0);
         LinearLayout foot = TUi.hrow(b, 12);
         TUi.icon(foot, R.drawable.ic_location_pin, 14, TUi.INK);
         TUi.fill(foot, " " + TUi.km(j.distanceKm) + "  \u2022  " + JobOfferActivity.duration(j.distanceKm), 13, TUi.INK, false);
@@ -197,6 +198,7 @@ public class TransporterJobsActivity extends AppCompatActivity {
         route.setMaxLines(1);
         route.setEllipsize(android.text.TextUtils.TruncateAt.END);
         TUi.label(rt, "  " + TUi.km(j.distanceKm) + " \u00B7 " + JobOfferActivity.duration(j.distanceKm), 12, TUi.MUTED, false);
+        if (j.pickupDate != null) TUi.text(c, "Pickup " + BaseTransporterOrderActivity.day(j.pickupDate), 12, TUi.DARK, true).setPadding(0, TUi.dp(this, 6), 0, 0);
         TextView more = TUi.text(c, "View Details \u2192", 14, TUi.DARK, true);
         more.setGravity(android.view.Gravity.END);
         more.setPadding(0, TUi.dp(this, 10), 0, 0);

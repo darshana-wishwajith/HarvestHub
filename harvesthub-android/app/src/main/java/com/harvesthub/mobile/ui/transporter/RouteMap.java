@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Tracking;
 import com.harvesthub.mobile.utils.OsmMaps;
+import com.harvesthub.mobile.utils.RoadRoute;
 
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -48,6 +49,10 @@ final class RouteMap {
     private final TextView chipSub;
     private final View chip;
     private boolean framed;
+    private Tracking last;
+    private boolean lastLeg;
+    private List<GeoPoint> road;
+    private String roadKey;
 
     RouteMap(AppCompatActivity activity) {
         this.activity = activity;
@@ -92,9 +97,31 @@ final class RouteMap {
         chipSub.setVisibility(sub == null ? View.GONE : View.VISIBLE);
     }
 
-    /** Pickup and drop-off pins, the vehicle's last GPS point, and a line for the current leg. */
+    /** Pickup and drop-off pins, the vehicle's last GPS point, and the current leg drawn along the roads. */
     void show(Tracking t, boolean legToDrop) {
         if (t == null) return;
+        last = t;
+        lastLeg = legToDrop;
+        GeoPoint from = point(t.pickupLatitude, t.pickupLongitude);
+        GeoPoint to = point(t.dropLatitude, t.dropLongitude);
+        GeoPoint now = point(t.currentLatitude, t.currentLongitude);
+        GeoPoint a = legToDrop ? from : now;
+        GeoPoint b = legToDrop ? to : from;
+        if (a != null && b != null) {
+            String key = (legToDrop ? "D" : "P") + RoadRoute.keyOf(a, b);
+            if (!key.equals(roadKey)) {
+                roadKey = key;
+                RoadRoute.get(a, b, (pts, isRoad) -> {
+                    if (!key.equals(roadKey)) return;
+                    road = pts;
+                    draw(last, lastLeg);
+                });
+            }
+        }
+        draw(t, legToDrop);
+    }
+
+    private void draw(Tracking t, boolean legToDrop) {
         map.getOverlays().removeAll(drawn);
         drawn.clear();
         GeoPoint from = point(t.pickupLatitude, t.pickupLongitude);
@@ -102,14 +129,22 @@ final class RouteMap {
         GeoPoint now = point(t.currentLatitude, t.currentLongitude);
         List<GeoPoint> pts = new ArrayList<>();
         if (legToDrop && from != null && to != null) {
+            List<GeoPoint> r = road != null && roadKey != null && roadKey.startsWith("D") ? road : straight(from, to);
             if (now != null) {
-                line(from, now, 0xFF1B4332, false);   // driven
-                line(now, to, 0xFF8A9A90, true);      // still to go
+                int i = RoadRoute.nearest(r, now);
+                List<GeoPoint> done = new ArrayList<>(r.subList(0, i + 1));
+                done.add(now);
+                List<GeoPoint> todo = new ArrayList<>();
+                todo.add(now);
+                todo.addAll(r.subList(Math.min(i + 1, r.size() - 1), r.size()));
+                line(todo, 0xFF8A9A90, true);    // still to go
+                line(done, 0xFF1B4332, false);   // driven
             } else {
-                line(from, to, 0xFF1B4332, false);
+                line(r, 0xFF1B4332, false);
             }
         } else if (!legToDrop && now != null && from != null) {
-            line(now, from, 0xFF15803D, true);
+            List<GeoPoint> r = road != null && roadKey != null && roadKey.startsWith("P") ? road : straight(now, from);
+            line(r, 0xFF15803D, true);
         }
         if (from != null) {
             marker(from, "Pickup: " + (t.pickupAddress == null ? "farm" : t.pickupAddress), dot(0xFF15803D, 16));
@@ -140,12 +175,16 @@ final class RouteMap {
         return lat == null || lng == null ? null : new GeoPoint(lat, lng);
     }
 
-    private void line(GeoPoint a, GeoPoint b, int color, boolean dashed) {
-        float d = activity.getResources().getDisplayMetrics().density;
-        Polyline l = new Polyline(map);
+    private static List<GeoPoint> straight(GeoPoint a, GeoPoint b) {
         List<GeoPoint> p = new ArrayList<>();
         p.add(a);
         p.add(b);
+        return p;
+    }
+
+    private void line(List<GeoPoint> p, int color, boolean dashed) {
+        float d = activity.getResources().getDisplayMetrics().density;
+        Polyline l = new Polyline(map);
         l.setPoints(p);
         l.getOutlinePaint().setColor(color);
         l.getOutlinePaint().setStrokeWidth(5 * d);

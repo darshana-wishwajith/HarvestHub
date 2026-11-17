@@ -50,6 +50,7 @@ public class TransporterDashboardResponse {
         private double quantityKg;
         private String pickupAddress;
         private String dropoffAddress;
+        private String pickupDate;
         private String farmerName;
         private String buyerName;
         private double distanceKm;

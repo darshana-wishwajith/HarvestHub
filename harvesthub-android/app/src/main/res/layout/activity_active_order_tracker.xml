@@ -209,7 +209,7 @@
                     app:strokeColor="#C8CEC8"
                     app:strokeWidth="1dp">
 
-                    <com.harvesthub.mobile.ui.farmer.DeliveryMapView
+                    <org.osmdroid.views.MapView
                         android:id="@+id/deliveryMap"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />

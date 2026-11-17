@@ -46,6 +46,7 @@ public class TransporterDashboard {
         public double quantityKg;
         public String pickupAddress;
         public String dropoffAddress;
+        public String pickupDate;
         public String farmerName;
         public String buyerName;
         public double distanceKm;

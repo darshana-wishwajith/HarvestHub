@@ -248,7 +248,7 @@ Deliberate design deviations (all user-approved): Order Summary says "Crop Advan
 
 | Area | Progress | Verified by |
 |---|---|---|
-| Backend | Feature-complete for the proposal; deployed (latest JAR sha256 `2b699928…95c9`, 17 Nov 05:30) | 52/52 tests; live HTTPS checks; live end-to-end order (17 Nov) |
+| Backend | Feature-complete for the proposal; deployed (latest JAR sha256 `285df750…614d`, 17 Nov evening) | 52/52 tests; live HTTPS checks; live end-to-end order (17 Nov) |
 | Android | All three roles feature-complete; Figma passes for buyer + transporter done 17 Nov; data audit done | Build + 28/28 unit tests; live login + dashboard/listings/notifications/wallet 200 for all roles. **Latest APK not yet installed / clicked through on a phone** |
 | Desktop | Feature-complete; visual refresh deployed as packaged exe | 14/14 tests; off-screen snapshot checks |
 | Data | Atlas has tagged test data for every stage (`@test.harvesthub.lk`); backups in `backups/` (git-ignored) | Seeder dry runs + read-only checks |
@@ -262,15 +262,15 @@ Overall: **functionally complete (≈95%)**; remaining work is verification on a
 ## 11. Gaps, risks and open items (priority order)
 
 ### 11.1 Critical before the presentation
-1. **Commit and push the work.** `fix/day1-security` holds ~150 uncommitted changes (everything since 13 Nov). One disk failure loses it. Commit only with the user's OK; never commit `application-local.properties`, `local.properties`, `*.pem`, `backups/`, `.env`. Then (with OK) open a PR into `main`.
+1. **Commit and push the work.** The user committed everything up to `c0de213`; the 17 Nov evening fixes (§16 last row) are uncommitted. One disk failure loses it. Commit only with the user's OK; never commit `application-local.properties`, `local.properties`, `*.pem`, `backups/`, `.env`. Then (with OK) open a PR into `main`.
 2. **Install and click through the latest APK** on the demo phone for all three roles (buyer + transporter UI passes of 17 Nov were compile-checked only; transporter screens are built in code, so small spacing/wrapping issues are likely). Build with the production URL (see §12.2).
 3. **Demo data readiness:** pick demo accounts (§12.4) and walk one order end-to-end the evening before; the test order `6afb98943723db762ba52287` was left open on test accounts.
 
 ### 11.2 Known functional limits (acceptable; explain if asked)
 - Chat is polling (proposal mentioned Socket.io).
 - Notifications are in-app only (no push/SMS); password reset codes by email only.
-- OSM maps draw straight lines between points (no road routing in-app); turn-by-turn opens Google Maps.
-- Farmer order tracker shows steps, not a live map.
+- Maps draw the route along real roads with the public OSRM demo router (`utils/RoadRoute`, cached, no login token sent); if it is unreachable the map falls back to a straight line. Turn-by-turn opens Google Maps. The OSRM demo server is fair-use only — fine for the demo, swap for a hosted router before a real launch.
+- Live position = driver phone GPS every 30 s (`TransporterTrackingService`) — needs location permission + the trip notification on the driver's phone.
 - FR-43 24 h reminder not implemented.
 - Legacy endpoints remain: `/auth/*-otp`, `LogisticsController` + `LogisticsService.estimateDistance` (fixed city table, not used by the app), `crop_batches`.
 - ~10 unreachable legacy Android screens + old `transporter_activity_*.xml` layouts (§6.2).
@@ -375,5 +375,6 @@ Atlas is shared live data. Inserts of tagged test data are allowed; **no deletes
 ## 16. Change log of this file
 | Date | By | Change |
 |---|---|---|
+| 2026-11-17 | Claude (Opus 5.5) | Live tracking fixes: new farmer "Live Delivery" screen (`OrderInTransitActivity`, real OSM map + ETA/route/driver/payment/steps) and real map in the farmer tracker (fake `DeliveryMapView` deleted); road-following routes (`RoadRoute` + shared `TripMap`, also buyer tracking and transporter `RouteMap`); pickup date on transporter job offer / pickup screen / job cards (backend adds `pickupDate` to the job DTO — deployed 17 Nov, JAR `285df750…614d`); fixed buyer crash loop after paying the 80% balance (`DeliveryHandshakeActivity` cast `AppCompatButton` to `MaterialButton`); checkout no longer opens a screen behind the success dialog. Build + 28/28; backend compiles; install was blocked on the phone (accept the prompt). Rollback point = commit `c0de213`. |
 | 2026-11-17 | Claude (Opus 5.5) | Buyer UX pass: 5-tab bottom bar, new Account tab, Home/Orders/Harvest Tracker rebuilt with TUi kit, wallet rows; installed |
 | 2026-11-17 | Claude (Fable 5.2 / Opus 5.5) | Created: full project analysis vs proposal + workflow, architecture, workflow/state machine, rules, UI inventory, progress, gaps, continuation guide |

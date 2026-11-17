@@ -223,6 +223,23 @@ public abstract class BaseTransporterOrderActivity extends AppCompatActivity {
         return com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(iso);
     }
 
+    /** "Thu, 20 Nov" (+ "today"/"tomorrow") from the agreed ISO pickup / delivery date; "Not set" when missing. */
+    public static String day(String iso) {
+        if (iso == null || iso.length() < 10) return "Not set";
+        try {
+            java.text.SimpleDateFormat in = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+            java.util.Date d = in.parse(iso.substring(0, 10));
+            String out = new java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale.US).format(d);
+            String today = in.format(new java.util.Date());
+            String tomorrow = in.format(new java.util.Date(System.currentTimeMillis() + 86_400_000L));
+            if (iso.startsWith(today)) return out + " (today)";
+            if (iso.startsWith(tomorrow)) return out + " (tomorrow)";
+            return out;
+        } catch (Exception e) {
+            return iso;
+        }
+    }
+
     protected String ref() {
         return "#" + order.shortId();
     }
