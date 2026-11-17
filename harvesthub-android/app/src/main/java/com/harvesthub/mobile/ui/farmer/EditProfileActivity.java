@@ -95,6 +95,12 @@ public class EditProfileActivity extends AppCompatActivity {
         binding.etEmail.setText(profile.getEmail());
         binding.etPhone.setText(profile.getPhoneNumber());
         binding.etNic.setText(profile.getNic());
+        // NIC is a verified identity attribute: the server never changes it, so don't let it look editable
+        binding.etNic.setEnabled(false);
+        binding.tilNic.setHelperText("NIC is verified at registration and can't be changed here.");
+        if (selectedImageUri == null && profile.getProfilePhotoUrl() != null && !profile.getProfilePhotoUrl().isEmpty()) {
+            com.harvesthub.mobile.utils.RemoteImage.load(binding.ivProfileLarge, profile.getProfilePhotoUrl());
+        }
         if (profile.getPasswordLastUpdated() != null) {
             binding.tvLastUpdated.setText("Last updated " + profile.getPasswordLastUpdated());
         }
@@ -114,8 +120,8 @@ public class EditProfileActivity extends AppCompatActivity {
             binding.tilFullName.setError("Name is required");
             isValid = false;
         }
-        if (nic.isEmpty()) {
-            binding.tilNic.setError("NIC is required");
+        if (!phone.matches("^\\d{10}$")) {
+            binding.tilPhone.setError("Enter a 10-digit phone number, e.g. 0771234567");
             isValid = false;
         }
 
@@ -131,24 +137,60 @@ public class EditProfileActivity extends AppCompatActivity {
 
         MultipartBody.Part body = null;
         if (selectedImageUri != null) {
-            // Real app would handle file conversion
+            body = photoPart(selectedImageUri);
+            if (body == null) {
+                Toast.makeText(this, "Could not read that photo. Choose a JPG or PNG under 5 MB.", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
 
+        binding.btnSaveChanges.setEnabled(false);
         apiService.updateFarmerProfile(farmerId, rbName, rbPhone, rbNic, body).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                binding.btnSaveChanges.setEnabled(true);
                 if (response.isSuccessful()) {
+                    // keep the signed-in copy in step, so greetings and headers show the new name at once
+                    com.harvesthub.mobile.utils.SessionManager sm = new com.harvesthub.mobile.utils.SessionManager(EditProfileActivity.this);
+                    com.harvesthub.mobile.model.User u = sm.getUser();
+                    if (u != null) {
+                        u.setFullName(name);
+                        u.setMobileNumber(phone);
+                        sm.saveUser(u);
+                    }
                     Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(EditProfileActivity.this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProfileActivity.this, com.harvesthub.mobile.utils.AuthInputUtils.errorMessage(response,
+                            "Failed to update profile"), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                binding.btnSaveChanges.setEnabled(true);
+                Toast.makeText(EditProfileActivity.this, R.string.fp_network_error, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /** Reads the picked image into a "photo" multipart part (the server checks the type and size). */
+    private MultipartBody.Part photoPart(Uri uri) {
+        try (java.io.InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) return null;
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                out.write(buf, 0, n);
+                if (out.size() > 5 * 1024 * 1024) return null;
+            }
+            String type = getContentResolver().getType(uri);
+            if (type == null || !type.startsWith("image/")) type = "image/jpeg";
+            RequestBody rb = RequestBody.create(MediaType.parse(type), out.toByteArray());
+            return MultipartBody.Part.createFormData("photo", type.endsWith("png") ? "profile.png" : "profile.jpg", rb);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -53,6 +53,7 @@ public class VehicleArrivalActivity extends BaseOrderActivity {
         setText(R.id.tvEtaLabel, "CURRENT STEP");
         setText(R.id.tvEta, eta);
         setText(R.id.tvDriverName, o.getTransporterName() != null ? o.getTransporterName() : "—");
+        setText(R.id.tvDriverAvatar, ChatActivity.initials(o.getTransporterName()));
         setText(R.id.tvVehicleValue, o.getVehiclePlate() != null ? o.getVehiclePlate() : "—");
         setText(R.id.tvCapacity, o.getVehicleLabel() != null ? o.getVehicleLabel() : "—");
     }

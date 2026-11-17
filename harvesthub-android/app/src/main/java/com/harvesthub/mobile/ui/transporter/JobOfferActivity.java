@@ -3,6 +3,7 @@ package com.harvesthub.mobile.ui.transporter;
 import android.content.Intent;
 import android.graphics.Color;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,10 @@ public class JobOfferActivity extends BaseTransporterOrderActivity {
         LinearLayout hr = TUi.hrow(head, 0);
         TUi.fill(hr, "\u25CF  PRIORITY MATCH", 12, Color.parseColor("#A7F3D0"), true).setLetterSpacing(0.05f);
         timer = TUi.label(hr, "", 14, Color.parseColor("#86EFAC"), true);
+        if (o.offeredCount() > 1) {
+            TUi.text(head, "Sent to " + o.offeredCount() + " nearby drivers – the first to accept gets the job", 13,
+                    Color.parseColor("#D1FAE5"), false).setPadding(0, TUi.dp(this, 6), 0, 0);
+        }
         bar = TUi.progress(head, 100, 10);
         bar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#86EFAC")));
         bar.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#2D6A4F")));
@@ -117,7 +122,8 @@ public class JobOfferActivity extends BaseTransporterOrderActivity {
     @Override
     protected boolean handOver(Order o) {
         // after a decline / expiry the order belongs to someone else → back to the Jobs list
-        if (!session.getUserId().equals(o.getTransporterId())) {
+        if (!o.isForDriver(session.getUserId())) {
+            if (o.getTransporterId() != null) Toast.makeText(this, "Another driver accepted this job first.", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, TransporterJobsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
             return true;

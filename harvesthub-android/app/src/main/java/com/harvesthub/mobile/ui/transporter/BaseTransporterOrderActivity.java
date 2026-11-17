@@ -100,6 +100,13 @@ public abstract class BaseTransporterOrderActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Order> call, @NonNull Response<Order> response) {
                 if (isFinishing()) return;
+                if (response.code() == 403) { // a broadcast request another driver accepted first
+                    Toast.makeText(BaseTransporterOrderActivity.this, "This job was taken by another driver.", Toast.LENGTH_LONG).show();
+                    startActivity(new android.content.Intent(BaseTransporterOrderActivity.this, TransporterJobsActivity.class)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    finish();
+                    return;
+                }
                 if (!response.isSuccessful() || response.body() == null) {
                     Toast.makeText(BaseTransporterOrderActivity.this, "Could not load the job.", Toast.LENGTH_SHORT).show();
                     return;
