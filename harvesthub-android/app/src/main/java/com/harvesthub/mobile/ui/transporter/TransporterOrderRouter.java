@@ -24,7 +24,7 @@ public final class TransporterOrderRouter {
 
     public static Class<? extends Activity> screenFor(Order o, String myUserId) {
         String s = o.getStatus() == null ? "" : o.getStatus();
-        boolean mine = myUserId != null && myUserId.equals(o.getTransporterId());
+        boolean mine = o.isForDriver(myUserId);
         if (!mine) return JobHistoryActivity.class; // request moved to another driver
         switch (s) {
             case "TRANSPORTER_ASSIGNED":

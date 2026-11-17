@@ -34,6 +34,8 @@ public class MarketplaceRules {
     private double defaultTruckSpeedKmh = 40;
     /** A job request sent to a driver expires after this time and goes to the next driver (decision 15 Nov). */
     private int transportRequestMinutes = 10;
+    /** A job request goes to this many nearest matching free drivers at once; the first to accept gets it (decision 18 Nov). */
+    private int dispatchBroadcastSize = 5;
     /** Pre-loading photos the driver must upload before buyer approval (decision 15 Nov: 2..4). */
     private int minLoadingPhotos = 2;
     private int maxLoadingPhotos = 4;

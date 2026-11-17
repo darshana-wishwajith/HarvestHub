@@ -13,15 +13,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
- * Smart dispatch (workflow 3.3): after the advance payment, offer the job to the nearest available
- * transporter whose vehicle can carry the load. Declines go to the next driver; with no driver the order
- * waits as PAUSED and is retried every 2 minutes (proposal §6.9 "Paused").
+ * Smart dispatch (workflow 3.3): after the advance payment, the job request is broadcast to the nearest available
+ * transporters whose vehicle can carry the load (up to {@code dispatch-broadcast-size}); the first driver to accept
+ * gets the order (decision 18 Nov - faster than offering one driver at a time). If they all decline or the request
+ * expires, it goes to the next nearest drivers; with no driver the order waits as PAUSED and is retried every
+ * 2 minutes (proposal §6.9 "Paused").
  */
 @Service
 public class DispatchService {
@@ -49,9 +51,16 @@ public class DispatchService {
     public Order dispatch(Order order) {
         LogisticsRecord lr = logistics.findByOrderId(order.getOrderId()).orElse(null);
         if (lr == null) throw new IllegalStateException("Order has no logistics plan");
-        Optional<User> best = candidates(order.getQuantity(), lr).stream()
-                .min(Comparator.comparingDouble(t -> distanceKm(t, lr)));
-        if (best.isEmpty()) {
+        List<User> nearest = candidates(order.getQuantity(), lr).stream()
+                .sorted(Comparator.comparingDouble(t -> distanceKm(t, lr)))
+                .limit(Math.max(1, rules.getDispatchBroadcastSize()))
+                .toList();
+        if (nearest.isEmpty()) {
+            if ("PAUSED".equals(order.getStatus()) && !lr.getDeclinedTransporterIds().isEmpty()) {
+                // everyone who could carry it declined or let it expire: give them another chance on the next retry
+                lr.getDeclinedTransporterIds().clear();
+                logistics.save(lr);
+            }
             if (!"PAUSED".equals(order.getStatus())) {
                 OrderService.setStatus(order, "PAUSED", "No vehicle available – waiting for a transporter");
                 notifications.notify(order.getFarmerId(), "ORDERS", "DISPATCH",
@@ -60,19 +69,25 @@ public class DispatchService {
             }
             return orders.save(order);
         }
-        User t = best.get();
-        order.setTransporterId(t.getId());
-        order.setTransporterName(t.getFullName());
-        order.setTransporterPhone(t.getMobileNumber());
-        order.setVehiclePlate(t.getVehiclePlate());
-        lr.setTransporterId(t.getId());
+        // nobody owns the job until one of the drivers accepts it
+        order.setTransporterId(null);
+        order.setTransporterName(null);
+        order.setTransporterPhone(null);
+        order.setVehiclePlate(null);
+        lr.setTransporterId(null);
         logistics.save(lr);
+        List<String> ids = new ArrayList<>();
+        nearest.forEach(t -> ids.add(t.getId()));
+        order.setOfferedTransporterIds(ids);
         order.setTransportRequestExpiresAt(System.currentTimeMillis() + rules.getTransportRequestMinutes() * 60_000L);
-        OrderService.setStatus(order, "TRANSPORTER_ASSIGNED", "Transport request sent to " + t.getFullName());
-        notifications.notify(t.getId(), "ORDERS", "TRANSPORT_REQUEST", "New delivery job",
-                String.format("%s, %,.0f kg, %.1f km. Pickup %s. Accept or decline within " + rules.getTransportRequestMinutes() + " minutes in Jobs.",
-                        order.getCropName(), order.getQuantity(), lr.getDistanceKm(),
-                        order.getPickupAddress() == null ? "at the farm" : order.getPickupAddress()));
+        OrderService.setStatus(order, "TRANSPORTER_ASSIGNED", "Job request sent to " + ids.size()
+                + (ids.size() == 1 ? " nearby driver" : " nearby drivers - first to accept gets it"));
+        String msg = String.format("%s, %,.0f kg, %.1f km. Pickup %s. %s within %d minutes in Jobs.",
+                order.getCropName(), order.getQuantity(), lr.getDistanceKm(),
+                order.getPickupAddress() == null ? "at the farm" : order.getPickupAddress(),
+                ids.size() == 1 ? "Accept or decline" : "Sent to " + ids.size() + " nearby drivers - the first to accept gets it. Answer",
+                rules.getTransportRequestMinutes());
+        for (String id : ids) notifications.notify(id, "ORDERS", "TRANSPORT_REQUEST", "New delivery job", msg);
         return orders.save(order);
     }
 

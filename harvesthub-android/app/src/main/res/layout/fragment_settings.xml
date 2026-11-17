@@ -60,10 +60,11 @@
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:gravity="center"
+                            android:background="@drawable/bg_avatar_initials"
                             android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="K"
-                            android:textColor="#073B27"
-                            android:textSize="36sp" />
+                            android:textColor="#FFFFFF"
+                            android:textSize="34sp" />
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/btnEditPhoto"

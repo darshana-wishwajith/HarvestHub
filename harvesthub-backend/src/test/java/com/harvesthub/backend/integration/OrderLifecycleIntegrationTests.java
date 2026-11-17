@@ -171,13 +171,18 @@ class OrderLifecycleIntegrationTests {
         assertEquals(p.path("advanceCropPortion").asDouble() + transport + p.path("buyerFee").asDouble(),
                 p.path("advanceDue").asDouble(), 0.01);
 
-        // nearest driver gets it first; farmer must not start before a driver accepts
-        assertEquals(nearDriver.getId(), o.path("transporterId").asText());
+        // request goes to all nearby drivers (nearest first); farmer must not start before one accepts
+        assertEquals(nearDriver.getId(), o.path("offeredTransporterIds").get(0).asText());
+        assertEquals(farDriver.getId(), o.path("offeredTransporterIds").get(1).asText());
         bad(farmer, "/orders/" + id + "/events", Map.of("event", "START_HARVESTING"));
 
-        // decline → rerouted to the next driver
-        assertEquals(farDriver.getId(), transport(nearDriver, id, "DECLINE").path("transporterId").asText());
-        assertEquals("TRANSPORTER_ACCEPTED", transport(farDriver, id, "ACCEPT").path("status").asText());
+        // one declines → the other can still accept
+        JsonNode d = transport(nearDriver, id, "DECLINE");
+        assertEquals("TRANSPORTER_ASSIGNED", d.path("status").asText());
+        assertEquals(1, d.path("offeredTransporterIds").size());
+        JsonNode acc = transport(farDriver, id, "ACCEPT");
+        assertEquals("TRANSPORTER_ACCEPTED", acc.path("status").asText());
+        assertEquals(farDriver.getId(), acc.path("transporterId").asText());
         assertTrue(notifications.findByFarmerIdOrderByTimestampDesc(farmer.getId()).stream()
                 .anyMatch(n -> "Vehicle Assigned - Start Harvesting".equals(n.getTitle())));
 

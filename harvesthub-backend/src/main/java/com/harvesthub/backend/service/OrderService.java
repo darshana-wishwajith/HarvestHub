@@ -110,7 +110,10 @@ public class OrderService {
     }
 
     public List<Order> getOrdersByTransporter(String transporterId, String status) {
-        List<Order> all = orderRepository.findByTransporterId(transporterId);
+        List<Order> all = new ArrayList<>(orderRepository.findByTransporterId(transporterId));
+        for (Order o : orderRepository.findByStatusAndOfferedTransporterIds("TRANSPORTER_ASSIGNED", transporterId)) {
+            if (all.stream().noneMatch(x -> x.getOrderId().equals(o.getOrderId()))) all.add(o); // open broadcast requests
+        }
         return sorted(status == null || status.isBlank() ? all
                 : all.stream().filter(o -> status.equalsIgnoreCase(o.getStatus())).toList());
     }
@@ -443,10 +446,11 @@ public class OrderService {
         }
     }
 
-    /** Declined or expired job request: remember the driver, then send it to the next one (workflow 3.3). */
-    private Order reroute(Order o, String tid, String note) {
+    /** Declined or expired job request: remember the drivers, then send it to the next nearest ones (workflow 3.3). */
+    private Order reroute(Order o, java.util.Collection<String> skip, String note) {
         LogisticsRecord lr = logistics.findByOrderId(o.getOrderId()).orElseThrow();
-        lr.getDeclinedTransporterIds().add(tid);
+        for (String id : skip) if (id != null && !lr.getDeclinedTransporterIds().contains(id)) lr.getDeclinedTransporterIds().add(id);
+        o.setOfferedTransporterIds(new ArrayList<>());
         lr.setTransporterId(null);
         logistics.save(lr);
         o.setTransporterId(null);
@@ -464,11 +468,12 @@ public class OrderService {
         long nowMs = System.currentTimeMillis();
         for (Order o : orderRepository.findByStatus("TRANSPORTER_ASSIGNED")) {
             if (o.getTransportRequestExpiresAt() == null || o.getTransportRequestExpiresAt() > nowMs) continue;
-            String tid = o.getTransporterId();
+            java.util.List<String> waiting = new ArrayList<>(o.getOfferedTransporterIds() == null ? java.util.List.of() : o.getOfferedTransporterIds());
+            if (o.getTransporterId() != null && !waiting.contains(o.getTransporterId())) waiting.add(o.getTransporterId());
             try {
-                reroute(o, tid, "Job request expired – rerouting");
-                if (tid != null) notifications.notify(tid, "ORDERS", "REQUEST_EXPIRED", "Job request expired",
-                        "You did not answer the request for order " + o.getOrderId() + " in time, so it went to another driver.");
+                reroute(o, waiting, "Job request expired – rerouting");
+                for (String tid : waiting) notifications.notify(tid, "ORDERS", "REQUEST_EXPIRED", "Job request expired",
+                        "The request for order " + o.getOrderId() + " was not accepted in time, so it went to other drivers.");
             } catch (Exception e) {
                 org.slf4j.LoggerFactory.getLogger(OrderService.class).warn("Expiry of {} failed: {}", o.getOrderId(), e.getMessage());
             }
@@ -477,11 +482,19 @@ public class OrderService {
 
     // ------------------------------------------------------------------ transporter events
 
-    public Order applyTransporterEvent(String orderId, TransporterEventRequest request) {
+    /** synchronized: when a request is broadcast, two drivers may accept at the same moment - only the first wins. */
+    public synchronized Order applyTransporterEvent(String orderId, TransporterEventRequest request) {
         Order o = require(orderId);
         String event = request.getEventType() == null ? "" : request.getEventType();
         String tid = request.getTransporterId();
-        if (tid == null || !tid.equals(o.getTransporterId())) throw new IllegalStateException("You are not assigned to this order");
+        boolean offered = "TRANSPORTER_ASSIGNED".equals(o.getStatus()) && o.getOfferedTransporterIds() != null
+                && o.getOfferedTransporterIds().contains(tid) && ("ACCEPT".equals(event) || "DECLINE".equals(event));
+        if (tid == null || !(tid.equals(o.getTransporterId()) || offered)) {
+            if ("ACCEPT".equals(event) && tid != null && o.getTransporterId() != null) {
+                throw new IllegalStateException("Another driver accepted this job first");
+            }
+            throw new IllegalStateException("You are not assigned to this order");
+        }
         record(o, request);
         switch (event) {
             case "ACCEPT" -> {
@@ -490,6 +503,19 @@ public class OrderService {
                     throw new IllegalStateException("This job request has expired and was sent to another driver");
                 }
                 o.setTransportRequestExpiresAt(null);
+                java.util.List<String> others = new ArrayList<>(o.getOfferedTransporterIds() == null ? java.util.List.of() : o.getOfferedTransporterIds());
+                others.remove(tid);
+                if (o.getTransporterId() == null) { // broadcast request: this driver was first
+                    User t = users.findById(tid).orElseThrow(() -> new IllegalStateException("Driver not found"));
+                    o.setTransporterId(tid);
+                    o.setTransporterName(t.getFullName());
+                    o.setTransporterPhone(t.getMobileNumber());
+                    o.setVehiclePlate(t.getVehiclePlate());
+                    logistics.findByOrderId(o.getOrderId()).ifPresent(lr -> { lr.setTransporterId(tid); logistics.save(lr); });
+                }
+                o.setOfferedTransporterIds(new ArrayList<>());
+                for (String other : others) notifications.notify(other, "ORDERS", "REQUEST_TAKEN", "Job taken",
+                        "Another driver accepted order " + orderId + " first.");
                 setStatus(o, "TRANSPORTER_ACCEPTED", "Transporter accepted the job");
                 users.findById(tid).ifPresent(t -> { t.setAvailable(false); users.save(t); });
                 notifications.notify(o.getFarmerId(), "ORDERS", "VEHICLE_ASSIGNED", "Vehicle Assigned - Start Harvesting",
@@ -501,7 +527,16 @@ public class OrderService {
             }
             case "DECLINE" -> {
                 expect(o, "TRANSPORTER_ASSIGNED");
-                return reroute(o, tid, "Transporter declined – rerouting");
+                if (o.getTransporterId() == null && o.getOfferedTransporterIds() != null && o.getOfferedTransporterIds().size() > 1) {
+                    // broadcast request: drop this driver; the others can still accept
+                    o.getOfferedTransporterIds().remove(tid);
+                    logistics.findByOrderId(o.getOrderId()).ifPresent(lr -> {
+                        if (!lr.getDeclinedTransporterIds().contains(tid)) lr.getDeclinedTransporterIds().add(tid);
+                        logistics.save(lr);
+                    });
+                    return orderRepository.save(o);
+                }
+                return reroute(o, java.util.List.of(tid), "Transporter declined – rerouting");
             }
             case "LOCATION" -> {
                 // live tracking point only (workflow 4.3); no status change

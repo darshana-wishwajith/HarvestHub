@@ -30,7 +30,7 @@ public final class OrderFlowRouter {
         if (myUserId != null && myUserId.equals(o.getBuyerId())) { // the buyer has its own screens
             return com.harvesthub.mobile.ui.buyer.BuyerOrderRouter.screenFor(o, myUserId);
         }
-        if (myUserId != null && myUserId.equals(o.getTransporterId())) { // so does the driver
+        if (o.isForDriver(myUserId)) { // so does the driver (also for a job request broadcast to them)
             return com.harvesthub.mobile.ui.transporter.TransporterOrderRouter.screenFor(o, myUserId);
         }
         String s = o.getStatus() == null ? "" : o.getStatus();
