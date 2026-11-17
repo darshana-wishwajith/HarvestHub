@@ -33,6 +33,20 @@ public class MediaController {
         return ResponseEntity.ok(Map.of("url", url, "filename", url.substring(url.lastIndexOf('/') + 1)));
     }
 
+    /** Small JPEG of a stored photo (list rows, cards): /uploads/thumb/{name}?size=160|320|640. */
+    @GetMapping("/uploads/thumb/{name}")
+    public ResponseEntity<Resource> getThumbnail(@PathVariable String name, @RequestParam(defaultValue = "320") int size) {
+        Path p = storage.thumbnail(name, size);
+        if (p == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(30)))
+                .header("X-Content-Type-Options", "nosniff")
+                .body(new FileSystemResource(p));
+    }
+
     /** Serves stored media. Names are random UUIDs, so they are not guessable. */
     @GetMapping("/uploads/{name}")
     public ResponseEntity<Resource> getMedia(@PathVariable String name) {

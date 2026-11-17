@@ -43,7 +43,7 @@ public class UsersPage implements Page {
 
     @Override
     public Node view() {
-        HBox chips = Ui.row(8);
+        HBox chips = Ui.segmented();
         String[][] options = {{"All", "all"}, {"Farmers", "FARMER"}, {"Buyers", "BUYER"}, {"Transporters", "TRANSPORTER"}, {"Officers", "OFFICER"}};
         for (String[] o : options) {
             ToggleButton t = Ui.chip(o[0], roles);

@@ -1,7 +1,10 @@
 package com.harvesthub.mobile.ui.transporter;
 
 import android.os.Bundle;
+import android.graphics.Color;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import com.harvesthub.mobile.R;
 
 import androidx.annotation.NonNull;
 
@@ -23,7 +26,7 @@ public class ArrivingPickupActivity extends BaseTransporterOrderActivity {
 
     @Override
     protected String title() {
-        return "Pickup Route";
+        return "Pickup Route Map";
     }
 
     @Override
@@ -52,27 +55,43 @@ public class ArrivingPickupActivity extends BaseTransporterOrderActivity {
     @Override
     protected void bind(@NonNull Order o, @NonNull LinearLayout c, @NonNull LinearLayout actions) {
         boolean ready = "HARVEST_READY".equals(o.getStatus());
-        LinearLayout stop = TUi.card(c);
-        TUi.pill(stop, ready ? "PICKUP • Harvest ready" : "PICKUP • Farmer is harvesting", ready ? TUi.SURFACE : TUi.AMBER_BG, ready ? TUi.DARK : TUi.AMBER);
-        TUi.text(stop, o.getFarmerName() == null ? "Farm pickup" : o.getFarmerName(), 20, TUi.DARK, true);
-        TUi.body(stop, o.getPickupAddress() == null ? "Pickup address not set" : o.getPickupAddress());
-        if (!ready) {
-            TUi.body(stop, "You'll get a notification with the exact pickup pin when the farmer taps Harvest Ready. "
-                    + "You can already head towards the farm.");
+        if (map != null) {
+            map.chip(ready ? "Harvest ready \u2013 head to the farm" : "Farmer is harvesting",
+                    o.getPickupAddress() == null ? null : "Pickup: " + o.getPickupAddress());
         }
-        TUi.row(stop, "Cargo", cargo(o));
-        TUi.row(stop, "Order", ref());
-        if (o.getDistanceKm() != null) TUi.row(stop, "Farm → buyer", TUi.km(o.getDistanceKm()));
-        TUi.row(stop, "Your payout", rs(o.driverPayout()), TUi.DARK, true);
+        LinearLayout stop = TUi.card(c);
+        LinearLayout tags = TUi.hrow(stop, 0);
+        TUi.tag(tags, "PICKUP STOP", TUi.DARK, Color.WHITE);
+        TextView st = TUi.tag(tags, ready ? "Harvest ready" : "Farmer harvesting", ready ? TUi.MINT : TUi.AMBER_BG, ready ? TUi.MINT_INK : TUi.AMBER);
+        ((LinearLayout.LayoutParams) st.getLayoutParams()).leftMargin = TUi.dp(this, 8);
+        TUi.text(stop, o.getFarmerName() == null ? "Farm pickup" : o.getFarmerName(), 22, TUi.DARK, true).setPadding(0, TUi.dp(this, 8), 0, 0);
+        LinearLayout ad = TUi.hrow(stop, 4);
+        TUi.icon(ad, R.drawable.ic_dock_terminal, 16, TUi.MUTED);
+        TextView at = TUi.fill(ad, o.getPickupAddress() == null ? "Pickup address not set" : o.getPickupAddress(), 14, TUi.MUTED, false);
+        ((LinearLayout.LayoutParams) at.getLayoutParams()).leftMargin = TUi.dp(this, 6);
 
-        LinearLayout info = TUi.card(c, TUi.GREY_BG, TUi.GREY_BG);
-        TUi.text(info, "At the farm", 14, TUi.DARK, true);
-        TUi.body(info, "Inspect the harvest and take at least 2 photos before loading. The buyer approves them remotely; "
-                + "Start Journey stays locked until then.");
+        LinearLayout info = TUi.box(stop, TUi.GREY_BG, 14);
+        LinearLayout ir = TUi.hrow(info, 0);
+        ir.setGravity(android.view.Gravity.TOP);
+        TUi.iconTile(ir, R.drawable.ic_info_outline, 34, TUi.DARK, Color.WHITE, false);
+        LinearLayout it = TUi.col(ir, 1f);
+        it.setPadding(TUi.dp(this, 10), 0, 0, 0);
+        TUi.text(it, "PICKUP INSTRUCTIONS", 12, TUi.INK, true);
+        TUi.text(it, ready ? "Inspect the harvest and take at least 2 photos before loading. The buyer approves them remotely; Start Journey stays locked until then."
+                : "You'll get a notification with the exact pickup pin when the farmer taps Harvest Ready. You can already head towards the farm.",
+                13, Color.parseColor("#374151"), false);
 
-        TUi.secondary(actions, "Open navigation in Google Maps", v -> RouteMap.navigate(this,
-                tracking == null ? null : tracking.pickupLatitude, tracking == null ? null : tracking.pickupLongitude));
-        TUi.primary(actions, ready ? "✓  Confirm Arrival at Pickup" : "Waiting for Harvest Ready…",
-                v -> sendEvent("ARRIVED_PICKUP", "Arrived at the farm", null, v)).setEnabled(ready);
+        LinearLayout t1 = TUi.tiles(stop);
+        TUi.tile(t1, R.drawable.ic_tractor, "Cargo Type", o.getCropName() == null ? "Produce" : o.getCropName(), null);
+        TUi.tile(t1, R.drawable.ic_scale_manifest, "Payload Weight", String.format(java.util.Locale.US, "%,.0f kg", o.getQuantity()), null);
+        LinearLayout t2 = TUi.tiles(stop);
+        TUi.tile(t2, R.drawable.ic_route, "Farm \u2192 Buyer", o.getDistanceKm() == null ? "\u2014" : TUi.km(o.getDistanceKm()), "Order " + ref());
+        TUi.tile(t2, R.drawable.ic_banknote, "Your Payout", rs(o.driverPayout()), "On delivery");
+
+        TUi.iconButton(actions, "Open Navigation in Google Maps", R.drawable.ic_navigation_pointer, Color.parseColor("#E9E7E5"), TUi.INK,
+                v -> RouteMap.navigate(this, tracking == null ? null : tracking.pickupLatitude, tracking == null ? null : tracking.pickupLongitude));
+        TUi.iconButton(actions, ready ? "Confirm Arrival at Pickup" : "Waiting for Harvest Ready\u2026", R.drawable.ic_check_circle_outline_white,
+                TUi.DARK, Color.WHITE, v -> sendEvent("ARRIVED_PICKUP", "Arrived at the farm", null, v)).setEnabled(ready);
     }
+
 }

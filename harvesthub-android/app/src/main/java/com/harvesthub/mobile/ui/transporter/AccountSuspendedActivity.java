@@ -1,5 +1,7 @@
 package com.harvesthub.mobile.ui.transporter;
 
+import com.harvesthub.mobile.R;
+import android.graphics.Color;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
@@ -57,27 +59,39 @@ public class AccountSuspendedActivity extends AppCompatActivity {
     private void render(TransporterDashboard d) {
         content.removeAllViews();
         if (!d.suspended) {
-            TUi.banner(content, TUi.SURFACE, TUi.DARK, "✓ Your account is active", "Your wallet balance is " + TUi.rs(d.balance) + ".");
-            TUi.primary(content, "Back to Home", v -> finish());
+            TUi.notice(content, R.drawable.ic_check, Color.parseColor("#D7F5DD"), Color.parseColor("#15803D"), "Your Account Is Active",
+                    "Your wallet balance is " + TUi.rs(d.balance) + ". You can receive job requests again.");
+            TUi.iconButton(content, "Back to Home", R.drawable.transporter_ic_bottom_home, TUi.DARK, Color.WHITE, v -> finish());
             return;
         }
-        LinearLayout b = TUi.banner(content, TUi.RED_BG, TUi.RED, "Account locked – balance below zero",
-                "A damage charge for a rejected delivery took your wallet below zero. You get no new job requests until it is paid back.");
-        TUi.big(b, "-" + TUi.rs(d.amountOwed), TUi.RED);
-        TUi.row(b, "Damage charges (all time)", "-" + TUi.rs(d.damageChargesTotal), TUi.RED, false);
+        LinearLayout b = TUi.card(content, TUi.RED_BG, TUi.RED_BG);
+        LinearLayout hr = TUi.hrow(b, 0);
+        hr.setGravity(android.view.Gravity.TOP);
+        TUi.iconTile(hr, R.drawable.ic_wallet_frozen, 42, TUi.RED, Color.WHITE, true);
+        LinearLayout ht = TUi.col(hr, 1f);
+        ht.setPadding(TUi.dp(this, 12), 0, 0, 0);
+        TUi.pill(ht, "\u26A0 ACCOUNT LOCKED", Color.WHITE, TUi.RED).setTextSize(10);
+        TUi.text(ht, "Wallet Balance Below Zero", 19, TUi.RED, true);
+        TUi.text(ht, "A damage charge for a rejected delivery took your wallet below zero. You get no new job requests until it is paid back.",
+                13, TUi.RED, false);
+        LinearLayout owed = TUi.box(b, Color.WHITE, 12);
+        TUi.text(owed, "AMOUNT TO PAY BACK", 11, TUi.MUTED, true);
+        TUi.text(owed, "-" + TUi.rs(d.amountOwed), 28, TUi.RED, true);
+        TUi.row(owed, "Damage charges (all time)", "-" + TUi.rs(d.damageChargesTotal), TUi.RED, false);
 
-        LinearLayout h = TUi.card(content);
-        TUi.title(h, "How to reactivate");
-        TUi.step(h, "Pay back now with a mock top-up", 1, null);
-        TUi.step(h, "Or wait: payouts from trips still in progress are credited too", 0, null);
-        TUi.step(h, "Disagree? Appeal from the rejected trip in History", 0, null);
+        LinearLayout h = TUi.card(content, TUi.GREY_BG, TUi.GREY_BG);
+        TUi.iconHeader(h, R.drawable.ic_mandatory_protocol, "How to Reactivate", null, 0, 0);
+        TUi.numStep(h, 1, "Pay Back Now", "Use a mock top-up to bring your wallet back to zero.", false);
+        TUi.numStep(h, 2, "Or Wait for Payouts", "Payouts from trips still in progress are credited to the wallet too.", false);
+        TUi.numStep(h, 3, "Disagree?", "Appeal from the rejected trip in History; an officer reviews it.", false);
 
-        TUi.primary(content, "Pay " + TUi.rs(d.amountOwed) + " now", v -> new AlertDialog.Builder(this)
+        TUi.iconButton(content, "Pay " + TUi.rs(d.amountOwed) + " Now", R.drawable.ic_bolt_green, TUi.DARK, Color.WHITE, v -> new AlertDialog.Builder(this)
                 .setTitle("Pay back " + TUi.rs(d.amountOwed) + "?")
                 .setMessage("Mock top-up (no real money).")
                 .setPositiveButton("Pay", (x, y) -> pay(d.amountOwed))
                 .setNegativeButton("Cancel", null).show());
-        TUi.secondary(content, "View trip history", v -> startActivity(new Intent(this, JobHistoryActivity.class)));
+        TUi.iconButton(content, "View Trip History", R.drawable.transporter_ic_bottom_history, Color.parseColor("#E9E7E5"), TUi.INK,
+                v -> startActivity(new Intent(this, JobHistoryActivity.class)));
     }
 
     private void pay(double amount) {

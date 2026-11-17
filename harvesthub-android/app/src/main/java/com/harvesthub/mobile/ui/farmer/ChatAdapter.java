@@ -75,7 +75,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void bind(ChatMessage message) {
             tvMessage.setText(message.getText());
-            tvTimestamp.setText(message.getTimestamp());
+            tvTimestamp.setText(com.harvesthub.mobile.utils.TimeText.chat(message.getTimestamp()));
             if (message.isRead()) {
                 ivReadReceipt.setColorFilter(itemView.getContext().getResources().getColor(R.color.primary_green));
             } else {
@@ -95,7 +95,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void bind(ChatMessage message) {
             tvMessage.setText(message.getText());
-            tvTimestamp.setText(message.getTimestamp());
+            tvTimestamp.setText(com.harvesthub.mobile.utils.TimeText.chat(message.getTimestamp()));
         }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,80 +86,152 @@ public class DeliveryDashboardActivity extends AppCompatActivity {
     private void render() {
         content.removeAllViews();
         TransporterDashboard d = data;
+        int green = Color.parseColor("#15803D");
 
         if (d.suspended) {
-            LinearLayout s = TUi.banner(content, TUi.RED_BG, TUi.RED, "Account suspended",
+            LinearLayout s = TUi.notice(content, R.drawable.ic_wallet_frozen, TUi.RED_BG, TUi.RED, "Account suspended",
                     "Your wallet is " + TUi.rs(d.amountOwed) + " below zero after a damage charge. You get no new jobs until it is paid back.");
-            TUi.button(s, "Pay back now", TUi.RED, Color.WHITE, v -> startActivity(new Intent(this, AccountSuspendedActivity.class)));
+            TUi.smallButton(s, "Pay back now", 0, TUi.RED, Color.WHITE, v -> startActivity(new Intent(this, AccountSuspendedActivity.class)));
         }
 
         // availability
         LinearLayout avail = TUi.card(content);
-        LinearLayout top = new LinearLayout(this);
-        top.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        avail.addView(top);
-        LinearLayout texts = new LinearLayout(this);
-        texts.setOrientation(LinearLayout.VERTICAL);
-        top.addView(texts, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TUi.text(texts, d.online ? "● Available for Hauls" : "○ Offline", 17, d.online ? TUi.DARK : TUi.MUTED, true);
-        TUi.text(texts, d.online ? (d.busy ? "Online • On a job" : "Online • Receiving job requests") : "You will not receive job requests",
-                13, d.online ? TUi.ACCENT : TUi.MUTED, false);
+        LinearLayout top = TUi.hrow(avail, 0);
+        TUi.label(top, "\u25CF", 14, d.online ? green : TUi.MUTED, false);
+        LinearLayout texts = TUi.col(top, 1f);
+        texts.setPadding(TUi.dp(this, 10), 0, 0, 0);
+        TUi.text(texts, d.online ? "Available for Hauls" : "Offline", 16, TUi.INK, true);
+        TUi.text(texts, d.online ? (d.busy ? "Online \u2022 On a job" : "Online \u2022 Receiving Offers") : "You will not receive job requests",
+                12, d.online ? green : TUi.MUTED, true);
         SwitchCompat sw = new SwitchCompat(this);
         sw.setChecked(d.online);
+        sw.setThumbTintList(android.content.res.ColorStateList.valueOf(Color.WHITE));
+        sw.setTrackTintList(android.content.res.ColorStateList.valueOf(d.online ? TUi.DARK : Color.parseColor("#CBD5E1")));
         sw.setOnCheckedChangeListener((b, on) -> setOnline(on, sw));
         top.addView(sw);
-        TUi.row(avail, "This week", TUi.rs(d.earningsWeek) + " • " + d.tripsThisWeek + " trips");
+        LinearLayout wk = TUi.box(avail, TUi.GREY_BG, 12);
+        LinearLayout wr = TUi.hrow(wk, 0);
+        TUi.icon(wr, R.drawable.ic_navigation_pointer, 16, TUi.INK);
+        TextView week = TUi.fill(wr, "+" + TUi.rs(d.earningsWeek) + " this week", 13, TUi.INK, true);
+        ((LinearLayout.LayoutParams) week.getLayoutParams()).leftMargin = TUi.dp(this, 8);
+        TUi.tag(wr, d.tripsThisWeek + (d.tripsThisWeek == 1 ? " TRIP" : " TRIPS"), TUi.MINT, TUi.MINT_INK);
 
         // vehicle
         LinearLayout v = TUi.card(content);
-        TUi.text(v, (d.vehicleLabel == null ? "Vehicle not set" : d.vehicleLabel) + (d.vehiclePlate == null ? "" : "  •  " + d.vehiclePlate), 16, TUi.INK, true);
-        TUi.body(v, String.format(Locale.US, "Max payload: %,.0f kg", d.capacityKg) + (d.vehicleBodyType == null ? "" : " • " + body(d.vehicleBodyType)));
-        if (!d.licenceUploaded) TUi.pill(v, "Driving licence photo missing – add it in Settings", TUi.AMBER_BG, TUi.AMBER);
+        LinearLayout vr = TUi.hrow(v, 0);
+        TUi.iconTile(vr, R.drawable.ic_truck, 48, TUi.MINT, TUi.DARK, false);
+        LinearLayout vt = TUi.col(vr, 1f);
+        vt.setPadding(TUi.dp(this, 12), 0, TUi.dp(this, 8), 0);
+        LinearLayout nameRow = TUi.hrow(vt, 0);
+        TUi.label(nameRow, d.vehicleLabel == null ? "Vehicle not set" : d.vehicleLabel, 16, TUi.INK, true);
+        if (d.licenceUploaded) {
+            ImageView ok = TUi.icon(nameRow, R.drawable.ic_verified_badge, 18, 0);
+            ((LinearLayout.LayoutParams) ok.getLayoutParams()).leftMargin = TUi.dp(this, 6);
+        }
+        TUi.text(vt, String.format(Locale.US, "Max Payload: %,.0f kg", d.capacityKg) + (d.vehicleBodyType == null ? "" : " \u2022 " + body(d.vehicleBodyType)),
+                12, TUi.MUTED, false);
+        if (d.vehiclePlate != null && !d.vehiclePlate.isEmpty()) TUi.tag(vr, d.vehiclePlate, TUi.GREY_BG, TUi.INK);
+        if (!d.licenceUploaded) TUi.pill(v, "Driving licence photo missing \u2013 add it in Settings", TUi.AMBER_BG, TUi.AMBER);
 
         // wallet + earnings
         LinearLayout w = TUi.card(content);
-        TUi.caption(w, "Available payout balance");
-        TUi.big(w, TUi.rs(d.balance) + " LKR", d.balance < 0 ? TUi.RED : TUi.DARK);
-        TUi.primary(w, "Wallet", x -> startActivity(new Intent(this, TransporterWalletActivity.class)));
-        TUi.row(w, "Gross freight (completed trips)", TUi.rs(d.grossFreightTotal));
-        TUi.row(w, "5% platform commission", "-" + TUi.rs(d.commissionTotal), TUi.RED, false);
-        if (d.emptyTripTotal > 0) TUi.row(w, "Empty Trip Fees received", "+" + TUi.rs(d.emptyTripTotal), TUi.ACCENT, false);
-        if (d.damageChargesTotal > 0) TUi.row(w, "Damage charges", "-" + TUi.rs(d.damageChargesTotal), TUi.RED, false);
-        TUi.row(w, "Total earned", TUi.rs(d.earningsTotal), TUi.DARK, true);
-        TUi.row(w, "Today", TUi.rs(d.earningsToday));
+        LinearLayout wh = TUi.hrow(w, 0);
+        TUi.fill(wh, "Available Payout Balance", 13, TUi.MUTED, false).setTypeface(TUi.semi(this));
+        TUi.tag(wh, "Auto-Sync", TUi.MINT, TUi.MINT_INK);
+        LinearLayout br = TUi.hrow(w, 2);
+        br.setGravity(android.view.Gravity.BOTTOM);
+        TUi.label(br, TUi.rs(d.balance), 32, d.balance < 0 ? TUi.RED : TUi.INK, true);
+        TUi.label(br, "  LKR", 12, TUi.DARK, true).setPadding(0, 0, 0, TUi.dp(this, 6));
+        LinearLayout btns = TUi.hrow(w, 4);
+        half(TUi.iconButton(btns, "Wallet", R.drawable.ic_bolt_green, TUi.DARK, Color.WHITE,
+                x -> startActivity(new Intent(this, TransporterWalletActivity.class))), false);
+        half(TUi.iconButton(btns, "Trip History", R.drawable.transporter_ic_bottom_history, Color.parseColor("#E9E7E5"), TUi.INK,
+                x -> startActivity(new Intent(this, JobHistoryActivity.class))), true);
+        LinearLayout eb = TUi.box(w, TUi.GREY_BG, 14);
+        TUi.row(eb, "Gross Hauling Earnings", "+" + TUi.rs(d.grossFreightTotal));
+        TUi.row(eb, "5% Platform Commission", "-" + TUi.rs(d.commissionTotal));
+        if (d.emptyTripTotal > 0) TUi.row(eb, "Empty Trip Fees (credit)", "+" + TUi.rs(d.emptyTripTotal), green, false);
+        if (d.damageChargesTotal > 0) TUi.row(eb, "Damage charges", "-" + TUi.rs(d.damageChargesTotal), TUi.RED, false);
+        LinearLayout tot = TUi.box(eb, Color.WHITE, 6);
+        TUi.row(tot, "Total Delivery Fees", TUi.rs(d.earningsTotal), TUi.DARK, true);
 
         // job request waiting for an answer
         if (!d.pendingRequests.isEmpty()) {
             TransporterDashboard.Job j = d.pendingRequests.get(0);
-            LinearLayout p = TUi.banner(content, TUi.DARK, Color.WHITE, "New job request" + (d.pendingRequests.size() > 1 ? "s (" + d.pendingRequests.size() + ")" : ""),
-                    j.cropName + " • " + String.format(Locale.US, "%,.0f kg", j.quantityKg) + " • " + TUi.km(j.distanceKm) + " • payout " + TUi.rs(j.payout));
-            TUi.button(p, "Review offer", TUi.ACCENT, Color.WHITE, x -> startActivity(new Intent(this, TransporterJobsActivity.class)));
+            LinearLayout p = TUi.card(content, TUi.DARK, TUi.DARK);
+            TUi.text(p, "\u25CF  NEW JOB REQUEST" + (d.pendingRequests.size() > 1 ? "S (" + d.pendingRequests.size() + ")" : ""), 12,
+                    Color.parseColor("#86EFAC"), true);
+            TUi.text(p, j.cropName + " \u2022 " + String.format(Locale.US, "%,.0f kg", j.quantityKg), 16, Color.WHITE, true);
+            TUi.text(p, TUi.km(j.distanceKm) + " \u2022 payout " + TUi.rs(j.payout), 13, Color.parseColor("#D1FAE5"), false);
+            TUi.smallButton(p, "Review Offer \u2192", 0, TUi.MINT, TUi.MINT_INK, x -> startActivity(new Intent(this, TransporterJobsActivity.class)));
         }
 
         // current job
-        TUi.title(content, "Current Job").setPadding(0, TUi.dp(this, 18), 0, 0);
+        LinearLayout sr = TUi.hrow(content, 20);
+        TUi.fill(sr, "Current Job", 17, TUi.INK, true);
+        if (d.activeJob != null) TUi.tag(sr, JobStatus.label(d.activeJob.status), Color.parseColor("#7C3AED"), Color.WHITE);
         if (d.activeJob == null) {
             TUi.body(content, d.online ? "No active job. New requests appear here and in Jobs." : "Go online to receive jobs.");
         } else {
-            TransporterDashboard.Job j = d.activeJob;
-            LinearLayout c = TUi.card(content);
-            TUi.pill(c, JobStatus.label(j.status), TUi.SURFACE, TUi.DARK);
-            TUi.text(c, j.cropName + " • " + String.format(Locale.US, "%,.0f kg", j.quantityKg), 16, TUi.INK, true);
-            TUi.body(c, (j.pickupAddress == null ? "Farm" : j.pickupAddress) + " → " + (j.dropoffAddress == null ? "Buyer" : j.dropoffAddress));
-            TUi.row(c, "Order #" + shortId(j.orderId), TUi.rs(j.payout), TUi.DARK, true);
-            TUi.primary(c, "Continue →", x -> TransporterOrderRouter.open(this, j.orderId));
+            jobCard(this, content, d.activeJob);
         }
 
         // recent payouts
-        TUi.title(content, "Recent Payouts").setPadding(0, TUi.dp(this, 18), 0, 0);
+        TextView all = TUi.sectionTitle(content, "Recent Payouts", "View All \u203A");
+        all.setOnClickListener(x -> startActivity(new Intent(this, TransporterWalletActivity.class)));
         if (d.recentPayouts.isEmpty()) TUi.body(content, "No payouts yet.");
-        LinearLayout list = d.recentPayouts.isEmpty() ? null : TUi.card(content);
         for (int i = 0; i < Math.min(5, d.recentPayouts.size()); i++) {
             TransporterDashboard.Payout p = d.recentPayouts.get(i);
-            TextView val = TUi.row(list, p.title + "\n" + com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(p.timestamp),
-                    TUi.signedRs(p.amount), p.amount >= 0 ? TUi.ACCENT : TUi.RED, false);
-            val.setTextSize(15);
+            LinearLayout pc = TUi.card(content);
+            ((LinearLayout.LayoutParams) ((android.view.View) pc.getParent()).getLayoutParams()).topMargin = TUi.dp(this, 10);
+            LinearLayout pr = TUi.hrow(pc, 0);
+            boolean plus = p.amount >= 0;
+            TUi.iconTile(pr, plus ? R.drawable.ic_tractor : R.drawable.ic_warning_triangle_red, 40, plus ? TUi.MINT : TUi.RED_BG, plus ? TUi.DARK : TUi.RED, true);
+            LinearLayout pt = TUi.col(pr, 1f);
+            pt.setPadding(TUi.dp(this, 12), 0, TUi.dp(this, 8), 0);
+            TextView title = TUi.text(pt, p.title, 14, TUi.INK, true);
+            title.setMaxLines(1);
+            title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            TUi.text(pt, "Settled " + com.harvesthub.mobile.ui.buyer.BaseBuyerOrderActivity.time(p.timestamp), 12, TUi.MUTED, false);
+            LinearLayout pv = TUi.col(pr, 0);
+            pv.setGravity(android.view.Gravity.END);
+            TUi.label(pv, TUi.signedRs(p.amount), 15, plus ? green : TUi.RED, true);
+            if (p.type != null) TUi.tag(pv, pretty(p.type), TUi.GREY_BG, TUi.INK);
         }
+    }
+
+    private void half(com.google.android.material.button.MaterialButton b, boolean second) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, TUi.dp(this, 52), 1f);
+        lp.topMargin = TUi.dp(this, 8);
+        if (second) lp.leftMargin = TUi.dp(this, 8);
+        b.setLayoutParams(lp);
+    }
+
+    private static String pretty(String type) {
+        String t = type.replace('_', ' ').toLowerCase(Locale.US);
+        return t.isEmpty() ? t : Character.toUpperCase(t.charAt(0)) + t.substring(1);
+    }
+
+    /** Figma "Current Job" card: truck tile, cargo, route, payout and Continue. */
+    static void jobCard(android.app.Activity a, LinearLayout parent, TransporterDashboard.Job j) {
+        LinearLayout c = TUi.card(parent);
+        ((android.view.View) c.getParent()).setOnClickListener(x -> TransporterOrderRouter.open(a, j.orderId));
+        LinearLayout r = TUi.hrow(c, 0);
+        TUi.iconTile(r, R.drawable.ic_truck, 48, TUi.SURFACE, TUi.DARK, false);
+        LinearLayout m = TUi.col(r, 1f);
+        m.setPadding(TUi.dp(a, 12), 0, TUi.dp(a, 8), 0);
+        TextView name = TUi.text(m, j.cropName, 16, TUi.INK, true);
+        name.setMaxLines(1);
+        name.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TextView route = TUi.text(m, (j.pickupAddress == null ? "Farm" : j.pickupAddress) + " \u2192 " + (j.dropoffAddress == null ? "Buyer" : j.dropoffAddress),
+                13, TUi.MUTED, false);
+        route.setMaxLines(1);
+        route.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TUi.text(m, "Order #" + shortId(j.orderId) + " \u2022 " + String.format(Locale.US, "%,.0f kg", j.quantityKg), 12, TUi.MUTED, false);
+        LinearLayout right = TUi.col(r, 0);
+        right.setGravity(android.view.Gravity.END);
+        TUi.label(right, TUi.rs(j.payout), 15, TUi.INK, true);
+        TUi.smallButton(right, "Continue \u2192", 0, TUi.DARK, Color.WHITE, x -> TransporterOrderRouter.open(a, j.orderId));
     }
 
     private void setOnline(boolean on, SwitchCompat sw) {

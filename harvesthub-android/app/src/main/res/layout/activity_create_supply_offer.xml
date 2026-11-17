@@ -305,12 +305,13 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvMarketInsight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/plus_jakarta_sans"
                         android:lineSpacingExtra="3dp"
-                        android:text="Average closing price for Red Onions in Dambulla region is currently LKR 275/KG. Your price is competitive."
+                        android:text="Loading market prices…"
                         android:textColor="#4F4F4F"
                         android:textSize="13sp" />
                 </LinearLayout>

@@ -339,6 +339,96 @@ class OrderLifecycleIntegrationTests {
     }
 
     @Test
+    @org.junit.jupiter.api.Order(6)
+    void photoThumbnailsAreSmallJpegsMadeOnce() throws Exception {
+        java.awt.image.BufferedImage big = new java.awt.image.BufferedImage(1600, 1200, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = big.createGraphics();
+        g.setColor(java.awt.Color.GREEN);
+        g.fillRect(0, 0, 1600, 1200);
+        g.dispose();
+        java.io.ByteArrayOutputStream jpg = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(big, "jpg", jpg);
+        String url = json.readTree(mvc.perform(multipart("/media/upload")
+                        .file(new org.springframework.mock.web.MockMultipartFile("file", "p.jpg", "image/jpeg", jpg.toByteArray()))
+                        .header("Authorization", token(farmer)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).path("url").asText();
+        String name = url.substring("/uploads/".length());
+
+        // public (no token), JPEG, longest side = the size bucket (200 -> 320)
+        byte[] thumb = mvc.perform(get("/uploads/thumb/" + name + "?size=200")).andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().contentType("image/jpeg"))
+                .andReturn().getResponse().getContentAsByteArray();
+        java.awt.image.BufferedImage t = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(thumb));
+        assertEquals(320, t.getWidth());
+        assertEquals(240, t.getHeight());
+        assertTrue(thumb.length < jpg.size());
+        // second request is served from the saved copy (same bytes)
+        assertArrayEquals(thumb, mvc.perform(get("/uploads/thumb/" + name + "?size=320")).andReturn().getResponse().getContentAsByteArray());
+        // not for videos or made-up names
+        mvc.perform(get("/uploads/thumb/00000000-0000-0000-0000-000000000000.mp4")).andExpect(status().isNotFound());
+        mvc.perform(get("/uploads/thumb/..%2Fsecret.jpg")).andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(6)
+    void farmerSeesAnOpenNegotiationOnTheListing() throws Exception {
+        Listing l = activeListing(500, 250);
+        String orderId = ok(buyer, "POST", "/orders/create", Map.of("listingId", l.getId(), "quantity", 100, "pricePerKg", 240))
+                .path("orderId").asText();
+        JsonNode mine = ok(farmer, "GET", "/farmer/" + farmer.getId() + "/active-listings", null);
+        JsonNode card = null;
+        for (JsonNode n : mine) if (l.getId().equals(n.path("id").asText())) card = n;
+        assertNotNull(card);
+        assertEquals("ACTIVE", card.path("status").asText());              // still on the market while negotiating
+        assertEquals(orderId, card.path("negotiationOrderId").asText());   // ...but the farmer can open the chat
+        assertEquals(1, card.path("negotiationCount").asInt());
+        // chat timestamps have whole seconds
+        String ts = ok(farmer, "POST", "/chat/" + orderId + "/send", Map.of("text", "Hello")).path("timestamp").asText();
+        assertTrue(ts.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"), ts);
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(6)
+    void farmerCardActionsEditDeactivateReactivate() throws Exception {
+        Listing l = activeListing(500, 250);                       // Listed, grade A
+        // Edit = yield + price only; Listed keeps its status and grade
+        JsonNode e = ok(farmer, "PUT", "/listings/" + l.getId(), Map.of("quantity", "450", "price", "260", "cropName", "Leeks"));
+        assertEquals("450", e.path("quantity").asText());
+        assertEquals("260", e.path("price").asText());
+        assertEquals("Big Onions", e.path("cropName").asText());   // crop is not editable
+        assertEquals("ACTIVE", e.path("status").asText());
+        assertEquals("A", e.path("grade").asText());
+        call(farmer, "PUT", "/listings/" + l.getId(), Map.of("price", "0")).andExpect(status().isBadRequest());
+        call(buyer, "PUT", "/listings/" + l.getId(), Map.of("price", "300")).andExpect(status().isForbidden());
+
+        // Deactivate: hidden from the marketplace, still in the farmer's list
+        assertEquals("DEACTIVATED", ok(farmer, "POST", "/listings/" + l.getId() + "/deactivate", null).path("status").asText());
+        assertFalse(ok(buyer, "GET", "/buyer/listings", null).toString().contains(l.getId()));
+        assertTrue(ok(farmer, "GET", "/farmer/" + farmer.getId() + "/active-listings", null).toString().contains("DEACTIVATED"));
+        bad(farmer, "/listings/" + l.getId() + "/deactivate", null);   // already deactivated
+
+        // Re-activate: a Listed lot comes back Listed with the same grade
+        JsonNode r = ok(farmer, "POST", "/listings/" + l.getId() + "/reactivate", null);
+        assertEquals("ACTIVE", r.path("status").asText());
+        assertEquals("A", r.path("grade").asText());
+
+        // A pending lot goes back to the officer queue
+        Listing p = activeListing(100, 100);
+        p.setStatus("PENDING");
+        p.setGrade(null);
+        listings.save(p);
+        ok(farmer, "POST", "/listings/" + p.getId() + "/deactivate", null);
+        assertEquals("PENDING", ok(farmer, "POST", "/listings/" + p.getId() + "/reactivate", null).path("status").asText());
+
+        // Not someone else's listing, and not while an order is running
+        User other = user("it-farmer-2", "FARMER", 7.87, 80.65, "other");
+        bad(other, "/listings/" + p.getId() + "/deactivate", null);
+        p.setActiveOrderId("ORD-1");
+        listings.save(p);
+        bad(farmer, "/listings/" + p.getId() + "/deactivate", null);
+    }
+
+    @Test
     @org.junit.jupiter.api.Order(7)
     void jsonFieldNamesMatchTheAndroidModels() throws Exception {
         WantedAd ad = new WantedAd();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Play badge drawn over the video thumbnail on the Listing Details form -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
+    <path
+        android:fillColor="#99000000"
+        android:pathData="M14,0a14,14 0,1 1,0 28a14,14 0,1 1,0 -28z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,8.5L20,14L11,19.5Z" />
+</vector>

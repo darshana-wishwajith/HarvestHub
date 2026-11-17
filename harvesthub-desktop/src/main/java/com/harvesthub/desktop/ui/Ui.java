@@ -20,6 +20,7 @@ import javafx.stage.Window;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -150,6 +151,7 @@ public final class Ui {
         }
         b.getStyleClass().addAll(styles);
         b.setMnemonicParsing(false);
+        b.setMinWidth(Region.USE_PREF_SIZE);   // never truncate button text
         return b;
     }
 
@@ -159,9 +161,31 @@ public final class Ui {
         return h;
     }
 
+    /** Groups chip toggles into one segmented control (selected = white raised segment). */
+    public static HBox segmented(Node... chips) {
+        HBox h = new HBox(2, chips);
+        h.setAlignment(Pos.CENTER_LEFT);
+        h.getStyleClass().add("segmented");
+        h.setMaxWidth(Region.USE_PREF_SIZE);
+        return h;
+    }
+
+    /** Dark call-to-action banner (dashboard "Go to Verification Queue"). */
+    public static HBox hero(String eyebrow, String title, String note, Runnable action) {
+        StackPane arrow = new StackPane(icon("fas-arrow-right", 18));
+        arrow.getStyleClass().add("hero-arrow");
+        HBox h = new HBox(16, new VBox(6, label(eyebrow, "hero-eyebrow"), label(title, "hero-title")), grow(),
+                label(note, "hero-note"), arrow);
+        h.setAlignment(Pos.CENTER_LEFT);
+        h.getStyleClass().add("hero");
+        h.setOnMouseClicked(e -> action.run());
+        return h;
+    }
+
     public static ToggleButton chip(String text, ToggleGroup group) {
         ToggleButton t = new ToggleButton(text);
         t.getStyleClass().add("chip-toggle");
+        t.setMinWidth(Region.USE_PREF_SIZE);
         t.setToggleGroup(group);
         t.setMnemonicParsing(false);
         return t;
@@ -273,21 +297,111 @@ public final class Ui {
     }
 
     public static VBox statCard(String iconLiteral, String tone, String value, String title, String sub) {
-        StackPane ic = new StackPane(icon(iconLiteral, 18));
-        ic.getStyleClass().addAll("stat-icon", "tone-" + tone);
-        VBox v = card(row(12, ic, grow()), label(value, "value-lg"), label(title, "h3"));
-        if (sub != null) v.getChildren().add(wrap(sub, "muted", "small"));
-        v.setSpacing(6);
-        HBox.setHgrow(v, Priority.ALWAYS);
-        v.setMaxWidth(Double.MAX_VALUE);
-        return v;
+        return statCard(iconLiteral, tone, value, title, sub, null);
     }
 
+    /** Dashboard number card: icon tile (+ small tag on the right), big value, caps title, optional note. */
+    public static VBox statCard(String iconLiteral, String tone, String value, String title, String sub, String tag) {
+        StackPane ic = new StackPane(icon(iconLiteral, 18));
+        ic.getStyleClass().addAll("stat-icon", "tone-" + tone);
+        HBox head = row(12, ic, grow());
+        if (tag != null) head.getChildren().add(label(tag, "stat-tag"));
+        VBox v = card(head, label(value, "value-lg"), label(title.toUpperCase(Locale.ROOT), "stat-title"));
+        if (sub != null) v.getChildren().add(wrap(sub, "muted", "small"));
+        v.setSpacing(4);
+        ((Region) v.getChildren().get(1)).setPadding(new Insets(10, 0, 0, 0));
+        v.getStyleClass().add("stat-card");
+        HBox.setHgrow(v, Priority.ALWAYS);
+        v.setMaxWidth(Double.MAX_VALUE);
+        v.setPrefWidth(120);   // cards in a row share the width equally
+        return v;
+    }
     // ---- images -------------------------------------------------------------------------------
 
     public static Image resource(String name) {
         var url = PortalApp.class.getResource("/com/harvesthub/desktop/images/" + name);
         return url == null ? null : new Image(url.toExternalForm());
+    }
+
+    /**
+     * Image decoded at the size it is shown (x screen scale) with smooth resampling. Shrinking a large PNG at draw
+     * time made the logo edges jagged.
+     */
+    public static ImageView crispImage(String name, double width) {
+        var url = PortalApp.class.getResource("/com/harvesthub/desktop/images/" + name);
+        double scale = javafx.stage.Screen.getPrimary().getOutputScaleX();
+        Image img = url == null ? null : new Image(url.toExternalForm(), Math.ceil(width * scale), 0, true, true);
+        ImageView v = new ImageView(img);
+        v.setFitWidth(width);
+        v.setPreserveRatio(true);
+        v.setSmooth(true);
+        return v;
+    }
+
+    private static final java.util.Map<String, java.util.concurrent.CompletableFuture<Image>> THUMBS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.concurrent.ExecutorService THUMB_POOL = java.util.concurrent.Executors.newFixedThreadPool(3, r -> {
+        Thread t = new Thread(r, "thumb-loader");
+        t.setDaemon(true);
+        return t;
+    });
+
+    /** Downloads and decodes a list thumbnail (server thumbnails are a few KB); completes with null on failure. */
+    private static java.util.concurrent.CompletableFuture<Image> fetchThumb(String url) {
+        return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+            try {
+                java.net.URLConnection c = java.net.URI.create(url).toURL().openConnection();
+                c.setConnectTimeout(15_000);
+                c.setReadTimeout(30_000);
+                try (java.io.InputStream in = c.getInputStream()) {
+                    double scale = javafx.stage.Screen.getPrimary().getOutputScaleX();
+                    Image img = new Image(in, 42 * scale * 2, 42 * scale * 2, true, true);
+                    return img.isError() || img.getWidth() <= 0 ? null : img;
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }, THUMB_POOL);
+    }
+
+    /** List-row tile: the listing photo (cover) when there is one, otherwise a coloured tile with the crop initial. */
+    public static StackPane cropTile(String cropName, String coverUrl) {
+        StackPane tile = new StackPane();
+        tile.getStyleClass().add("crop-tile");
+        String[][] tones = {{"#DCF5E1", "#1E7B3A"}, {"#FDEBD3", "#C2410C"}, {"#E1EDFB", "#1D5FA8"}, {"#F3E8FF", "#7E22CE"},
+                {"#FEF9C3", "#A16207"}, {"#E0F2F1", "#0F766E"}};
+        String[] tone = tones[Math.floorMod(cropName == null ? 0 : cropName.toLowerCase(Locale.ROOT).hashCode(), tones.length)];
+        tile.setStyle("-fx-background-color: " + tone[0] + ";");
+        Label initial = label(cropName == null || cropName.isBlank() ? "?" : cropName.trim().substring(0, 1).toUpperCase(Locale.ROOT));
+        initial.setStyle("-fx-text-fill: " + tone[1] + ";");
+        tile.getChildren().add(initial);
+        String url = ApiClient.absolute(coverUrl);
+        if (url != null) {
+            // one download per photo, done on a worker thread; the decoded image is placed on the UI thread
+            THUMBS.computeIfAbsent(url, Ui::fetchThumb).thenAccept(img -> {
+                if (img == null) return;
+                Platform.runLater(() -> {
+                    ImageView iv = new ImageView(img);
+                    double w = img.getWidth(), h = img.getHeight(), side = Math.min(w, h);
+                    iv.setViewport(new javafx.geometry.Rectangle2D((w - side) / 2, (h - side) / 2, side, side));   // centre square
+                    iv.setFitWidth(42);
+                    iv.setFitHeight(42);
+                    iv.setSmooth(true);
+                    javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(42, 42);
+                    clip.setArcWidth(20);
+                    clip.setArcHeight(20);
+                    iv.setClip(clip);
+                    tile.getChildren().setAll(iv);
+                });
+            });
+        }
+        return tile;
+    }
+
+    /** Crop tile + crop name + second line (farmer), as in the queue / history rows. */
+    public static HBox cropCell(String main, String sub, String coverUrl, String cropName) {
+        HBox h = row(12, cropTile(cropName, coverUrl), twoLine(main, sub));
+        h.setAlignment(Pos.CENTER_LEFT);
+        return h;
     }
 
     /** Server image (e.g. /uploads/x.jpg) loaded in the background, with a placeholder until it arrives. */

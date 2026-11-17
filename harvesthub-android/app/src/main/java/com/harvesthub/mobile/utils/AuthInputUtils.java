@@ -58,6 +58,23 @@ public final class AuthInputUtils {
                 && password.matches(".*[A-Za-z].*") && password.matches(".*\\d.*");
     }
 
+    /** Sri Lankan NIC: old 9 digits + V/X, new 12 digits. Day-of-year must be 1-366 (+500 for female). */
+    public static boolean isValidNic(String nic) {
+        if (nic == null) return false;
+        int day;
+        if (nic.matches("^[0-9]{9}[VvXx]$")) {
+            day = Integer.parseInt(nic.substring(2, 5));
+        } else if (nic.matches("^[0-9]{12}$")) {
+            int year = Integer.parseInt(nic.substring(0, 4));
+            if (year < 1900 || year > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) - 16) return false;
+            day = Integer.parseInt(nic.substring(4, 7));
+        } else {
+            return false;
+        }
+        if (day > 500) day -= 500;
+        return day >= 1 && day <= 366;
+    }
+
     /** Reads {"error": "..."} or a field->message map from an error response; falls back to {@code fallback}. */
     public static String errorMessage(Response<?> response, String fallback) {
         try (ResponseBody body = response.errorBody()) {

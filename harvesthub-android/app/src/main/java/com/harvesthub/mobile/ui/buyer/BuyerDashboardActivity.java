@@ -21,7 +21,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
 
     /** MARKET has no bottom-nav item: it opens from Home ("View Market", Figma 564:330). */
     public enum Tab {
-        HOME, ORDERS, DEMANDS, OFFERS, MARKET
+        HOME, ORDERS, DEMANDS, OFFERS, MARKET, ACCOUNT
     }
 
     private String offersAdId;
@@ -113,16 +113,13 @@ public class BuyerDashboardActivity extends AppCompatActivity {
 
     private void setupBottomNav() {
         if (buyerBottomNav == null) return;
-
-        View navHome = buyerBottomNav.findViewById(R.id.buyerNavHome);
-        View navOrders = buyerBottomNav.findViewById(R.id.buyerNavOrders);
-        View navDemands = buyerBottomNav.findViewById(R.id.buyerNavDemands);
-        View navOffers = buyerBottomNav.findViewById(R.id.buyerNavOffers);
-
-        if (navHome != null) navHome.setOnClickListener(v -> selectTab(Tab.HOME));
-        if (navOrders != null) navOrders.setOnClickListener(v -> selectTab(Tab.ORDERS));
-        if (navDemands != null) navDemands.setOnClickListener(v -> selectTab(Tab.DEMANDS));
-        if (navOffers != null) navOffers.setOnClickListener(v -> selectTab(Tab.OFFERS));
+        int[] ids = {R.id.buyerNavHome, R.id.buyerNavMarket, R.id.buyerNavOrders, R.id.buyerNavDemands, R.id.buyerNavAccount};
+        Tab[] tabs = {Tab.HOME, Tab.MARKET, Tab.ORDERS, Tab.DEMANDS, Tab.ACCOUNT};
+        for (int i = 0; i < ids.length; i++) {
+            final Tab t = tabs[i];
+            View item = buyerBottomNav.findViewById(ids[i]);
+            if (item != null) item.setOnClickListener(v -> selectTab(t));
+        }
     }
 
     public void selectTab(Tab tab) {
@@ -161,6 +158,8 @@ public class BuyerDashboardActivity extends AppCompatActivity {
                 return f;
             case MARKET:
                 return new BuyerMarketplaceFragment();
+            case ACCOUNT:
+                return new BuyerAccountFragment();
             case HOME:
             default:
                 return new BuyerHomeFragment();
@@ -169,28 +168,31 @@ public class BuyerDashboardActivity extends AppCompatActivity {
 
     private void updateBottomNavVisuals(Tab activeTab) {
         if (buyerBottomNav == null) return;
-
-        int[] pills = {R.id.buyerPillHome, R.id.buyerPillOrders, R.id.buyerPillDemands, R.id.buyerPillOffers};
-        int[] icons = {R.id.buyerIconHome, R.id.buyerIconOrders, R.id.buyerIconDemands, R.id.buyerIconOffers};
-        int[] labels = {R.id.buyerLabelHome, R.id.buyerLabelOrders, R.id.buyerLabelDemands, R.id.buyerLabelOffers};
-        int activeIndex = activeTab == Tab.MARKET ? Tab.HOME.ordinal() : activeTab.ordinal();
-
+        int[] pills = {R.id.buyerPillHome, R.id.buyerPillMarket, R.id.buyerPillOrders, R.id.buyerPillDemands, R.id.buyerPillAccount};
+        int[] icons = {R.id.buyerIconHome, R.id.buyerIconMarket, R.id.buyerIconOrders, R.id.buyerIconDemands, R.id.buyerIconAccount};
+        int[] labels = {R.id.buyerLabelHome, R.id.buyerLabelMarket, R.id.buyerLabelOrders, R.id.buyerLabelDemands, R.id.buyerLabelAccount};
+        // supply offers belong to a wanted ad, so they light up "Requests"
+        int activeIndex;
+        switch (activeTab) {
+            case MARKET: activeIndex = 1; break;
+            case ORDERS: activeIndex = 2; break;
+            case DEMANDS:
+            case OFFERS: activeIndex = 3; break;
+            case ACCOUNT: activeIndex = 4; break;
+            default: activeIndex = 0;
+        }
         for (int index = 0; index < pills.length; index++) {
             View pill = buyerBottomNav.findViewById(pills[index]);
             ImageView icon = buyerBottomNav.findViewById(icons[index]);
             TextView label = buyerBottomNav.findViewById(labels[index]);
-
-            boolean active = (index == activeIndex);
+            boolean active = index == activeIndex;
             if (pill != null) {
-                pill.setBackgroundResource(active ? R.drawable.bg_nav_item_active : android.R.color.transparent);
+                pill.setBackground(active ? com.harvesthub.mobile.ui.transporter.TUi.round(Color.parseColor("#1B4332"),
+                        14 * getResources().getDisplayMetrics().density) : null);
             }
-            int color = Color.parseColor(active ? "#FFFFFF" : "#414844");
-            if (icon != null) {
-                icon.setColorFilter(color);
-            }
-            if (label != null) {
-                label.setTextColor(color);
-            }
+            int color = active ? Color.WHITE : Color.parseColor("#111827");
+            if (icon != null) icon.setColorFilter(color);
+            if (label != null) label.setTextColor(color);
         }
     }
 

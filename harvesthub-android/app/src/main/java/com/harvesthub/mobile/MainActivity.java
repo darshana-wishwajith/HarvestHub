@@ -41,33 +41,42 @@ public class MainActivity extends AppCompatActivity {
                     initialTab = Tab.valueOf(getIntent().getStringExtra(EXTRA_INITIAL_TAB));
                 } catch (Exception ignored) {}
             }
-            loadFragment(initialTab, createFragmentForTab(initialTab));
-            openCreateListingIfCaptured(getIntent());
+            if (!openCreateListingIfCaptured(getIntent())) loadFragment(initialTab, createFragmentForTab(initialTab));
         }
     }
 
     /** Extras set by CameraCaptureActivity after the location lock + guided capture (workflow 1.2-1.3). */
     public static final String EXTRA_CAPTURED_MEDIA = "capturedMedia";
 
-    private void openCreateListingIfCaptured(Intent intent) {
-        if (intent == null || !intent.hasExtra(EXTRA_CAPTURED_MEDIA)) return;
+    /**
+     * After the guided capture: always show the Listing Details form. (loadFragment() skips a tab that is
+     * already selected, which used to drop the form and leave the farmer on Active Listings.)
+     */
+    private boolean openCreateListingIfCaptured(Intent intent) {
+        if (intent == null || !intent.hasExtra(EXTRA_CAPTURED_MEDIA)) return false;
         com.harvesthub.mobile.ui.farmer.CreateListingFragment f = new com.harvesthub.mobile.ui.farmer.CreateListingFragment();
-        f.setArguments(intent.getExtras());
+        f.setArguments(new Bundle(intent.getExtras()));
         intent.removeExtra(EXTRA_CAPTURED_MEDIA);
-        loadFragment(Tab.LISTINGS, f);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, f)
+                .commit();
+        currentTab = Tab.LISTINGS;
+        updateBottomNavVisuals(Tab.LISTINGS);
+        return true;
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        if (openCreateListingIfCaptured(intent)) return;
         if (intent.hasExtra(EXTRA_INITIAL_TAB)) {
             try {
                 Tab targetTab = Tab.valueOf(intent.getStringExtra(EXTRA_INITIAL_TAB));
+                if (targetTab == currentTab) currentTab = null;   // reload (e.g. back from a retake)
                 loadFragment(targetTab, createFragmentForTab(targetTab));
             } catch (Exception ignored) {}
         }
-        openCreateListingIfCaptured(intent);
     }
 
     private void setupTopNav() {
