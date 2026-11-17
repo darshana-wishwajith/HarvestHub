@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarvestHub — Trusted farm-to-market trade</title>
+<meta name="description" content="HarvestHub connects farmers directly with buyers in Sri Lanka: officer-verified harvests, escrow payments, automatic transport and live delivery tracking.">
+<meta name="theme-color" content="#1B4332">
+<meta property="og:title" content="HarvestHub — Trusted farm-to-market trade">
+<meta property="og:description" content="Officer-verified harvests, escrow payments, automatic transport and live tracking.">
+<meta property="og:image" content="/site/logo-mark.png">
+<link rel="icon" type="image/png" href="/site/favicon.png">
+<link rel="apple-touch-icon" href="/site/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1B4332; --forest-2:#2D6A4F; --forest-3:#143426; --leaf:#4CAF50; --leaf-2:#86EFAC;
+  --mint:#E8F5EA; --mint-2:#B9F2C4; --page:#FDF8F6; --ink:#111827; --muted:#64748B; --line:#E7E2DE;
+  --amber:#F59E0B; --white:#fff;
+  --r-lg:24px; --r-md:16px; --shadow:0 20px 50px -20px rgba(27,67,50,.35); --shadow-sm:0 6px 20px -8px rgba(17,24,39,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,100% - 40px);margin-inline:auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--forest-2);background:var(--mint);padding:7px 14px;border-radius:999px}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--leaf);box-shadow:0 0 0 4px rgba(76,175,80,.2)}
+h1,h2,h3{line-height:1.12;letter-spacing:-.02em;color:var(--forest-3)}
+h2{font-size:clamp(30px,4vw,44px);font-weight:800;margin:14px 0 14px}
+.lead{font-size:18px;color:var(--muted);max-width:640px}
+section{padding:110px 0;position:relative;scroll-margin-top:40px}
+.center{text-align:center}.center .lead{margin-inline:auto}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;padding:15px 24px;border-radius:14px;transition:transform .25s ease,box-shadow .25s ease,background .25s ease;cursor:pointer;border:0;font-family:inherit}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--forest);color:#fff;box-shadow:0 12px 28px -10px rgba(27,67,50,.6)}
+.btn-primary:hover{transform:translateY(-2px);background:var(--forest-2);box-shadow:0 18px 34px -12px rgba(27,67,50,.6)}
+.btn-ghost{background:#fff;color:var(--forest);border:1.5px solid var(--line)}
+.btn-ghost:hover{transform:translateY(-2px);border-color:var(--leaf);box-shadow:var(--shadow-sm)}
+.btn-light{background:#fff;color:var(--forest)}
+.btn-light:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(0,0,0,.4)}
+.btn small{display:block;font-weight:500;font-size:11px;opacity:.75;line-height:1.1}
+.btn span{line-height:1.2;text-align:left}
+
+/* nav */
+header{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,box-shadow .3s,backdrop-filter .3s}
+header.scrolled{background:rgba(253,248,246,.82);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);box-shadow:0 1px 0 var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;color:var(--forest);letter-spacing:-.02em}
+.brand img{width:38px;height:38px}
+.brand b{color:var(--leaf);font-weight:800}
+.links{display:flex;gap:30px;font-weight:600;font-size:15px;color:#334155}
+.links a{position:relative;padding:4px 0}
+.links a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;background:var(--leaf);border-radius:2px;transition:width .3s}
+.links a:hover::after{width:100%}
+.nav .btn{padding:11px 18px;font-size:14px}
+.m-only{display:none}
+.menu-btn{display:none;background:none;border:0;width:42px;height:42px;border-radius:12px;cursor:pointer}
+.menu-btn span{display:block;width:22px;height:2px;background:var(--forest);margin:5px auto;border-radius:2px;transition:.3s}
+
+/* hero */
+.hero{padding:150px 0 90px;overflow:hidden}
+.hero::before{content:"";position:absolute;width:780px;height:780px;right:-220px;top:-260px;background:radial-gradient(circle at center,rgba(76,175,80,.28),rgba(76,175,80,0) 65%);filter:blur(10px);animation:float 14s ease-in-out infinite;z-index:-1}
+.hero::after{content:"";position:absolute;width:520px;height:520px;left:-240px;bottom:-180px;background:radial-gradient(circle at center,rgba(27,67,50,.16),rgba(27,67,50,0) 65%);animation:float 18s ease-in-out infinite reverse;z-index:-1}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+.hero h1{font-size:clamp(40px,5.6vw,66px);font-weight:800;margin:20px 0 22px}
+.hero h1 .hl{background:linear-gradient(100deg,var(--leaf),#22A06B 60%,var(--forest-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{font-size:19px}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin:34px 0 40px}
+.trust{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:34px}
+.trust strong{display:block;font-size:30px;font-weight:800;color:var(--forest);letter-spacing:-.02em}
+.trust span{font-size:13px;color:var(--muted);font-weight:500}
+
+/* phone mock */
+.stage{position:relative;height:600px;display:grid;place-items:center}
+.phone{width:300px;height:600px;border-radius:44px;background:#0F1F18;padding:12px;box-shadow:0 40px 80px -30px rgba(15,31,24,.6),0 0 0 1px rgba(255,255,255,.06) inset;position:relative;animation:bob 7s ease-in-out infinite}
+.phone::before{content:"";position:absolute;top:22px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#0F1F18;border-radius:20px;z-index:3}
+.screen{width:100%;height:100%;border-radius:34px;overflow:hidden;background:var(--page);position:relative;display:flex;flex-direction:column}
+.s-top{padding:44px 18px 10px;display:flex;align-items:center;justify-content:space-between}
+.s-top .t{font-weight:800;font-size:15px;color:var(--forest)}
+.live{font-size:10px;font-weight:800;color:#14532D;background:var(--mint-2);padding:4px 9px;border-radius:999px;display:flex;align-items:center;gap:5px}
+.live i{width:6px;height:6px;border-radius:50%;background:#16A34A;animation:pulse 1.6s infinite}
+.s-map{margin:4px 14px;height:250px;border-radius:20px;background:#EAF3EC;position:relative;overflow:hidden}
+.s-map svg{position:absolute;inset:0;width:100%;height:100%}
+.route-bg{stroke:#9DD3AE;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.route{stroke:var(--forest);stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:620;stroke-dashoffset:620;animation:draw 6s ease-in-out infinite}
+.s-card{margin:12px 14px 0;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-sm)}
+.s-row{display:flex;gap:10px}
+.s-tile{flex:1;background:#F3F0EE;border-radius:12px;padding:9px 10px}
+.s-tile small{display:block;font-size:9px;color:var(--muted);font-weight:600}
+.s-tile b{font-size:15px;color:var(--ink)}
+.bar{height:6px;border-radius:6px;background:#E2DDD9;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:62%;background:var(--forest);border-radius:6px;animation:grow 6s ease-in-out infinite}
+.s-driver{display:flex;align-items:center;gap:10px}
+.av{width:36px;height:36px;border-radius:12px;background:var(--mint);display:grid;place-items:center;color:var(--forest)}
+.av svg{width:20px;height:20px}
+.s-driver b{font-size:13px}.s-driver small{display:block;font-size:10px;color:var(--muted)}
+.call{margin-left:auto;background:var(--forest);color:#fff;font-size:10px;font-weight:700;padding:7px 11px;border-radius:10px}
+
+.chip{position:absolute;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;font-size:13px;z-index:4}
+.chip .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.chip .ic svg{width:22px;height:22px}
+.chip b{display:block;font-size:14px;color:var(--ink)}
+.chip small{color:var(--muted);font-size:12px}
+.chip.c1{top:300px;left:-30px;animation:bob 6s ease-in-out infinite .5s}
+.chip.c2{bottom:110px;right:-20px;animation:bob 7s ease-in-out infinite 1.2s}
+.chip.c3{bottom:20px;left:10px;animation:bob 8s ease-in-out infinite .2s}
+
+/* logos strip */
+.strip{padding:34px 0;border-block:1px solid var(--line);background:#fff}
+.strip .wrap{display:flex;flex-wrap:wrap;gap:20px 46px;justify-content:center;align-items:center;color:#475569;font-weight:600;font-size:14px}
+.strip .it{display:flex;align-items:center;gap:9px}
+.strip svg{width:20px;height:20px;color:var(--leaf)}
+
+/* problem */
+.problems{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:50px}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:26px;transition:transform .35s,box-shadow .35s,border-color .35s}
+.pcard:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
+.pcard .n{font-size:13px;font-weight:800;color:var(--leaf)}
+.pcard h3{font-size:18px;margin:8px 0}
+.pcard p{color:var(--muted);font-size:14.5px}
+.pcard .fix{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);font-size:13.5px;font-weight:600;color:var(--forest-2)}
+
+/* features */
+.features{background:linear-gradient(180deg,#fff,var(--page))}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:56px}
+.fcard{position:relative;background:#fff;border-radius:var(--r-lg);padding:30px;border:1px solid var(--line);overflow:hidden;transition:transform .35s,box-shadow .35s}
+.fcard::after{content:"";position:absolute;inset:auto -40% -60% auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(76,175,80,.16),transparent 70%);transition:transform .5s}
+.fcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.fcard:hover::after{transform:scale(1.5)}
+.ficon{width:54px;height:54px;border-radius:16px;background:var(--mint);color:var(--forest);display:grid;place-items:center;margin-bottom:20px;transition:transform .35s,background .35s,color .35s}
+.fcard:hover .ficon{transform:rotate(-6deg) scale(1.06);background:var(--forest);color:#fff}
+.ficon svg{width:26px;height:26px}
+.fcard h3{font-size:19px;margin-bottom:8px}
+.fcard p{color:var(--muted);font-size:15px}
+.fcard.wide{grid-column:span 2;background:var(--forest);color:#fff;border:0;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.fcard.wide h3{color:#fff;font-size:24px}
+.fcard.wide p{color:#CFE7D6}
+.fcard.wide .ficon{background:rgba(255,255,255,.12);color:var(--leaf-2)}
+.money{display:grid;gap:10px}
+.mrow{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 16px;font-size:14px}
+.mrow b{font-size:16px;color:var(--leaf-2)}
+
+/* how it works */
+.steps{margin-top:60px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative}
+.step:not(:nth-child(4n))::after{content:"";position:absolute;top:30px;left:calc(50% + 40px);width:calc(100% - 58px);height:2px;background:repeating-linear-gradient(90deg,var(--mint-2) 0 10px,transparent 10px 18px)}
+.step{position:relative;text-align:center;padding:0 6px}
+.dot{width:60px;height:60px;margin:0 auto 20px;border-radius:50%;background:#fff;border:2px solid var(--mint-2);display:grid;place-items:center;font-weight:800;color:var(--forest);font-size:18px;position:relative;z-index:1;transition:background .4s,color .4s,transform .4s}
+.step.on .dot{background:var(--forest);color:#fff;border-color:var(--forest);transform:scale(1.08)}
+.step h3{font-size:17px;margin-bottom:6px}
+.step p{color:var(--muted);font-size:14px}
+
+/* roles */
+.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:56px}
+.role{background:#fff;border-radius:var(--r-lg);padding:28px 24px;border:1px solid var(--line);transition:transform .35s,box-shadow .35s}
+.role:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.role .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--mint);color:var(--forest-2);margin-bottom:16px}
+.role .tag.d{background:#EEF4FF;color:#1E3A8A}
+.role h3{font-size:21px;margin-bottom:12px}
+.role ul{list-style:none;display:grid;gap:9px}
+.role li{display:flex;gap:9px;font-size:14.5px;color:#334155}
+.role li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;background:var(--mint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4332' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/11px no-repeat}
+
+/* download */
+.download{background:var(--forest-3);color:#fff;overflow:hidden}
+.download::before{content:"";position:absolute;width:700px;height:700px;right:-200px;top:-300px;background:radial-gradient(circle,rgba(76,175,80,.35),transparent 65%);animation:float 16s ease-in-out infinite}
+.download h2{color:#fff}
+.download .lead{color:#B7D3C1}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:50px;position:relative}
+.dcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:34px;backdrop-filter:blur(6px);transition:transform .35s,background .35s,border-color .35s}
+.dcard:hover{transform:translateY(-6px);background:rgba(255,255,255,.09);border-color:rgba(134,239,172,.4)}
+.dhead{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.dicon{width:60px;height:60px;border-radius:18px;background:var(--leaf);display:grid;place-items:center;color:#0F2A1D}
+.dicon svg{width:32px;height:32px}
+.dcard h3{color:#fff;font-size:22px}
+.dcard .for{color:var(--leaf-2);font-size:13px;font-weight:700}
+.dcard p{color:#CFE1D6;font-size:15px;margin-bottom:18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.meta span{font-size:12px;font-weight:600;color:#DCEFE3;background:rgba(255,255,255,.08);padding:6px 11px;border-radius:999px}
+.howto{margin-top:20px;font-size:13px;color:#A9C6B4;border-top:1px dashed rgba(255,255,255,.18);padding-top:16px}
+.howto ol{padding-left:18px;display:grid;gap:4px}
+
+/* footer */
+footer{background:#0B1D14;color:#9FB8A9;padding:60px 0 34px;font-size:14px}
+.fgrid2{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px}
+footer .brand{color:#fff}
+footer h4{color:#fff;font-size:14px;margin-bottom:14px}
+footer ul{list-style:none;display:grid;gap:8px}
+footer a:hover{color:var(--leaf-2)}
+.copy{margin-top:44px;padding-top:24px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:13px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,30px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}100%{box-shadow:0 0 0 8px rgba(22,163,74,0)}}
+@keyframes draw{0%{stroke-dashoffset:620}55%,100%{stroke-dashoffset:235}}
+@keyframes grow{0%{width:4%}55%,100%{width:62%}}
+
+/* responsive */
+@media (max-width:1000px){
+  .hero-grid{grid-template-columns:1fr}
+  .stage{height:560px}
+  .problems,.roles{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:repeat(2,1fr)}
+  .fcard.wide{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,1fr);gap:40px 22px}
+  .step::after{display:none}
+  .trust{grid-template-columns:repeat(2,auto);gap:22px 40px}
+  .fgrid2{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  section{padding:80px 0}
+  .links,.nav .btn{display:none}
+  .menu-btn{display:block}
+  header.open{background:var(--page);box-shadow:0 10px 30px -10px rgba(0,0,0,.15)}
+  header.open .links{display:flex;position:absolute;top:76px;left:0;right:0;flex-direction:column;gap:0;background:var(--page);padding:6px 20px 18px;border-bottom:1px solid var(--line)}
+  header.open .links a{padding:13px 0;border-bottom:1px solid var(--line)}
+  header.open .menu-btn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  header.open .menu-btn span:nth-child(2){opacity:0}
+  header.open .menu-btn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .problems,.roles,.fgrid,.dgrid,.steps,.fgrid2{grid-template-columns:1fr}
+  .fcard.wide{grid-column:auto}
+  .chip.c1{left:0}.chip.c2{display:none}
+  header.open .links a.m-only{display:block;color:var(--forest)}
+  .stage{transform:scale(.92)}
+  .wrap{width:calc(100% - 32px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+  .route{stroke-dashoffset:235}
+}
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap nav">
+    <a href="#" class="brand" aria-label="HarvestHub home"><img src="/site/logo-mark.png" alt=""><span>Harvest<b>Hub</b></span></a>
+    <nav class="links" aria-label="Main">
+      <a href="#why">Why HarvestHub</a>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#roles">Who it's for</a>
+      <a href="#download" class="m-only">Download</a>
+    </nav>
+    <a href="#download" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download</a>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow reveal">Farm-to-market platform · Sri Lanka</span>
+      <h1 class="reveal d1">Fair trade from the <span class="hl">farm gate</span> to the buyer's door.</h1>
+      <p class="lead reveal d2">HarvestHub connects farmers directly with buyers. Every harvest is verified by an agricultural officer, payments are protected in escrow, transport is arranged automatically, and every delivery is tracked live.</p>
+      <div class="cta reveal d3">
+        <a href="/downloads/HarvestHub.apk" class="btn btn-primary" download>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18a.38.38 0 00-.66-.38l-1.86 3.22A11.4 11.4 0 0012 8.1c-1.78 0-3.46.38-4.92 1.04L5.22 5.92a.38.38 0 00-.66.38L6.4 9.48A10.8 10.8 0 001 18h22a10.8 10.8 0 00-5.4-8.52zM7 15.25a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm10 0a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5z"/></svg>
+          <span>Get the Android app<small>Farmers · Buyers · Transporters</small></span></a>
+        <a href="#download" class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.1L21 21v-8.5h-9.5v7.1zm0-15.2v7.1H21V3l-9.5 1.4z"/></svg>
+          <span>Officer portal for Windows<small>Desktop app</small></span></a>
+      </div>
+      <div class="trust reveal d4">
+        <div><strong data-count="0" data-suffix="%">0%</strong><span>fee for farmers</span></div>
+        <div><strong data-count="20" data-suffix="%">20%</strong><span>advance held in escrow</span></div>
+        <div><strong data-count="4">4</strong><span>roles, one platform</span></div>
+        <div><strong>Live</strong><span>GPS delivery tracking</span></div>
+      </div>
+    </div>
+
+    <div class="stage reveal d2" aria-hidden="true">
+      <div class="phone">
+        <div class="screen">
+          <div class="s-top"><span class="t">Live Delivery</span><span class="live"><i></i>LIVE</span></div>
+          <div class="s-map">
+            <svg viewBox="0 0 272 250" preserveAspectRatio="none">
+              <path d="M0 60 C60 40 90 90 140 70 S230 30 272 50" stroke="#fff" stroke-width="10" fill="none" opacity=".9"/>
+              <path d="M30 250 C40 190 90 170 120 140 S170 90 200 30" stroke="#fff" stroke-width="8" fill="none" opacity=".9"/>
+              <path d="M0 190 C80 200 160 170 272 210" stroke="#fff" stroke-width="7" fill="none" opacity=".8"/>
+              <rect x="160" y="140" width="80" height="60" rx="14" fill="#D7EBDD"/>
+              <rect x="20" y="20" width="70" height="40" rx="12" fill="#D7EBDD"/>
+              <path id="road" class="route-bg" d="M40 215 C70 205 80 170 110 160 S150 150 165 120 S190 70 230 45"/>
+              <path class="route" d="M40 215 C70 205 80 170 110 160 S150 150 165 120 S190 70 230 45"/>
+              <circle cx="40" cy="215" r="9" fill="#15803D" stroke="#fff" stroke-width="4"/>
+              <circle cx="230" cy="45" r="9" fill="#DC2626" stroke="#fff" stroke-width="4"/>
+              <g>
+                <circle r="13" fill="#1B4332" stroke="#fff" stroke-width="4"/>
+                <circle r="20" fill="none" stroke="#1B4332" stroke-opacity=".25" stroke-width="6"/>
+                <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0.62;0.62" keyTimes="0;0.55;1" calcMode="spline" keySplines=".45 0 .55 1;0 0 1 1"><mpath href="#road"/></animateMotion>
+              </g>
+            </svg>
+          </div>
+          <div class="s-card">
+            <div class="s-row">
+              <div class="s-tile"><small>Arriving in</small><b>24 min</b></div>
+              <div class="s-tile"><small>Remaining</small><b>11.8 km</b></div>
+            </div>
+            <div class="bar"><i></i></div>
+          </div>
+          <div class="s-card s-driver">
+            <div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div>
+            <div><b>Mini lorry · 1 ton</b><small>1,000 kg Carrots</small></div>
+            <span class="call">Call</span>
+          </div>
+        </div>
+      </div>
+      <div class="chip c1"><div class="ic" style="background:#E8F5EA;color:#1B4332"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><div><b>Grade A · Verified</b><small>Checked by an officer</small></div></div>
+      <div class="chip c2"><div class="ic" style="background:#FEF3C7;color:#92400E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><div><b>Funds in escrow</b><small>Released on 2-way confirm</small></div></div>
+      <div class="chip c3"><div class="ic" style="background:#EEF4FF;color:#1E3A8A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><div><b>Vehicle assigned</b><small>Nearest free driver</small></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="wrap">
+    <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>GPS-locked listings</div>
+    <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/></svg>Officer-verified quality</div>
+    <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Escrow payments</div>
+    <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/></svg>Automatic transport</div>
+    <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>2-way delivery handshake</div>
+  </div>
+</div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap center">
+    <span class="eyebrow reveal">The problem</span>
+    <h2 class="reveal d1">Farmers grow the food. Middlemen take the margin.</h2>
+    <p class="lead reveal d2">Small farmers struggle to reach buyers they can trust, and buyers can't see the harvest before they pay. HarvestHub removes each of these barriers.</p>
+    <div class="problems" style="text-align:left">
+      <div class="pcard reveal"><div class="n">01</div><h3>Hidden demand</h3><p>Farmers don't know who wants what, or at what price.</p><div class="fix">→ Live market prices and buyer "wanted" requests</div></div>
+      <div class="pcard reveal d1"><div class="n">02</div><h3>Trust gap</h3><p>Distant buyers can't check the quality of a harvest.</p><div class="fix">→ Geotagged photos and video, graded by officers</div></div>
+      <div class="pcard reveal d2"><div class="n">03</div><h3>Costly transport</h3><p>Finding and pricing a vehicle is slow, and produce spoils.</p><div class="fix">→ Right-sized vehicle, fair fee, nearest driver</div></div>
+      <div class="pcard reveal d3"><div class="n">04</div><h3>Payment risk</h3><p>No safe way to pay a stranger in advance.</p><div class="fix">→ Escrow released only when both sides confirm</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow reveal">Features</span>
+      <h2 class="reveal d1">Everything a harvest needs to reach the market</h2>
+      <p class="lead reveal d2">One connected system covers listing, verification, deals, payment, transport and delivery.</p>
+    </div>
+    <div class="fgrid">
+      <div class="fcard reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><h3>GPS-verified listings</h3><p>Farmers capture photos and a short video in the app, at the farm. Location and time are locked into every file.</p></div>
+      <div class="fcard reveal d1"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h3>Officer quality grading</h3><p>Agricultural officers review each harvest on the desktop portal and grade it A, B or C before buyers can see it.</p></div>
+      <div class="fcard reveal d2"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg></div><h3>Negotiate in chat</h3><p>Buyer and farmer agree quantity, price and pickup date with counter-offers. The deal is locked when both confirm.</p></div>
+      <div class="fcard wide reveal">
+        <div><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><h3>Payment-first escrow</h3><p>The buyer pays a 20% advance into escrow before any vehicle moves. The farmer receives it when the goods leave the farm, and the rest is released automatically after delivery is confirmed by both driver and buyer.</p></div>
+        <div class="money">
+          <div class="mrow">Farmer fee<b>0%</b></div>
+          <div class="mrow">Buyer service fee<b>3%</b></div>
+          <div class="mrow">Advance held in escrow<b>20%</b></div>
+          <div class="mrow">Refund if rejected before loading<b>Full</b></div>
+        </div>
+      </div>
+      <div class="fcard reveal d1"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div><h3>Smart dispatch</h3><p>The smallest vehicle that fits the load is chosen, the fee is calculated by distance and weight, and the nearest free driver gets the job.</p></div>
+      <div class="fcard reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4z"/><path d="M8 20h8M12 16v4"/><path d="M8 11l2.5 2.5L16 8"/></svg></div><h3>Pre-loading approval</h3><p>The driver photographs the harvest at the farm. The buyer approves it remotely before loading — no surprises on arrival.</p></div>
+      <div class="fcard reveal d1"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><h3>Live tracking</h3><p>Farmer and buyer follow the vehicle on a live map, with the road route, arrival time and distance left.</p></div>
+      <div class="fcard reveal d2"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg></div><h3>Trust scores</h3><p>Ratings and completed deliveries build a public trust score for every farmer, buyer and driver.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap center">
+    <span class="eyebrow reveal">How it works</span>
+    <h2 class="reveal d1">From harvest to payment in eight clear steps</h2>
+    <p class="lead reveal d2">Every order follows the same safe path. Each party always knows the next step.</p>
+    <div class="steps" id="steps">
+      <div class="step reveal"><div class="dot">1</div><h3>List</h3><p>Farmer lists the harvest with in-app photos and video.</p></div>
+      <div class="step reveal d1"><div class="dot">2</div><h3>Verify</h3><p>An officer checks the media and grades the crop.</p></div>
+      <div class="step reveal d2"><div class="dot">3</div><h3>Negotiate</h3><p>Buyer and farmer agree price, quantity and pickup date.</p></div>
+      <div class="step reveal d3"><div class="dot">4</div><h3>Pay advance</h3><p>Buyer's advance is locked safely in escrow.</p></div>
+      <div class="step reveal"><div class="dot">5</div><h3>Dispatch</h3><p>The nearest suitable vehicle accepts the job.</p></div>
+      <div class="step reveal d1"><div class="dot">6</div><h3>Approve loading</h3><p>Buyer approves the driver's photos before loading.</p></div>
+      <div class="step reveal d2"><div class="dot">7</div><h3>Track</h3><p>Live GPS from the farm to the buyer's door.</p></div>
+      <div class="step reveal d3"><div class="dot">8</div><h3>Confirm & settle</h3><p>Driver and buyer confirm; everyone is paid automatically.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section id="roles" class="features">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow reveal">Who it's for</span>
+      <h2 class="reveal d1">Built for everyone in the supply chain</h2>
+      <p class="lead reveal d2">Three roles use the Android app. Agricultural officers work from the desktop portal.</p>
+    </div>
+    <div class="roles">
+      <div class="role reveal"><span class="tag">Android</span><h3>Farmers</h3><ul><li>List harvests in minutes</li><li>See market prices and buyer requests</li><li>Get the advance before the goods leave</li><li>Zero platform fee</li></ul></div>
+      <div class="role reveal d1"><span class="tag">Android</span><h3>Buyers</h3><ul><li>Browse officer-graded harvests</li><li>Post what you need, receive offers</li><li>Approve the load before it ships</li><li>Pay safely through escrow</li></ul></div>
+      <div class="role reveal d2"><span class="tag">Android</span><h3>Transporters</h3><ul><li>Receive nearby jobs that fit your vehicle</li><li>Clear payout shown up front</li><li>Navigation to farm and buyer</li><li>Paid automatically on delivery</li></ul></div>
+      <div class="role reveal d3"><span class="tag d">Windows</span><h3>Officers</h3><ul><li>Shared verification queue</li><li>Zoomable photos, video and GPS checks</li><li>Grade A / B / C or ask for a retake</li><li>Handle disputes and appeals</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download" class="download">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow reveal" style="background:rgba(255,255,255,.1);color:#B9F2C4">Download</span>
+      <h2 class="reveal d1">Get started with HarvestHub</h2>
+      <p class="lead reveal d2">Both apps connect to the same secure HarvestHub service. Sign up in the app with your role.</p>
+    </div>
+    <div class="dgrid">
+      <div class="dcard reveal">
+        <div class="dhead"><div class="dicon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18a.38.38 0 00-.66-.38l-1.86 3.22A11.4 11.4 0 0012 8.1c-1.78 0-3.46.38-4.92 1.04L5.22 5.92a.38.38 0 00-.66.38L6.4 9.48A10.8 10.8 0 001 18h22a10.8 10.8 0 00-5.4-8.52zM7 15.25a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm10 0a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5z"/></svg></div><div><h3>Android app</h3><div class="for">Farmers · Buyers · Transporters</div></div></div>
+        <p>List harvests, buy produce, accept transport jobs and follow deliveries live — all in one app.</p>
+        <div class="meta"><span>Version 1.0</span><span>Android 5.0+</span><span>APK · 42 MB</span></div>
+        <a href="/downloads/HarvestHub.apk" class="btn btn-light" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download APK</a>
+        <div class="howto"><ol><li>Open the downloaded file on your phone.</li><li>If asked, allow installing apps from this source.</li><li>Open HarvestHub and choose your role.</li></ol></div>
+      </div>
+      <div class="dcard reveal d1">
+        <div class="dhead"><div class="dicon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.1L21 21v-8.5h-9.5v7.1zm0-15.2v7.1H21V3l-9.5 1.4z"/></svg></div><div><h3>Officer portal</h3><div class="for">Agricultural Officers · Windows</div></div></div>
+        <p>Review and grade listings, monitor orders and resolve disputes from a full desktop dashboard.</p>
+        <div class="meta"><span>Version 1.0</span><span>Windows 10 / 11 (64-bit)</span><span>ZIP · 34 MB</span></div>
+        <a href="/downloads/HarvestHub-Officer-Portal-Windows.zip" class="btn btn-light" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download for Windows</a>
+        <div class="howto"><ol><li>Extract the ZIP to a folder.</li><li>Run <b>HarvestHub.exe</b> — Java is included.</li><li>Sign in with your officer account.</li></ol></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid2">
+      <div>
+        <a href="#" class="brand"><img src="/site/logo-mark-light.png" alt=""><span>Harvest<b>Hub</b></span></a>
+        <p style="margin-top:14px;max-width:360px">A trusted agricultural marketplace and logistics platform connecting farmers directly with buyers in Sri Lanka.</p>
+      </div>
+      <div><h4>Platform</h4><ul><li><a href="#features">Features</a></li><li><a href="#how">How it works</a></li><li><a href="#roles">Who it's for</a></li></ul></div>
+      <div><h4>Download</h4><ul><li><a href="/downloads/HarvestHub.apk" download>Android app</a></li><li><a href="/downloads/HarvestHub-Officer-Portal-Windows.zip" download>Officer portal (Windows)</a></li></ul></div>
+    </div>
+    <div class="copy"><span>© 2026 HarvestHub · Team CodeX, Rajarata University of Sri Lanka</span><span>Smart farming. Better tomorrow.</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var header=document.getElementById('top');
+  function onScroll(){header.classList.toggle('scrolled',window.scrollY>10)}
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  var btn=document.querySelector('.menu-btn');
+  btn.addEventListener('click',function(){var o=header.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+  document.querySelectorAll('.links a').forEach(function(a){a.addEventListener('click',function(){header.classList.remove('open');btn.setAttribute('aria-expanded','false')})});
+
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!('IntersectionObserver' in window)||reduce){document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in')});return}
+
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(e){io.observe(e)});
+
+  // count-up numbers
+  var co=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting)return;co.unobserve(e.target);
+    var el=e.target,end=+el.dataset.count,suf=el.dataset.suffix||'',t0=null;
+    if(!end){return}
+    function step(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/1200);el.textContent=Math.round(end*(1-Math.pow(1-p,3)))+suf;if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step);
+  })},{threshold:.6});
+  document.querySelectorAll('[data-count]').forEach(function(e){co.observe(e)});
+
+  // walk through the 8 steps
+  var steps=document.querySelectorAll('#steps .step'),i=0,timer=null;
+  var so=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting&&!timer){timer=setInterval(function(){steps.forEach(function(s,k){s.classList.toggle('on',k<=i)});i=(i+1)%(steps.length+2)},700)}
+    else if(!e.isIntersecting&&timer){clearInterval(timer);timer=null}
+  })},{threshold:.3});
+  so.observe(document.getElementById('steps'));
+})();
+</script>
+</body>
+</html>
