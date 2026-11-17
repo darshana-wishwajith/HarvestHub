@@ -149,15 +149,16 @@ public class SecureCheckoutActivity extends BaseBuyerOrderActivity {
         Callback<Order> done = new Callback<Order>() {
             @Override
             public void onResponse(@NonNull Call<Order> call, @NonNull Response<Order> response) {
-                busy = false;
                 if (!response.isSuccessful() || response.body() == null) {
+                    busy = false;
                     Toast.makeText(SecureCheckoutActivity.this,
                             AuthInputUtils.errorMessage(response, "Payment could not be recorded."), Toast.LENGTH_LONG).show();
                     loadWallet();
                     load();
                     return;
                 }
-                Order updated = response.body();
+                Order updated = response.body(); // busy stays true: the refresh must not open a screen behind the dialog
+                if (isFinishing() || isDestroyed()) return;
                 new AlertDialog.Builder(SecureCheckoutActivity.this)
                         .setTitle("Payment successful")
                         .setMessage(rs(amount) + (balanceStage

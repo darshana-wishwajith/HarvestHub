@@ -87,6 +87,19 @@ public class ArrivingPickupActivity extends BaseTransporterOrderActivity {
         LinearLayout t2 = TUi.tiles(stop);
         TUi.tile(t2, R.drawable.ic_route, "Farm \u2192 Buyer", o.getDistanceKm() == null ? "\u2014" : TUi.km(o.getDistanceKm()), "Order " + ref());
         TUi.tile(t2, R.drawable.ic_banknote, "Your Payout", rs(o.driverPayout()), "On delivery");
+        LinearLayout t3 = TUi.tiles(stop);
+        TUi.tile(t3, R.drawable.ic_calendar, "Pickup Date", day(o.getPickupDate() != null ? o.getPickupDate() : o.getDeliveryDate()), null);
+        TUi.tile(t3, R.drawable.ic_truck, "Vehicle", o.getVehiclePlate() != null ? o.getVehiclePlate()
+                : o.getVehicleLabel() != null ? o.getVehicleLabel() : "—", null);
+
+        // where the load goes after pickup
+        LinearLayout drop = TUi.card(c);
+        TUi.iconHeader(drop, R.drawable.ic_route, "Trip", "Order " + ref(), TUi.GREY_BG, TUi.INK);
+        LinearLayout tl = TUi.box(drop, Color.WHITE, 10);
+        tl.setPadding(0, 0, 0, 0);
+        TUi.timeline(tl,
+                new String[]{"Pickup • " + day(o.getPickupDate()), o.getFarmerName() == null ? "Farm" : o.getFarmerName(), o.getPickupAddress()},
+                new String[]{"Drop-off", o.getBuyerName() == null ? "Buyer" : o.getBuyerName(), o.getDropAddress()});
 
         TUi.iconButton(actions, "Open Navigation in Google Maps", R.drawable.ic_navigation_pointer, Color.parseColor("#E9E7E5"), TUi.INK,
                 v -> RouteMap.navigate(this, tracking == null ? null : tracking.pickupLatitude, tracking == null ? null : tracking.pickupLongitude));
