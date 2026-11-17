@@ -132,6 +132,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void bindOrder() {
         ((TextView) findViewById(R.id.tvBuyerName)).setText(order.getBuyerName() != null ? order.getBuyerName() : "Buyer");
+        ((TextView) findViewById(R.id.ivAvatar)).setText(initials(order.getBuyerName()));
         ((TextView) findViewById(R.id.tvBuyerRating)).setText(order.isBuyerConfirmed() ? "Confirmed ✓" : "");
         ((TextView) findViewById(R.id.tvProductSummary)).setText(String.format(Locale.US, "%s • %,.0f KG • LKR %,.0f/kg",
                 order.getCropName(), order.getQuantity(), order.getPricePerKg()));
@@ -248,5 +249,14 @@ public class ChatActivity extends AppCompatActivity {
         topNav.findViewById(R.id.btnNotification).setOnClickListener(v ->
                 startActivity(new Intent(this, NotificationsActivity.class)));
         BottomNavHelper.setup(this, findViewById(R.id.included_nav), BottomNavHelper.Tab.LISTINGS);
+    }
+
+    /** "Lahiru Sahan" → "LS", "Kamal" → "K". */
+    static String initials(String name) {
+        if (name == null || name.trim().isEmpty()) return "?";
+        String[] p = name.trim().split("\\s+");
+        String first = p[0].substring(0, 1);
+        String last = p.length > 1 ? p[p.length - 1].substring(0, 1) : "";
+        return (first + last).toUpperCase(java.util.Locale.ROOT);
     }
 }

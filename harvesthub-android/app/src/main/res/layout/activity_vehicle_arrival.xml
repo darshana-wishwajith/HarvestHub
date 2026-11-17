@@ -138,14 +138,17 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.imageview.ShapeableImageView
+                    <TextView
+                        android:id="@+id/tvDriverAvatar"
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/profile_png"
-                        app:shapeAppearanceOverlay="@style/CircleAppearance"
-                        app:strokeColor="@color/divider_gray"
-                        app:strokeWidth="1dp" />
+                        android:background="@drawable/bg_avatar_initials"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:gravity="center"
+                        android:text="D"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

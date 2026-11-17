@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/primary_green</item>
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.HarvestHubMobile" parent="Base.Theme.HarvestHubMobile" />

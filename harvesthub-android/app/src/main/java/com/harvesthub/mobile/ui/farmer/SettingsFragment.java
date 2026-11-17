@@ -108,11 +108,12 @@ public class SettingsFragment extends Fragment {
             ivProfile.setVisibility(View.INVISIBLE);
             tvInitial.setVisibility(View.VISIBLE);
             if (profile.getFullName() != null && !profile.getFullName().isEmpty()) {
-                tvInitial.setText(String.valueOf(profile.getFullName().charAt(0)).toUpperCase());
+                tvInitial.setText(ChatActivity.initials(profile.getFullName())); // first + last name, e.g. "DB"
             }
         } else {
             ivProfile.setVisibility(View.VISIBLE);
             tvInitial.setVisibility(View.GONE);
+            com.harvesthub.mobile.utils.RemoteImage.load(ivProfile, profile.getProfilePhotoUrl());
         }
     }
 

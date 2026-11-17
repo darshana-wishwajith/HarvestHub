@@ -248,7 +248,7 @@ Deliberate design deviations (all user-approved): Order Summary says "Crop Advan
 
 | Area | Progress | Verified by |
 |---|---|---|
-| Backend | Feature-complete for the proposal; deployed (latest JAR sha256 `285df750…614d`, 17 Nov evening) | 52/52 tests; live HTTPS checks; live end-to-end order (17 Nov) |
+| Backend | Feature-complete for the proposal; deployed (latest JAR sha256 `901c52a7…bf6b`, 18 Nov — broadcast dispatch) | 52/52 tests; live HTTPS checks; live end-to-end order (17 Nov) |
 | Android | All three roles feature-complete; Figma passes for buyer + transporter done 17 Nov; data audit done | Build + 28/28 unit tests; live login + dashboard/listings/notifications/wallet 200 for all roles. **Latest APK not yet installed / clicked through on a phone** |
 | Desktop | Feature-complete; visual refresh deployed as packaged exe | 14/14 tests; off-screen snapshot checks |
 | Data | Atlas has tagged test data for every stage (`@test.harvesthub.lk`); backups in `backups/` (git-ignored) | Seeder dry runs + read-only checks |
@@ -375,6 +375,8 @@ Atlas is shared live data. Inserts of tagged test data are allowed; **no deletes
 ## 16. Change log of this file
 | Date | By | Change |
 |---|---|---|
+| 2026-11-18 | Claude (Opus 5.5) | UI fixes: empty buyer chat bubbles, demand card badge/buttons, buyer top bar greeting removed, farmer avatar initials, Edit Profile save (photo upload, NIC read-only, phone check), sharp top-bar logo. On the website download (APK `b6d1bc30…`). |
+| 2026-11-18 | Claude (Opus 5.5) | Broadcast dispatch (first driver to accept wins), farmer tracker rebuilt, initials avatars, app locked to light mode (fixes invisible chat text). Deployed 18 Nov with the matching website APK (JAR `901c52a7…`). Old APKs cannot open broadcast offers — every driver phone needs the new APK. |
 | 2026-11-17 | Claude (Opus 5.5) | Public landing page + downloads deployed at https://harvesthubapp.tech/ (source in `website/`; nginx `/site/` and `/downloads/` static routes; to update: re-copy `website/` files to `/usr/share/nginx/harvesthub/`). The APK offered is the debug build pointed at production (release build is unsigned). |
 | 2026-11-17 | Claude (Opus 5.5) | Live tracking fixes: new farmer "Live Delivery" screen (`OrderInTransitActivity`, real OSM map + ETA/route/driver/payment/steps) and real map in the farmer tracker (fake `DeliveryMapView` deleted); road-following routes (`RoadRoute` + shared `TripMap`, also buyer tracking and transporter `RouteMap`); pickup date on transporter job offer / pickup screen / job cards (backend adds `pickupDate` to the job DTO — deployed 17 Nov, JAR `285df750…614d`); fixed buyer crash loop after paying the 80% balance (`DeliveryHandshakeActivity` cast `AppCompatButton` to `MaterialButton`); checkout no longer opens a screen behind the success dialog. Build + 28/28; backend compiles; install was blocked on the phone (accept the prompt). Rollback point = commit `c0de213`. |
 | 2026-11-17 | Claude (Opus 5.5) | Buyer UX pass: 5-tab bottom bar, new Account tab, Home/Orders/Harvest Tracker rebuilt with TUi kit, wallet rows; installed |

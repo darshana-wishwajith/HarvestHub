@@ -55,11 +55,13 @@ public class DemandRequestAdapter extends RecyclerView.Adapter<DemandRequestAdap
         if (item.getStatus() == DemandStatus.ACTIVE) {
             holder.tvStatusBadge.setText("Status: Active");
             holder.tvStatusBadge.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_badge_status_active));
+            holder.tvStatusBadge.setTextColor(0xFF14532D);
             holder.layoutActiveActions.setVisibility(View.VISIBLE);
             holder.layoutClosedActions.setVisibility(View.GONE);
         } else {
             holder.tvStatusBadge.setText("Status: Closed");
             holder.tvStatusBadge.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_badge_status_closed));
+            holder.tvStatusBadge.setTextColor(0xFF475569);
             holder.layoutActiveActions.setVisibility(View.GONE);
             holder.layoutClosedActions.setVisibility(View.VISIBLE);
         }

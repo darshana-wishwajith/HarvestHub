@@ -290,10 +290,15 @@ public class NegotiationChatActivity extends BaseBuyerOrderActivity {
         TextView msg = new TextView(this);
         msg.setBackgroundResource(mine ? R.drawable.bg_chat_buyer : R.drawable.bg_chat_farmer);
         msg.setText(text);
-        msg.setTextColor(mine ? ContextCompat.getColor(this, R.color.white) : 0xFF111827);
+        msg.setTextColor(mine ? 0xFFFFFFFF : 0xFF111827);
         msg.setTextSize(14f);
         msg.setPadding(dp(16), dp(12), dp(16), dp(12));
-        box.addView(msg);
+        msg.setMaxWidth(getResources().getDisplayMetrics().widthPixels * 3 / 4);
+        // explicit WRAP_CONTENT: a vertical LinearLayout's default child width is MATCH_PARENT, which squeezed the
+        // bubble to the width of the time label underneath and left no room for the text
+        LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mp.gravity = mine ? Gravity.END : Gravity.START;
+        box.addView(msg, mp);
 
         TextView t = new TextView(this);
         t.setText(mine ? when : (order != null && order.getFarmerName() != null ? order.getFarmerName() + " · " : "") + when);

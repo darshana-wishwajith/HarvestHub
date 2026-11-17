@@ -220,7 +220,10 @@ class TransporterFlowIntegrationTests {
         dispatchService.retryPaused();
         Order o = orders.findById(id).orElseThrow();
         assertEquals("TRANSPORTER_ASSIGNED", o.getStatus());
-        assertEquals(driver.getId(), o.getTransporterId());
+        // broadcast to every nearby matching driver, nearest first; nobody owns it until someone accepts
+        assertNull(o.getTransporterId());
+        assertEquals(driver.getId(), o.getOfferedTransporterIds().get(0));
+        assertTrue(o.getOfferedTransporterIds().contains(driver2.getId()));
         assertNotNull(o.getTransportRequestExpiresAt());
         assertTrue(o.getTransportRequestExpiresAt() > System.currentTimeMillis() + 9 * 60_000L);
 
@@ -239,10 +242,24 @@ class TransporterFlowIntegrationTests {
         assertTrue(err.contains("expired"), err);
         orderService.expireTransportRequests();
         o = orders.findById(id).orElseThrow();
-        assertEquals("TRANSPORTER_ASSIGNED", o.getStatus());
-        assertEquals(driver2.getId(), o.getTransporterId());
+        assertEquals("PAUSED", o.getStatus()); // both drivers let it expire
+        assertTrue(o.getOfferedTransporterIds().isEmpty());
         assertEquals(0, ok(driver, "GET", "/dashboard/transporter/" + driver.getId(), null).path("pendingRequests").size());
+
+        // the retries give them another chance; the first driver to accept wins
+        dispatchService.retryPaused();
+        dispatchService.retryPaused();
+        o = orders.findById(id).orElseThrow();
+        assertEquals("TRANSPORTER_ASSIGNED", o.getStatus());
+        assertEquals(2, o.getOfferedTransporterIds().size());
+        assertEquals(1, ok(driver2, "GET", "/dashboard/transporter/" + driver2.getId(), null).path("pendingRequests").size());
         assertEquals("TRANSPORTER_ACCEPTED", transport(driver2, id, "ACCEPT").path("status").asText());
+        String late = bad(driver, "POST", "/orders/" + id + "/transporter-events", Map.of("eventType", "ACCEPT"));
+        assertTrue(late.contains("first"), late);
+        o = orders.findById(id).orElseThrow();
+        assertEquals(driver2.getId(), o.getTransporterId());
+        assertNotNull(o.getTransporterName());
+        assertTrue(o.getOfferedTransporterIds().isEmpty());
     }
 
     // ---------------------------------------------------------------- pre-loading photos 2..4
@@ -343,6 +360,6 @@ class TransporterFlowIntegrationTests {
         ok(driver, "POST", "/wallet/" + driver.getId() + "/deposit", Map.of("amount", charge));
         assertFalse(ok(driver, "GET", "/dashboard/transporter/" + driver.getId(), null).path("suspended").asBoolean());
         dispatchService.retryPaused();
-        assertEquals(driver.getId(), orders.findById(next).orElseThrow().getTransporterId());
+        assertEquals(List.of(driver.getId()), orders.findById(next).orElseThrow().getOfferedTransporterIds());
     }
 }

@@ -102,6 +102,20 @@ public class Order {
     public String getEscrowStatus() { return escrowStatus; }
     public void setEscrowStatus(String escrowStatus) { this.escrowStatus = escrowStatus; }
     public String getTransporterId() { return transporterId; }
+
+    /** Drivers an open job request was broadcast to (decision 18 Nov: first to accept wins). */
+    private java.util.List<String> offeredTransporterIds;
+
+    /** True when this driver owns the job, or the open request was sent to them. */
+    public boolean isForDriver(String userId) {
+        if (userId == null) return false;
+        if (userId.equals(transporterId)) return true;
+        return "TRANSPORTER_ASSIGNED".equals(getStatus()) && offeredTransporterIds != null && offeredTransporterIds.contains(userId);
+    }
+
+    public int offeredCount() {
+        return offeredTransporterIds == null ? 0 : offeredTransporterIds.size();
+    }
     public void setTransporterId(String transporterId) { this.transporterId = transporterId; }
 
     // ---- fields from the backend order workflow (OrderService) ----
