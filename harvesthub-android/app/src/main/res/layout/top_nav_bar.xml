@@ -21,15 +21,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Wordmark Logo -->
-    <ImageView
+    <!-- Text in the brand font instead of the 114x16 px image, which was blurry when scaled up -->
+    <TextView
         android:id="@+id/ivWordmark"
         android:layout_width="wrap_content"
-        android:layout_height="18dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="HarvestHub"
-        android:src="@drawable/harvesthub_logo_given"
-        app:tint="@color/top_nav_icon_tint"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:text="HarvestHub"
+        android:textColor="#1B4332"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivLogoIcon"
         app:layout_constraintTop_toTopOf="parent" />

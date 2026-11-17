@@ -79,6 +79,8 @@ public class Order {
     private boolean disputeOpen;
     /** Epoch ms when the pending job request to the assigned driver expires (decision 15 Nov: 10 min). */
     private Long transportRequestExpiresAt;
+    /** Drivers the open job request was broadcast to (decision 18 Nov: nearest matching drivers, first to accept wins). */
+    private java.util.List<String> offeredTransporterIds = new java.util.ArrayList<>();
     /** Driver brought rejected goods back to the farm (decision 15 Nov). */
     private String goodsReturnedAt;
 

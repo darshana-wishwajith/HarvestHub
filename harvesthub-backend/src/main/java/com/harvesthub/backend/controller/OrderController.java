@@ -46,6 +46,9 @@ public class OrderController {
     private Order requireParticipant(String orderId) {
         Order order = orderService.getOrderById(orderId);
         if (order == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        // drivers an open job request was broadcast to may read it (decision 18 Nov)
+        if ("TRANSPORTER_ASSIGNED".equals(order.getStatus()) && order.getOfferedTransporterIds() != null
+                && order.getOfferedTransporterIds().contains(currentUser.id())) return order;
         currentUser.requireParticipantOrStaff(order.getFarmerId(), order.getBuyerId(), order.getTransporterId());
         return order;
     }

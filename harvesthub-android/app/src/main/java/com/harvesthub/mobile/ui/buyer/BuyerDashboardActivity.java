@@ -107,7 +107,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
         if (tvSubtitle != null) {
             String name = (session.getUser() != null && session.getUser().getFullName() != null && !session.getUser().getFullName().isEmpty())
                     ? session.getUser().getFullName() : "Buyer";
-            tvSubtitle.setText("Hi, " + name);
+            tvSubtitle.setVisibility(View.GONE); // greeting lives on the Home screen only (user request 18 Nov)
         }
     }
 

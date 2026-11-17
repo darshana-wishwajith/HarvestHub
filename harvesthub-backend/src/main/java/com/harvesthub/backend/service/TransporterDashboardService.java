@@ -97,7 +97,10 @@ public class TransporterDashboardService {
                 });
 
         // jobs
-        List<Order> mine = orders.findByTransporterId(transporterId);
+        List<Order> mine = new java.util.ArrayList<>(orders.findByTransporterId(transporterId));
+        for (Order o : orders.findByStatusAndOfferedTransporterIds("TRANSPORTER_ASSIGNED", transporterId)) {
+            if (mine.stream().noneMatch(x -> x.getOrderId().equals(o.getOrderId()))) mine.add(o); // broadcast requests
+        }
         for (Order o : mine) {
             String s = o.getStatus() == null ? "" : o.getStatus();
             switch (s) {
