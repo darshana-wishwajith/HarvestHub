@@ -59,6 +59,9 @@ public class JobOfferActivity extends BaseTransporterOrderActivity {
         LinearLayout tl = TUi.tiles(pay);
         TUi.tile(tl, R.drawable.ic_clock, "Est. Duration", duration(km), null);
         TUi.tile(tl, R.drawable.ic_route, "Total Distance", TUi.km(km), null);
+        LinearLayout dates = TUi.tiles(pay);
+        TUi.tile(dates, R.drawable.ic_calendar, "Pickup Date", day(o.getPickupDate() != null ? o.getPickupDate() : o.getDeliveryDate()), null);
+        TUi.tile(dates, R.drawable.ic_scale_manifest, "Load", String.format(java.util.Locale.US, "%,.0f kg", o.getQuantity()), null);
 
         LinearLayout rp = TUi.card(c);
         LinearLayout rh = TUi.hrow(rp, 0);

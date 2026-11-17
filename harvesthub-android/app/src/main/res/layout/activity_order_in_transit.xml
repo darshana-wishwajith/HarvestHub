@@ -1,238 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- Farmer "Live Delivery" (replaces the static Figma 31 illustration): real OSM map with the road route and the
+     driver's GPS point, trip progress / ETA, driver contact and the payment state. Cards are built in OrderInTransitActivity. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFBF8">
+    android:background="#FDF8F6"
+    android:orientation="vertical">
 
-    <!-- Top Bar -->
     <include
         android:id="@+id/included_top_nav"
         layout="@layout/top_nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:id="@+id/statusBanner"
-        android:layout_width="match_parent"
-        android:layout_height="92dp"
-        android:background="#C9F8C4"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingStart="17dp"
-        app:layout_constraintTop_toBottomOf="@id/included_top_nav">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="16dp"
-                android:contentDescription="Order in transit"
-                android:src="@drawable/ic_local_shipping" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="9dp"
-                android:text="Status: Order In Transits"
-                android:textColor="#00731E"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvOrderId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
-            android:text="Order #ORD-4082"
-            android:textColor="#40955A"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/tripScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/included_nav"
-        app:layout_constraintTop_toBottomOf="@id/statusBanner">
+        android:layout_weight="1"
+        android:clipToPadding="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="680dp"
-            android:paddingBottom="34dp">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:id="@+id/tripHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/illustrationCard"
-                android:layout_width="246dp"
-                android:layout_height="246dp"
-                android:layout_marginTop="30dp"
-                app:cardBackgroundColor="#FFFFFF"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="#E8F5EA"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:cardElevation="1.5dp"
+                app:strokeWidth="0dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
-                <ImageView
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Lorry transporting produce"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/intransists_lorry_illustration" />
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvInTransitTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="In Transits"
-                android:textColor="#242424"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/illustrationCard" />
+                    <org.osmdroid.views.MapView
+                        android:id="@+id/mapFarmerTrip"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
 
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="17dp"
-                android:lineSpacingExtra="3dp"
-                android:text="Your crops are currently being transported to the buyer's location. You can monitor the live progress below."
-                android:textColor="#617695"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvInTransitTitle" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/driverCard"
-                android:layout_width="0dp"
-                android:layout_height="82dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="34dp"
-                android:layout_marginEnd="15dp"
-                app:cardBackgroundColor="#F8F9F7"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#D8DDDA"
-                app:strokeWidth="1dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvDescription">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-
-                    <ImageView
-                        android:id="@+id/ivTruckSmall"
-                        android:layout_width="22dp"
-                        android:layout_height="16dp"
-                        android:contentDescription="Driver vehicle"
-                        android:src="@drawable/ic_local_shipping"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvLiveChip"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="13dp"
-                        android:orientation="vertical"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/btnCall"
-                        app:layout_constraintStart_toEndOf="@id/ivTruckSmall"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_gravity="top|start"
+                        android:layout_margin="12dp"
+                        android:background="@drawable/bg_timestamp_pill"
+                        android:elevation="3dp"
+                        android:paddingStart="12dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="6dp"
+                        android:text="Waiting for GPS"
+                        android:textColor="#111827"
+                        android:textSize="12sp" />
 
-                        <TextView
-                            android:id="@+id/tvDriverName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Driver: Samuel O."
-                            android:textColor="#262626"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvVehicleInfo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="Vehicle: KDH 492L"
-                            android:textColor="#617695"
-                            android:textSize="16sp" />
-                    </LinearLayout>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnCall"
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        app:cardBackgroundColor="#B8F4A9"
-                        app:cardCornerRadius="17dp"
-                        app:cardElevation="0dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Call driver"
-                            android:src="@drawable/ic_call" />
-                    </com.google.android.material.card.MaterialCardView>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageButton
+                        android:id="@+id/btnRecenter"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="12dp"
+                        android:background="@drawable/bg_call_circle_light"
+                        android:contentDescription="Show the vehicle"
+                        android:elevation="3dp"
+                        android:padding="10dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_my_location" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTrackOrder"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="44dp"
-                android:layout_marginEnd="28dp"
-                android:backgroundTint="#1B4332"
-                android:text="Track Order"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                app:icon="@drawable/ic_check_circle"
-                app:iconGravity="textStart"
-                app:iconPadding="11dp"
-                app:iconSize="20dp"
-                app:iconTint="#FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/driverCard" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+            <LinearLayout
+                android:id="@+id/tripContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation -->
     <include
         android:id="@+id/included_nav"
         layout="@layout/bottom_nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content" />
+</LinearLayout>

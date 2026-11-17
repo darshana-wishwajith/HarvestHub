@@ -140,6 +140,7 @@ public class TransporterDashboardService {
         j.setQuantityKg(o.getQuantity());
         j.setPickupAddress(o.getPickupAddress());
         j.setDropoffAddress(o.getDropAddress());
+        j.setPickupDate(o.getPickupDate() != null ? o.getPickupDate() : o.getDeliveryDate());
         j.setFarmerName(o.getFarmerName());
         j.setBuyerName(o.getBuyerName());
         j.setVehicleLabel(o.getVehicleLabel());

@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
-import com.google.android.material.button.MaterialButton;
+import android.widget.Button;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
 import com.harvesthub.mobile.utils.AuthInputUtils;
@@ -64,7 +64,7 @@ public class DeliveryHandshakeActivity extends BaseBuyerOrderActivity {
                 : "Confirming releases the 80% crop balance to the farmer and the transport fee to the driver "
                 + "(5% platform commission deducted). This cannot be undone.");
 
-        MaterialButton confirm = findViewById(R.id.btnConfirmGoodsReceived);
+        Button confirm = findViewById(R.id.btnConfirmGoodsReceived);
         boolean rated = o.getRatedBy() != null && o.getRatedBy().contains(session.getUserId());
         if (completed) {
             confirm.setText(rated ? "Back to Orders" : "Rate Farmer & Driver");
