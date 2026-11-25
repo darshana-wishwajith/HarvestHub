@@ -15,7 +15,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
 
-/** Farmer Home (Figma 10) and the My Listings header — computed only from stored data. */
+/** Farmer Home and the My Listings header — computed only from stored data. */
 @Service
 public class DashboardService {
 

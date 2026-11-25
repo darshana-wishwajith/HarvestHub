@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/** Mock wallet (proposal §4.2). Path ids are checked against the token. */
+/** Mock wallet. Path ids are checked against the token. */
 @RestController
 public class WalletController {
 
@@ -36,7 +36,7 @@ public class WalletController {
         return ResponseEntity.ok(walletService.getRecentTransactions(userId, limit));
     }
 
-    /** Mock top-up "Deposit Funds" (Figma buyer wallet): body {"amount": 5000}. Only the wallet owner. */
+    /** Mock top-up "Deposit Funds": body {"amount": 5000}. Only the wallet owner. */
     @PostMapping("wallet/{userId}/deposit")
     public ResponseEntity<Transaction> deposit(@PathVariable String userId, @RequestBody Map<String, Object> body) {
         if (!currentUser.id().equals(userId)) {

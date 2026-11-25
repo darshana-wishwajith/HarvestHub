@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Forgot password, step 2: enter the 6-digit code.
-     Figma: "4.Forgot password - Code Verfication Screen" (660:111, empty),
+     "4.Forgot password - Code Verfication Screen" screen (660:111, empty),
      "5. ... VC Code - Success Screen" (83:265, green boxes) and
      "6. ... VC Code - Error Screen" (660:21, red boxes + banner). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -63,7 +63,7 @@
                 <EditText android:id="@+id/etOtp6" style="@style/FpOtpBox" />
             </LinearLayout>
 
-            <!-- Error banner (Figma 660:48) -->
+            <!-- Error banner -->
             <LinearLayout
                 android:id="@+id/llErrorContainer"
                 android:layout_width="match_parent"

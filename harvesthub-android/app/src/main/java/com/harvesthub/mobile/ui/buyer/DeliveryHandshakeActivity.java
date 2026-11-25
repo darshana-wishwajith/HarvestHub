@@ -24,9 +24,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 6.2 "Delivery Handshake" (BALANCE_PAID, DELIVERED, COMPLETED). Funds are released when both the
+ * "Delivery Handshake" screen (BALANCE_PAID, DELIVERED, COMPLETED). Funds are released when both the
  * driver ("Delivery Completed") and the buyer ("Goods Received") confirm. "Report Issue with Handover" opens a
- * dispute ticket for the officers; money stays as settled (decision 15 Nov).
+ * dispute ticket for the officers; money stays as settled.
  */
 public class DeliveryHandshakeActivity extends BaseBuyerOrderActivity {
 

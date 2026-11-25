@@ -34,7 +34,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Figma buyer 2.1 marketplace feed + 2.2 filters + "Purchase Request Form" (563:105). Real ACTIVE (officer-verified) lots. */
+/** marketplace feed + 2.2 filters + "Purchase Request Form". Real ACTIVE (officer-verified) lots. */
 public class BuyerMarketplaceFragment extends Fragment implements FilterMarketplaceBottomSheet.Listener {
 
     private RecyclerView rvHarvestList;
@@ -188,7 +188,7 @@ public class BuyerMarketplaceFragment extends Fragment implements FilterMarketpl
     }
 
     /**
-     * Figma "Purchase Request Form": the buyer proposes quantity, rate and pickup (logistics) date. The order starts in
+     * "Purchase Request Form" screen: the buyer proposes quantity, rate and pickup (logistics) date. The order starts in
      * negotiation with the buyer's confirmation on these terms; the farmer accepts or counters in the chat.
      */
     private void showPurchaseForm(HarvestItem item) {

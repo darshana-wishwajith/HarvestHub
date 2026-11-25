@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-/** "Logistics &amp; Tracking" collection (proposal §6.5, §6.8): vehicle, distance, fee and route points per order. */
+/** "Logistics &amp; Tracking" collection: vehicle, distance, fee and route points per order. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

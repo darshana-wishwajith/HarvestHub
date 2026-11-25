@@ -39,8 +39,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Transporter "Vehicle Profile" (design 16 Nov): sign-up step 2 of 3 and "Edit vehicle" in Settings.
- * Vehicle classes come from GET /api/vehicle-types (decision 15 Nov: backend classes in the design's card grid);
+ * Transporter "Vehicle Profile": sign-up step 2 of 3 and "Edit vehicle" in Settings.
+ * Vehicle classes come from GET /api/vehicle-types;
  * the configuration (body type) is required; the driving-licence photo is required at sign-up and uploaded right
  * after the account is created. Every field is checked at once and errors show under the field (like farmer
  * registration).

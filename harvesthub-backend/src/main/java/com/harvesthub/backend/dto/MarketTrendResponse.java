@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Price trend for Home chart + Market Insights (Figma 10, 11). */
+/** Price trend for Home chart + Market Insights. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

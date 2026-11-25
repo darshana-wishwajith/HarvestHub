@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/** One user's 1–5 star rating of another after an order (workflow 5.4). One per (order, from, to). */
+/** One user's 1–5 star rating of another after an order. One per (order, from, to). */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

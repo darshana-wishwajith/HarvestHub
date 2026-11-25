@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Buyer Home (Figma buyer "Buyer Home Dashboard" 564:330) — computed only from stored data. */
+/** Buyer Home — computed only from stored data. */
 @Data
 public class BuyerDashboardResponse {
     private String buyerName;
@@ -18,7 +18,7 @@ public class BuyerDashboardResponse {
     private int activeOrders;
     private double escrowHeld;              // buyer money currently locked in escrow
     private int pendingOffers;              // PENDING supply offers on the buyer's open wanted ads
-    private int offersExpiringToday;        // ... whose wanted ad deadline is today
+    private int offersExpiringToday;        // .. whose wanted ad deadline is today
     private int openWantedAds;
     private int actionRequired;             // orders waiting for the buyer (pay, approve, inspect, confirm)
 

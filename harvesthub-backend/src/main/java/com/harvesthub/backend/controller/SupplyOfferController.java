@@ -36,7 +36,7 @@ public class SupplyOfferController {
     private com.harvesthub.backend.service.NotificationService notificationService;
 
     /**
-     * Scenario B (workflow 2.1): a farmer answers a buyer's wanted ad with one of their verified
+     * Scenario B: a farmer answers a buyer's wanted ad with one of their verified
      * (ACTIVE, graded) listings of the same crop — the "batch".
      */
     @PostMapping({"/offers/create", "/api/offers/create"})

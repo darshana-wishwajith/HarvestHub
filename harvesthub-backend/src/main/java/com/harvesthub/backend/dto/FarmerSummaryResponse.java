@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Header of My Listings (Figma 15-17). */
+/** Header of My Listings. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -15,7 +15,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Opens the transporter screen for the order's workflow status (Figma transporter page 612:58). */
+/** Opens the transporter screen for the order's workflow status. */
 public final class TransporterOrderRouter {
 
     public static final String EXTRA_ORDER_ID = OrderFlowRouter.EXTRA_ORDER_ID;

@@ -27,9 +27,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 4.2 "Simulated Payment Gateway". Pays the advance (AWAITING_PAYMENT) or, with
+ * "Simulated Payment Gateway" screen. Pays the advance (AWAITING_PAYMENT) or, with
  * EXTRA_STAGE = BALANCE, the remaining 80% when accepting the delivery (ARRIVED_AT_DESTINATION).
- * Decision 15 Nov: the buyer chooses a simulated card (no real money) or the mock wallet balance.
+ * The buyer chooses a simulated card (no real money) or the mock wallet balance.
  */
 public class SecureCheckoutActivity extends BaseBuyerOrderActivity {
 
@@ -192,7 +192,7 @@ public class SecureCheckoutActivity extends BaseBuyerOrderActivity {
         }
     }
 
-    /** Format checks only — the gateway is simulated (proposal §4.2, no real money). */
+    /** Format checks only — the gateway is simulated. */
     private boolean cardValid() {
         EditText number = findViewById(R.id.etCardNumber);
         EditText expiry = findViewById(R.id.etExpiry);

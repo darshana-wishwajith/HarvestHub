@@ -199,7 +199,7 @@ public interface ApiService {
     @GET("buyer/listings")
     Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grade);
 
-    /** Buyer marketplace with the Figma 2.2 filters; null parameters are left out. */
+    /** Buyer marketplace with the filters; null parameters are left out. */
     @GET("buyer/listings")
     Call<List<ListingItem>> getBuyerListings(@Query("search") String search, @Query("grade") String grades,
                                              @Query("category") String category, @Query("district") String district,
@@ -217,7 +217,7 @@ public interface ApiService {
     @GET("offers")
     Call<List<com.harvesthub.mobile.model.SupplyOffer>> getAllOffers();
 
-    // ---- Farmer workflow (backend OrderService / ListingService, 14 Nov) ----
+    // ---- Farmer workflow ----
 
     @GET("market/centers")
     Call<List<com.harvesthub.mobile.model.MarketCenterInfo>> getMarketCenterInfo(@Query("crop") String crop);
@@ -254,7 +254,7 @@ public interface ApiService {
     @PUT("api/me/preferences")
     Call<Map<String, Object>> updatePreferences(@Body Map<String, Object> body);
 
-    // ---- Buyer workflow (backend, 15 Nov) ----
+    // ---- Buyer workflow ----
 
     @GET("dashboard/buyer/{id}")
     Call<com.harvesthub.mobile.model.BuyerDashboard> getBuyerDashboard(@Path("id") String buyerId);
@@ -286,7 +286,7 @@ public interface ApiService {
     @POST("orders/{orderId}/disputes")
     Call<Map<String, Object>> openDispute(@Path("orderId") String orderId, @Body Map<String, String> body);
 
-    // ---- transporter view (15 Nov) ----
+    // ---- transporter view ----
     @GET("api/vehicle-types")
     Call<List<Map<String, Object>>> getVehicleTypes();
 

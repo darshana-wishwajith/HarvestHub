@@ -58,7 +58,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma 13 "Smart Guided Camera" (workflow 1.3, design 16 Nov). Live capture only (no gallery), all inside the app:
+ * "Smart Guided Camera" screen. Live capture only (no gallery), all inside the app:
  * step 1 wide-angle photo, step 2 close-up photo, step 3 a 10-second video (stops by itself). Each file is
  * uploaded right away; after the third the farmer goes straight to the Listing Details form, which shows the
  * captured media (or, for a retake, the new media is re-submitted). GPS comes from the location lock.

@@ -25,8 +25,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Matchmaking Job Offers" (Jobs tab). Decision 15 Nov: only the requests dispatch sent to this driver
- * (nearest-driver workflow), each with its 10-minute countdown, plus the job in progress.
+ * "Matchmaking Job Offers" screen (Jobs tab). Only the requests dispatch sent to this driver
+ *each with its 10-minute countdown, plus the job in progress.
  */
 public class TransporterJobsActivity extends AppCompatActivity {
 
@@ -133,7 +133,7 @@ public class TransporterJobsActivity extends AppCompatActivity {
         return (j.cropName == null ? "Produce" : j.cropName) + " \u2022 " + String.format(Locale.US, "%,.0f kg", j.quantityKg);
     }
 
-    /** First request: dark "PRIORITY MATCH" strip with the countdown (Figma). */
+    /** First request: dark "PRIORITY MATCH" strip with the countdown. */
     private void priorityCard(TransporterDashboard.Job j) {
         LinearLayout c = TUi.card(content);
         c.setPadding(0, 0, 0, 0);

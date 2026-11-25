@@ -17,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Transit Damage Dispute" – post-delivery rejection (workflow 5.3, transporter at fault). Decisions 15 Nov:
+ * "Transit Damage Dispute" screen – post-delivery rejection.
  * the crop-advance charge applies at once; the driver drives the goods back to the farm and taps Goods Returned;
  * an appeal opens a ticket for the officers but does not change the money.
  */

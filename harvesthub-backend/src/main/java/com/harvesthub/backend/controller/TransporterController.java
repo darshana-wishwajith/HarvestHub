@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Transporter endpoints (Figma transporter view, decisions 15 Nov). */
+/** Transporter endpoints. */
 @RestController
 public class TransporterController {
 
@@ -52,7 +52,7 @@ public class TransporterController {
         return ResponseEntity.ok(dashboard.dashboard(id));
     }
 
-    /** Online / offline switch (Figma Home "Available for Hauls"). body {"online": true, "latitude"?, "longitude"?} */
+    /** Online / offline switch. body {"online": true, "latitude"?, "longitude"?} */
     @PutMapping("/api/me/availability")
     public ResponseEntity<TransporterDashboardResponse> setAvailability(@RequestBody Map<String, Object> body) {
         currentUser.requireRole("TRANSPORTER");
@@ -69,7 +69,7 @@ public class TransporterController {
     }
 
     /**
-     * Vehicle profile / base / licence (Figma "Vehicle Profile", "Set Vehicle Address", Settings). Partial update:
+     * Vehicle profile / base / licence. Partial update:
      * {"vehicleType", "vehiclePlate", "vehicleCapacityKg", "vehicleBodyType", "latitude", "longitude", "address", "licenceUrl"}
      */
     @PutMapping("/api/me/vehicle")

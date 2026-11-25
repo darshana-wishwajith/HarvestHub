@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Forgot password, step 3. Figma: "5.Forgot Password - Account Verified Page" (node 137:2). -->
+<!-- Forgot password, step 3. "5.Forgot Password - Account Verified Page" screen (node 137:2). -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

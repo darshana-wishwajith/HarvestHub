@@ -28,7 +28,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma 22 "Active Order Tracker", rebuilt 18 Nov: overview of any order (escrow state, buyer, current step with the
+ * "Active Order Tracker" screen: overview of any order (escrow state, buyer, current step with the
  * full text, a milestone stepper, driver / vehicle, payment) with the real map (farm, buyer, road route, the driver's
  * GPS point during the trip). Does not auto-advance. Shares its layout with the Live Delivery screen.
  */

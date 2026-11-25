@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Extras set by CameraCaptureActivity after the location lock + guided capture (workflow 1.2-1.3). */
+    /** Extras set by CameraCaptureActivity after the location lock + guided capture. */
     public static final String EXTRA_CAPTURED_MEDIA = "capturedMedia";
 
     /**

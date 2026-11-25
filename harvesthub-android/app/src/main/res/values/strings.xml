@@ -104,7 +104,7 @@
     <string name="transporter_desc">Accept delivery jobs</string>
     <string name="terms_and_privacy">Terms of Service &amp; Privacy Policy</string>
 
-    <!-- Transporter login (Figma 623:2819) -->
+    <!-- Transporter login -->
     <string name="tl_badge">Driver Partner Portal</string>
     <string name="tl_heading">Empowering Local <font color="#006E1C">Harvest</font>\nLogistics</string>
     <string name="tl_subtitle">Log in or register your agricultural transport vehicle to access fresh daily delivery manifests.</string>
@@ -130,7 +130,7 @@
     <string name="tl_fast_access">Fast transit access</string>
     <string name="tl_footer">By continuing you agree to HarvestHub\'s <u><font color="#414844">Carrier Terms</font></u> &amp; <u><font color="#414844">Fair Transit Standards</font></u>.</string>
 
-    <!-- Farmer forgot-password (Figma frames 3-7). The design text says "4-digit"; codes are 6 digits. -->
+    <!-- Farmer forgot-password. The design text says "4-digit"; codes are 6 digits. -->
     <string name="fp_back">Go back</string>
     <string name="fp_title_forgot">Forgot Password?</string>
     <string name="fp_desc_forgot">Enter your registered email address or mobile number. We will send you a 6-digit verification code to reset your password.</string>

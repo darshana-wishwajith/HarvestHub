@@ -31,7 +31,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
         MaterialCardView cardBuyer = findViewById(R.id.cardBuyer);
         MaterialCardView cardTransporter = findViewById(R.id.cardTransporter);
 
-        // Figma shows Farmer as the active card on first open.
+        // Farmer is the active card on first open.
         updateSelection(cardFarmer, cardBuyer, cardTransporter);
 
         cardFarmer.setOnClickListener(v -> {

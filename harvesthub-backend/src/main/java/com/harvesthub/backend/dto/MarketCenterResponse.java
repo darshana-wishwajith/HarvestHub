@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Centre highlight card (Figma 11). */
+/** Centre highlight card. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

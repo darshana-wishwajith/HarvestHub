@@ -28,7 +28,7 @@ public class WalletSummaryResponse {
     private int ratingCount;
     private boolean suspended;
     private double totalPenalties;
-    // buyer wallet (15 Nov)
+    // buyer wallet
     private double escrowHeld;
     private double escrowReleased;
     private double todayInflow;

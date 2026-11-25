@@ -36,7 +36,7 @@ import retrofit2.Response;
 /**
  * Base of the transporter job-step screens. Loads the real order, refreshes it every 10 s, hands over to the
  * screen for the new status (e.g. the buyer approved the photos) and sends driver events with the phone's GPS
- * position attached (decision 15 Nov: position recorded, never blocking).
+ * position attached.
  */
 public abstract class BaseTransporterOrderActivity extends AppCompatActivity {
 

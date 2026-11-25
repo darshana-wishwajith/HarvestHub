@@ -32,7 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma transporter Home: online switch (decision 15 Nov), vehicle, wallet + earnings, current job, the job
+ * Transporter Home: online switch, vehicle, wallet + earnings, current job, the job
  * request waiting for an answer, recent payouts. Everything comes from GET /dashboard/transporter/{id}.
  */
 public class DeliveryDashboardActivity extends AppCompatActivity {
@@ -212,7 +212,7 @@ public class DeliveryDashboardActivity extends AppCompatActivity {
         return t.isEmpty() ? t : Character.toUpperCase(t.charAt(0)) + t.substring(1);
     }
 
-    /** Figma "Current Job" card: truck tile, cargo, route, payout and Continue. */
+    /** "Current Job" screen card: truck tile, cargo, route, payout and Continue. */
     static void jobCard(android.app.Activity a, LinearLayout parent, TransporterDashboard.Job j) {
         LinearLayout c = TUi.card(parent);
         ((android.view.View) c.getParent()).setOnClickListener(x -> TransporterOrderRouter.open(a, j.orderId));

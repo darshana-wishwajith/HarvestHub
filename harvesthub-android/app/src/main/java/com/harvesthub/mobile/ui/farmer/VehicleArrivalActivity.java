@@ -10,7 +10,7 @@ import com.harvesthub.mobile.model.Order;
 import java.util.Locale;
 
 /**
- * Figma 30: harvest is ready; the vehicle is coming / at the farm / loading checks (workflow 4.1–4.2).
+ * harvest is ready; the vehicle is coming / at the farm / loading checks.
  * Moves on by itself to "In Transit" once the driver starts the journey.
  */
 public class VehicleArrivalActivity extends BaseOrderActivity {

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Figma buyer "Harvesting & Pickup Tracker" (563:228): from the driver accepting the job until the journey
+ * "Harvesting & Pickup Tracker" screen: from the driver accepting the job until the journey
  * starts (TRANSPORTER_ACCEPTED, HARVESTING, HARVEST_READY, ARRIVED_AT_PICKUP, LOADING_APPROVED). Opens 5.1
  * automatically when the loading photos arrive.
  */
@@ -70,7 +70,7 @@ public class HarvestTrackerActivity extends BaseBuyerOrderActivity {
         });
     }
 
-    /** Stepper row in the style of Figma 4.3 "Dispatch Loop": status circle, connector line, title, detail, time. */
+    /** Stepper row in the style of "Dispatch Loop" screen: status circle, connector line, title, detail, time. */
     private void addStep(LinearLayout parent, String title, String body, boolean done, boolean active, String when) {
         boolean last = parent.getChildCount() == 3;
         LinearLayout row = new LinearLayout(this);

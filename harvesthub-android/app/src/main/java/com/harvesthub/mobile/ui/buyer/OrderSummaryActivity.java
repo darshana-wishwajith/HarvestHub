@@ -11,7 +11,7 @@ import com.harvesthub.mobile.model.Order;
 import java.util.Locale;
 
 /**
- * Figma buyer 4.1 "Order Summary & Dynamic Billing". Shows the backend's quote for the accepted deal:
+ * "Order Summary & Dynamic Billing" screen. Shows the backend's quote for the accepted deal:
  * crop value, auto-selected vehicle and distance, and the advance = 20% crop + transport + 3% fee.
  */
 public class OrderSummaryActivity extends BaseBuyerOrderActivity {

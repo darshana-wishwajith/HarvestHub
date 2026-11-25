@@ -8,9 +8,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Mock wallet (proposal §4.2: no real gateway). One per user, plus "PLATFORM" (fee revenue)
+ * Mock wallet. One per user, plus "PLATFORM" (fee revenue)
  * and "ESCROW" (buyer money held for orders). Balance may go negative after a penalty
- * (workflow 5.3) — the user is then suspended until it is paid back.
+ * — the user is then suspended until it is paid back.
  */
 @Data
 @NoArgsConstructor

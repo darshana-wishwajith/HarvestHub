@@ -1,6 +1,6 @@
 package com.harvesthub.mobile.model;
 
-/** GET /orders/{id}/tracking (Figma buyer 5.2). Position fields are null until the driver's first GPS ping. */
+/** GET /orders/{id}/tracking. Position fields are null until the driver's first GPS ping. */
 public class Tracking {
     public String orderId;
     public String status;

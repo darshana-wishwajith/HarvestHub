@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/** Wallet screen (Figma 18): balance, trust %, star rating, penalties, transactions, mock withdrawal. */
+/** Wallet screen: balance, trust %, star rating, penalties, transactions, mock withdrawal. */
 @Service
 public class WalletService {
 

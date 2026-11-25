@@ -7,7 +7,7 @@ import com.harvesthub.mobile.model.Order;
 
 import org.junit.Test;
 
-/** Each backend order status opens the matching farmer screen (Figma 22, 25–32). */
+/** Each backend order status opens the matching farmer screen. */
 public class OrderFlowRouterTest {
 
     private final Gson gson = new Gson();

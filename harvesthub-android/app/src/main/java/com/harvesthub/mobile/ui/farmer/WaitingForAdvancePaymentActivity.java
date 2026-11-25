@@ -9,7 +9,7 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
 
 /**
- * Figma 27: deal accepted, waiting for the buyer's advance payment (workflow 3.2).
+ * deal accepted, waiting for the buyer's advance payment.
  * Shows the farmer's 20% crop advance that will be held in escrow.
  */
 public class WaitingForAdvancePaymentActivity extends BaseOrderActivity {

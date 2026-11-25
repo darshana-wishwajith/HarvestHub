@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
-/** Dispute tickets after handover (decision 15 Nov): recorded on the order, officers notified, no money moves. */
+/** Dispute tickets after handover: recorded on the order, officers notified, no money moves. */
 @Service
 public class DisputeService {
 
@@ -31,7 +31,7 @@ public class DisputeService {
         this.notifications = notifications;
     }
 
-    /** Driver appeal after a post-delivery rejection (decision 15 Nov): ticket only, the damage charge stays. */
+    /** Driver appeal after a post-delivery rejection: ticket only, the damage charge stays. */
     static final Set<String> APPEAL_ALLOWED = Set.of("RETURN_JOURNEY", "RETURNED");
 
     public Dispute open(String orderId, String userId, String reason, String details) {
@@ -90,7 +90,7 @@ public class DisputeService {
     }
 
     /**
-     * Officer decision on a ticket or a driver's appeal (desktop decision 15 Nov): RESOLVED or DISMISSED with a written
+     * Officer decision on a ticket or a driver's appeal: RESOLVED or DISMISSED with a written
      * note. Money is not moved – the workflow already settled it; the note tells everyone what was decided.
      */
     public Dispute resolve(String disputeId, com.harvesthub.backend.security.AuthUser officer, String outcome, String note) {

@@ -17,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 4.3 "Payment Processing Ledger". Shows the advance held in escrow and the real dispatch state
+ * "Payment Processing Ledger" screen. Shows the advance held in escrow and the real dispatch state
  * (DISPATCHING → TRANSPORTER_ASSIGNED, or PAUSED when no vehicle is free; the server retries every 2 minutes).
  * Moves on by itself when the driver accepts.
  */

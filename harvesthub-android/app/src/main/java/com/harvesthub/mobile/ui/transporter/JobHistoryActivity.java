@@ -26,7 +26,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma transporter "History": weekly earnings header (dashboard) and every job of this driver with its money
+ * "History" screen: weekly earnings header (dashboard) and every job of this driver with its money
  * outcome – completed (95% payout), empty trip (Empty Trip Fee), rejected (damage charge / appeal).
  */
 public class JobHistoryActivity extends AppCompatActivity {

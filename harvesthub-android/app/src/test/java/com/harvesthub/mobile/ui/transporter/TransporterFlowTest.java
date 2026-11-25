@@ -9,7 +9,7 @@ import com.harvesthub.mobile.ui.farmer.OrderFlowRouter;
 
 import org.junit.Test;
 
-/** Transporter screen routing per workflow status, payout and timer helpers (Figma transporter page 612:58). */
+/** Transporter screen routing per workflow status, payout and timer helpers. */
 public class TransporterFlowTest {
 
     private static Order order(String status, String transporterId) {
@@ -57,7 +57,7 @@ public class TransporterFlowTest {
     public void payoutIsNinetyFivePercentOfTheTransportFee() {
         Order fromServer = new Gson().fromJson("{\"payment\":{\"transportFee\":14000,\"transporterPayout\":13300}}", Order.class);
         assertEquals(13300, fromServer.driverPayout(), 0.001);
-        Order older = new Gson().fromJson("{\"payment\":{\"transportFee\":11400}}", Order.class); // created before 15 Nov
+        Order older = new Gson().fromJson("{\"payment\":{\"transportFee\":11400}}", Order.class); // order saved in the older format
         assertEquals(10830, older.driverPayout(), 0.001);
         assertEquals(0, new Order().driverPayout(), 0.001);
     }

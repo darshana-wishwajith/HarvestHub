@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Farmer "Live Delivery" (replaces the static Figma 31 illustration): real OSM map with the road route and the
+<!-- Farmer "Live Delivery": real OSM map with the road route and the
      driver's GPS point, trip progress / ETA, driver contact and the payment state. Cards are built in OrderInTransitActivity. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

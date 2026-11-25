@@ -48,7 +48,7 @@ public class MarketFragment extends Fragment {
         return binding.getRoot();
     }
 
-    // ---- real data (market_prices + completed orders), workflow 1.1 ----
+    // ---- real data (market_prices + completed orders)
     private static final String[] CROPS = {"Big Onions", "Red Onions", "Tomatoes", "Potatoes", "Carrots", "Leeks",
             "Cabbage", "Beans", "Keeri Samba"};
     private String crop = "Big Onions";

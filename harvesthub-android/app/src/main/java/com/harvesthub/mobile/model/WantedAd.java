@@ -81,7 +81,7 @@ public class WantedAd {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    // buyer view (15 Nov)
+    // buyer view
     private String buyerName;
     private String notes;
     private String closedDate;

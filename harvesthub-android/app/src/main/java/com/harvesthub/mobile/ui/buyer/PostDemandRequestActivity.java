@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 /**
- * Figma buyer 2.3 "Post Demand Request" (wanted ad). Crops come from the catalogue (GET /api/crops).
+ * "Post Demand Request" screen (wanted ad). Crops come from the catalogue (GET /api/crops).
  * With EXTRA_EDIT_AD (JSON of the ad) the same form edits an open ad (PUT /wanted-ads/{id}).
  */
 public class PostDemandRequestActivity extends AppCompatActivity {

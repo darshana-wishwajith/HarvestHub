@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Money and vehicle rules (workflow 3.1, 3.2, 5.2; user decisions 14 Nov). */
+/** Money and vehicle rules. */
 class FeeCalculatorTests {
 
     private final MarketplaceRules rules = new MarketplaceRules();
@@ -63,7 +63,7 @@ class FeeCalculatorTests {
 
     @Test
     void trustScoreFormula() {
-        assertEquals(100, TrustService.score(null, 0, 0));     // new user starts at 100 % (decision 17 Nov)
+        assertEquals(100, TrustService.score(null, 0, 0));     // new user starts at 100 %
         assertEquals(100, TrustService.score(5.0, 20, 0));     // perfect record
         assertEquals(94, TrustService.score(4.5, 10, 0));      // 0.60 x 0.9 + 0.40 = 0.94
         assertEquals(88, TrustService.score(4.0, 0, 0));       // one 4-star rating, no orders yet: 0.48 + 0.40

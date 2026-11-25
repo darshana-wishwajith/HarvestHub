@@ -47,7 +47,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * One "pin a location" screen for every role (Figma "9. Farm Location Setup", 28:380), so farmer, buyer and
+ * One "pin a location" screen for every role, so farmer, buyer and
  * transporter see the same UI and process: OpenStreetMap map with a fixed centre pin and a my-location button,
  * a search box (place name, coordinates or a Google Maps link), a "Use copied coordinates" chip,
  * the address under the pin, "Check this pin in Google Maps" and a Confirm button.

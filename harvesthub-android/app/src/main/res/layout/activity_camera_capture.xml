@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma 13 "Smart Guided Camera" (design 16 Nov): step title, framed viewfinder with corner brackets
+<!-- "Smart Guided Camera" screen: step title, framed viewfinder with corner brackets
      and crosshair, WIDE ANGLE / CLOSE UP / VIDEO steps, location lock, shutter, flip; app top + bottom bars. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

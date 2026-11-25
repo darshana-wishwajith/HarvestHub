@@ -41,7 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Forgot password, step 2: enter the 6-digit code (Figma frames 4, 5 = success, 6 = error).
+ * Forgot password, step 2: enter the 6-digit code.
  * The code is checked with POST api/auth/verify-reset-code; on success it is passed on to
  * {@link AccountVerifiedActivity} and used once more by the final reset call.
  */

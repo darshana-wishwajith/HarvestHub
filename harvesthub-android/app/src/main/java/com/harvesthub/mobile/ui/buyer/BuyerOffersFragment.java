@@ -35,8 +35,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 3.1 "Received Supply Offers". Real offers from farmers on the buyer's wanted ads (optionally one ad).
- * Accepting an offer creates the order in negotiation and closes the ad (decision 15 Nov), then opens the chat.
+ * "Received Supply Offers" screen. Real offers from farmers on the buyer's wanted ads (optionally one ad).
+ * Accepting an offer creates the order in negotiation and closes the ad, then opens the chat.
  */
 public class BuyerOffersFragment extends Fragment {
 

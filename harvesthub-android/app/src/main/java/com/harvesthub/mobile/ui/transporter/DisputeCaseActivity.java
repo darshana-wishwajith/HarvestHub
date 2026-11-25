@@ -19,7 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Dispute Details & Photo Log" + "Dispute Management": pre-loading evidence vs the buyer's rejection,
+ * "Dispute Details & Photo Log" screen + "Dispute Management": pre-loading evidence vs the buyer's rejection,
  * the money summary, and the status of the driver's appeal tickets (OPEN → RESOLVED by an officer).
  */
 public class DisputeCaseActivity extends BaseTransporterOrderActivity {

@@ -27,10 +27,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Farmer "Live Delivery" (replaces the static Figma 31 illustration and the drawn map): from loading until both
+ * Farmer "Live Delivery": from loading until both
  * sides confirm the delivery. Real OSM map with the road route and the driver's last GPS point
  * (GET /orders/{id}/tracking, refreshed with the order every 10 s), ETA / distance / progress, driver contact,
- * and what happens to the money (20 % advance already paid, 80 % on confirmation – workflow 4.3, 5.1–5.2).
+ * and what happens to the money.
  */
 public class OrderInTransitActivity extends BaseOrderActivity {
 

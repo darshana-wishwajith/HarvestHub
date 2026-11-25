@@ -2,10 +2,10 @@ package com.harvesthub.backend.service;
 
 import java.util.Set;
 
-/** Validation of the transporter vehicle details (Figma transporter "Vehicle Profile", decisions 15 Nov). */
+/** Validation of the transporter vehicle details. */
 public final class TransporterProfile {
 
-    /** Backend vehicle classes (MarketplaceRules.vehicles) – user kept these instead of the Figma 500/1,000/3,000/5,000 kg cards. */
+    /** Backend vehicle classes (MarketplaceRules.vehicles) – user kept these instead of the /1,000/3,000/5,000 kg cards. */
     public static final Set<String> VEHICLE_TYPES = Set.of("THREE_WHEELER", "MINI_LORRY", "LORRY", "TRUCK");
     /** Label only, not used in dispatch. */
     public static final Set<String> BODY_TYPES = Set.of("REEFER", "FLATBED", "BOX");

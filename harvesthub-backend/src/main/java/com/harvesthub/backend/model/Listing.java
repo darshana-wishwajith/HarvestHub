@@ -28,7 +28,7 @@ public class Listing {
     private String createdDate;
     private String updatedTime;
     /**
-     * Workflow 1.2–1.5: DRAFT → PENDING (Pending Verification) → UNDER_REVIEW → ACTIVE (Listed)
+     *DRAFT → PENDING (Pending Verification) → UNDER_REVIEW → ACTIVE (Listed)
      * or RETAKE_REQUESTED / REJECTED (Action Required). ONGOING while an order is running, COMPLETED after.
      * quantity / price hold plain numbers as text ("1200", "250").
      */
@@ -59,7 +59,7 @@ public class Listing {
     private String mediaCaption2;
     private String videoLabel;
 
-    // Location-locked, geotagged capture (workflow 1.2–1.3)
+    // Location-locked, geotagged capture
     private Double gpsLatitude;
     private Double gpsLongitude;
     private Double distanceFromFarmMeters;

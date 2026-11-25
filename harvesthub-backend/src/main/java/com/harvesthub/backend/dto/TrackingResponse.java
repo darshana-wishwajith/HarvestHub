@@ -2,7 +2,7 @@ package com.harvesthub.backend.dto;
 
 import lombok.Data;
 
-/** Buyer live tracking (Figma buyer 5.2). Distances in km, ETA in minutes. Position fields are null until the first GPS ping. */
+/** Buyer live tracking. Distances in km, ETA in minutes. Position fields are null until the first GPS ping. */
 @Data
 public class TrackingResponse {
     private String orderId;

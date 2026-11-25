@@ -35,9 +35,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer "Buyer Wallet Page" (567:682). Mock wallet (proposal §4.2): balance, money locked in escrow,
+ * "Buyer Wallet Page" screen. Mock wallet: balance, money locked in escrow,
  * today's inflow, escrow released, activity with an "Holds" filter. Deposit Funds = simulated top-up used for
- * wallet payments (decision 15 Nov); Withdraw = mock withdrawal.
+ * wallet payments; Withdraw = mock withdrawal.
  */
 public class BuyerWalletActivity extends AppCompatActivity {
 

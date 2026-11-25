@@ -19,7 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Figma buyer 2.2 "Advanced Filter & Search Panel". Category (crop catalogue), officer-verified grade, district,
+ * "Advanced Filter & Search Panel" screen. Category (crop catalogue), officer-verified grade, district,
  * max price per kg and min quantity — applied server-side by GET /buyer/listings.
  */
 public class FilterMarketplaceBottomSheet extends BottomSheetDialogFragment {

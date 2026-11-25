@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Farmer Home (Figma 10). */
+/** Farmer Home. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

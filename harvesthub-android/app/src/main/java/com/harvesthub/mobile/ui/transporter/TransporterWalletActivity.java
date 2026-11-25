@@ -28,8 +28,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Driver wallet (Home "Wallet" button). Mock wallet only (proposal §4.2): balance, ledger, mock withdrawal,
- * and a mock top-up that pays back a negative balance (decision 15 Nov). No bank accounts.
+ * Driver wallet (Home "Wallet" button). Mock wallet only: balance, ledger, mock withdrawal,
+ * and a mock top-up that pays back a negative balance. No bank accounts.
  */
 public class TransporterWalletActivity extends AppCompatActivity {
 

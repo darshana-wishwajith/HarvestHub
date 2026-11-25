@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Figma buyer 5.1 "Pre-Loading Evidence Review". Shows the driver's real loading photos and GPS, with the
- * server's 15-minute deadline (decision 15 Nov: auto-approve when it runs out).
+ * "Pre-Loading Evidence Review" screen. Shows the driver's real loading photos and GPS, with the
+ * server's 15-minute deadline.
  * Approve → LOADING_APPROVED. Reject → PRELOAD_REJECTED: 100% refund, Empty Trip Fee charged to the farmer.
  */
 public class VerifyCargoActivity extends BaseBuyerOrderActivity {

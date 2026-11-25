@@ -75,10 +75,10 @@ public class UserService {
         if (Roles.FARMER.equals(role) && req.getFarmLocation() == null) {
             throw new IllegalStateException("Farm location is required for farmers");
         }
-        if (Roles.BUYER.equals(role) && req.getFarmLocation() == null) { // decision 15 Nov: required delivery pin
+        if (Roles.BUYER.equals(role) && req.getFarmLocation() == null) { // Required delivery pin
             throw new IllegalStateException("Delivery location is required for buyers");
         }
-        if (Roles.TRANSPORTER.equals(role)) { // decision 15 Nov: vehicle + base pin at sign-up
+        if (Roles.TRANSPORTER.equals(role)) { // Vehicle + base pin at sign-up
             if (req.getFarmLocation() == null) throw new IllegalStateException("Vehicle address is required for transporters");
             if (!TransporterProfile.VEHICLE_TYPES.contains(req.getVehicleType() == null ? "" : req.getVehicleType())) {
                 throw new IllegalStateException("Choose a vehicle type");

@@ -8,7 +8,7 @@ import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
 
 /**
- * Figma 28: "Vehicle Assigned – Start Harvesting" (workflow 3.3). Only reachable once a transporter
+ * "Vehicle Assigned – Start Harvesting" screen. Only reachable once a transporter
  * accepted; the backend refuses START_HARVESTING in any other state.
  */
 public class StartHarvestingActivity extends BaseOrderActivity {

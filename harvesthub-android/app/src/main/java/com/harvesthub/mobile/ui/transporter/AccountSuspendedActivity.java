@@ -25,7 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Suspended driver (workflow 5.3: negative wallet after a damage charge). Decision 15 Nov: clear it with a mock
+ * Suspended driver. Clear it with a mock
  * "Pay now" top-up or from future earnings. Suspended drivers receive no job requests.
  */
 public class AccountSuspendedActivity extends AppCompatActivity {

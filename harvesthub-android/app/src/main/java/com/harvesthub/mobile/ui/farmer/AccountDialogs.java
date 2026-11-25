@@ -21,7 +21,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Settings dialogs (Figma 19/20; user decision 14 Nov): change password, notification preferences, help. */
+/** Settings dialogs: change password, notification preferences, help. */
 public final class AccountDialogs {
 
     private AccountDialogs() {}

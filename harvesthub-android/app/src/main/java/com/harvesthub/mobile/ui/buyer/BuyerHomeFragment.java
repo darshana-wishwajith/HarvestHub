@@ -32,7 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Buyer Home (Figma buyer 564:330): greeting, wallet + escrow hero, stat tiles, quick actions, orders holding money
+ * Buyer Home: greeting, wallet + escrow hero, stat tiles, quick actions, orders holding money
  * in escrow and fresh verified harvests. Everything comes from GET /dashboard/buyer/{id}; built with the shared
  * {@link TUi} kit so the buyer app has the same structure and look as the transporter screens.
  */

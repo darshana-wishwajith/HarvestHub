@@ -9,7 +9,7 @@ import com.harvesthub.mobile.ui.farmer.OrderFlowRouter;
 
 import org.junit.Test;
 
-/** Buyer screen routing per workflow status and the simulated card checks (Figma buyer 4.1 – 6.4). */
+/** Buyer screen routing per workflow status and the simulated card checks. */
 public class BuyerFlowTest {
 
     private static Order order(String status) {

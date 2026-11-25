@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HarvestHub Officer Portal – JavaFX desktop app for Agricultural Officers (proposal 3.3, 6.3.1).
+ * HarvestHub Officer Portal – JavaFX desktop app for Agricultural Officers.
  * Talks to the backend over HTTPS (default https://harvesthubapp.tech).
  */
 public class PortalApp extends Application {

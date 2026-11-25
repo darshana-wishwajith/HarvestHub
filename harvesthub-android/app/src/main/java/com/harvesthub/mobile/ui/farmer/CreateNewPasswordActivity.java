@@ -30,7 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Forgot password, step 4 (Figma "7.Forgot password - Create New Password").
+ * Forgot password, step 4.
  * "Save &amp; Login" sets the new password with the verified code, then signs the farmer in with it.
  */
 public class CreateNewPasswordActivity extends AppCompatActivity {

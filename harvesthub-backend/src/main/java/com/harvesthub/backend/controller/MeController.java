@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Settings (Figma 19/20) for the logged-in user, any role. */
+/** Settings for the logged-in user, any role. */
 @RestController
 @RequestMapping("/api/me")
 public class MeController {
@@ -54,7 +54,7 @@ public class MeController {
             if (body.get(c) instanceof Boolean b) prefs.put(c, b);
         }
         u.setNotificationPreferences(prefs);
-        u.setLanguage("en"); // English only for now (user decision 14 Nov)
+        u.setLanguage("en"); // English only for now
         users.save(u);
         return preferences();
     }

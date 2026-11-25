@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
 
-/** Figma 29: harvesting in progress → "Confirm Harvest Ready" pings the driver with the pickup GPS (workflow 4.1). */
+/** harvesting in progress → "Confirm Harvest Ready" pings the driver with the pickup GPS. */
 public class HarvestReadyActivity extends BaseOrderActivity {
 
     @Override

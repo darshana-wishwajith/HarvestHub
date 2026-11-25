@@ -14,9 +14,9 @@ import com.harvesthub.mobile.utils.RemoteImage;
 import java.util.Locale;
 
 /**
- * Figma buyer 6.1 "Post-Delivery Action" (ARRIVED_AT_DESTINATION). Compare the goods with the loading photo,
+ * "Post-Delivery Action" screen (ARRIVED_AT_DESTINATION). Compare the goods with the loading photo,
  * then Accept & Pay Balance (80%, card or wallet → 4.2 checkout in balance mode) or Reject (Transit Damage):
- * full refund, the transporter pays the crop advance (workflow 5.3).
+ * full refund, the transporter pays the crop advance.
  */
 public class ArrivalInspectionActivity extends BaseBuyerOrderActivity {
 

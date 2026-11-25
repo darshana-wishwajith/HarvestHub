@@ -18,7 +18,7 @@ import retrofit2.Response;
 /**
  * Buyer delivery point / transporter vehicle address. Same screen and process as the farmer's
  * Pin Farm Location ({@link PinLocationActivity}); only the wording and the save call differ.
- * The pin is required (decision 15 Nov) because transport distance and price are calculated from it.
+ * The pin is required because transport distance and price are calculated from it.
  * <ul>
  *   <li>EXTRA_REGISTER (from Create Account): the account is created here.</li>
  *   <li>Without it: the signed-in user changes their saved point (Profile / Settings).</li>

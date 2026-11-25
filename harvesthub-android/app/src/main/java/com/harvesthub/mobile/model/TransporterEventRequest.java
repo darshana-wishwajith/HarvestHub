@@ -18,7 +18,7 @@ public class TransporterEventRequest {
     public void setBuyerVerified(Boolean buyerVerified) { this.buyerVerified = buyerVerified; }
     public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
-    // GPS + uploaded evidence (backend TransporterEventRequest, 15 Nov)
+    // GPS + uploaded evidence
     private Double latitude;
     private Double longitude;
     private java.util.List<String> photoUrls;

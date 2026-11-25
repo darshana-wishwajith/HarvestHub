@@ -114,7 +114,7 @@
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Email (not in Figma 1.2: needed for sign-in and password reset codes, 15 Nov) -->
+            <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilEmail"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

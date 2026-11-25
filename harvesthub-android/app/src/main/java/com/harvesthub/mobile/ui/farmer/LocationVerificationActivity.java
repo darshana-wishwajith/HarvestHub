@@ -30,7 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma 12 "Location-Lock Validation" (workflow 1.2): the farmer must be physically at the registered farm.
+ * "Location-Lock Validation" screen: the farmer must be physically at the registered farm.
  * The device position is checked by the backend against the farm GPS saved at registration.
  * On success the guided camera opens (new listing, or a retake requested by an officer).
  */

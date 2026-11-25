@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Mock wallet ledger. Every money movement is a debit on one wallet and a credit on another,
- * each recorded as a {@link Transaction}. Balances may go negative (penalties, workflow 5.3).
+ * each recorded as a {@link Transaction}. Balances may go negative.
  */
 @Service
 public class LedgerService {
@@ -56,7 +56,7 @@ public class LedgerService {
 
     /**
      * Buyer pays into escrow. CARD = simulated gateway (money enters the system); WALLET = debited from the
-     * buyer's mock wallet, refused when the available balance is too low (user decision 15 Nov).
+     * buyer's mock wallet, refused when the available balance is too low.
      */
     public Transaction payIntoEscrow(String payerUserId, String method, double amount, String type, String title,
                                      String orderId) {

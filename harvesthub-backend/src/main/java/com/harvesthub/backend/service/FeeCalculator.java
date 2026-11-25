@@ -6,10 +6,10 @@ import com.harvesthub.backend.model.Order;
 /**
  * Pure money rules (no I/O), so they are easy to unit test.
  * <ul>
- *   <li>Transport fee = Distance × Rate + Weight × HandlingFee (workflow 3.1)</li>
+ *   <li>Transport fee = Distance × Rate + Weight × HandlingFee</li>
  *   <li>Buyer fee = 3% of (crop value + transport fee)</li>
- *   <li>Advance = 20% of crop value + transport fee + buyer fee (workflow 3.2; user decision 14 Nov)</li>
- *   <li>Balance = remaining 80% of crop value (workflow 5.1)</li>
+ *   <li>Advance = 20% of crop value + transport fee + buyer fee</li>
+ *   <li>Balance = remaining 80% of crop value</li>
  * </ul>
  */
 public final class FeeCalculator {

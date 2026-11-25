@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * Read models and actions for the Agricultural Officer desktop portal (proposal 3.3, 6.3.1, workflow 1.5;
- * decisions 15 Nov: officers also monitor users, orders and disputes, suspend / reactivate accounts and
+ * Read models and actions for the Agricultural Officer desktop portal (;
+ * Officers also monitor users, orders and disputes, suspend / reactivate accounts and
  * resolve disputes with a note – money unchanged).
  */
 @Service
@@ -25,7 +25,7 @@ public class OfficerPortalService {
 
     public static final List<String> QUEUE_STATUSES = List.of("PENDING", "PENDING_VERIFICATION", "SUBMITTED", "UNDER_REVIEW");
     static final Set<String> PROBLEM_STATUSES = Set.of("PRELOAD_REJECTED", "RETURN_JOURNEY", "RETURNED", "CANCELLED");
-    /** Workflow 1.3: media must be captured at the registered farm (same 500 m limit as the app's location lock). */
+    /**media must be captured at the registered farm (same 500 m limit as the app's location lock). */
     static final double FARM_RADIUS_M = 500;
     static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final Pattern NUMBER = Pattern.compile("\\d+(?:[.,]\\d+)*");
@@ -152,7 +152,7 @@ public class OfficerPortalService {
                 farmer == null ? null : brief(farmer), checks(l), decisions(l, me == null ? null : me.id()));
     }
 
-    /** Proposal 3.3.1 step 1 "Media authenticity check": GPS at the farm, all three media, captured close to submission. */
+    /**step 1 "Media authenticity check": GPS at the farm, all three media, captured close to submission. */
     List<Check> checks(Listing l) {
         List<Check> out = new ArrayList<>();
         Double d = distanceFromFarm(l);
@@ -201,7 +201,7 @@ public class OfficerPortalService {
                 .toList();
     }
 
-    /** Decisions on a listing; listings reviewed before 15 Nov have no review log, so one entry is derived from the listing. */
+    /** Decisions on a listing; older listings have no review log, so one entry is derived from the listing. */
     List<HistoryItem> decisions(Listing l, String myId) {
         String farmer = farmerName(l);
         if (l.getReviews() != null && !l.getReviews().isEmpty()) {

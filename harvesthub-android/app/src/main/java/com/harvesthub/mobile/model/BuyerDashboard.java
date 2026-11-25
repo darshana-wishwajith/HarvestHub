@@ -2,7 +2,7 @@ package com.harvesthub.mobile.model;
 
 import java.util.List;
 
-/** GET /dashboard/buyer/{id} (Figma buyer Home 564:330). Field names match the backend DTO. */
+/** GET /dashboard/buyer/{id}. Field names match the backend DTO. */
 public class BuyerDashboard {
     public String buyerName;
     public String greeting;

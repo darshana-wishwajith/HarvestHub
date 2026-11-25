@@ -23,7 +23,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Forgot password, step 1 (Figma "3.Forgot Password - VC sending Screen").
+ * Forgot password, step 1.
  * Sends a 6-digit code to the account's email, then opens {@link VerifyOtpActivity}.
  */
 public class ForgotPasswordActivity extends AppCompatActivity {

@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Central transaction record (proposal §6.5, §6.9). Status values follow the workflow; see
+ * Central transaction record. Status values follow the workflow; see
  * {@link com.harvesthub.backend.service.OrderWorkflowService} for the allowed transitions.
  */
 @Data
@@ -39,17 +39,17 @@ public class Order {
     private String actualDeliveryDate;
     private java.util.List<TransportEvent> transportEvents;
 
-    // ---- Origin (workflow 2.1) ----
+    // ---- Origin ----
     /** PURCHASE_REQUEST (buyer → listing) or SUPPLY_OFFER (farmer → wanted ad) */
     private String origin;
     private String supplyOfferId;
     private String wantedAdId;
 
-    // ---- Negotiation (workflow 2.2): both parties confirm the same terms ----
+    // ---- Negotiation: both parties confirm the same terms ----
     private boolean farmerConfirmed;
     private boolean buyerConfirmed;
 
-    // ---- Money (workflow 3.2, 4.3, 5.2, 5.3) — all LKR ----
+    // ---- Money — all LKR ----
     private Payment payment;
 
     // ---- Logistics snapshot for the apps (full record in "logistics") ----
@@ -62,14 +62,14 @@ public class Order {
     private String pickupAddress;
     private String dropAddress;
 
-    // ---- 2-way delivery confirmation (workflow 5.2) ----
+    // ---- 2-way delivery confirmation ----
     private boolean transporterConfirmedDelivery;
     private boolean buyerConfirmedReceipt;
 
     /** Users who already rated someone on this order (fromUserId list). */
     private java.util.List<String> ratedBy;
 
-    // buyer flow (Figma buyer 4.2, 5.1, 6.2 — 15 Nov)
+    // buyer flow
     private String advancePaymentMethod;          // CARD | WALLET
     private String balancePaymentMethod;          // CARD | WALLET
     private java.util.List<String> loadingEvidenceUrls;
@@ -77,11 +77,11 @@ public class Order {
     private Long loadingApprovalDeadline;         // epoch ms; auto-approve after this (15 min)
     private boolean loadingAutoApproved;
     private boolean disputeOpen;
-    /** Epoch ms when the pending job request to the assigned driver expires (decision 15 Nov: 10 min). */
+    /** Epoch ms when the pending job request to the assigned driver expires. */
     private Long transportRequestExpiresAt;
-    /** Drivers the open job request was broadcast to (decision 18 Nov: nearest matching drivers, first to accept wins). */
+    /** Drivers the open job request was broadcast to. */
     private java.util.List<String> offeredTransporterIds = new java.util.ArrayList<>();
-    /** Driver brought rejected goods back to the farm (decision 15 Nov). */
+    /** Driver brought rejected goods back to the farm. */
     private String goodsReturnedAt;
 
     public double getTotalPrice() {

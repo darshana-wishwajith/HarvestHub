@@ -22,8 +22,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer "Profile & Settings" (567:1553): identity, trust score and rating, delivery location (required,
- * editable — decision 15 Nov), wallet, notification preferences, change password, sign out.
+ * "Profile & Settings" screen: identity, trust score and rating, delivery location (required,
+ * editable), wallet, notification preferences, change password, sign out.
  */
 public class BuyerProfileActivity extends AppCompatActivity {
 

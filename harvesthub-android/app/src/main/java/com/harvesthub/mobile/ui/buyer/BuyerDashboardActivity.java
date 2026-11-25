@@ -19,7 +19,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
     public static final String EXTRA_INITIAL_TAB = "extra_initial_tab";
     public static final String EXTRA_AD_TITLE = "extra_ad_title";
 
-    /** MARKET has no bottom-nav item: it opens from Home ("View Market", Figma 564:330). */
+    /** MARKET has no bottom-nav item: it opens from Home. */
     public enum Tab {
         HOME, ORDERS, DEMANDS, OFFERS, MARKET, ACCOUNT
     }
@@ -107,7 +107,7 @@ public class BuyerDashboardActivity extends AppCompatActivity {
         if (tvSubtitle != null) {
             String name = (session.getUser() != null && session.getUser().getFullName() != null && !session.getUser().getFullName().isEmpty())
                     ? session.getUser().getFullName() : "Buyer";
-            tvSubtitle.setVisibility(View.GONE); // greeting lives on the Home screen only (user request 18 Nov)
+            tvSubtitle.setVisibility(View.GONE); // greeting lives on the Home screen only
         }
     }
 

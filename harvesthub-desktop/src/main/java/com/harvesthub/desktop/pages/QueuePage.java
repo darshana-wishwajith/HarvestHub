@@ -18,7 +18,7 @@ import javafx.util.Duration;
 import java.util.*;
 
 /**
- * Shared "Pending Verification Queue" (workflow 1.5): every officer sees it, oldest first. Claiming locks the listing
+ * Shared "Pending Verification Queue": every officer sees it, oldest first. Claiming locks the listing
  * to one officer (server-side atomic claim) and opens the review screen.
  */
 public class QueuePage implements Page {
