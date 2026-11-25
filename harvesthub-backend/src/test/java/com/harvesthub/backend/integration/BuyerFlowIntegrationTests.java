@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Buyer view (Figma page 413:4, decisions 15 Nov) over HTTP with real services on the LOCAL
+ * Buyer view over HTTP with real services on the LOCAL
  * mongodb://localhost:27017/harvesthub_it database. Never touches Atlas. Transporter steps are driven through the API.
  */
 @SpringBootTest(properties = {
@@ -69,6 +69,7 @@ class BuyerFlowIntegrationTests {
         driver.setVehicleCapacityKg(4000.0);
         driver.setVehiclePlate("WP-L0492");
         driver.setAvailable(true);
+        driver.setOnline(true);
         driver = users.save(driver);
     }
 
@@ -292,7 +293,7 @@ class BuyerFlowIntegrationTests {
         bad(buyer, "POST", "/orders/" + id + "/disputes", Map.of("reason", "again"));      // one open ticket per user
         assertEquals(0, ledger.wallet(Wallet.ESCROW).getBalance(), 0.01);                    // no money moved
 
-        // buyer rates farmer and transporter (Figma 6.4)
+        // Buyer rates farmer and transporter
         ok(buyer, "POST", "/orders/" + id + "/rate", Map.of("rating", 4, "toRole", "FARMER"));
         ok(buyer, "POST", "/orders/" + id + "/rate", Map.of("rating", 5, "toRole", "TRANSPORTER"));
         assertEquals(5.0, users.findById(driver.getId()).orElseThrow().getRatingAverage());

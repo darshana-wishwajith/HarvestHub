@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Smart dispatch (workflow 3.3): after the advance payment, the job request is broadcast to the nearest available
+ * Smart dispatch: after the advance payment, the job request is broadcast to the nearest available
  * transporters whose vehicle can carry the load (up to {@code dispatch-broadcast-size}); the first driver to accept
- * gets the order (decision 18 Nov - faster than offering one driver at a time). If they all decline or the request
+ * gets the order. If they all decline or the request
  * expires, it goes to the next nearest drivers; with no driver the order waits as PAUSED and is retried every
- * 2 minutes (proposal §6.9 "Paused").
+ * 2 minutes.
  */
 @Service
 public class DispatchService {
@@ -91,15 +91,36 @@ public class DispatchService {
         return orders.save(order);
     }
 
+    /** Order stages in which the driver is still physically on a job. */
+    static final java.util.Set<String> ON_A_JOB = java.util.Set.of("TRANSPORTER_ACCEPTED", "HARVESTING", "HARVEST_READY",
+            "ARRIVED_AT_PICKUP", "AWAITING_BUYER_LOADING_APPROVAL", "LOADING_APPROVED", "IN_TRANSIT", "ARRIVED_AT_DESTINATION",
+            "RETURN_JOURNEY");
+
+    /**
+     * Busy = has a job in progress, worked out from the driver's orders. The stored "available" flag was
+     * only reset on completion / goods returned, so a driver whose last order ended any other way (buyer never pressed
+     * Goods Received, pre-loading rejection, cancellation) stayed "busy" for ever and never got another request.
+     * After the driver confirms the delivery they are free, even while the buyer's confirmation is pending.
+     */
+    boolean busy(User t) {
+        for (Order o : orders.findByTransporterId(t.getId())) {
+            String s = o.getStatus() == null ? "" : o.getStatus();
+            if (ON_A_JOB.contains(s)) return true;
+            if (("BALANCE_PAID".equals(s) || "DELIVERED".equals(s)) && !o.isTransporterConfirmedDelivery()) return true;
+        }
+        return false;
+    }
+
     List<User> candidates(double weightKg, LogisticsRecord lr) {
         return users.findByRole("TRANSPORTER").stream()
-                .filter(t -> !Boolean.FALSE.equals(t.getAvailable()))
-                .filter(t -> !Boolean.FALSE.equals(t.getOnline()))
+                // Only drivers who switched "Available for Hauls" on
+                .filter(t -> Boolean.TRUE.equals(t.getOnline()))
                 .filter(t -> !t.isAccountSuspended())
                 .filter(t -> !lr.getDeclinedTransporterIds().contains(t.getId()))
                 .filter(t -> capacityOf(t) >= weightKg)
                 .filter(t -> wallets.findByUserId(t.getId()).map(w -> !w.isSuspended()).orElse(true))
                 .filter(t -> position(t) != null)
+                .filter(t -> !busy(t))
                 .toList();
     }
 
