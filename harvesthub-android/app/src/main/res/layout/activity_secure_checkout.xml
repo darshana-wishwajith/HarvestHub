@@ -191,7 +191,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Payment method (decision 15 Nov: buyer chooses simulated card or wallet balance) -->
+            <!-- Payment method -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPaymentMethod"
                 android:layout_width="match_parent"

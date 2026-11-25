@@ -39,7 +39,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * In-app negotiation chat (Figma 25, workflow 2.2). The farmer agrees quantity, price and pickup date
+ * In-app negotiation chat. The farmer agrees quantity, price and pickup date
  * with the buyer and taps "Confirm Final Deal". Changing a term is a counter-offer the buyer must confirm.
  */
 public class ChatActivity extends AppCompatActivity {

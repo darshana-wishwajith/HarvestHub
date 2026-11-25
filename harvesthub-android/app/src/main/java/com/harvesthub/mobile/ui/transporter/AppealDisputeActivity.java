@@ -34,7 +34,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Appeal Dispute". Decision 15 Nov: an appeal is a dispute ticket (type APPEAL) for the agricultural officers
+ * "Appeal Dispute" screen. An appeal is a dispute ticket (type APPEAL) for the agricultural officers
  * with the driver's statement and optional photos. The system evidence (approved pre-loading photos, GPS track,
  * arrival time) is already on the order. The damage charge is not changed by submitting.
  */

@@ -124,7 +124,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- "3 Supply Offers Received" (Figma 2.4), shown only when offers exist -->
+        <!-- "3 Supply Offers Received", shown only when offers exist -->
         <LinearLayout
             android:id="@+id/layoutOffersBanner"
             android:layout_width="match_parent"

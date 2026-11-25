@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * Monitoring for Agricultural Officers (proposal 6.3.1 "monitoring users, orders and disputes"; decision 15 Nov:
+ * Monitoring for Agricultural Officers ("monitoring users, orders and disputes";
  * there is no admin role, officers do this). Access: /api/officer/** = OFFICER (or legacy ADMIN), see SecurityConfig.
  */
 @RestController

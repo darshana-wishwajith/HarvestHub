@@ -46,14 +46,14 @@ public class OrderController {
     private Order requireParticipant(String orderId) {
         Order order = orderService.getOrderById(orderId);
         if (order == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
-        // drivers an open job request was broadcast to may read it (decision 18 Nov)
+        // drivers an open job request was broadcast to may read it
         if ("TRANSPORTER_ASSIGNED".equals(order.getStatus()) && order.getOfferedTransporterIds() != null
                 && order.getOfferedTransporterIds().contains(currentUser.id())) return order;
         currentUser.requireParticipantOrStaff(order.getFarmerId(), order.getBuyerId(), order.getTransporterId());
         return order;
     }
 
-    // ---- create (workflow 2.1) ----
+    // ---- create ----
 
     /** Scenario A: buyer's purchase request on a verified listing. */
     @PostMapping("/orders/create")
@@ -164,7 +164,7 @@ public class OrderController {
         return ResponseEntity.ok(requireParticipant(orderId));
     }
 
-    /** Vehicle, distance, fee breakdown and live tracking points (proposal §6.8). */
+    /** Vehicle, distance, fee breakdown and live tracking points. */
     @GetMapping("/orders/{orderId}/logistics")
     public ResponseEntity<LogisticsRecord> getLogistics(@PathVariable String orderId) {
         requireParticipant(orderId);
@@ -172,14 +172,14 @@ public class OrderController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No logistics plan yet"));
     }
 
-    /** Live tracking for the buyer (Figma buyer 5.2): last GPS point, remaining distance, ETA. */
+    /** Live tracking for the buyer: last GPS point, remaining distance, ETA. */
     @GetMapping("/orders/{orderId}/tracking")
     public ResponseEntity<TrackingResponse> tracking(@PathVariable String orderId) {
         requireParticipant(orderId);
         return ResponseEntity.ok(trackingService.tracking(orderId));
     }
 
-    /** Figma buyer 6.2 "Report Issue with Handover": body {"reason": "...", "details": "..."} */
+    /** "Report Issue with Handover" screen: body {"reason": "...", "details": "..."} */
     @PostMapping("/orders/{orderId}/disputes")
     public ResponseEntity<Dispute> openDispute(@PathVariable String orderId, @RequestBody Map<String, Object> body) {
         requireParticipant(orderId);

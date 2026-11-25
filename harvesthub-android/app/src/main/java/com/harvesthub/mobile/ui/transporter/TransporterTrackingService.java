@@ -36,7 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Background GPS during trips (decision 15 Nov): a foreground service with a visible notification that sends the
+ * Background GPS during trips: a foreground service with a visible notification that sends the
  * phone's position every 30 s as a LOCATION event for each IN_TRANSIT order, from Start Journey until arrival.
  * Stops itself when the driver has no order in transit.
  */

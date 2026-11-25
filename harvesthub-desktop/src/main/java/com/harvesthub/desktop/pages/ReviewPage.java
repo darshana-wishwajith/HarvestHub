@@ -25,12 +25,12 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Listing review (proposal 3.3.1): media authenticity check (GPS + time), visual inspection of the two photos and the
+ * Listing review: media authenticity check (GPS + time), visual inspection of the two photos and the
  * 10 s video, then Approve with Grade A/B/C, Request retake or Reject. Only the claiming officer can decide.
  */
 public class ReviewPage implements Page {
 
-    /** Proposal 3.3.1 grade definitions, shown next to the grade buttons. */
+    /**grade definitions, shown next to the grade buttons. */
     static final Map<String, String> GRADES = Map.of(
             "A", "Export / supermarket quality – uniform size and colour, no visible damage or decay, optimal freshness.",
             "B", "Standard retail quality – slight size variation or minor skin blemishes; no rot or structural damage.",

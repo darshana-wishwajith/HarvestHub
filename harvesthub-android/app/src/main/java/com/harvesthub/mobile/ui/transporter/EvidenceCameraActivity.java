@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * Figma transporter "Smart Evidence Camera": takes one pre-loading photo with CameraX and writes the GPS position
+ * "Smart Evidence Camera" screen: takes one pre-loading photo with CameraX and writes the GPS position
  * into the JPEG (EXIF) so the photo is geotagged. Returns the file path in {@link #EXTRA_PHOTO_PATH}.
  */
 public class EvidenceCameraActivity extends AppCompatActivity {

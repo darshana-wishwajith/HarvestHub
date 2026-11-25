@@ -118,7 +118,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void showLanguageDialog() {
-        // English only for now (user decision 14 Nov)
+        // English only for now
         new AlertDialog.Builder(requireContext())
                 .setTitle("App Language")
                 .setMessage("HarvestHub is available in English. Sinhala and Tamil are planned.")

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Small view kit for the transporter screens (Figma page 612:58): white rounded cards, label/value rows,
+ * Small view kit for the transporter screens: white rounded cards, label/value rows,
  * pills, step rows, photo strips and brand buttons (#1B4332 / #4CAF50 / #E8F5EA). Screens put real data into
  * these blocks inside the shared {@code transporter_scaffold} layout.
  */
@@ -406,7 +406,7 @@ public final class TUi {
         return e;
     }
 
-    // ---------------------------------------------------------------- Figma building blocks
+    // ---------------------------------------------------------------- building blocks
 
     /** Horizontal, vertically centred row. */
     public static LinearLayout hrow(ViewGroup parent, int topMarginDp) {
@@ -443,7 +443,7 @@ public final class TUi {
         return t;
     }
 
-    /** Tinted inner box (Figma grey panels). */
+    /** Tinted inner box. */
     public static LinearLayout box(ViewGroup parent, int bg, int topMarginDp) {
         Context c = parent.getContext();
         LinearLayout b = new LinearLayout(c);
@@ -495,7 +495,7 @@ public final class TUi {
         return pillText == null ? null : tag(r, pillText, pillBg, pillFg);
     }
 
-    /** Heading with an icon in front (Figma "Manifest", "Pre-Loading Sequence"...). */
+    /** Heading with an icon in front. */
     public static TextView iconHeader(ViewGroup parent, int iconRes, CharSequence title, @Nullable CharSequence pillText, int pillBg, int pillFg) {
         Context c = parent.getContext();
         LinearLayout r = hrow(parent, 0);
@@ -588,7 +588,7 @@ public final class TUi {
         return r;
     }
 
-    /** Numbered instruction card (Figma "Mandatory Driver Actions"); returns the text column for extra buttons. */
+    /** Numbered instruction card; returns the text column for extra buttons. */
     public static LinearLayout numStep(ViewGroup parent, int number, CharSequence title, CharSequence bodyText, boolean alert) {
         Context c = parent.getContext();
         LinearLayout r = new LinearLayout(c);
@@ -613,7 +613,7 @@ public final class TUi {
         return v;
     }
 
-    /** Coloured notice with a round icon, title and body (Figma "Smart Contract Notice", "Escrow ... Protected"). */
+    /** Coloured notice with a round icon, title and body. */
     public static LinearLayout notice(ViewGroup parent, int iconRes, int bg, int iconBg, CharSequence title, CharSequence bodyText) {
         Context c = parent.getContext();
         LinearLayout card = card(parent, bg, bg);

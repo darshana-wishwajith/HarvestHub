@@ -25,7 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 6.4 "Rate Your Experience": the buyer rates the farmer (crop quality) and the driver
+ * "Rate Your Experience" screen: the buyer rates the farmer (crop quality) and the driver
  * (communication, punctuality), each with its own stars and comment. Ratings feed the trust scores.
  */
 public class BuyerRatingActivity extends BaseBuyerOrderActivity {

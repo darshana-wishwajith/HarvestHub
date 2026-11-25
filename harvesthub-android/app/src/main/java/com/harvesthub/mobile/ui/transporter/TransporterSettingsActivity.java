@@ -28,7 +28,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma transporter "Settings": profile + rating, vehicle & capacity profile, driving licence (decision 15 Nov),
+ * "Settings" screen: profile + rating, vehicle & capacity profile, driving licence,
  * vehicle base, wallet, notifications, password, log out. No bank accounts (mock wallet only).
  */
 public class TransporterSettingsActivity extends AppCompatActivity {

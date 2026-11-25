@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAsync // Enable Spring's ability to run tasks asynchronously
-@EnableScheduling // re-dispatch of orders waiting for a vehicle (workflow 3.3)
+@EnableScheduling // re-dispatch of orders waiting for a vehicle
 @ConfigurationPropertiesScan // MarketplaceRules
 public class HarvesthubBackendApplication {
 

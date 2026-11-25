@@ -62,7 +62,7 @@ public class MarketController {
         return ResponseEntity.ok(marketService.createWantedAd(ad));
     }
 
-    /** Figma buyer 2.4 "Edit Ad": only the owner, only while open with no accepted offer. */
+    /** "Edit Ad" screen: only the owner, only while open with no accepted offer. */
     @PutMapping({"/wanted-ads/{adId}", "/api/wanted-ads/{adId}"})
     public ResponseEntity<WantedAd> updateWantedAd(@PathVariable String adId, @RequestBody WantedAd changes) {
         currentUser.requireRole("BUYER");

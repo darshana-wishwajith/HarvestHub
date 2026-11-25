@@ -88,7 +88,7 @@ public class BuyerOrdersFragment extends Fragment {
     static final java.util.Set<String> FINAL = new java.util.HashSet<>(java.util.Arrays.asList(
             "COMPLETED", "PRELOAD_REJECTED", "RETURN_JOURNEY", "CANCELLED"));
 
-    /** What the buyer sees for each workflow status (Figma Order History 566:516). */
+    /** What the buyer sees for each workflow status. */
     static String statusLabel(Order o) {
         String s = o.getStatus() == null ? "" : o.getStatus();
         switch (s) {

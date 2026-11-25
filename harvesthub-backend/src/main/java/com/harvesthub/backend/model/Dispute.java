@@ -6,8 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Issue raised after the goods were accepted (Figma buyer 6.2 "Report Issue with Handover").
- * Decision 15 Nov: a ticket for the officers; money stays as settled, no automatic refund.
+ * Issue raised after the goods were accepted.
+ * A ticket for the officers; money stays as settled, no automatic refund.
  */
 @Data
 @NoArgsConstructor
@@ -26,7 +26,7 @@ public class Dispute {
     private String createdAt;
     private String resolvedAt;
     private String resolutionNote;
-    private String resolvedById;     // Agricultural Officer who closed the ticket (desktop, 15 Nov)
+    private String resolvedById;     // Agricultural Officer who closed the ticket
     private String resolvedByName;
     private String type;            // ISSUE (buyer/farmer after handover) | APPEAL (driver after a delivery rejection)
     private java.util.List<String> photoUrls;

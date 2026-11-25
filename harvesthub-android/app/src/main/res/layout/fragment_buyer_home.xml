@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Buyer Home (Figma buyer 564:330). Cards are built in BuyerHomeFragment with the shared TUi kit. -->
+<!-- Buyer Home. Cards are built in BuyerHomeFragment with the shared TUi helpers. -->
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/swipeBuyerHome"
     android:layout_width="match_parent"

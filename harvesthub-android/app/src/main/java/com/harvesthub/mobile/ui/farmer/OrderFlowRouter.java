@@ -16,7 +16,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Opens the farmer screen that matches the order's current workflow status (Figma 25–32),
+ * Opens the farmer screen that matches the order's current workflow status,
  * always passing the real order id. Used by My Listings, notifications and the order screens themselves.
  */
 public final class OrderFlowRouter {

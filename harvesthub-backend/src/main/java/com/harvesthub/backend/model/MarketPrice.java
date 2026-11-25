@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/** Daily wholesale price of a crop at an economic centre (Market Insights, workflow 1.1). */
+/** Daily wholesale price of a crop at an economic centre. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

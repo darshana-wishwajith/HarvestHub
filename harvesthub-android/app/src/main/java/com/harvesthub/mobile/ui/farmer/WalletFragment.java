@@ -87,7 +87,7 @@ public class WalletFragment extends Fragment {
     private double balance = 0;
     private boolean suspended = false;
 
-    /** Mock withdrawal (user decision 14 Nov): records a debit; no real bank transfer (proposal §4.2). */
+    /** Mock withdrawal: records a debit; no real bank transfer. */
     private void showWithdrawDialog() {
         if (suspended) {
             Toast.makeText(requireContext(), "Your balance is negative. Withdrawals are blocked until it is paid back.",
@@ -148,7 +148,7 @@ public class WalletFragment extends Fragment {
                     suspended = data.isSuspended();
                     tvBalance.setText("LKR " + data.getAvailableBalance());
                     tvBalance.setTextColor(suspended ? 0xFFDC2626 : tvPenalties.getCurrentTextColor());
-                    // trust % and star rating (user decision 14 Nov)
+                    // trust % and star rating
                     String rating = data.getRatingAverage() == null ? "no ratings yet"
                             : String.format(java.util.Locale.US, "%.1f / 5.0 (%d)", data.getRatingAverage(), data.getRatingCount());
                     tvTrustScore.setText(data.getTrustPercent() + "%  ·  " + rating);

@@ -90,6 +90,7 @@ class OrderLifecycleIntegrationTests {
         d.setVehicleCapacityKg(4000.0);
         d.setVehiclePlate("IT-" + id);
         d.setAvailable(true);
+        d.setOnline(true);
         return users.save(d);
     }
 
@@ -238,7 +239,7 @@ class OrderLifecycleIntegrationTests {
         assertEquals(0, balance(Wallet.ESCROW), 0.01);
         assertTrue(ok(farmer, "GET", "/wallet/" + farmer.getId() + "/summary", null).path("suspended").asBoolean());
 
-        // suspended farmer cannot list new crops (workflow 5.3)
+        // Suspended farmer cannot list new crops
         Listing capture = new Listing();
         capture.setCropName("Carrots");
         capture.setQuantity("100");
@@ -273,7 +274,7 @@ class OrderLifecycleIntegrationTests {
         assertEquals(advanceCrop, balance(farmer.getId()), 0.01);                     // farmer keeps the advance
         assertEquals(-advanceCrop, balance(nearDriver.getId()), 0.01);                // driver pays for the crops, earns 0
         assertEquals(0, balance(Wallet.ESCROW), 0.01);
-        // decision 15 Nov: the driver takes the goods back to the farm first, then is free again
+        // The driver takes the goods back to the farm first, then is free again
         assertEquals(Boolean.FALSE, users.findById(nearDriver.getId()).orElseThrow().getAvailable());
         assertEquals("RETURNED", transport(nearDriver, id, "GOODS_RETURNED").path("status").asText());
         assertEquals(Boolean.TRUE, users.findById(nearDriver.getId()).orElseThrow().getAvailable());
@@ -282,9 +283,9 @@ class OrderLifecycleIntegrationTests {
     @Test
     @org.junit.jupiter.api.Order(4)
     void noDriverMeansPausedAndOnlyPartiesCanSeeTheOrder() throws Exception {
-        nearDriver.setAvailable(false);
+        nearDriver.setOnline(false);
         users.save(nearDriver);
-        farDriver.setAvailable(false);
+        farDriver.setOnline(false);
         users.save(farDriver);
         Listing l = activeListing(1000, 100);
         String id = ok(buyer, "POST", "/orders/create", Map.of("listingId", l.getId(), "quantity", 300, "pricePerKg", 100))
@@ -318,7 +319,7 @@ class OrderLifecycleIntegrationTests {
         Map<String, Object> capture = new java.util.HashMap<>(Map.of(
                 "cropName", "Dragon Fruit", "quantity", "120", "price", "600", "mediaUrls", urls));
 
-        // 2 km away from the registered farm → refused (workflow 1.2)
+        // 2 km away from the registered farm → refused
         capture.put("gpsLatitude", 7.8920);
         capture.put("gpsLongitude", 80.6511);
         String err = call(farmer, "POST", "/listings/create", capture).andExpect(status().isBadRequest())

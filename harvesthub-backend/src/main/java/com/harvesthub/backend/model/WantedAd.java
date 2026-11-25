@@ -25,12 +25,12 @@ public class WantedAd {
     private String targetGrade;
     private String status;            // OPEN | CLOSED
     private String buyerName;
-    private String notes;             // "Additional details" (Figma buyer 2.3)
+    private String notes;             // "Additional details"
     private String closedDate;
     private String closedReason;      // OFFER_ACCEPTED | DEADLINE | MANUAL
     private String republishedFrom;
 
-    // computed per request, not stored (Figma buyer 2.4 "3 Supply Offers Received")
+    // computed per request, not stored
     @org.springframework.data.annotation.Transient
     private int offerCount;
     @org.springframework.data.annotation.Transient

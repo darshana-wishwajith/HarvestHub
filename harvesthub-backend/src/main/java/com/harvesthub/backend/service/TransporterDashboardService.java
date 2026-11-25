@@ -17,7 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-/** Figma transporter Home / Jobs / History data, built from real orders, logistics plans and wallet transactions. */
+/** Home / Jobs / History data, built from real orders, logistics plans and wallet transactions. */
 @Service
 public class TransporterDashboardService {
 
@@ -48,7 +48,7 @@ public class TransporterDashboardService {
         User u = users.findById(transporterId).orElseThrow(() -> new IllegalStateException("User not found"));
         TransporterDashboardResponse r = new TransporterDashboardResponse();
         r.setFullName(u.getFullName());
-        r.setOnline(!Boolean.FALSE.equals(u.getOnline()));
+        r.setOnline(Boolean.TRUE.equals(u.getOnline())); // same rule as dispatch: only "on" counts as online
         r.setVehicleType(u.getVehicleType());
         MarketplaceRules.Vehicle v = rules.getVehicles().stream()
                 .filter(x -> x.getType().equals(u.getVehicleType())).findFirst().orElse(null);

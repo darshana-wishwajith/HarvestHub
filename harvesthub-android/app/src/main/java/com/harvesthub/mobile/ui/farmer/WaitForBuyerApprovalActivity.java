@@ -9,7 +9,7 @@ import com.harvesthub.mobile.MainActivity;
 import com.harvesthub.mobile.R;
 import com.harvesthub.mobile.model.Order;
 
-/** Figma 26: farmer confirmed the deal, waiting for the buyer to confirm the same terms (workflow 2.2). */
+/** farmer confirmed the deal, waiting for the buyer to confirm the same terms. */
 public class WaitForBuyerApprovalActivity extends BaseOrderActivity {
 
     @Override

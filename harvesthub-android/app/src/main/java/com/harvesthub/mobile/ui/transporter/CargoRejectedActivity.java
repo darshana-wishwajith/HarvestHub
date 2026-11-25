@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import com.harvesthub.mobile.model.Order;
 
 /**
- * Figma "Cargo Rejected by Buyer" – pre-loading rejection (workflow 5.3, farmer at fault): nothing is loaded,
+ * "Cargo Rejected by Buyer" screen – pre-loading rejection: nothing is loaded,
  * the driver receives the Empty Trip Fee (= full transport fee) from the farmer's wallet.
  */
 public class CargoRejectedActivity extends BaseTransporterOrderActivity {

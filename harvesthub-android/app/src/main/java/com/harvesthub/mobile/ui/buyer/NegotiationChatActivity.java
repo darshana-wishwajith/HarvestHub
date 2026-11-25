@@ -34,9 +34,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 3.2 "In-App Chat & Negotiation". Real chat for the order plus the binding contract card.
+ * "In-App Chat & Negotiation" screen. Real chat for the order plus the binding contract card.
  * Changing quantity, price or pickup date is a counter-offer (the farmer must confirm again); when both sides
- * confirmed the same terms the order is accepted and the buyer goes to 4.1 (workflow 2.2 / 3.1).
+ * confirmed the same terms the order is accepted and the buyer goes to 4.1.
  */
 public class NegotiationChatActivity extends BaseBuyerOrderActivity {
 
@@ -70,7 +70,7 @@ public class NegotiationChatActivity extends BaseBuyerOrderActivity {
         qtyView.setOnClickListener(v -> editQuantity());
     }
 
-    /** The layout contains Figma sample bubbles; only real messages are shown. */
+    /** The layout contains sample bubbles; only real messages are shown. */
     private void hideSamples() {
         hideRow(findViewById(R.id.tvChatTimestamp));
         hideRow(findViewById(R.id.tvBuyerMessage));

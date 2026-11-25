@@ -134,7 +134,7 @@ public final class Fmt {
         };
     }
 
-    /** Order status → words the officer understands (workflow phases 2–5). */
+    /** Order status → words the officer understands. */
     public static String orderStatus(String s) {
         if (s == null) return NONE;
         return switch (s) {

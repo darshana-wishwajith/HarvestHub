@@ -3,7 +3,7 @@ package com.harvesthub.mobile.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/** GET /dashboard/transporter/{id} – Figma transporter Home, Jobs and History headers. Amounts in LKR. */
+/** GET /dashboard/transporter/{id} – data for the transporter Home, Jobs and History headers. Amounts in LKR. */
 public class TransporterDashboard {
     public String fullName;
     public boolean online;

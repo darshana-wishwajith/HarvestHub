@@ -77,7 +77,7 @@ public class Listing {
         this.status = status;
     }
 
-    // Location-locked, geotagged capture (workflow 1.2-1.3); sent on create / retake
+    // Location-locked, geotagged capture; sent on create / retake
     private Double gpsLatitude;
     private Double gpsLongitude;
     private java.util.List<String> mediaUrls;

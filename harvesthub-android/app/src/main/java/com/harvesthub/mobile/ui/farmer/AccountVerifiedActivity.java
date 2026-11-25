@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.harvesthub.mobile.R;
 
 /**
- * Forgot password, step 3 (Figma "5.Forgot Password - Account Verified Page").
+ * Forgot password, step 3.
  * Shown after the code was accepted; passes the identifier and code on to {@link CreateNewPasswordActivity}.
  */
 public class AccountVerifiedActivity extends AppCompatActivity {

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Trust score (proposal §6.10, workflow 5.4) from average rating and reliability. Every user starts at 100 %
- * (user decision 17 Nov) and it moves with their record:
+ * Trust score from average rating and reliability. Every user starts at 100 %
+ * and it moves with their record:
  * <pre>trust% = 100 × (0.60 × rating/5 + 0.40 × reliability)</pre>
  * rating = average stars received (5 before the first rating); reliability = completed / (completed + failed),
  * 1.0 before the first order. Failed = orders that ended through this user's fault.
@@ -21,7 +21,7 @@ import java.util.Set;
 @Service
 public class TrustService {
 
-    /** Final statuses where this user was at fault (workflow 5.3) */
+    /** Final statuses where this user was at fault */
     static final Set<String> FARMER_FAULT = Set.of("PRELOAD_REJECTED");
     static final Set<String> TRANSPORTER_FAULT = Set.of("RETURN_JOURNEY", "DISPUTED");
 

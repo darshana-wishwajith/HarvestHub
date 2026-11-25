@@ -46,7 +46,7 @@ public class ListingService {
     }
 
     /**
-     * Creates (existingId == null) or re-submits after a retake request. Enforces workflow 1.2-1.4 and 5.3:
+     * Creates (existingId == null) or re-submits after a retake request. Enforcesand 5.3:
      * not suspended, physically at the registered farm, 2 photos + 1 video captured in the app.
      */
     public Listing submitListing(Listing in, String farmerId, String existingId) {
@@ -158,7 +158,7 @@ public class ListingService {
         }
 
     /**
-     * Buyer marketplace (Figma buyer 2.1/2.2). Only verified ACTIVE lots; optional filters: grade(s) "A,B",
+     * Buyer marketplace. Only verified ACTIVE lots; optional filters: grade(s) "A,B",
      * crop category (from the crop catalogue), district/location text, max price per kg, min quantity. Newest first.
      */
     public List<Listing> getMarketplaceListings(String searchQuery, String grade, String category, String district,
@@ -241,7 +241,7 @@ public class ListingService {
         return null;
     }
 
-    // ---------------------------------------------------------------- farmer card actions (user rules, 16 Nov)
+    // ---------------------------------------------------------------- farmer card actions
 
     private Listing ownListing(String id, String farmerId) {
         Listing l = listingRepository.findById(id).orElseThrow(() -> new IllegalStateException("Listing not found"));

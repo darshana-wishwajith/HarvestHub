@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Market Insights (workflow 1.1) from the market_prices collection plus prices of completed orders.
+ * Market Insights from the market_prices collection plus prices of completed orders.
  * No random or fixed numbers: with no data the response says so (samples = 0).
  */
 @Service
@@ -191,7 +191,7 @@ public class MarketService {
         return ad.getStatus() == null || "OPEN".equals(ad.getStatus()) || "ACTIVE".equals(ad.getStatus());
     }
 
-    /** Edit is allowed only while the ad is open and no offer was accepted (decision 15 Nov). */
+    /** Edit is allowed only while the ad is open and no offer was accepted. */
     public WantedAd updateWantedAd(String adId, String buyerId, WantedAd changes) {
         WantedAd ad = ownAd(adId, buyerId);
         if (!isOpen(ad)) throw new IllegalStateException("Only open requests can be edited");
@@ -215,7 +215,7 @@ public class MarketService {
         return ad;
     }
 
-    /** Republish = a new open copy with a new deadline (decision 15 Nov). */
+    /** Republish = a new open copy with a new deadline. */
     public WantedAd republishWantedAd(String adId, String buyerId, String deadline) {
         WantedAd old = ownAd(adId, buyerId);
         if (isOpen(old)) throw new IllegalStateException("This request is still open");
@@ -250,7 +250,7 @@ public class MarketService {
         if (isOpen(ad) && d != null && d.isBefore(java.time.LocalDate.now())) close(ad, "DEADLINE");
     }
 
-    /** Ads close automatically after their deadline day (decision 15 Nov). */
+    /** Ads close automatically after their deadline day. */
     @org.springframework.scheduling.annotation.Scheduled(fixedDelayString = "${harvesthub.wanted-ad-check-ms:3600000}", initialDelay = 120000)
     public void closeExpiredAds() {
         wantedAdRepository.findAll().forEach(this::closeIfExpired);

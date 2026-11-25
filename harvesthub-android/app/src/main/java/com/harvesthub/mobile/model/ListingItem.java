@@ -117,7 +117,7 @@ public class ListingItem {
     // For compatibility with previous code
     public String getType() { return status.name(); }
 
-    // from the backend (14 Nov): order link and officer feedback
+    // from the backend: order link and officer feedback
     @SerializedName("activeOrderId")
     private String activeOrderId;
     @SerializedName("reviewNotes")

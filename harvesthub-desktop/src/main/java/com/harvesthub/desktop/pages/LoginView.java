@@ -21,7 +21,7 @@ import javafx.util.Duration;
 import java.util.regex.Pattern;
 
 /**
- * Sign-in for Agricultural Officers, plus the real forgot-password flow (decision 15 Nov: same email-code flow as the
+ * Sign-in for Agricultural Officers, plus the real forgot-password flow (same email-code flow as the
  * mobile app – email → 6-digit code → new password).
  */
 public class LoginView {

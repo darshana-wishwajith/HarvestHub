@@ -183,8 +183,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                     firstError.requestFocus();
                     return;
                 }
-                // Step 2: required delivery pin; the account is created there (decision 15 Nov)
-                // transporters: vehicle profile first (Figma transporter "Vehicle Profile"), then the vehicle address
+                // Step 2: required delivery pin; the account is created there
+                // transporters: vehicle profile first, then the vehicle address
                 Intent intent = new Intent(CreateAccountActivity.this, "TRANSPORTER".equals(targetRole())
                         ? com.harvesthub.mobile.ui.transporter.TransporterVehicleProfileActivity.class : SetDeliveryAddressActivity.class);
                 intent.putExtra(SetDeliveryAddressActivity.EXTRA_REGISTER, request);

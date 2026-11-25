@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Money and logistics rules (proposal §6.8, §6.12; workflow 3.1–5.3; user decisions 14 Nov 2026).
+ * Money and logistics rules.
  * Defaults live here; any value can be overridden with harvesthub.rules.* properties.
  */
 @Data
@@ -26,17 +26,17 @@ public class MarketplaceRules {
     private double handlingFeePerKg = 2.0;
     /** Straight-line distance is multiplied by this when Google Maps is unavailable. */
     private double roadDistanceFactor = 1.3;
-    /** A listing may only be created this close (metres) to the registered farm (workflow 1.2). */
+    /** A listing may only be created this close (metres) to the registered farm. */
     private double farmRadiusMeters = 500;
-    /** Buyer must approve the pre-loading photos within this time, else they are auto-approved (decision 15 Nov). */
+    /** Buyer must approve the pre-loading photos within this time, else they are auto-approved. */
     private int loadingApprovalMinutes = 15;
     /** Speed used for the ETA when the transporter has sent fewer than two GPS points. */
     private double defaultTruckSpeedKmh = 40;
-    /** A job request sent to a driver expires after this time and goes to the next driver (decision 15 Nov). */
+    /** A job request sent to a driver expires after this time and goes to the next driver. */
     private int transportRequestMinutes = 10;
-    /** A job request goes to this many nearest matching free drivers at once; the first to accept gets it (decision 18 Nov). */
+    /** A job request goes to this many nearest matching free drivers at once; the first to accept gets it. */
     private int dispatchBroadcastSize = 5;
-    /** Pre-loading photos the driver must upload before buyer approval (decision 15 Nov: 2..4). */
+    /** Pre-loading photos the driver must upload before buyer approval. */
     private int minLoadingPhotos = 2;
     private int maxLoadingPhotos = 4;
 

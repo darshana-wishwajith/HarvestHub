@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Listing verification for Agricultural Officers (proposal 3.3, workflow 1.5): shared queue, atomic claim,
+ * Listing verification for Agricultural Officers: shared queue, atomic claim,
  * approve with grade / request retake / reject. All values come from the database; nothing is invented.
  * Access: OFFICER (or the legacy ADMIN account) – see SecurityConfig.OFFICER_AREA.
  */
@@ -111,7 +111,7 @@ public class OfficerController {
         }
         AuthUser me = currentUser.get();
         // Atomic claim: succeeds only if the listing is still pending and unclaimed (or already claimed by me),
-        // so two officers can never grade the same listing at the same time (workflow 1.5).
+        // so two officers can never grade the same listing at the same time.
         Query query = new Query(Criteria.where("_id").is(listingId).andOperator(
                 new Criteria().orOperator(
                         Criteria.where("status").in(CLAIMABLE).and("claimedByOfficerId").in(null, ""),

@@ -218,7 +218,7 @@ public class BuyerDemandsFragment extends Fragment {
         });
     }
 
-    /** Republish = new open copy with a new deadline (decision 15 Nov). */
+    /** Republish = new open copy with a new deadline. */
     private void republish(WantedAd ad) {
         java.util.Calendar c = java.util.Calendar.getInstance();
         c.add(java.util.Calendar.DAY_OF_MONTH, 7);

@@ -7,7 +7,7 @@ import com.harvesthub.mobile.ui.buyer.SignInBuyerActivity;
 import com.harvesthub.mobile.utils.AuthInputUtils;
 
 /**
- * Transporter login (design "Welcome Transporter", 16 Nov): the same screen and behaviour as the buyer sign-in,
+ * Transporter login: the same screen and behaviour as the buyer sign-in,
  * with transporter wording; signs in to the delivery dashboard. Registration opens the shared Create Account
  * form with TARGET_ROLE=TRANSPORTER; forgot password uses the shared reset flow.
  */

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Live delivery tracking (workflow 4.3, Figma buyer 5.2). Positions come from the transporter app's
- * LOCATION events, stored as tracking points on the logistics record (decision 15 Nov: real GPS).
+ * Live delivery tracking. Positions come from the transporter app's
+ * LOCATION events, stored as tracking points on the logistics record.
  */
 @Service
 public class TrackingService {

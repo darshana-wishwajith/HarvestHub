@@ -12,8 +12,8 @@ import com.harvesthub.mobile.model.Order;
 import java.util.Locale;
 
 /**
- * Figma "Buyer Approval" (photos submitted, Start Journey locked) and "Pre-Loading Photos Approved" (Start Journey).
- * Start Journey releases the 20% crop advance to the farmer (workflow 4.3) and starts background GPS.
+ * "Buyer Approval" screen (photos submitted, Start Journey locked) and "Pre-Loading Photos Approved" (Start Journey).
+ * Start Journey releases the 20% crop advance to the farmer and starts background GPS.
  */
 public class LoadingApprovalActivity extends BaseTransporterOrderActivity {
 

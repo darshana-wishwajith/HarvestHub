@@ -15,8 +15,8 @@ import com.harvesthub.mobile.model.Order;
 import java.util.Locale;
 
 /**
- * Figma "Matchmaking Job Offer": payout (95% of the transport fee), distance, duration, route, cargo and the
- * 10-minute request countdown (decision 15 Nov). Accept → pickup screen; Decline → dispatch moves on.
+ * "Matchmaking Job Offer" screen: payout (95% of the transport fee), distance, duration, route, cargo and the
+ * 10-minute request countdown. Accept → pickup screen; Decline → dispatch moves on.
  */
 public class JobOfferActivity extends BaseTransporterOrderActivity {
 

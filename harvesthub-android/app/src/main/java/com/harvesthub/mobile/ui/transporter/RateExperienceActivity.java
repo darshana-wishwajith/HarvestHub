@@ -24,8 +24,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "2-Way Handshake Complete" + trip wrap-up rating (workflow 5.4). The driver rates the farmer and the buyer
- * 1–5 stars; highlight chips and the optional note are saved in the rating comment (decision 15 Nov).
+ * "2-Way Handshake Complete" screen + trip wrap-up rating. The driver rates the farmer and the buyer
+ * 1–5 stars; highlight chips and the optional note are saved in the rating comment.
  */
 public class RateExperienceActivity extends BaseTransporterOrderActivity {
 
@@ -105,7 +105,7 @@ public class RateExperienceActivity extends BaseTransporterOrderActivity {
     private final int[] stars = {5, 5};
     private static final String[] WORDS = {"", "Poor", "Fair", "Good", "Very Good", "Excellent"};
 
-    /** One rating card (Figma): tag, name, star box with a caption, highlight chips. */
+    /** One rating card: tag, name, star box with a caption, highlight chips. */
     private List<TextView> party(LinearLayout c, int iconRes, String tagText, int tagBg, int tagFg, String name, String sub,
                                  int row, String chipsLabel, String[] chipLabels) {
         LinearLayout card = TUi.card(c);

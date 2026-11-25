@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma "9. Farm Location Setup Screen" (28:380): header, full map with a centred pin and a
+<!-- "9. Farm Location Setup Screen" screen: header, full map with a centred pin and a
      current-location button, bottom card with search, hint and Confirm.
      Map = OpenStreetMap (osmdroid); "Check in Google Maps" lets the farmer verify the pin. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

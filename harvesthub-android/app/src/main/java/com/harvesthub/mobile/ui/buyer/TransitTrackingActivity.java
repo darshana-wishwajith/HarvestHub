@@ -22,7 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 5.2 "Live Delivery Tracking". Real GPS (decision 15 Nov): the driver's app sends its position,
+ * "Live Delivery Tracking" screen. Real GPS: the driver's app sends its position,
  * GET /orders/{id}/tracking returns the last point, remaining distance and ETA. Refreshes every 10 s and
  * opens 6.1 when the vehicle arrives.
  */
@@ -43,7 +43,7 @@ public class TransitTrackingActivity extends BaseBuyerOrderActivity {
         super.onCreate(savedInstanceState);
         if (api == null) return;
         map = findViewById(R.id.mapTransit);
-        trip = new TripMap(map, 0xFF2563EB, 0xFF93C5FD); // driven solid blue, still to go light blue (Figma 5.2)
+        trip = new TripMap(map, 0xFF2563EB, 0xFF93C5FD); // driven solid blue, still to go light blue
     }
 
     @Override

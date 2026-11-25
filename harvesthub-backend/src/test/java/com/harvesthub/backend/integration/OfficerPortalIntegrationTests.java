@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Agricultural Officer desktop portal (decisions 15 Nov: four roles only, officers verify listings and monitor
+ * Agricultural Officer desktop portal (four roles only, officers verify listings and monitor
  * users / orders / disputes) over HTTP on the LOCAL mongodb://localhost:27017/harvesthub_it database. Never touches Atlas.
  */
 @SpringBootTest(properties = {

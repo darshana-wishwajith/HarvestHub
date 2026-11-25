@@ -33,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Buyer "Account" tab (Figma buyer Profile & Settings 567:1553): identity + trust, delivery point (required for
+ * Buyer "Account" tab: identity + trust, delivery point (required for
  * orders), wallet and escrow, notification preferences, password, help and sign out. Same structure as the
  * transporter Settings screen.
  */

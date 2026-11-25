@@ -19,7 +19,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Read-only monitoring of every order (workflow phases 2–5): in progress, completed, or with a problem. */
+/** Read-only monitoring of every order: in progress, completed, or with a problem. */
 public class OrdersPage implements Page {
 
     private final VBox root = new VBox(14);

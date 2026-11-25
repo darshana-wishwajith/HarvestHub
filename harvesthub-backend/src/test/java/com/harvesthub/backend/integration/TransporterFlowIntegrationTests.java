@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Transporter view (Figma page 612:58, decisions 15 Nov) over HTTP with real services on the LOCAL
+ * Transporter view over HTTP with real services on the LOCAL
  * mongodb://localhost:27017/harvesthub_it database. Never touches Atlas.
  */
 @SpringBootTest(properties = {
@@ -97,6 +97,7 @@ class TransporterFlowIntegrationTests {
         d.setVehicleType("LORRY");
         d.setVehiclePlate("WP LB-" + (1000 + Math.abs(id.hashCode() % 9000)));
         d.setAvailable(true);
+        d.setOnline(true);
         return users.save(d);
     }
 
@@ -260,6 +261,34 @@ class TransporterFlowIntegrationTests {
         assertEquals(driver2.getId(), o.getTransporterId());
         assertNotNull(o.getTransporterName());
         assertTrue(o.getOfferedTransporterIds().isEmpty());
+    }
+
+    // ---------------------------------------------------------------- busy = job in progress
+    @Test
+    void driverOnAJobIsSkippedButAStaleBusyFlagDoesNotBlockJobs() throws Exception {
+        String first = loadedOrder();                       // driver is on a job (loading approved)
+        String second = paidOrder();
+        Order o = orders.findById(second).orElseThrow();
+        assertFalse(o.getOfferedTransporterIds().contains(driver.getId()), "a driver on a job must not get new requests");
+        assertTrue(o.getOfferedTransporterIds().contains(driver2.getId()));
+
+        // the first job ends; even with the old "available=false" flag left behind, the driver gets the next request
+        transport(driver2, second, "DECLINE");
+        Order done = orders.findById(first).orElseThrow();   // driver confirmed delivery; buyer never pressed Goods Received
+        done.setStatus("DELIVERED");
+        done.setTransporterConfirmedDelivery(true);
+        orders.save(done);
+        User d = users.findById(driver.getId()).orElseThrow();
+        d.setAvailable(false);
+        users.save(d);
+        String third = paidOrder();
+        assertTrue(orders.findById(third).orElseThrow().getOfferedTransporterIds().contains(driver.getId()));
+
+        // never switched online -> no requests
+        User never = users.findById(driver2.getId()).orElseThrow();
+        never.setOnline(null);
+        users.save(never);
+        assertFalse(orders.findById(paidOrder()).orElseThrow().getOfferedTransporterIds().contains(driver2.getId()));
     }
 
     // ---------------------------------------------------------------- pre-loading photos 2..4

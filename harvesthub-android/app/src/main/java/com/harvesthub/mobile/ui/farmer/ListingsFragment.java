@@ -90,7 +90,7 @@ public class ListingsFragment extends Fragment {
         binding.rvListings.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ListingAdapter(filteredItems, new ListingAdapter.OnListingActionListener() {
             @Override public void onAction(ListingItem item) {
-                // Action Required → retake: back to the farm, location lock + guided camera (workflow 1.5)
+                // Action Required → retake: back to the farm, location lock + guided camera
                 Intent intent = new Intent(requireContext(), LocationVerificationActivity.class);
                 intent.putExtra(LocationVerificationActivity.EXTRA_RETAKE_LISTING_ID, item.getId());
                 intent.putExtra(LocationVerificationActivity.EXTRA_CROP, item.getCropName());

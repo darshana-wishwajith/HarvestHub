@@ -16,7 +16,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Opens the buyer screen that matches the order's workflow status (Figma buyer 3.2 – 6.4), always with
+ * Opens the buyer screen that matches the order's workflow status, always with
  * the real order id. Used by Orders, Home, notifications and the order screens themselves.
  */
 public final class BuyerOrderRouter {

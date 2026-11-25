@@ -38,7 +38,7 @@ public class RegisterRequest {
     @Valid
     private FarmLocation farmLocation;
 
-    /** Transporters (Figma "Vehicle Profile"): THREE_WHEELER | MINI_LORRY | LORRY | TRUCK. farmLocation = vehicle base. */
+    /** Transporters: THREE_WHEELER | MINI_LORRY | LORRY | TRUCK. farmLocation = vehicle base. */
     private String vehicleType;
     @Size(max = 20)
     private String vehiclePlate;

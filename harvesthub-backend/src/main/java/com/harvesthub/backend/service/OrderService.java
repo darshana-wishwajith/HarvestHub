@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Order state machine and liability engine (proposal §6.9, workflow phases 2–5).
+ * Order state machine and liability engine.
  *
  * <pre>
  * NEGOTIATING ──both confirm──▶ AWAITING_PAYMENT ──advance paid──▶ DISPATCHING ─▶ TRANSPORTER_ASSIGNED | PAUSED
@@ -163,7 +163,7 @@ public class OrderService {
         Order saved = startNegotiation(o, "Supply offer accepted by " + buyerName);
         offer.setStatus("ACCEPTED");
         offers.save(offer);
-        // decision 15 Nov: the wanted ad closes when an offer is accepted; other pending offers are declined
+        // The wanted ad closes when an offer is accepted; other pending offers are declined
         ad.setStatus("CLOSED");
         ad.setClosedDate(now());
         ad.setClosedReason("OFFER_ACCEPTED");
@@ -182,7 +182,7 @@ public class OrderService {
     private void checkQuantity(double qty, Listing listing) {
         if (qty <= 0) throw new IllegalStateException("Quantity must be positive");
         double available = listing.quantityKgValue();
-        if (available > 0 && qty > available * 1.05) { // estimated quantity, ±5% (workflow 1.4)
+        if (available > 0 && qty > available * 1.05) { // estimated quantity, ±5%
             throw new IllegalStateException(String.format("Only about %,.0f kg is available", available));
         }
         if (qty > FeeCalculator.maxCapacity(rules)) FeeCalculator.selectVehicle(qty, rules); // throws with message
@@ -208,7 +208,7 @@ public class OrderService {
     /**
      * A party confirms the final terms (quantity, price per kg, pickup date). Changing a term resets the
      * other party's confirmation (counter-offer). When both have confirmed the same terms the order is
-     * Accepted: logistics are planned and the advance is quoted (workflow 3.1).
+     * Accepted: logistics are planned and the advance is quoted.
      */
     public GenericResponse confirmDeal(String orderId, ConfirmDealRequest req, String userId) {
         Order o = require(orderId);
@@ -327,7 +327,7 @@ public class OrderService {
         return recordAdvancePayment(orderId, amount, buyerId, "CARD");
     }
 
-    /** method: CARD (simulated gateway) or WALLET (buyer's mock wallet balance) - decision 15 Nov. */
+    /** method: CARD (simulated gateway) or WALLET (buyer's mock wallet balance) - . */
     public Order recordAdvancePayment(String orderId, double amount, String buyerId, String method) {
         Order o = require(orderId);
         if (!buyerId.equals(o.getBuyerId())) throw new IllegalStateException("Only the buyer can pay");
@@ -434,7 +434,7 @@ public class OrderService {
         }
     }
 
-    /** Decision 15 Nov: pre-loading photos are auto-approved when the buyer does not answer in time. */
+    /** Pre-loading photos are auto-approved when the buyer does not answer in time. */
     @org.springframework.scheduling.annotation.Scheduled(fixedDelayString = "${harvesthub.loading-check-ms:60000}", initialDelay = 30000)
     public void autoApproveExpiredLoading() {
         long nowMs = System.currentTimeMillis();
@@ -446,7 +446,7 @@ public class OrderService {
         }
     }
 
-    /** Declined or expired job request: remember the drivers, then send it to the next nearest ones (workflow 3.3). */
+    /** Declined or expired job request: remember the drivers, then send it to the next nearest ones. */
     private Order reroute(Order o, java.util.Collection<String> skip, String note) {
         LogisticsRecord lr = logistics.findByOrderId(o.getOrderId()).orElseThrow();
         for (String id : skip) if (id != null && !lr.getDeclinedTransporterIds().contains(id)) lr.getDeclinedTransporterIds().add(id);
@@ -462,7 +462,7 @@ public class OrderService {
         return dispatch.dispatch(o);
     }
 
-    /** Decision 15 Nov: an unanswered job request expires after harvesthub.rules.transport-request-minutes. */
+    /** An unanswered job request expires after harvesthub.rules.transport-request-minutes. */
     @org.springframework.scheduling.annotation.Scheduled(fixedDelayString = "${harvesthub.request-check-ms:30000}", initialDelay = 30000)
     public void expireTransportRequests() {
         long nowMs = System.currentTimeMillis();
@@ -539,7 +539,7 @@ public class OrderService {
                 return reroute(o, java.util.List.of(tid), "Transporter declined – rerouting");
             }
             case "LOCATION" -> {
-                // live tracking point only (workflow 4.3); no status change
+                // live tracking point only; no status change
             }
             case "ARRIVED_PICKUP" -> {
                 expect(o, "HARVEST_READY");
@@ -594,7 +594,7 @@ public class OrderService {
                 expect(o, "ARRIVED_AT_DESTINATION");
                 settlePostDeliveryRejection(o, request.getRejectionReason());
             }
-            case "GOODS_RETURNED" -> { // decision 15 Nov: rejected goods back at the farm; no money moves
+            case "GOODS_RETURNED" -> { // Rejected goods back at the farm; no money moves
                 expect(o, "RETURN_JOURNEY");
                 o.setGoodsReturnedAt(now());
                 setStatus(o, "RETURNED", "Rejected goods returned to the farm");
@@ -635,7 +635,7 @@ public class OrderService {
         }
     }
 
-    /** Workflow 5.2: platform keeps 3% + 5% commission; farmer gets the 80% balance; transporter 95% of the fee. */
+    /**platform keeps 3% + 5% commission; farmer gets the 80% balance; transporter 95% of the fee. */
     void settleCompletion(Order o) {
         Order.Payment p = pay(o);
         String id = o.getOrderId();
@@ -660,13 +660,13 @@ public class OrderService {
         notifications.notify(o.getBuyerId(), "ORDERS", "COMPLETED", "Order completed", "Please rate the farmer and the transporter.");
     }
 
-    /** Workflow 5.3, rejected BEFORE loading: farmer at fault. */
+    /**rejected BEFORE loading: farmer at fault. */
     void settlePreloadRejection(Order o, String reason) {
         Order.Payment p = pay(o);
         String id = o.getOrderId();
         ledger.transfer(Wallet.ESCROW, o.getBuyerId(), p.getAdvanceDue(), "REFUND",
                 "Refund to buyer – order " + id, "Full refund incl. 3% fee – order " + id, id);
-        double fee = p.getTransportFee(); // Empty Trip Fee = full transport fee (user decision 14 Nov)
+        double fee = p.getTransportFee(); // Empty Trip Fee = full transport fee
         ledger.transfer(o.getFarmerId(), o.getTransporterId(), fee, "EMPTY_TRIP_FEE",
                 "Empty Trip Fee – order " + id, "Empty Trip Fee received – order " + id, id);
         ledger.addPenalty(o.getFarmerId(), fee);
@@ -686,7 +686,7 @@ public class OrderService {
                 "LKR " + LedgerService.format(fee) + " for the wasted trip on order " + id + ".");
     }
 
-    /** Workflow 5.3, rejected AFTER delivery: transporter at fault. */
+    /**rejected AFTER delivery: transporter at fault. */
     void settlePostDeliveryRejection(Order o, String reason) {
         Order.Payment p = pay(o);
         String id = o.getOrderId();

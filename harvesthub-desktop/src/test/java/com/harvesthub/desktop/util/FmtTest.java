@@ -45,7 +45,7 @@ class FmtTest {
     @Test
     void labelsForRolesStatusesAndDecisions() {
         assertEquals("Agricultural Officer", Fmt.role("OFFICER"));
-        assertEquals("Agricultural Officer", Fmt.role("ADMIN"), "no admin role is shown (decision 15 Nov)");
+        assertEquals("Agricultural Officer", Fmt.role("ADMIN"), "no admin role is shown");
         assertEquals("Transporter", Fmt.role("TRANSPORTER"));
         assertEquals("Rejected on delivery – returning", Fmt.orderStatus("RETURN_JOURNEY"));
         assertEquals("Buyer checking loading photos", Fmt.orderStatus("AWAITING_BUYER_LOADING_APPROVAL"));

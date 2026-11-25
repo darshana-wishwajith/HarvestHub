@@ -25,7 +25,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Figma 32: rate the buyer and the transporter after completion (workflow 5.4). Sent to the backend → trust score. */
+/** rate the buyer and the transporter after completion. Sent to the backend → trust score. */
 public class RatingFeedbackActivity extends BaseOrderActivity {
 
     private final int[] stars = {5, 5};

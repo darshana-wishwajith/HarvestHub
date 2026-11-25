@@ -5,7 +5,7 @@
  * Compatible with: mongosh, MongoDB Compass (Script / Aggregation), MongoDB Atlas
  * 
  * Usage via mongosh:
- *   mongosh "mongodb+srv://<user>:<password>@harvesthubdbcluster.pwozoql.mongodb.net/harvesthub_db" seed_harvesthub_database.js
+ *   mongosh "mongodb+srv://<user>:<password>@<cluster-host>/harvesthub_db" seed_harvesthub_database.js
  */
 
 const dbName = "harvesthub_db";

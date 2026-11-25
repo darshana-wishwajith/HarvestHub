@@ -14,8 +14,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * Buyer / farmer issues reported after handover and drivers' appeals after a delivery rejection (workflow 5.3).
- * Officers resolve or dismiss each case with a written decision; money is not changed (decision 15 Nov).
+ * Buyer / farmer issues reported after handover and drivers' appeals after a delivery rejection.
+ * Officers resolve or dismiss each case with a written decision; money is not changed.
  */
 public class DisputesPage implements Page {
 

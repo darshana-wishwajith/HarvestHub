@@ -19,9 +19,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma in-transit telemetry screen: map, remaining km, ETA and progress from GET /orders/{id}/tracking, which
- * the background GPS service feeds every 30 s (decision 15 Nov). Sensor values (temperature, humidity) are not
- * shown – no sensors in scope (decision 15 Nov).
+ * In-transit telemetry screen: map, remaining km, ETA and progress from GET /orders/{id}/tracking, which
+ * the background GPS service feeds every 30 s. Sensor values (temperature, humidity) are not
+ * shown – no sensors in scope.
  */
 public class NavigationTrackingActivity extends BaseTransporterOrderActivity {
 

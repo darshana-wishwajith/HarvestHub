@@ -17,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma buyer 6.3 "Dispute & Refund Resolution" for rejected orders (workflow 5.3):
+ * "Dispute & Refund Resolution" screen for rejected orders:
  * PRELOAD_REJECTED — 100% refund, the farmer pays the Empty Trip Fee to the transporter;
  * RETURN_JOURNEY — 100% refund, the transporter pays the crop advance and earns no delivery fee.
  * Amounts come from the buyer's real refund transactions.

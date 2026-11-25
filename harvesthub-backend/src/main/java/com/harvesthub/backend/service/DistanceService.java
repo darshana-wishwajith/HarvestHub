@@ -15,7 +15,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 /**
- * Road distance between two points: Google Maps Distance Matrix (proposal §6.8) when a key is configured,
+ * Road distance between two points: Google Maps Distance Matrix when a key is configured,
  * otherwise straight-line distance × road factor.
  */
 @Service

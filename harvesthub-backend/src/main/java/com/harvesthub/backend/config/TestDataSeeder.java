@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Repeatable TEST data for the shared Atlas database (user decision 14 Nov 2026: tagged test data, inserts only).
+ * Repeatable TEST data for the shared Atlas database.
  * Runs only with the "seedtest" profile and then exits:
  * <pre>mvnw spring-boot:run -Dspring-boot.run.profiles=seedtest -Dspring-boot.run.arguments=--server.port=0</pre>
  * - Never updates or deletes existing documents that it did not create (all users use @test.harvesthub.lk).
@@ -38,9 +38,9 @@ public class TestDataSeeder implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(TestDataSeeder.class);
     static final String FARMER_EMAIL = "nimal.farmer@test.harvesthub.lk";
     static final String BUYER_VIEW_MARKER = "farmer_kamala_test";
-    /** Created by the transporter-view phase (15 Nov); its presence means that phase already ran. */
+    /** Created by the transporter-view phase; its presence means that phase already ran. */
     static final String TRANSPORTER_VIEW_MARKER = "transporter_tharindu";
-    /** Second Agricultural Officer for the desktop portal (15 Nov) – shows the claim lock between two officers. */
+    /** Second Agricultural Officer for the desktop portal – shows the claim lock between two officers. */
     static final String OFFICER_VIEW_MARKER = "officer_nadeesha_test";
 
     private final UserRepository users;
@@ -57,7 +57,7 @@ public class TestDataSeeder implements ApplicationRunner {
     private final ConfigurableApplicationContext context;
     private final String demoPassword;
 
-    // buyer view (15 Nov)
+    // buyer view
     @org.springframework.beans.factory.annotation.Autowired
     private LogisticsRepository logisticsRecords;
     @org.springframework.beans.factory.annotation.Autowired
@@ -174,7 +174,7 @@ public class TestDataSeeder implements ApplicationRunner {
         User nimal = user("farmer_nimal_test", "Nimal Bandara", FARMER_EMAIL, "0700000301", "FARMER",
                 7.8742, 80.6511, "Kandalama Road, Dambulla");
 
-        // Listings in every My Listings state (workflow 1.4–1.5)
+        // Listings in every My Listings state
         listing(nimal, "Carrots", 300, 220, "PENDING", null, null);
         listing(nimal, "Leeks", 200, 210, "UNDER_REVIEW", null, null);
         listing(nimal, "Potatoes", 450, 190, "RETAKE_REQUESTED", null, "Close-up photo is blurry – please retake in daylight.");
@@ -182,11 +182,11 @@ public class TestDataSeeder implements ApplicationRunner {
         Listing onionsForOffer = listing(nimal, "Big Onions", 1200, 250, "ACTIVE", "A", null);
         listing(nimal, "Tomatoes", 500, 180, "ACTIVE", "B", null);
 
-        // Wanted ads (Figma 17)
+        // Wanted ads
         WantedAd onionAd = wanted(roshan, "Big Onions", "Dambulla Sector", 1000, 280, true);
         wanted(keells, "Tomatoes", "Colombo Sector", 500, 150, false);
         wanted(greenmart, "Potatoes", "Nuwara Eliya Sector", 2500, 190, false);
-        // A pending supply offer from the farmer (Figma 21)
+        // A pending supply offer from the farmer
         SupplyOffer offer = new SupplyOffer();
         offer.setId("offer_test_" + System.currentTimeMillis());
         offer.setRequestId(onionAd.getRequestId());
@@ -211,7 +211,7 @@ public class TestDataSeeder implements ApplicationRunner {
         String negotiating = runOrder(nimal, keells, "Beans", 150, 320, "NEGOTIATING", 0);
         chat(negotiating, keells, nimal);
 
-        // Ratings on the completed orders (workflow 5.4)
+        // Ratings on the completed orders
         orderService.rate(completed1, roshan.getId(), "FARMER", 5, "Grade-A onions, packed well.");
         orderService.rate(completed1, nimal.getId(), "BUYER", 5, "Paid on time.");
         orderService.rate(completed1, nimal.getId(), "TRANSPORTER", 4, "Arrived a little late.");
@@ -223,7 +223,7 @@ public class TestDataSeeder implements ApplicationRunner {
     }
 
     /**
-     * Buyer view (Figma page 413:4, 15 Nov): data for every buyer screen. New test users and documents only.
+     * Buyer view: data for every buyer screen. New test users and documents only.
      * Orders at loading approval, arrived, balance paid, rejected on delivery and completed-unrated; a wanted ad with
      * two offers and a closed one; GPS tracking points on the in-transit order; a wallet balance for wallet payments.
      */
@@ -288,13 +288,13 @@ public class TestDataSeeder implements ApplicationRunner {
     }
 
     /**
-     * Transporter view (Figma 612:58, 15 Nov). Existing seed already covers accepted, awaiting approval, in transit,
+     * Transporter view. Existing seed already covers accepted, awaiting approval, in transit,
      * arrived, balance paid, rejected-on-delivery and completed. Adds a test farmer in Bandarawela and, next to it:
      * Tharindu (history: empty trip + completed and rated, plus a pending job request to accept live),
      * Pradeep (harvest ready → pickup map), Lahiru (at the farm → photos), Mahesh (photos approved → Start Journey).
      */
     /**
-     * Desktop officer portal (15 Nov). Officers cannot self-register, so the second test officer is created here.
+     * Desktop officer portal. Officers cannot self-register, so the second test officer is created here.
      * Listings with real photos/video, decisions and disputes are created afterwards through the live HTTPS API
      * (farmer upload + officer review + dispute endpoints), so the files exist on the server.
      */

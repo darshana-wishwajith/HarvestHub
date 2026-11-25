@@ -31,7 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Common base of the buyer order-step screens (Figma buyer 4.1 – 6.3). Loads the real order by id, refreshes it
+ * Common base of the buyer order-step screens. Loads the real order by id, refreshes it
  * every 10 s while open and hands over to the matching screen when the status moves on (e.g. the driver
  * uploaded the loading photos), so the buyer always sees the current step.
  */

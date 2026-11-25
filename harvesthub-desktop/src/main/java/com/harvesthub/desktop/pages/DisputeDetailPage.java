@@ -73,7 +73,7 @@ public class DisputeDetailPage implements Page {
                         "Order status now", Fmt.orderStatus(Fmt.text(d, "orderStatus"))));
         if (appeal) {
             report.getChildren().add(Ui.banner("The buyer rejected this delivery, so the workflow refunded the buyer and charged the "
-                    + "driver for the crop (workflow 5.3). The driver says this was not their fault.", "info"));
+                    + "driver for the crop. The driver says this was not their fault.", "info"));
         }
         JsonNode photos = d.get("photoUrls");
         if (photos != null && photos.size() > 0) {

@@ -21,7 +21,7 @@ public class ListingController {
     private ListingService listingService;
 
     /**
-     * Workflow 1.2–1.4: location-locked, geotagged submission. Body must carry gpsLatitude/gpsLongitude
+     *location-locked, geotagged submission. Body must carry gpsLatitude/gpsLongitude
      * (device position at capture) and mediaUrls [wide photo, close-up photo, 10 s video] from /media/upload.
      */
     @PostMapping("/create")
@@ -37,7 +37,7 @@ public class ListingController {
         return ResponseEntity.ok(listingService.submitListing(capture, currentUser.id(), id));
     }
 
-    /** Location-Lock screen (Figma 12): is the device at the registered farm? */
+    /** Location-Lock screen: is the device at the registered farm? */
     @GetMapping("/location-check")
     public ResponseEntity<Map<String, Object>> locationCheck(@RequestParam double lat, @RequestParam double lng) {
         currentUser.requireRole("FARMER");

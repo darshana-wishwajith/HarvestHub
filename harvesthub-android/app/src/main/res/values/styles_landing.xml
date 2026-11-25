@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Role cards on the landing screen (Figma node 125:900). Selected state comes from
+<!-- Role cards on the landing screen. Selected state comes from
      MaterialCardView.setChecked (stroke) + setSelected (propagates to children). -->
 <resources>
 

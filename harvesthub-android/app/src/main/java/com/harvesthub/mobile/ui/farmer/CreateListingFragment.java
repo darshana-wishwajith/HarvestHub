@@ -38,7 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma 14 "Listing Details &amp; Submission" (workflow 1.4). Reached only after the location lock
+ * "Listing Details &amp; Submission" screen. Reached only after the location lock
  * and the guided capture; sends crop, Estimated Total Yield and expected price together with the
  * captured media and GPS. Without a capture it starts the capture flow first.
  */
@@ -64,7 +64,7 @@ public class CreateListingFragment extends Fragment {
         Bundle args = getArguments();
         media = args == null ? null : args.getStringArrayList(MainActivity.EXTRA_CAPTURED_MEDIA);
         if (media == null || media.size() < 3) {
-            // workflow 1.2: every listing starts with the location lock + guided camera
+            //every listing starts with the location lock + guided camera
             startActivity(new Intent(requireContext(), LocationVerificationActivity.class));
             getParentFragmentManager().popBackStack();
             return binding.getRoot();
@@ -140,7 +140,7 @@ public class CreateListingFragment extends Fragment {
         });
     }
 
-    /** "Can't find your harvest? Add New" — saved as a pending crop, reviewed with the listing (user decision 14 Nov). */
+    /** "Can't find your harvest? Add New" — saved as a pending crop, reviewed with the listing. */
     private void showAddNewCropDialog() {
         final EditText input = new EditText(requireContext());
         input.setHint("Crop name, e.g. Red Onions");

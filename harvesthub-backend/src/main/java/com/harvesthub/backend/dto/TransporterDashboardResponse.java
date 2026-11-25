@@ -5,13 +5,13 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Figma transporter Home + History header: availability, vehicle, wallet, earnings, jobs. All amounts in LKR. */
+/** Transporter Home + History header: availability, vehicle, wallet, earnings, jobs. All amounts in LKR. */
 @Data
 public class TransporterDashboardResponse {
     private String fullName;
     private boolean online;          // driver's switch
     private boolean busy;            // has an active job
-    private boolean suspended;       // negative wallet (workflow 5.3)
+    private boolean suspended;       // negative wallet
     private double amountOwed;       // > 0 when suspended
 
     private String vehicleType;

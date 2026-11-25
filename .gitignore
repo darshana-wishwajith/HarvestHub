@@ -1,29 +1,56 @@
-.github/
-.idea/
-.vscode/
-mongo-init/
-out/
-deploy2.ps1
-# --- Secrets & local config (never commit) ---
+# ---------------------------------------------------------------
+# Secrets and machine-specific configuration (never commit)
+# ---------------------------------------------------------------
 *.pem
+*.key
 *.jks
 *.keystore
+*.p12
 .env
 .env.*
 application-local.properties
-harvesthub-backend/uploads/
+local.properties
 
-# --- JVM crash dumps ---
+# ---------------------------------------------------------------
+# Build output
+# ---------------------------------------------------------------
+target/
+build/
+out/
+dist/
+.gradle/
+*.class
+*.apk
+*.aab
+
+# ---------------------------------------------------------------
+# Runtime data
+# ---------------------------------------------------------------
+harvesthub-backend/uploads/
+backups/
+website/downloads/
+
+# ---------------------------------------------------------------
+# Logs and JVM crash dumps
+# ---------------------------------------------------------------
+*.log
 hs_err_pid*.log
 replay_pid*.log
 
-# Local Atlas backups (contain password hashes) - never commit
-backups/
-*.log
-CLAUDE.md
-DEVELOPMENT_STATUS.md
-docs/
-.claude/
+# ---------------------------------------------------------------
+# IDE and OS files
+# ---------------------------------------------------------------
 .idea/
 .vscode/
-website/downloads/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------
+# Documentation: only the images used by README.md are tracked.
+# Reports, proposal and design files stay local.
+# ---------------------------------------------------------------
+docs/*
+!docs/images/

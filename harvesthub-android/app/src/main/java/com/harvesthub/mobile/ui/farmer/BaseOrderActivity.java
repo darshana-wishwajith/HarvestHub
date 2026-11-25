@@ -31,7 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Common base of the farmer order-step screens (Figma 22, 26–32). Loads the real order by id,
+ * Common base of the farmer order-step screens. Loads the real order by id,
  * refreshes it every 10 s while open, and hands over to the matching screen when the status moves on
  * (e.g. the buyer paid, the driver accepted) — so the farmer always sees the current step.
  */

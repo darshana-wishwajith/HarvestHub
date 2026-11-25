@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Spring MVC's own routing / binding errors (unknown URL, wrong HTTP method, missing or badly typed parameter,
-     * unsupported media type) are the caller's mistake: answer with their 4xx status, not 500 (BUG-18, 15 Nov).
+     * unsupported media type) are the caller's mistake: answer with their 4xx status, not 500.
      */
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class,
             HttpMediaTypeNotSupportedException.class, HttpMediaTypeNotAcceptableException.class, ServletRequestBindingException.class,

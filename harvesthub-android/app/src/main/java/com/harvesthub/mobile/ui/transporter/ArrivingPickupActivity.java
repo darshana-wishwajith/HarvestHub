@@ -16,8 +16,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Pickup Route Map". After accepting, the farmer harvests; when they tap Harvest Ready the driver gets the
- * pickup pin (workflow 4.1) and can confirm arrival. Turn-by-turn directions open in Google Maps.
+ * "Pickup Route Map" screen. After accepting, the farmer harvests; when they tap Harvest Ready the driver gets the
+ * pickup pin and can confirm arrival. Turn-by-turn directions open in Google Maps.
  */
 public class ArrivingPickupActivity extends BaseTransporterOrderActivity {
 

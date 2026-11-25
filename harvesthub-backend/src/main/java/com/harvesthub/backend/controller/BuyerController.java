@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/** Buyer-only endpoints (Figma buyer view, 15 Nov). */
+/** Buyer-only endpoints. */
 @RestController
 public class BuyerController {
 
@@ -32,7 +32,7 @@ public class BuyerController {
     }
 
     /**
-     * Buyer delivery location (Figma buyer 1.2 map, editable in Profile). body {"latitude", "longitude", "address"}.
+     * Buyer delivery location. body {"latitude", "longitude", "address"}.
      * Farmers keep using their registered farm location (listing location lock), so this is buyer-only.
      */
     @PutMapping("/api/me/delivery-location")

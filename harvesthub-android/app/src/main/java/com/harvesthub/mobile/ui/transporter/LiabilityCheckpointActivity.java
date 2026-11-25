@@ -33,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Figma "Arrived at Farm" – pre-loading sequence (workflow 4.2, decision 15 Nov: 2–4 photos). Photos are taken
+ * "Arrived at Farm" screen – pre-loading sequence. Photos are taken
  * with the in-app evidence camera (GPS + time stamped), uploaded, and submitted for the buyer's approval.
  */
 public class LiabilityCheckpointActivity extends BaseTransporterOrderActivity {

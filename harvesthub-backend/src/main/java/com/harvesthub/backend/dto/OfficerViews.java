@@ -5,7 +5,7 @@ import com.harvesthub.backend.model.Order;
 import java.util.List;
 
 /**
- * Response shapes for the Agricultural Officer desktop portal (decision 15 Nov: only four roles,
+ * Response shapes for the Agricultural Officer desktop portal (only four roles,
  * officers also monitor users, orders and disputes). Values the database does not have stay null –
  * the portal shows "Not recorded" instead of invented numbers.
  */

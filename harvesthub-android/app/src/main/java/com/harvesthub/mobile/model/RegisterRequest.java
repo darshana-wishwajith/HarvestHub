@@ -25,7 +25,7 @@ public class RegisterRequest implements Parcelable {
 
     @SerializedName("farmLocation")
     private FarmLocation farmLocation;
-    // transporter sign-up (Figma "Vehicle Profile")
+    // transporter sign-up
     private String vehicleType;
     private String vehiclePlate;
     private Double vehicleCapacityKg;

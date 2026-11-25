@@ -12,7 +12,7 @@ import com.harvesthub.mobile.model.Order;
 import java.util.Locale;
 
 /**
- * Figma "Arrived at destination" (buyer inspecting) and "2-Way Verification Handshake" (workflow 5.1–5.2):
+ * "Arrived at destination" screen (buyer inspecting) and "2-Way Verification Handshake":
  * ARRIVED_AT_DESTINATION → wait for the buyer to accept (pays 80%) or reject;
  * BALANCE_PAID / DELIVERED → driver taps Delivery Completed; buyer taps Goods Received; both → COMPLETED.
  */

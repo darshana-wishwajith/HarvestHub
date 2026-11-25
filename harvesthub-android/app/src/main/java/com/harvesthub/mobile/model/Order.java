@@ -103,7 +103,7 @@ public class Order {
     public void setEscrowStatus(String escrowStatus) { this.escrowStatus = escrowStatus; }
     public String getTransporterId() { return transporterId; }
 
-    /** Drivers an open job request was broadcast to (decision 18 Nov: first to accept wins). */
+    /** Drivers an open job request was broadcast to. */
     private java.util.List<String> offeredTransporterIds;
 
     /** True when this driver owns the job, or the open request was sent to them. */
@@ -135,7 +135,7 @@ public class Order {
     private String dropAddress;
     private java.util.List<String> ratedBy;
     private java.util.List<StatusChange> statusHistory;
-    // buyer flow (15 Nov)
+    // buyer flow
     private String advancePaymentMethod;
     private String balancePaymentMethod;
     private java.util.List<String> loadingEvidenceUrls;
@@ -148,7 +148,7 @@ public class Order {
     private String supplyOfferId;
     private String wantedAdId;
     private java.util.List<TransportEvent> transportEvents;
-    // transporter flow (15 Nov)
+    // transporter flow
     private Long transportRequestExpiresAt;   // epoch ms, pending job request
     private String goodsReturnedAt;
     public Long getTransportRequestExpiresAt() { return transportRequestExpiresAt; }

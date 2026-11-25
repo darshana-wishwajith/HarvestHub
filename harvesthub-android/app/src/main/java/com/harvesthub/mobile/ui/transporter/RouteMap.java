@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * OpenStreetMap (osmdroid) in the scaffold's map area (Figma "Pickup Route Map", in-transit map), with a
+ * OpenStreetMap (osmdroid) in the scaffold's map area, with a
  * floating info chip. Turn-by-turn directions open in Google Maps.
  */
 final class RouteMap {
@@ -66,7 +66,7 @@ final class RouteMap {
         map.getController().setZoom(8.0);
         map.getController().setCenter(new GeoPoint(7.8731, 80.7718));
 
-        // floating "18 min (12.4 km)" chip, bottom-left (Figma)
+        // floating "18 min (12.4 km)" chip, bottom-left
         LinearLayout c = new LinearLayout(activity);
         c.setOrientation(LinearLayout.VERTICAL);
         c.setBackground(TUi.round(Color.WHITE, TUi.dp(activity, 12)));

@@ -98,7 +98,7 @@ public class UserDetailPage implements Page {
                     "Penalties paid", Fmt.money(Fmt.num(d, "walletPenalties"))));
             if (Fmt.bool(u, "walletSuspended")) {
                 numbers.getChildren().add(Ui.banner("The wallet is negative (Empty Trip Fee or damage charge), so the app blocks new "
-                        + ("TRANSPORTER".equals(role) ? "jobs" : "listings") + " until it is paid back (workflow 5.3).", "warn"));
+                        + ("TRANSPORTER".equals(role) ? "jobs" : "listings") + " until it is paid back.", "warn"));
             }
         }
 
